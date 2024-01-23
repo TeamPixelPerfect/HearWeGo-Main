@@ -13,7 +13,7 @@ export const appSlice = createSlice({
     reducers: {
         setApp: (state, action: PayloadAction<AppItem>) => {
             return {...action.payload};
-        }
+        },
     }
 });
 

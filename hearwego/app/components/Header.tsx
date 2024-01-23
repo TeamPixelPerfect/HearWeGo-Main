@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersistentDrawerLeft from "./MobileDrawer";
+import { HeaderContainer } from "../styles/header.styles";
 
 interface Props {
   app: AppItem;
@@ -32,22 +33,7 @@ const Header = ({ app }: Props) => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        bgcolor: `${pathName === "/" ? "transparent" : "#000"}`,
-        color: "#fff",
-        maxHeight: "60px",
-        display: "flex",
-        alignItems: "center",
-        padding: "1em 2em",
-        zIndex: 100,
-      }}
-      style={
-        matches
-          ? { justifyContent: "flex-start" }
-          : { justifyContent: "space-between", padding: "2em 1em"}
-      }
-    >
+    <HeaderContainer pathName={pathName}>
       <Box>
         {!matches ? (
           <PersistentDrawerLeft
@@ -90,7 +76,7 @@ const Header = ({ app }: Props) => {
           </IconButton>
         )}
       </Box>
-    </Box>
+    </HeaderContainer>
   );
 };
 
