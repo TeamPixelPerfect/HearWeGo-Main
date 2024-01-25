@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
-import Box from "@mui/material/Box";
 import { useAppSelector } from "@/lib/hooks";
-import Stack from "@mui/material/Stack";
 import { useMediaQuery } from "@mui/material";
 import {
   HomeBanner,
@@ -11,12 +9,15 @@ import {
   HomeTagline,
   HomeTagline2,
   HomeTaglineContainer,
+  HomeServicesContainer,
+  HomeServiceItemOdd,
+  HomeServiceItemEven,
 } from "./styles/home.styles";
+import { serviceItem } from "./constants/models";
 
 const Home = () => {
   const app = useAppSelector((state) => state.app);
-  const matches = useMediaQuery("(min-width:960px)");
-
+  const matches = useMediaQuery("(max-width:960px)");
   return (
     <>
       <HomeBanner imgs={app?.banner_imgs}>
@@ -40,6 +41,61 @@ const Home = () => {
           </HomeBannerButton>
         </HomeBannerButtonContainer>
       </HomeBanner>
+      <HomeServicesContainer>
+        {app.service_items
+          ? app.service_items.map((item: serviceItem, index: number) => {
+              if (index % 2 === 0) {
+                return (
+                  <HomeServiceItemOdd key={item._id} service={item}>
+                    <div>
+                      <h2>{item.title}</h2>
+                      <p>{item.description}</p>
+                      {!matches && (
+                        <HomeBannerButton sx={{ backgroundColor: "#6B21A8" }}>
+                          <span>Explore</span>
+                        </HomeBannerButton>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        backgroundImage: `url(${item.img_url})`,
+                      }}
+                    ></div>
+                    {matches && (
+                      <HomeBannerButton sx={{ backgroundColor: "#6B21A8", order: 2, marginLeft:0 }}>
+                        <span>Explore</span>
+                      </HomeBannerButton>
+                    )}
+                  </HomeServiceItemOdd>
+                );
+              } else {
+                return (
+                  <HomeServiceItemEven key={item._id} service={item}>
+                    <div
+                      style={{
+                        backgroundImage: `url(${item.img_url})`,
+                      }}
+                    ></div>
+                    <div>
+                      <h2>{item.title}</h2>
+                      <p>{item.description}</p>
+                      {!matches && (
+                        <HomeBannerButton sx={{ backgroundColor: "#6B21A8" }}>
+                          <span>Explore</span>
+                        </HomeBannerButton>
+                      )}
+                    </div>
+                    {matches && (
+                      <HomeBannerButton sx={{ backgroundColor: "#6B21A8", order:2, marginLeft:0 }}>
+                        <span>Explore</span>
+                      </HomeBannerButton>
+                    )}
+                  </HomeServiceItemEven>
+                );
+              }
+            })
+          : "Loading..."}
+      </HomeServicesContainer>
     </>
   );
 };

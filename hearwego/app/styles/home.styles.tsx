@@ -1,5 +1,6 @@
-import { Padding } from "@mui/icons-material";
+import { Height, Padding } from "@mui/icons-material";
 import { styled } from "@mui/material";
+import { serviceItem } from "../constants/models";
 
 export const HomeBanner = styled("div", {
   shouldForwardProp: (prop) => prop !== "imgs",
@@ -13,14 +14,16 @@ export const HomeBanner = styled("div", {
   })`,
   backgroundSize: "cover",
   backgroundPosition: "center center",
-  position: "absolute",
+  position: "relative",
+  float: "left",
   top: 0,
-  zIndex: -1,
+  marginTop: "-80px",
   '@media (max-width:960px)': {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    marginTop:"-80px"
   }
 }));
 
@@ -116,3 +119,112 @@ export const HomeBannerButton = styled("button")(({ theme }) => ({
         right: 0,
     },
 }));
+
+export const HomeServicesContainer = styled("div", {
+  shouldForwardProp: (prop) => prop !== "services",
+})<{ services?: serviceItem }>(({ services }) => ({
+  width: "70%",
+  margin:"auto",
+}));
+
+export const HomeServiceItemOdd = styled("div", {
+  shouldForwardProp: (prop) => prop !== "services",
+})<{ service?: serviceItem }>(({ service }) => ({
+  width: "100%",
+  // height: "300px",
+  display: "flex",
+  padding: "32px 0",
+  gap: "30px",
+  'h2': {
+    color: "#4B4B4B",
+    fontWeight: 700,
+    textAlign:"right",
+    margin:0,
+    marginBottom:"8px",
+    fontSize: "48px",
+   
+  },
+  'p': {
+    textAlign: "right",
+    color: "#787878",
+  },
+  'div': {
+    width: "50%",
+    backgroundSize: "cover",
+    backgroundPosition: "center center",
+    display:"flex",
+    flexDirection:"column",
+    alignItems:"flex-end"
+  },
+  '@media (max-width: 960px)': {
+    flexDirection: "column",
+    gap:"10px",
+    'p, h2' :{
+      textAlign: "left"
+    },
+    'div': {
+      width: "inherit",
+      alignItems: "flex-start",
+    },
+    'div:nth-child(1)': {
+      height: "fit-content",
+      order:0
+    },
+    'div:nth-child(2)': {
+      minHeight: "270px",
+      order:1
+    }
+  }
+}));
+
+export const HomeServiceItemEven = styled("div", {
+  shouldForwardProp: (prop) => prop !== "services",
+})<{ service?: serviceItem }>(({ service }) => ({
+  width: "100%",
+  // height: "300px",
+  display: "flex",
+  padding: "32px 0",
+  gap: "30px",
+  'h2': {
+    color: "#4B4B4B",
+    fontWeight: 700,
+    textAlign:"left",
+    margin:0,
+    marginBottom:"8px",
+    fontSize: "48px",
+   
+  },
+  'p': {
+    textAlign: "left",
+    color: "#787878",
+  },
+  'div': {
+    width: "50%",
+    backgroundSize: "cover",
+    backgroundPosition: "center center",
+    display:"flex",
+    flexDirection:"column",
+    alignItems:"flex-start"
+  },
+  '@media (max-width: 960px)': {
+    flexDirection: "column",
+    gap: "10px",
+    'p, h2' :{
+      textAlign: "left"
+    },
+    'div': {
+      width: "inherit",
+      minHeight: "300px",
+      alignItems: "flex-start",
+    },
+    'div:nth-child(1)': {
+      minHeight: "270px",
+      order:1
+    },
+    'div:nth-child(2)': {
+      height: "fit-content",
+      order:0
+    }
+  }
+}));
+

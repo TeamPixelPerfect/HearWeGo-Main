@@ -1,11 +1,11 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { AppItem } from "../constants/models";
 import Logo from "../components/Logo";
 import Navigation from "../components/Navigation";
 import { base_url } from "../constants/keys";
-import { IconButton, Button, Stack } from "@mui/material";
+import { IconButton, Button, Stack, PaletteMode } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import { useAppDispatch } from "@/lib/hooks";
@@ -15,6 +15,10 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersistentDrawerLeft from "./MobileDrawer";
 import { HeaderContainer } from "../styles/header.styles";
+import { ColorModeContext } from "../styles/CustomeTheme";
+import { useTheme } from "@mui/material/styles";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 interface Props {
   app: AppItem;
@@ -27,6 +31,9 @@ const Header = ({ app }: Props) => {
   const matches = useMediaQuery("(min-width:960px)");
 
   const [open, setOpen] = useState(false);
+
+  const theme = useTheme();
+  const colorMode = useContext(ColorModeContext);
 
   useEffect(() => {
     dispatch(setApp(app));
@@ -49,6 +56,17 @@ const Header = ({ app }: Props) => {
         {matches ? (
           <Box>
             <IconButton
+              sx={{ ml: 1 }}
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+            >
+              {theme.palette.mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </IconButton>
+            <IconButton
               aria-label="user-profile"
               size="large"
               style={{ margin: "0 16px" }}
@@ -66,14 +84,27 @@ const Header = ({ app }: Props) => {
             </Button>
           </Box>
         ) : (
-          <IconButton
-            aria-label="main-menu"
-            size="large"
-            sx={{ padding: "0", margin: "0", marginRight: "8px" }}
-            onClick={() => setOpen(true)}
-          >
-            <MenuIcon sx={{ color: "#fff" }} fontSize="large" />
-          </IconButton>
+          <>
+            <IconButton
+              sx={{ ml: 1 }}
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+            >
+              {theme.palette.mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </IconButton>
+            <IconButton
+              aria-label="main-menu"
+              size="large"
+              sx={{ padding: "0", margin: "0", marginRight: "8px" }}
+              onClick={() => setOpen(true)}
+            >
+              <MenuIcon sx={{ color: "#fff" }} fontSize="large" />
+            </IconButton>
+          </>
         )}
       </Box>
     </HeaderContainer>
