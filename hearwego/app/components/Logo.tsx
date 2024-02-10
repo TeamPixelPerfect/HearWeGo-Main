@@ -11,7 +11,7 @@ const Logo = ({img_url}: Props) => {
 
   return (
     <Box sx={{padding: 0}}>
-        {matches ? img_url ? <img src={img_url} alt='logo' width={200}/>: null :
+        {matches ? img_url ? <img src={img_url} alt='logo' width={180}/>: null :
         img_url ? <img src={img_url} alt='logo' width={150}/> : null}
     </Box>
   )
