@@ -5,7 +5,7 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
   ".ad-left": {
-    width: "20%",
+    width: "21%",
     height: "100vh",
     background: "#F3E8FF",
     // position: "fixed",

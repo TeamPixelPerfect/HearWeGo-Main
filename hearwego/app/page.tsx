@@ -15,6 +15,7 @@ import {
 } from "./styles/home.styles";
 import { serviceItem } from "./constants/models";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 const Home = () => {
   const app = useAppSelector((state) => state.app);
@@ -98,6 +99,7 @@ const Home = () => {
             })
           : "Loading..."}
       </HomeServicesContainer>
+      <Footer />
     </>
   );
 };
