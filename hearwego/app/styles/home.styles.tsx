@@ -70,7 +70,7 @@ export const HomeTagline2 = styled("div")(({ theme }) => ({
 }));
 
 export const HomeBannerButtonContainer = styled("div")(({ theme }) => ({
-  zIndex: 100,
+  zIndex: 1,
   marginLeft: 4,
   display: "flex",
   gap: 10,
