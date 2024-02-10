@@ -14,4 +14,5 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
     width: "100%",
     // background: "blue"
   },
+  
 }));
