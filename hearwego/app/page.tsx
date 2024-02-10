@@ -14,12 +14,14 @@ import {
   HomeServiceItemEven,
 } from "./styles/home.styles";
 import { serviceItem } from "./constants/models";
+import Header from "./components/Header";
 
 const Home = () => {
   const app = useAppSelector((state) => state.app);
   const matches = useMediaQuery("(max-width:960px)");
   return (
     <>
+      <Header app={app} />
       <HomeBanner imgs={app?.banner_imgs}>
         <HomeTaglineContainer>
           <HomeTagline>Music For Living,</HomeTagline>

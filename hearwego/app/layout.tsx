@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { Inter, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import "./globals.css";
 import Header from "./components/Header";
-import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import StoreProvider from "./StoreProvider";
+import Wrapper from "./components/Wrapper";
 import { AppItem } from "./constants/models";
 import { base_url } from "./constants/keys";
-import { hearWeGoDarkTheme, hearWeGoTheme } from "./styles/theme";
-import { CssBaseline, PaletteMode, createTheme, useMediaQuery } from "@mui/material";
 import React from "react";
 import CustomeThemeProvider from "./styles/CustomeTheme";
 
-const roboto = Roboto({ weight: ['100', '300', '400', '500', '700', '900'], subsets: ["latin"] });
+const roboto = Roboto({
+  weight: ["100", "300", "400", "500", "700", "900"],
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,14 +30,13 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <CustomeThemeProvider>
+        <CustomeThemeProvider>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <StoreProvider>
-              <Header app={app}/>
-              {children}
+              <Wrapper app={app} children={children}/>
             </StoreProvider>
-          </CustomeThemeProvider>
-        </AppRouterCacheProvider>
+          </AppRouterCacheProvider>
+        </CustomeThemeProvider>
       </body>
     </html>
   );
