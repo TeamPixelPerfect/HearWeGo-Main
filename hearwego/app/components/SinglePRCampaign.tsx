@@ -1,51 +1,102 @@
-import React from "react";
+"use client";
+import * as React from "react";
 import {
   SingleCampaign,
   CampaignMedia,
   CampaignContent,
 } from "../styles/pressRelease.style";
+// import SwipeableViews from 'react-swipeable-views';
+import { useTheme } from '@mui/material/styles';
 import Button from "@mui/material/Button";
+import AppBar from '@mui/material/AppBar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import Box from "@mui/material/Box";
 import LinearProgress, {
   LinearProgressProps,
 } from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 
-export default function SinglePRCampaign() {
-  const [progress, setProgress] = React.useState(10);
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) =>
-        prevProgress >= 100 ? 10 : prevProgress + 10
-      );
-    }, 800);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-  return (
-    <Box>
-      <SingleCampaign>
-        <CampaignMedia
-          image={
-            "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/classic-song-mixtape-album-cover-template-design-3ba3255137894fac49ae81b1346b289e_screen.jpg?ts=1635384548"
-          }
-        />
-        <CampaignContent>
-          <h2> Classic Song Mixtape</h2>
-          <p> Classic Song Mixtape Album Cover Template Design</p>
-          <Box sx={{ width: "100%" }}>
-            <LinearProgressWithLabel value={progress} />
+interface TabPanelProps {
+    children?: React.ReactNode;
+    dir?: string;
+    index: number;
+    value: number;
+  }
+  
+  function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            <Typography>{children}</Typography>
           </Box>
-          <Button variant="contained" sx={{ width: "140px" }}>
-            See More
-          </Button>
-        </CampaignContent>
-      </SingleCampaign>
-    </Box>
-  );
-}
+        )}
+      </div>
+    );
+  }
+  
+  function a11yProps(index: number) {
+    return {
+      id: `full-width-tab-${index}`,
+      'aria-controls': `full-width-tabpanel-${index}`,
+    };
+  }
+  
+  export default function FullWidthTabs() {
+    const theme = useTheme();
+    const [value, setValue] = React.useState(0);
+  
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+      setValue(newValue);
+    };
+  
+    const handleChangeIndex = (index: number) => {
+      setValue(index);
+    };
+  
+    return (
+      <Box sx={{ bgcolor: 'background.paper', width: 500 }}>
+        <AppBar position="static">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="secondary"
+            textColor="inherit"
+            variant="fullWidth"
+            aria-label="full width tabs example"
+          >
+            <Tab label="Item One" {...a11yProps(0)} />
+            <Tab label="Item Two" {...a11yProps(1)} />
+            <Tab label="Item Three" {...a11yProps(2)} />
+          </Tabs>
+        </AppBar>
+        <SwipeableViews
+          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+          index={value}
+          onChangeIndex={handleChangeIndex}
+        >
+          <TabPanel value={value} index={0} dir={theme.direction}>
+            Item One
+          </TabPanel>
+          <TabPanel value={value} index={1} dir={theme.direction}>
+            Item Two
+          </TabPanel>
+          <TabPanel value={value} index={2} dir={theme.direction}>
+            Item Three
+          </TabPanel>
+        </SwipeableViews>
+      </Box>
+    );
+  }
 function LinearProgressWithLabel(
   props: LinearProgressProps & { value: number }
 ) {
