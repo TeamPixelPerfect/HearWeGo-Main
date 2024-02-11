@@ -166,7 +166,7 @@ export default function CustomizedInputBase() {
     <Card
       sx={{
         maxWidth: 1000,
-        marginTop: 5,
+        marginTop: 2,
         marginLeft: 15,
         boxShadow: "0 0 20px 0 rgba(0,0,0,0.12)",
         transition: "0.3s",
@@ -231,13 +231,16 @@ export default function CustomizedInputBase() {
 
       <CardMedia
         image={
-          "https://images.unsplash.com/photo-1517147177326-b37599372b73?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2229&q=80"
+          "https://weezevent.com/wp-content/uploads/2018/08/27184514/organiser-un-concert-en-7-etapes.jpg"
         }
         sx={{
           width: "100%",
+          height: 50,
           marginTop: 1,
+          paddingLeft:5,
+          paddingRight:5,
           paddingBottom: "56.25%",
-          clipPath: "polygon(0 0, 100% 0%, 100% 84%, 0% 100%)",
+          clpPath: "polygon(0 0, 100% 0%, 100% 84%, 0% 100%)",
           backgroundColor: "rgba(0, 0, 0, 0.08)",
         }}
       />
