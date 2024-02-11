@@ -18,12 +18,8 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
-import Fab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import Avatar from "@mui/material/Avatar";
-import Card from "@mui/material/Card";
-import Slider, { sliderClasses } from "@mui/material/Slider";
 
 const ArtistDashboardHeader = () => {
   return (
