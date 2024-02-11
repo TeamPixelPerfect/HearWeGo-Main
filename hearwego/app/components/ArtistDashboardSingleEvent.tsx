@@ -2,15 +2,8 @@
 
 import * as React from "react";
 
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import CallMissedIcon from "@mui/icons-material/CallMissed";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import PeopleIcon from "@mui/icons-material/People";
+
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -27,11 +20,6 @@ import PaidIcon from "@mui/icons-material/Paid";
 
 
 import {
-  EventMainBox,
-  TopBar,
-  TabBar,
-  BtnSec,
-  EventSec,
   EventDetailRow,
 } from "../styles/artistDashboardEventsPage.styles";
 

@@ -10,19 +10,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import { CardActionArea, CardActions } from "@mui/material";
-import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
-import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import PaidIcon from "@mui/icons-material/Paid";
+
 
 import ArtistSingleEvent from '../../components/ArtistDashboardSingleEvent'
 
@@ -33,7 +21,6 @@ import {
   TabBar,
   BtnSec,
   EventSec,
-  EventDetailRow,
 } from "../../styles/artistDashboardEventsPage.styles";
 
 export default function ArtistEvents() {
