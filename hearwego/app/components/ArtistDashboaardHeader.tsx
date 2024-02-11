@@ -1,45 +1,80 @@
+"use client";
 import Link from "next/link";
 import react from "react";
+import {
+  HeaderBox,
+  SearchArea,
+  HitPredictorIco,
+  HitPredictorBtn,
+  ProfileArea,
+  ProfileDetailArea,
+  ArtistDetail,
+  ArtistName,
+  ArtistGenre
+} from "../styles/artistDashboardHeader.styles";
 
-import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import DirectionsIcon from '@mui/icons-material/Directions';
+import SearchIcon from "@mui/icons-material/Search";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import InputBase from "@mui/material/InputBase";
+import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
+import CellTowerIcon from "@mui/icons-material/CellTower";
+import Avatar from "@mui/material/Avatar";
+import Card from "@mui/material/Card";
+import Slider, { sliderClasses } from "@mui/material/Slider";
 
 const ArtistDashboardHeader = () => {
   return (
-    <div
-      style={{
-        display: "flex",
-        padding: "1em",
-        backgroundColor: "#000",
-        width: "100%",
-      }}
-    >
-      <Paper
-        component="form"
-        sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: 400 }}
-      >
-        <IconButton sx={{ p: "10px" }} aria-label="menu">
-          <MenuIcon />
-        </IconButton>
-        <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Search Google Maps"
-          inputProps={{ "aria-label": "search google maps" }}
-        />
-        <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
-          <SearchIcon />
-        </IconButton>
-        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-        <IconButton color="primary" sx={{ p: "10px" }} aria-label="directions">
-          <DirectionsIcon />
-        </IconButton>
-      </Paper>
-    </div>
+    <HeaderBox>
+      <SearchArea>
+        <Paper
+          component="form"
+          sx={{
+            p: "5px 10px",
+            display: "flex",
+            alignItems: "center",
+            width: "50%",
+            height: "50%",
+            border: '1px solid #969696',
+            borderRadius: '50px'
+          }}
+        >
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Search"
+            inputProps={{ "aria-label": "search google maps" }}
+          />
+          <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+            <SearchIcon />
+          </IconButton>
+        </Paper>
+      </SearchArea>
+
+      <HitPredictorIco>
+        <Box sx={{ "& > :not(style)": { m: 1 } }}>
+          <HitPredictorBtn color="secondary" aria-label="add">
+            <CellTowerIcon />
+          </HitPredictorBtn>
+        </Box>
+      </HitPredictorIco>
+
+      <ProfileArea>
+        <ProfileDetailArea elevation={0}>
+          <Avatar src={"https://i.pravatar.cc/300"} />
+          <ArtistDetail>
+            <ArtistName>
+              The Rembrandts
+            </ArtistName>
+            <ArtistGenre>
+              Rock | Dance
+            </ArtistGenre>
+            
+          </ArtistDetail>
+        </ProfileDetailArea>
+      </ProfileArea>
+    </HeaderBox>
   );
 };
 
