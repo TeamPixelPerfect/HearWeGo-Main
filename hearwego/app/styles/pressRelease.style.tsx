@@ -50,21 +50,19 @@ export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   width: "495px",
-  borderRadius: theme.spacing(2),
   transition: "0.3s",
   position: "relative",
   overflow: "initial",
   marginLeft: "20px ",
   padding: "10px",
   marginBottom: "10px",
-  backgroundColor: "#8D59CE",
+  backgroundColor:theme.palette.primary.main,
 }));
 
 export const CampaignMedia = muiStyled(CardMedia)(({ theme }) => ({
   width: "60%", // Adjust this width as needed
   height: "300px",
   objectFit: "cover",
-  borderRadius: theme.spacing(2),
   backgroundColor: "black",
 }));
 
@@ -72,17 +70,24 @@ export const CampaignContent = muiStyled(CardContent)(({ theme }) => ({
   width: "50%",
   padding: "16px",
   textAlign: "center",
-  backgroundColor: "#C084FC",
-  borderRadius: theme.spacing(2),
+  backgroundColor: theme.palette.background.default,
 }));
 
-export const CreateCampaignPopup = styled("div")(({ }) => ({
+export const CreateCampaignPopup = styled("div")(({ theme }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
-  height: 400,
+  width: "20%",
+  height: "20%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: "white",
+  backgroundColor: theme.palette.background.default,
+  borderRadius: "10px",
+}));
+
+export const NameBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  backgroundColor: "#7e22ce",
+  textAlign: "center",
+  color:theme.palette.text.primary,
 }));

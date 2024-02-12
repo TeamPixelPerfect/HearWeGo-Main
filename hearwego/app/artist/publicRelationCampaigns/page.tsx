@@ -1,6 +1,12 @@
 "use client";
 import React from "react";
-import { BorderBox, TabItem, TabsNav,CreateCampaignPopup} from "../../styles/pressRelease.style";
+import {
+  BorderBox,
+  TabItem,
+  TabsNav,
+  CreateCampaignPopup,
+  NameBox,
+} from "../../styles/pressRelease.style";
 import SinglePRCampaign from "../../components/SinglePRCampaign";
 import Button from "@mui/material/Button";
 import EditNoteIcon from "@mui/icons-material/EditNote";
@@ -42,9 +48,13 @@ export default function Context() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-           <CreateCampaignPopup>
-            
-           </CreateCampaignPopup>
+            <CreateCampaignPopup>
+              <NameBox>
+                <Typography variant="h6" component="h2">
+                  Create Campaign
+                </Typography>
+                </NameBox>
+            </CreateCampaignPopup>
           </Modal>
           <Button
             variant="contained"
