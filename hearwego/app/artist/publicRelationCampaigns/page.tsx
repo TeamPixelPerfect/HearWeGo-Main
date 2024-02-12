@@ -1,16 +1,19 @@
 "use client";
 import React from "react";
-import { BorderBox, TabItem, TabsNav } from "../../styles/pressRelease.style";
+import { BorderBox, TabItem, TabsNav,CreateCampaignPopup} from "../../styles/pressRelease.style";
 import SinglePRCampaign from "../../components/SinglePRCampaign";
 import Button from "@mui/material/Button";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-
-
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
 export default function Context() {
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   return (
     <BorderBox>
       <Box sx={{ display: "flex", backgroundColor: "", padding: "10px" }}>
@@ -26,12 +29,23 @@ export default function Context() {
         </TabsNav>
         <Stack direction="row" spacing={4} sx={{ padding: "5px 20px" }}>
           <Button
+            onClick={handleOpen}
             variant="contained"
             startIcon={<EditNoteIcon />}
-            sx={{ width: "180px" }}
+            sx={{ width: "190px" }}
           >
-            Create Event
+            Create Campaign
           </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+           <CreateCampaignPopup>
+            
+           </CreateCampaignPopup>
+          </Modal>
           <Button
             variant="contained"
             startIcon={<ScheduleIcon />}
@@ -41,12 +55,12 @@ export default function Context() {
           </Button>
         </Stack>
       </Box>
-      <Box sx={{display:"flex",flexWrap:"wrap"}}>
+      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
         <SinglePRCampaign />
         <SinglePRCampaign />
         <SinglePRCampaign />
         <SinglePRCampaign />
-        <SinglePRCampaign/>
+        <SinglePRCampaign />
         <SinglePRCampaign />
         <SinglePRCampaign />
         <SinglePRCampaign />
