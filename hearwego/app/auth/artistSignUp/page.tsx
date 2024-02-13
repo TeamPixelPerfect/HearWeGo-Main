@@ -46,15 +46,39 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import PublicIcon from "@mui/icons-material/Public";
 import { GiPartyPopper } from "react-icons/gi";
+import { TypeSpecimenOutlined } from "@mui/icons-material";
 
 const ArtistSignUp = () => {
+  // Sign up stage
   const [step, setStep] = useState<number>(0);
+
+  // Artist type
   const [type, setType] = useState<string>("");
+
+  // Genres
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+
+  // Professions
   const [selectedProfessions, setSelectedProfessions] = useState<string[]>([]);
+
+  // Country
   const [selectedCountry, setSelectedCountry] = useState<string>("LK");
+
+  // Verification Documents
+  const [verDoc, setVerDoc] = useState<any>(null);
+
+  // Profile Picture
+  const [profilePicture, setProfilePicture] = useState<any>(null);
+
+  // Cover Photos
+  const [coverPhoto1, setCoverPhoto1] = useState<any>(null);
+  const [coverPhoto2, setCoverPhoto2] = useState<any>(null);
+  const [coverPhoto3, setCoverPhoto3] = useState<any>(null);
+
+  // OTP
   const [otp, setOtp] = useState("");
 
+  // Genres list TODO: Fetch from API
   const [genres, setGenres] = React.useState<string[]>([
     "Pop",
     "Rock",
@@ -67,19 +91,21 @@ const ArtistSignUp = () => {
     "World Music",
   ]);
 
+  // Artist details
   const [artistDetails, setArtistDetails] = React.useState({
     artistName: "",
     alias: "",
-    otherAliases: [],
+    otherAliases: [""],
     artistType: "",
-    musicGenres: [],
-    artistProfession: [],
+    musicGenres: [""],
+    artistProfession: [""],
     mobileNumber: "",
     country: "",
     birthDate: "",
-    verificationDocuments: [],
-    artistCovers: [],
+    verificationDocuments: [""],
+    artistCovers: [""],
     artistBio: "",
+    email: "",
     password: "",
     confirmPassword: "",
     profilePicture: "",
@@ -98,19 +124,42 @@ const ArtistSignUp = () => {
     },
   });
 
+  // Error Handling for Inputs
+  const [artistNameError, setArtistNameError] = useState(false);
+  const [artistTypeError, setArtistTypeError] = useState(false);
+  const [genreError, setGenreError] = useState(false);
+  const [professionError, setProfessionError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordMismatchError, setPasswordMismatchError] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [mobileNumberError, setMobileNumberError] = useState(false);
+  const [countryError, setCountryError] = useState(false);
+  const [verificationDocumentError, setVerificationDocumentError] = useState(false);
+
+  // Increment Sign up stage (Next button)
   const incrementStep = (step: number) => {
     setStep((current) => current + step);
   };
 
+  // Decrement Sign up stage (Back button)
   const decrementStep = (step: number) => {
     setStep((current) => current - step);
   };
 
+  // Check if the selected type is the current type
   const checkType = (selectedType: string) => {
     if (selectedType === type) return true;
     return;
   };
 
+  // Handle artist type select
+  const handleArtistTypeSelect = (selectedType: string) => {
+    setArtistTypeError(false);
+    setType(selectedType);
+  }
+
+  // Check if the selected genre is in the selected genres list
   const checkGenre = (selectedGenre: string) => {
     if (selectedGenres.includes(selectedGenre)) {
       return true;
@@ -118,6 +167,7 @@ const ArtistSignUp = () => {
     return;
   };
 
+  // Check if the selected profession is in the selected professions list
   const checkProfession = (selectedProfession: string) => {
     if (selectedProfessions.includes(selectedProfession)) {
       return true;
@@ -125,29 +175,109 @@ const ArtistSignUp = () => {
     return;
   };
 
+  // If genre is selected, add to the list, else remove from the list
   const handleGenreSelect = (selectedGenre: string) => {
     if (selectedGenres.includes(selectedGenre)) {
       setSelectedGenres(
         selectedGenres.filter((genre) => genre !== selectedGenre)
       );
     } else {
+      setGenreError(false);
       setSelectedGenres([...selectedGenres, selectedGenre]);
     }
   };
 
+  // If profession is selected, add to the list, else remove from the list
   const handleProfessionSelect = (selectedProfession: string) => {
     if (selectedProfessions.includes(selectedProfession)) {
       setSelectedProfessions(
         selectedProfessions.filter((prof) => prof !== selectedProfession)
       );
     } else {
+      setProfessionError(false);
       setSelectedProfessions([...selectedProfessions, selectedProfession]);
     }
   };
 
+  // Handle country change
   const handleCountryChange = (event: SelectChangeEvent) => {
     setSelectedCountry(event.target.value);
   };
+
+  // Handle Sign up stage by stage
+  const handleStageOne = () => {
+    if (artistDetails.artistName === "") {
+      setArtistNameError(true);
+      return;
+    }
+    setArtistNameError(false);
+    incrementStep(1);
+  }
+
+  const handleStageTwo = () => {
+    if (type === "") {
+      setArtistTypeError(true);
+      return;
+    }
+    setArtistDetails({ ...artistDetails, artistType: type });
+    setArtistTypeError(false);
+    incrementStep(1);
+  }
+
+  const handleStageThree = () => {
+    if (selectedGenres.length === 0) {
+      setGenreError(true);
+      return;
+    }
+    setArtistDetails({ ...artistDetails, musicGenres: selectedGenres });
+    setGenreError(false);
+    incrementStep(1);
+  }
+
+  const handleStageFive = () => {
+    if (selectedProfessions.length === 0) {
+      setProfessionError(true);
+      return;
+    }
+    setArtistDetails({ ...artistDetails, artistProfession: selectedProfessions });
+    setProfessionError(false);
+    incrementStep(1);
+  }
+
+  const handleStageSix = () => {
+    if(artistDetails.email === ""){
+      setEmailError(true);
+      return;
+    }
+    if(artistDetails.password === ""){
+      setPasswordError(true);
+      return;
+    }
+    if(artistDetails.confirmPassword === ""){
+      setConfirmPasswordError(true);
+      return;
+    }
+    if(artistDetails.mobileNumber === ""){
+      setMobileNumberError(true);
+      return;
+    }
+    if(selectedCountry === ""){
+      setArtistDetails({ ...artistDetails, country: selectedCountry });
+      setCountryError(true);
+      return;
+    }
+    if (artistDetails.password !== artistDetails.confirmPassword) {
+      setPasswordMismatchError(true);
+      return;
+    }
+    setEmailError(false);
+    setPasswordError(false);
+    setConfirmPasswordError(false);
+    setMobileNumberError(false);
+    setCountryError(false);
+    setPasswordMismatchError(false);
+    incrementStep(1);
+  }
 
   return (
     <AuthContainer>
@@ -238,6 +368,10 @@ const ArtistSignUp = () => {
             id="artist-name"
             label="Artist Name*"
             variant="outlined"
+            color={artistNameError?"error":"primary"}
+            defaultValue={artistDetails.artistName}
+            onChange={(e) => {setArtistDetails({ ...artistDetails, artistName: e.target.value })}}
+            inputRef={input => input && artistNameError && input.focus()}
             style={{ boxSizing: "initial" }}
           />
           <AuthTextField
@@ -326,7 +460,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleStageOne}
             >
               Next
             </Button>
@@ -372,7 +506,7 @@ const ArtistSignUp = () => {
               style={
                 checkType("solo") && { background: "rgba(255,255,255,0.4" }
               }
-              onClick={() => setType("solo")}
+              onClick={() => handleArtistTypeSelect("solo")}
             >
               <Stack
                 width={"100%"}
@@ -396,7 +530,7 @@ const ArtistSignUp = () => {
             <AuthCheckBox
               id="duo"
               style={checkType("duo") && { background: "rgba(255,255,255,0.4" }}
-              onClick={() => setType("duo")}
+              onClick={() => handleArtistTypeSelect("duo")}
             >
               <Stack
                 width={"100%"}
@@ -422,7 +556,7 @@ const ArtistSignUp = () => {
               style={
                 checkType("group") && { background: "rgba(255,255,255,0.4" }
               }
-              onClick={() => setType("group")}
+              onClick={() => handleArtistTypeSelect("group")}
             >
               <Stack
                 width={"100%"}
@@ -446,6 +580,10 @@ const ArtistSignUp = () => {
               <MdGroups style={{ fontSize: "40px", color: "#fff" }} />
             </AuthCheckBox>
           </Box>
+
+          <Typography color="error">
+            {artistTypeError && ("Please select an artist type!")}
+          </Typography>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
@@ -473,7 +611,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleStageTwo}
             >
               Next
             </Button>
@@ -539,6 +677,10 @@ const ArtistSignUp = () => {
               })}
           </Box>
 
+          <Typography color="error">
+            {genreError && ("Please select at lease one genre!")}
+          </Typography>
+
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
               size="large"
@@ -565,7 +707,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleStageThree}
             >
               Next
             </Button>
@@ -740,6 +882,10 @@ const ArtistSignUp = () => {
             </AuthCheckBox>
           </Box>
 
+          <Typography color="error">
+            {professionError && ("Please select at lease one profession!")}
+          </Typography>
+
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
               size="large"
@@ -766,7 +912,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleStageFive}
             >
               Next
             </Button>
@@ -800,21 +946,33 @@ const ArtistSignUp = () => {
             label="Email*"
             variant="outlined"
             type="email"
+            color={emailError?"error":"primary"}
             style={{ boxSizing: "initial" }}
+            defaultValue={artistDetails.email}
+            onChange={(e) => {setArtistDetails({ ...artistDetails, email: e.target.value })}}
+            inputRef={input => input && emailError && input.focus()}
           />
           <AuthTextField
             id="password"
             label="Password*"
             variant="outlined"
             type="password"
+            color={passwordError?"error":"primary"}
             style={{ boxSizing: "initial" }}
+            defaultValue={artistDetails.password}
+            onChange={(e) => {setArtistDetails({ ...artistDetails, password: e.target.value })}}
+            inputRef={input => input && passwordError && input.focus()}
           />
           <AuthTextField
             id="confirm-password"
             label="Confirm Password*"
             variant="outlined"
             type="password"
+            color={confirmPasswordError?"error":"primary"}
             style={{ boxSizing: "initial" }}
+            defaultValue={artistDetails.confirmPassword}
+            onChange={(e) => {setArtistDetails({ ...artistDetails, confirmPassword: e.target.value })}}
+            inputRef={input => input && (confirmPasswordError||passwordMismatchError) && input.focus()}
           />
 
           <Stack
@@ -845,11 +1003,14 @@ const ArtistSignUp = () => {
                 onChange={handleCountryChange}
                 // autoWidth
                 label="Country"
+                color={countryError?"error":"primary"}
                 sx={{
                   background: "rgba(255,255,255,0.1)",
                   borderRadius: "10px",
                   margin: "0",
                 }}
+                defaultValue={selectedCountry}
+                inputRef={input => input && countryError && input.focus()}
               >
                 <MenuItem value="">
                   <em>None</em>
@@ -878,7 +1039,11 @@ const ArtistSignUp = () => {
               label="Mobile Number*"
               variant="outlined"
               type="number"
+              color={mobileNumberError?"error":"primary"}
               style={{ boxSizing: "initial", width: "100%" }}
+              defaultValue={artistDetails.mobileNumber}
+              onChange={(e) => {setArtistDetails({ ...artistDetails, mobileNumber: e.target.value })}}
+              inputRef={input => input && mobileNumberError && input.focus()}
             />
           </Stack>
 
@@ -908,7 +1073,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleStageSix}
             >
               Next
             </Button>
@@ -954,6 +1119,8 @@ const ArtistSignUp = () => {
             isCircular={false}
             width="60%"
             height="300px"
+            file={verDoc}
+            setFile={setVerDoc}
           />
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
@@ -1326,6 +1493,8 @@ const ArtistSignUp = () => {
                   isCircular={true}
                   width="200px"
                   height="200px"
+                  file={profilePicture}
+                  setFile={setProfilePicture}
                 />
               </Box>
             </Stack>
@@ -1345,6 +1514,8 @@ const ArtistSignUp = () => {
                 isCircular={false}
                 width="32.5%"
                 height="170px"
+                file={coverPhoto1}
+                setFile={setCoverPhoto1}
               />
               <DropFile
                 fileTypes="Cover Photo"
@@ -1352,6 +1523,8 @@ const ArtistSignUp = () => {
                 isCircular={false}
                 width="32.5%"
                 height="170px"
+                file={coverPhoto2}
+                setFile={setCoverPhoto2}
               />
               <DropFile
                 fileTypes="Cover Photo"
@@ -1359,6 +1532,8 @@ const ArtistSignUp = () => {
                 isCircular={false}
                 width="32.5%"
                 height="170px"
+                file={coverPhoto3}
+                setFile={setCoverPhoto3}
               />
             </Stack>
           </Box>

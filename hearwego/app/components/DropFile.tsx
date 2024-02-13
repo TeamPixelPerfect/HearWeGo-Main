@@ -10,12 +10,12 @@ interface Props {
     isCircular: boolean,
     width: string,
     height: string
+    file: any,
+    setFile: (file: any) => void
 }
 
 
-const DropFile = ({fileTypes, fileExtensions, isCircular, width, height}: Props) => {
-  const [file, setFile] = useState<any>(null);
-
+const DropFile = ({fileTypes, fileExtensions, isCircular, width, height, file, setFile}: Props) => {
   const handleSelectFile = (acceptedFiles: File[]) => {
     setFile(URL.createObjectURL(acceptedFiles[0]));
   };
