@@ -84,12 +84,12 @@ export const ChatButton = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
 }));
 
-export const NavigationBox = styled(Box)(({ theme }) => ({
-  width: "100%",
-  backgroundcolor: "#E0C6FB",
-  marginTop: 2,
-  click
-}));
+// export const NavigationBox = styled(Box)(({ theme }) => ({
+//   width: "100%",
+//   marginTop: 2,
+//   justifyContent:'center'
+ 
+// }));
 
 export const PostCard = styled(Card)(({ theme }) => ({
   maxWidth: 1000,
@@ -180,4 +180,19 @@ export const FindMorebutton = styled(Button)(({ theme }) => ({
   alignItems: "center",
   color: theme.palette.text.primary,
   textTransform: "initial",
+}));
+
+export const PhotosCard = styled(Card)(({ theme }) => ({
+  maxWidth: 1000,
+  height: 800,
+  width: 800,
+  margin: "2em 0 1em 0",
+  //padding: "0.5em",
+  boxShadow: "0 0 20px 0 rgba(0,0,0,0.12)",
+  transition: "0.3s",
+  backgroundColor: theme.palette.background.default,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  
 }));
