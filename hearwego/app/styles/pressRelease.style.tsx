@@ -5,8 +5,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { Box } from "@mui/material";
-import styled from 'styled-components';
-
+import styled from "styled-components";
 
 export const TabItem = muiStyled(Tab)(({ theme }) => ({
   minHeight: 53,
@@ -35,7 +34,7 @@ export const BorderBox = muiStyled("div")(({ theme }) => ({
   background: "#E0E7FF",
 }));
 
-export const TabsNav = muiStyled(Tabs)(({ theme }) => ({
+export const TabsNav = muiStyled(Box)(({ theme }) => ({
   width: "100%",
   boxShadow: "inset 0 -1px 0 0 #E6ECF0",
   [`& .${tabsClasses.indicator}`]: {
@@ -56,7 +55,7 @@ export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   marginLeft: "20px ",
   padding: "10px",
   marginBottom: "10px",
-  backgroundColor:theme.palette.primary.main,
+  backgroundColor: theme.palette.primary.main,
 }));
 
 export const CampaignMedia = muiStyled(CardMedia)(({ theme }) => ({
@@ -74,14 +73,14 @@ export const CampaignContent = muiStyled(CardContent)(({ theme }) => ({
 }));
 
 export const CreateCampaignPopup = styled("div")(({ theme }) => ({
-  position: "absolute",
+  position: "relative",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "20%",
-  height: "20%",
+  height: "25%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: "#ffff",
   borderRadius: "10px",
 }));
 
@@ -89,5 +88,7 @@ export const NameBox = styled(Box)(({ theme }) => ({
   width: "100%",
   backgroundColor: "#7e22ce",
   textAlign: "center",
-  color:theme.palette.text.primary,
+  color: "white",
+  borderRadius: "10px",
+  padding: "5px",
 }));
