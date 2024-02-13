@@ -48,7 +48,7 @@ export const TabsNav = muiStyled(Box)(({ theme }) => ({
 export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
-  width: "495px",
+  width: "450px",
   transition: "0.3s",
   position: "relative",
   overflow: "initial",
@@ -78,7 +78,7 @@ export const CreateCampaignPopup = styled("div")(({ theme }) => ({
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "20%",
-  height: "25%",
+  height: "20%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   backgroundColor: "#ffff",
   borderRadius: "10px",
@@ -91,4 +91,16 @@ export const NameBox = styled(Box)(({ theme }) => ({
   color: "white",
   borderRadius: "10px",
   padding: "5px",
+}));
+
+export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  backgroundColor: theme.palette.background.default,
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+  border: "2px solid #000",
+  p: 4,
 }));

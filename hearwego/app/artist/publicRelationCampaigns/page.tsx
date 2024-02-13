@@ -2,7 +2,7 @@
 import {
   BorderBox,
   TabItem,
-  //TabsNav,
+  PostSchedulePopup,
   CreateCampaignPopup,
   NameBox,
   TabsNav,
@@ -24,52 +24,70 @@ import { Tab } from "@mui/material";
 
 export default function Context() {
   const [value, setValue] = React.useState("1");
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [openCreateCampaign, setOpenCreateCampaign] = React.useState(false);
+  const handleCreateCampaignOpen = () => setOpenCreateCampaign(true);
+  const handleCreateCampaignClose = () => setOpenCreateCampaign(false);
+
+  const [openPostScheduling, setOpenPostScheduling] = React.useState(false);
+  const handlePostSchedulingOpen = () => setOpenPostScheduling(true);
+  const handlePostSchedulingClose = () => setOpenPostScheduling(false);
   return (
     <BorderBox>
       <Box
         sx={{
           position: "relative",
-          width: 1000,
+          width: "100%",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "baseline",
         }}
       >
-        <Box sx={{ display: "flex", backgroundColor: "", padding: "10px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            backgroundColor: "",
+            padding: "10px",
+            width: "100%",
+          }}
+        >
           <TabsNav sx={{ width: "100%", typography: "body1" }}>
             <TabContext value={value}>
-              <Box sx={{ borderBottom: 1, borderColor: "divider",display:"flex",position:"relative",alignItems:"baseline",justifyContent:"space-between",width:"100%"}}>
+              <Box
+                sx={{
+                  borderBottom: 1,
+                  borderColor: "divider",
+                  display: "flex",
+                  position: "relative",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <TabList
-                  onChange={handleChange}
+                  onChange={handle01Change}
                   aria-label="lab API tabs example"
                 >
-                  <TabItem label="Item One" value="1" />
-                  <TabItem label="Item Two" value="2" />
-                  <TabItem label="Item Three" value="3" />
-                  <TabItem label="Item four" value="4" />
-                  <TabItem label="Item five" value="5" />
+                  <TabItem label="In Progress" value="1" />
+                  <TabItem label="Completd" value="2" />
+                  <TabItem label="Drafts" value="3" />
+                  <TabItem label="Scheduled Posts" value="4" />
                 </TabList>
 
                 <Stack direction="row" spacing={4}>
                   <Button
-                    onClick={handleOpen}
+                    onClick={handleCreateCampaignOpen}
                     variant="contained"
                     startIcon={<EditNoteIcon />}
-                    sx={{ width: "190px" }}
+                    sx={{ width: "60%" }}
                   >
                     Create Campaign
                   </Button>
                   <Modal
-                    open={open}
-                    onClose={handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
+                    open={openCreateCampaign}
+                    onClose={handleCreateCampaignClose}
                   >
                     <CreateCampaignPopup>
                       <NameBox>
@@ -89,20 +107,72 @@ export default function Context() {
                           label="Enter the Name"
                           style={{ boxSizing: "initial" }}
                         />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            marginTop: "20px",
+                          }}
+                        >
+                          <Stack direction="row" spacing={1}>
+                            <Button
+                              onClick={handleCreateCampaignClose}
+                              sx={{ backgroundColor: "background.default" }}
+                            >
+                              <Typography component="h2">Cancel</Typography>
+                            </Button>
+                            <Button variant="contained">
+                              <Typography component="h2">Create</Typography>
+                            </Button>
+                          </Stack>
+                        </Box>
                       </Box>
                     </CreateCampaignPopup>
                   </Modal>
                   <Button
+                    onClick={handlePostSchedulingOpen}
                     variant="contained"
                     startIcon={<ScheduleIcon />}
-                    sx={{ width: "190px" }}
+                    sx={{ width: "60%" }}
                   >
                     Post Scheduling
                   </Button>
+                  <Modal
+                    open={openPostScheduling}
+                    onClose={handlePostSchedulingClose}
+                  >
+                    <PostSchedulePopup>
+                      <Typography
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
+                      >
+                        Text in a modal
+                      </Typography>
+                      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Duis mollis, est non commodo luctus, nisi erat porttitor
+                        ligula.
+                      </Typography>
+                    </PostSchedulePopup>
+                  </Modal>
                 </Stack>
               </Box>
-              <TabPanel value="1">
-                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+              <TabPanel
+                value="1"
+                style={{
+                  width: "100%",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    margin: "auto",
+                  }}
+                  style={{ boxSizing: "initial" }}
+                >
+                  <SinglePRCampaign />
+                  <SinglePRCampaign />
                   <SinglePRCampaign />
                   <SinglePRCampaign />
                 </Box>
