@@ -1121,6 +1121,9 @@ const ArtistSignUp = () => {
             height="300px"
             file={verDoc}
             setFile={setVerDoc}
+            aspectX={4}
+            aspectY={3}
+            shape="rect"
           />
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
@@ -1495,6 +1498,9 @@ const ArtistSignUp = () => {
                   height="200px"
                   file={profilePicture}
                   setFile={setProfilePicture}
+                  aspectX={1}
+                  aspectY={1}
+                  shape="round"
                 />
               </Box>
             </Stack>
@@ -1516,6 +1522,9 @@ const ArtistSignUp = () => {
                 height="170px"
                 file={coverPhoto1}
                 setFile={setCoverPhoto1}
+                aspectX={16}
+                aspectY={9}
+                shape="rect"
               />
               <DropFile
                 fileTypes="Cover Photo"
@@ -1525,6 +1534,9 @@ const ArtistSignUp = () => {
                 height="170px"
                 file={coverPhoto2}
                 setFile={setCoverPhoto2}
+                aspectX={16}
+                aspectY={9}
+                shape="rect"
               />
               <DropFile
                 fileTypes="Cover Photo"
@@ -1534,6 +1546,9 @@ const ArtistSignUp = () => {
                 height="170px"
                 file={coverPhoto3}
                 setFile={setCoverPhoto3}
+                aspectX={16}
+                aspectY={9}
+                shape="rect"
               />
             </Stack>
           </Box>
