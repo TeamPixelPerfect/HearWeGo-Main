@@ -6,7 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { Box } from "@mui/material";
 import styled from "styled-components";
-
+import TextField from "@mui/material/TextField";
 export const TabItem = muiStyled(Tab)(({ theme }) => ({
   minHeight: 53,
   minWidth: 80,
@@ -31,7 +31,7 @@ export const BorderBox = muiStyled("div")(({ theme }) => ({
   width: "100%",
   height: "100%",
   borderRadius: "30px",
-  background: "#E0E7FF",
+  backgroundColor: "#E0E7FF",
 }));
 
 export const TabsNav = muiStyled(Box)(({ theme }) => ({
@@ -94,13 +94,44 @@ export const NameBox = styled(Box)(({ theme }) => ({
 }));
 
 export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
-  position: "absolute",
+  position: "relative",
   top: "50%",
-  left: "50%",
+  left: "53%",
   transform: "translate(-50%, -50%)",
-  width: 400,
-  backgroundColor: theme.palette.background.default,
+  width: "30%",
+  height: "80%",
+  backgroundColor: "#8D59CE",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  border: "2px solid #000",
-  p: 4,
+  padding: "4px",
+  borderRadius: "10px",
+}));
+
+export const ArtistDetail = muiStyled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "10%",
+  padding: "5px",
+  marginTop: "10px",
+  position: "relative",
+  display: "flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
+}));
+
+export const PostTextField = muiStyled(TextField)(({ theme }) => ({
+  boxSizing: "initial",
+  minWidth: "95%",
+  border: "2px solid",
+  padding: "8px",
+  borderRadius: "4px",
+  color: "black",
+}));
+
+export const PostContextBox = muiStyled(Box)(({ theme }) => ({
+  backgroundColor: "#B2B1FF",
+  padding: "10px",
+  marginTop: "10px",
+  width: "40%",
+  textAlign: "center",
+  borderRadius: "10px",
+  height: "50%",
 }));
