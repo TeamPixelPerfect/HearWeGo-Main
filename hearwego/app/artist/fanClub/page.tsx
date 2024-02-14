@@ -10,7 +10,6 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AddIcon from "@mui/icons-material/Add";
 
-
 // Stack from "@mui/material";
 
 // import { BorderBox } from "../../styles/fanclub.styles";
@@ -55,9 +54,9 @@ const userNames = [
 ];
 
 export default function ArtistFanClub() {
-  const [openCreateCampaign, setOpenCreateCampaign] = React.useState(false);
-  const handleCreateCampaignOpen = () => setOpenCreateCampaign(true);
-  const handleCreateCampaignClose = () => setOpenCreateCampaign(false);
+  const [openCreatePost, setOpenCreatePost] = React.useState(false);
+  const handleCreatePostOpen = () => setOpenCreatePost(true);
+  const handleCreatePostClose = () => setOpenCreatePost(false);
 
   return (
     <BorderBox>
@@ -113,19 +112,15 @@ export default function ArtistFanClub() {
         1,900 Fans
       </Box>
 
-      <Grid
-        container
-        spacing={1}
-        sx={{ margin: "1em auto", width: "95%" }}
-      >
+      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
         {userNames.map(({ name, img }) => (
-           <Grid item xs={4} md={3} style={{paddingLeft:0}}>
-           <SingleFan userName={name} userImg={img}></SingleFan>
-         </Grid>
+          <Grid item xs={4} md={3} style={{ paddingLeft: 0 }}>
+            <SingleFan userName={name} userImg={img}></SingleFan>
+          </Grid>
         ))}
       </Grid>
 
-      <FindMorebutton color={"primary"} fullWidth>
+      <FindMorebutton color={"secondary"} fullWidth>
         See all Fans <ChevronRightRounded />
       </FindMorebutton>
 
@@ -138,24 +133,49 @@ export default function ArtistFanClub() {
         }}
       />
 
-      
-      <Stack direction="row" spacing={4}>
-              <Button
-                onClick={handleCreateCampaignOpen}
-                variant="contained"
-                startIcon={<AddIcon />}
-                sx={{ width: "60%" }}
-              >
-                Create Campaign
-              </Button>
-              <Modal
-                open={openCreateCampaign}
-                onClose={handleCreateCampaignClose}
+      <Stack direction="row" spacing={2}>
+        <Box
+          sx={{
+            padding: "0em",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+          }}
+        >
+          <Button
+            onClick={handleCreatePostOpen}
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{
+              fontSize: 14,
+              textTransform: "capitalize",
+            }}
+          >
+            Create Post
+          </Button>
+
+          <Button
+            onClick={handleCreatePostOpen}
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{
+              fontSize: 14,
+              textTransform: "capitalize",
+            }}
+          >
+            Create Post
+          </Button>
+        </Box>
+      </Stack>
+
+      {/* <Modal
+                open={openCreatePost}
+                onClose={handleCreatePostClose}
               >
                 <Box>
                   <Box>
                     <Typography variant="h6" component="h2">
-                      Create Campaign
+                      Create Post
                     </Typography>
                   </Box>
                   <Box
@@ -175,8 +195,7 @@ export default function ArtistFanClub() {
                       </Box>
                   </Box> 
                   </Box>
-                  </Modal> 
-                  </Stack>  
+                  </Modal> */}
     </BorderBox>
   );
-  }
+}
