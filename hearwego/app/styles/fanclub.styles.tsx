@@ -18,6 +18,7 @@ export const SearchBarPaper = styled(Paper)(({ theme }) => ({
 export const CoverBackgroundCard = styled(Card)(({ theme }) => ({
   width: "100%",
   maxHeight: "80vh",
+  //padding: "5px",
   backgroundColor: theme.palette.background.default,
   boxShadow: "0px 14px 80px rgba(34, 35, 58, 0.2)",
 }));
@@ -25,6 +26,7 @@ export const CoverBackgroundCard = styled(Card)(({ theme }) => ({
 export const CoverCardMedia = styled(CardMedia)(({ theme }) => ({
   width: "100%",
   height: "250px",
+  
 }));
 
 export const ProfilePicAvatar = styled(Avatar)(({ theme }) => ({
@@ -115,7 +117,7 @@ export const PublisherNameBox = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,
   fontSize: 18,
   fontWeight: "bold",
-  letterSpacing: "0.5px",
+  //letterSpacing: "0.5px",
   //   marginTop: -5,
   marginLeft: 18,
   marginBottom: "0 !important",
@@ -183,7 +185,7 @@ export const FindMorebutton = styled(Button)(({ theme }) => ({
 }));
 
 export const PhotosCard = styled(Card)(({ theme }) => ({
-  maxWidth: 1000,
+ // maxWidth: 1000,
   height: 800,
   width: 800,
   margin: "2em 0 1em 0",
@@ -196,3 +198,16 @@ export const PhotosCard = styled(Card)(({ theme }) => ({
   alignItems: "center",
   
 }));
+
+//Styles for AD Fan club
+
+export const BorderBox = styled(Box)(({ theme }) => ({
+  maxWidth :'100%',
+  height: 'auto',
+  borderRadius: "30px",
+  padding: "15px 8px 8px 8px",
+  backgroundColor: "#E0E7FF",
+}));
+
+
+
