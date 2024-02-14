@@ -15,6 +15,7 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
     padding: "1em",
     // background: "blue"
   },
+  
 }));
 
 export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
