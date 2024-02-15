@@ -29,7 +29,21 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import { TimeField } from "@mui/x-date-pickers/TimeField";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import { renderTimeViewClock } from "@mui/x-date-pickers";
+
+const options = [
+  "None",
+  "New Song Release",
+  "New Album Release",
+  "New Music Video Release",
+];
+
 export default function Context() {
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
@@ -42,6 +56,25 @@ export default function Context() {
   const [openPostScheduling, setOpenPostScheduling] = React.useState(false);
   const handlePostSchedulingOpen = () => setOpenPostScheduling(true);
   const handlePostSchedulingClose = () => setOpenPostScheduling(false);
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const open = Boolean(anchorEl);
+  const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (
+    event: React.MouseEvent<HTMLElement>,
+    index: number
+  ) => {
+    setSelectedIndex(index);
+    setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <BorderBox>
       <TabsNav sx={{ width: "100%", typography: "body1" }}>
@@ -132,7 +165,7 @@ export default function Context() {
                 open={openPostScheduling}
                 onClose={handlePostSchedulingClose}
               >
-                <PostSchedulePopup>
+                <PostSchedulePopup sx={{backgroundColor:"#8D59CE"}}>
                   <Typography
                     variant="h5"
                     component="h5"
@@ -199,14 +232,70 @@ export default function Context() {
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
-                      height: "50%",
                     }}
                   >
-                    <PostContextBox>
-                      <Typography sx={{ color: "black" }}>
-                        Share Post On :
-                      </Typography>
-                    </PostContextBox>
+                    <Box
+                      sx={{
+                        width: "50%",
+                        textAlign: "center",
+                        borderRadius: "10px",
+                        height: "fit-content",
+                        display: "flex",
+                        flexDirection: "column",
+                        padding: "10px",
+                      }}
+                    >
+                      <PostContextBox>
+                        <Typography sx={{ color: "black" }}>
+                          Share Post On :
+                        </Typography>
+                      </PostContextBox>
+                      <div>
+                        <List
+                          component="nav"
+                          sx={{
+                            backgroundColor: "#B2B1FF",
+                            marginTop: "10px",
+                            textAlign: "center",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <ListItemButton
+                            id="lock-button"
+                            aria-expanded={open ? "true" : undefined}
+                            onClick={handleClickListItem}
+                          >
+                            <ListItemText
+                              primary="Select the Event "
+                              secondary={options[selectedIndex]}
+                            />
+                          </ListItemButton>
+                        </List>
+                        <Menu
+                          id="lock-menu"
+                          anchorEl={anchorEl}
+                          open={open}
+                          onClose={handleClose}
+                          MenuListProps={{
+                            "aria-labelledby": "lock-button",
+                            role: "listbox",
+                          }}
+                        >
+                          {options.map((option, index) => (
+                            <MenuItem
+                              key={option}
+                              disabled={index === 0}
+                              selected={index === selectedIndex}
+                              onClick={(event) =>
+                                handleMenuItemClick(event, index)
+                              }
+                            >
+                              {option}
+                            </MenuItem>
+                          ))}
+                        </Menu>
+                      </div>
+                    </Box>
                     <Box
                       sx={{
                         backgroundColor: "#B2B1FF",
@@ -215,7 +304,7 @@ export default function Context() {
                         width: "50%",
                         textAlign: "center",
                         borderRadius: "10px",
-                        height: "50%",
+                        height: "45%",
                         display: "flex",
                         flexDirection: "column",
                       }}
@@ -225,25 +314,48 @@ export default function Context() {
                           components={["DatePicker"]}
                           sx={{ overflow: "hidden" }}
                         >
-                          <div style={{boxSizing:"initial"}}>
+                          <div style={{ boxSizing: "initial" }}>
                             <DatePicker label="Input The Date" />
                           </div>
                         </DemoContainer>
                       </LocalizationProvider>
 
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer
-                          components={["TimeField"]}
-                          sx={{ overflow: "hidden" }}
-                        >
-                          <TimeField
-                            label="Input The Time"
-                            style={{ boxSizing: "initial" }}
-                          />
+                        <DemoContainer components={["TimePicker"]}>
+                          <div style={{ boxSizing: "initial" }}>
+                            <TimePicker
+                              label="Input The Time"
+                              viewRenderers={{
+                                hours: renderTimeViewClock,
+                                minutes: renderTimeViewClock,
+                                seconds: renderTimeViewClock,
+                              }}
+                            />
+                          </div>
                         </DemoContainer>
                       </LocalizationProvider>
                     </Box>
                   </Box>
+
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ marginTop: "10px", justifyContent: "right" }}
+                  >
+                    <Button
+                      onClick={handlePostSchedulingClose}
+                      variant="text"
+                      sx={{
+                        width: "20%",
+                        backgroundColor: "background.default",
+                      }}
+                    >
+                      Cancle
+                    </Button>
+                    <Button variant="contained" sx={{ width: "20%" }}>
+                      Schedule
+                    </Button>
+                  </Stack>
                 </PostSchedulePopup>
               </Modal>
             </Stack>

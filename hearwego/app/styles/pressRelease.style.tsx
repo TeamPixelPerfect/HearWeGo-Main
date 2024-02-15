@@ -7,6 +7,8 @@ import CardMedia from "@mui/material/CardMedia";
 import { Box } from "@mui/material";
 import styled from "styled-components";
 import TextField from "@mui/material/TextField";
+
+
 export const TabItem = muiStyled(Tab)(({ theme }) => ({
   minHeight: 53,
   minWidth: 80,
@@ -72,7 +74,7 @@ export const CampaignContent = muiStyled(CardContent)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
-export const CreateCampaignPopup = styled("div")(({ theme }) => ({
+export const CreateCampaignPopup = muiStyled("div")(({ theme }) => ({
   position: "relative",
   top: "50%",
   left: "50%",
@@ -80,7 +82,7 @@ export const CreateCampaignPopup = styled("div")(({ theme }) => ({
   width: "20%",
   height: "20%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: "#ffff",
+  backgroundColor: theme.palette.background.default,
   borderRadius: "10px",
 }));
 
@@ -100,7 +102,6 @@ export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
   transform: "translate(-50%, -50%)",
   width: "30%",
   height: "80%",
-  backgroundColor: "#8D59CE",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   padding: "4px",
   borderRadius: "10px",
@@ -130,8 +131,8 @@ export const PostContextBox = muiStyled(Box)(({ theme }) => ({
   backgroundColor: "#B2B1FF",
   padding: "10px",
   marginTop: "10px",
-  width: "40%",
+  width: "100%",
   textAlign: "center",
   borderRadius: "10px",
-  height: "50%",
+  height: "40%",
 }));

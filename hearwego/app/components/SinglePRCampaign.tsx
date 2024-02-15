@@ -4,6 +4,7 @@ import {
   SingleCampaign,
   CampaignMedia,
   CampaignContent,
+  PostSchedulePopup,
 } from "../styles/pressRelease.style";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -11,9 +12,13 @@ import LinearProgress, {
   LinearProgressProps,
 } from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
 
 export default function SinglePRCampaign() {
   const [progress, setProgress] = React.useState(10);
+  const [openSeeMore, setopenSeeMore] = React.useState(false);
+  const handleSeeMoreOpen = () => setopenSeeMore(true);
+  const handleSeeMoreClose = () => setopenSeeMore(false);
   return (
     <Box>
       <SingleCampaign>
@@ -28,9 +33,20 @@ export default function SinglePRCampaign() {
           <Box sx={{ width: "100%" }}>
             <LinearProgressWithLabel value={progress} />
           </Box>
-          <Button variant="contained" sx={{ width: "140px" }}>
+          <Button
+            onClick={handleSeeMoreOpen}
+            variant="contained"
+            sx={{ width: "140px" }}
+          >
             See More
           </Button>
+          <Modal open={openSeeMore} onClose={handleSeeMoreClose}>
+            <PostSchedulePopup sx={{backgroundColor:"background.default"}}>
+              <Typography variant="h2">
+          
+              </Typography>
+            </PostSchedulePopup>
+          </Modal>
         </CampaignContent>
       </SingleCampaign>
     </Box>
