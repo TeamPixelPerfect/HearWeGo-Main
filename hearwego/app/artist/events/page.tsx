@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 
 import ArtistSingleEvent from '../../components/ArtistDashboardSingleEvent'
-
+ 
 
 import {
   EventMainBox,
@@ -31,7 +31,7 @@ export default function ArtistEvents() {
   };
 
   return (
-    <EventMainBox>
+    <>
       <TopBar>
         <TabBar>
           <Tabs value={value} onChange={handleChange}>
@@ -67,7 +67,7 @@ export default function ArtistEvents() {
         
 
       </EventSec>
-    </EventMainBox>
+    </>
   );
 }
 

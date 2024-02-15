@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ADNavItemBox,
   ADNavItemGroupBox,
@@ -8,7 +8,7 @@ import {
 } from "../styles/artistDashboard.styles";
 import Logo from "../components/Logo";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { Box } from "@mui/material";
+import { Box, IconButton, useMediaQuery } from "@mui/material";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import AlbumIcon from "@mui/icons-material/Album";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
@@ -20,83 +20,139 @@ import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import EventIcon from "@mui/icons-material/Event";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import PublicIcon from "@mui/icons-material/Public";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
+import { IoIosArrowDropleftCircle } from "react-icons/io";
+import { IoIosArrowDroprightCircle } from "react-icons/io";
+import ADNavItemGroup from "./ADNavItemGroup";
 
 const ArtistDashboardSideNav = () => {
   const app = useAppSelector((state) => state.app);
+  const [open, setOpen] = useState(true);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const matches = useMediaQuery("(max-width:960px)");
+
+  const sideMenuOpts = [
+    {
+      groupLabel: "Discography",
+      items: [
+        {
+          icon: LibraryMusicIcon,
+          label: "Songs",
+          link: "/artist/songs",
+        },
+        {
+          icon: AlbumIcon,
+          label: "Albums",
+          link: "/artist/albums",
+        },
+      ],
+    },
+    {
+      groupLabel: "Analytics",
+      items: [
+        {
+          icon: MilitaryTechIcon,
+          label: "Top Charts",
+          link: "/artist/topCharts",
+        },
+        {
+          icon: AutoGraphIcon,
+          label: "Audience Analytics",
+          link: "/artist/audienceAnalytics",
+        },
+        {
+          icon: SsidChartIcon,
+          label: "Compare",
+          link: "/artist/comparisons",
+        },
+      ],
+    },
+    {
+      groupLabel: "Fans",
+      items: [
+        {
+          icon: GroupsIcon,
+          label: "Fan Club",
+          link: "/artist/fanClub",
+        },
+        {
+          icon: StorefrontIcon,
+          label: "Merchandise",
+          link: "/artist/merchandise",
+        },
+      ],
+    },
+    {
+      groupLabel: "Events",
+      items: [
+        {
+          icon: LocalActivityIcon,
+          label: "Events",
+          link: "/artist/events",
+        },
+        {
+          icon: EventIcon,
+          label: "Calendar",
+          link: "/artist/eventCalendar",
+        },
+      ],
+    },
+    {
+      groupLabel: "Public",
+      items: [
+        {
+          icon: NewspaperIcon,
+          label: "Press Releases",
+          link: "/artist/pressRelease",
+        },
+        {
+          icon: PublicIcon,
+          label: "PR Campaigns",
+          link: "/artist/publicRelationCampaigns",
+        },
+      ],
+    },
+  ];
 
   return (
     <ArtistDashboardSideNavContainer>
-      <Box sx={{ marginBottom: "8px" }}></Box>
-      <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
-      <Box sx={{ marginTop: "12px" }}>
+      <Box sx={{marginBottom: "1em"}}></Box>
+      {!matches ? (
+        <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
+      ) : (
+        <IconButton color="primary" sx={{ fontSize: "40px" }}>
+          <IoIosArrowDroprightCircle />
+        </IconButton>
+      )}
+      <Box>
+        <Box
+          sx={
+            matches
+              ? { padding: "1em 0", width: "auto" }
+              : { padding: "1em 0", width: "100%" }
+          }
+        >
+          {sideMenuOpts.map((opt) => {
+            return (
+              <ADNavItemGroup
+                groupLabel={opt.groupLabel}
+                items={opt.items}
+              ></ADNavItemGroup>
+            );
+          })}
+        </Box>
         <ADNavItemGroupBox>
-          <label>Discography</label>
           <ADNavItemBox>
-            <LibraryMusicIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/songs">Songs</Link>
-          </ADNavItemBox>
-          <ADNavItemBox>
-            <AlbumIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/albums">Albums</Link>
+            <Link href="/artist">
+              <SettingsIcon sx={{ color: "#3730A3", marginRight: "10px" }} />
+              {!matches && <div style={{ color: "#3730A3" }}>Settings</div>}
+            </Link>
           </ADNavItemBox>
         </ADNavItemGroupBox>
-        <ADNavItemGroupBox>
-        <label>Analytics</label>
-          <ADNavItemBox>
-            <MilitaryTechIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/topCharts">Top Charts</Link>
-          </ADNavItemBox>
-          <ADNavItemBox>
-            <AutoGraphIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/audienceAnalytics">Audience Analytics</Link>
-          </ADNavItemBox>
-          <ADNavItemBox>
-            <SsidChartIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/comparisons">Compare</Link>
-          </ADNavItemBox>
-        </ADNavItemGroupBox>
-        <ADNavItemGroupBox>
-        <label>Fans</label>
-          <ADNavItemBox>
-            <GroupsIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/fanClub">Fan Club</Link>
-          </ADNavItemBox>
-          <ADNavItemBox>
-            <StorefrontIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/merchandise">Merchandise</Link>
-          </ADNavItemBox>
-        </ADNavItemGroupBox>
-        <ADNavItemGroupBox>
-        <label>Events</label>
-          <ADNavItemBox>
-            <LocalActivityIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/events">Events</Link>
-          </ADNavItemBox>
-          <ADNavItemBox>
-            <EventIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/eventCalendar">Calendar</Link>
-          </ADNavItemBox>
-        </ADNavItemGroupBox>
-        <ADNavItemGroupBox>
-        <label>Public</label>
-          <ADNavItemBox>
-            <NewspaperIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/pressRelease">Press Releases</Link>
-          </ADNavItemBox>
-          <ADNavItemBox>
-            <PublicIcon sx={{ color: "#4B4B4B", marginRight: "10px" }} />
-            <Link href="/artist/publicRelationCampaigns">PR Campaigns</Link>
-          </ADNavItemBox>
-        </ADNavItemGroupBox>
-        
       </Box>
-      <ADNavItemGroupBox>
-          <ADNavItemBox>
-            <SettingsIcon sx={{ color: "#3730A3", marginRight: "10px" }} />
-            <Link href="/artist" style={{color:"#3730A3"}}>Settings</Link>
-          </ADNavItemBox>
-        </ADNavItemGroupBox>
     </ArtistDashboardSideNavContainer>
   );
 };
