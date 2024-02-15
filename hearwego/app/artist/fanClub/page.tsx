@@ -16,6 +16,7 @@ import SinglePost from "@/app/components/SinglePost";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
 
 // Stack from "@mui/material";
 
@@ -37,7 +38,6 @@ import {
   PostTextField,
   SubmitButton,
   CancleButton,
-
 } from "../../styles/fanclub.styles";
 
 const userNames = [
@@ -204,17 +204,18 @@ export default function ArtistFanClub() {
                   color: "#464141",
                   textAlign: "center",
                   padding: "10px",
+                  fontSize: "16px",
                   borderColor: "divider",
                   borderBottom: "2px solid",
                 }}
               >
                 Create Post
               </Typography>
-              <ArtistDetail sx={{marginTop:'20px',marginLeft:'50px'}}>
-               <Avatar
+              <ArtistDetail sx={{ marginTop: "20px", marginLeft: "50px" }}>
+                <Avatar
                   sx={{
-                    width: "80px",
-                    height: "80px",
+                    width: "50px",
+                    height: "50px",
                     position: "relative",
                     border: "4px solid #370660",
                     margin: "30px",
@@ -227,20 +228,19 @@ export default function ArtistFanClub() {
                   sx={{
                     paddingLeft: "5px",
                     color: "#370660",
-                    fontSize: "20px",
+                    fontSize: "16px",
                     fontWeight: "bold",
                   }}
                 >
                   Avishka Ridmi<br></br>
                   Musician
                 </Typography>
-              
               </ArtistDetail>
-            
+
               <Box
                 component="form"
                 sx={{
-                  "& > :not(style)": { m: 1, width: "25ch" },
+                  "& > :not(style)": { m: 1, width: "10ch" },
                   display: "flex",
                   justifyContent: "center",
                   marginTop: "20px",
@@ -256,24 +256,40 @@ export default function ArtistFanClub() {
                   inputProps={{
                     style: {
                       color: "black",
+                      width: "100%",
                     },
                   }}
                 />
               </Box>
 
-              <Box sx = {{width:'50%',height:'30%',backgroundColor:'#F3E8FF',alignItems:'center'}}></Box>
-            <Box sx={{display:'flex',justifyContent:'right',padding:'10px'}}>
-              <Stack direction="row" spacing={1}>
-              <CancleButton variant="contained" disableElevation>
-              Cancle
-            </CancleButton>
-            <SubmitButton variant="contained" disableElevation>
-              Post
-            </SubmitButton>
-          </Stack>
-          </Box>
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "25%",
+                  backgroundColor: "#F3E8FF",
+                  marginLeft: "150px",
+                  marginTop: "10px",
+                }}
+              ></Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "right",
+                  padding: "10px",
+                  marginTop: "25px",
+                }}
+              >
+                <Stack direction="row" spacing={1}>
+                  <CancleButton variant="contained" disableElevation>
+                    Cancle
+                  </CancleButton>
+                  <SubmitButton variant="contained" disableElevation>
+                    Post
+                  </SubmitButton>
+                </Stack>
+              </Box>
             </CreatePostPopup>
-            </Modal>
+          </Modal>
 
           <Button
             onClick={handleCreateContestOpen}
@@ -287,7 +303,95 @@ export default function ArtistFanClub() {
             Create Contest
           </Button>
           <Modal open={openCreateContest} onClose={handleCreateContestClose}>
-            <CreateContestPopup></CreateContestPopup>
+            <CreateContestPopup sx={{ backgroundColor: "white" }}>
+              <Typography
+                variant="h5"
+                component="h5"
+                sx={{
+                  color: "#464141",
+                  textAlign: "center",
+                  padding: "10px",
+                  fontSize: "16px",
+                  borderColor: "divider",
+                  borderBottom: "2px solid",
+                }}
+              >
+                Create Contest
+              </Typography>
+
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  padding: "5px",
+                  backgroundColor: "#F3E8FF",
+                }}
+              >
+
+                <Box sx={{padding:'20px'}}>
+                  <p style={{
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    color: "#370660",
+                 
+                  }}>Contest Name</p>
+          
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { m: 1, width: "50%" },
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                      height: "50px",
+                    },
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Enter event name"
+                    variant="outlined"
+                    sx={{
+                      fontSize: "8px",
+                      width: "100%",
+                    }}
+                  />
+                  </Box>
+                </Box>
+                <Box sx={{padding:'20px'}}>
+                  <p style={{
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    color: "#370660",
+                 
+                  }}>Contest Type</p>
+          
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { m: 1, width: "50%" },
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                      height: "50px",
+                    },
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Enter event type"
+                    variant="outlined"
+                    sx={{
+                      fontSize: "8px",
+                      width: "100%",
+                    }}
+                  />
+                  </Box>
+                </Box>
+              </Box>
+            </CreateContestPopup>
           </Modal>
         </Stack>
 

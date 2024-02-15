@@ -215,7 +215,7 @@ export const CreatePostPopup = styled("div")(({ theme }) => ({
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "50%",
-  height: "95%",
+  height: "97%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   backgroundColor: "#ffff",
   borderRadius: "10px",
@@ -254,23 +254,24 @@ export const PostTextField = styled(TextField)(({ theme }) => ({
   border: "2px solid",
   padding: "10px",
   borderRadius: "4px",
-  marginTop:'10px',
+  marginTop:'5px',
   color: "primary",
   display: "flex",
   justifyContent: "center",
+
 }));
 
 export const SubmitButton = styled(Button)(({ theme }) => ({
-  width: "120px",
-  fontSize: "16px",
+  width: "100px",
+  fontSize: "14px",
   color: "#fff",
   backgroundColor: theme.palette.primary.main,
   textTransform: "capitalize",
 }));
 
 export const CancleButton = styled(Button)(({ theme }) => ({
-  width: "120px",
-  fontSize: "16px",
+  width: "100px",
+  fontSize: "14px",
   color: "#370660",
   backgroundColor: 'white',
   textTransform: "capitalize",
