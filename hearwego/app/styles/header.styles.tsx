@@ -4,7 +4,7 @@ import { serviceItem } from "../constants/models";
 export const HeaderContainer = styled("div", {
   shouldForwardProp: (prop) => prop !== "pathName",
 })<{ pathName?: string }>(({ theme, pathName }) => ({
-  background: `${pathName === "/" ? "transparent" : "#000"}`,
+  background: `${(pathName === "/" || pathName === "/auth/artistSignUp") ? "transparent" : "#000"}`,
   color: "#fff",
   maxHeight: "80px",
   display: "flex",

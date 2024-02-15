@@ -4,6 +4,7 @@ import { base_url } from "../constants/keys";
 import ArtistDashboardSideNav from "../components/ArtistDashboardSideNav";
 import { ArtistDashboardLayout } from "../styles/artistDashboard.styles";
 import ArtistDashboardHeader from "../components/ArtistDashboaardHeader";
+import { EventMainBox } from "../styles/artistDashboardEventsPage.styles";
 //import { ArtistDashboardHeader } from "../styles/artistDashboardHeader.styles";
 
 export default async function Layout({
@@ -16,8 +17,8 @@ export default async function Layout({
       </div>
       <div className="ad-right">
         <ArtistDashboardHeader />
-        {children}
-    </div>
+        <EventMainBox>{children}</EventMainBox>
+      </div>
     </ArtistDashboardLayout>
   );
 }

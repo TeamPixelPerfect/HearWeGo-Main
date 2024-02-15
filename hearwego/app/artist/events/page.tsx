@@ -14,7 +14,7 @@ import Link from "next/link";
 
 
 import ArtistSingleEvent from '../../components/ArtistDashboardSingleEvent'
-
+ 
 
 import {
   EventMainBox,
@@ -32,7 +32,7 @@ export default function ArtistEvents() {
   };
 
   return (
-    <EventMainBox>
+    <>
       <TopBar>
         <TabBar>
           <Tabs value={value} onChange={handleChange}>
@@ -70,7 +70,7 @@ export default function ArtistEvents() {
         
 
       </EventSec>
-    </EventMainBox>
+    </>
   );
 }
 
