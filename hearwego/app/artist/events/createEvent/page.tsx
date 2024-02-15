@@ -28,6 +28,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
@@ -52,6 +53,8 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import {
   CreateEventMainBox,
@@ -63,6 +66,8 @@ import {
   CalendarArea,
   SessionInfo,
 } from "../../../styles/artistDashboardCretaeEvent.styles";
+
+import { IOSSwitch } from "../../../styles/switch.styles";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -467,14 +472,15 @@ function TicketDetails() {
   return (
     <div>
       Ticket Details
-      <Stack direction="row" spacing={2}>
-        <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
-          Clear
-        </Button>
-        <Button variant="contained" endIcon={<NavigateNextIcon />}>
-          Next
-        </Button>
-      </Stack>
+      <InputRow>
+        <AutoGenerateSwitch />
+      </InputRow>
+      <InputRow>
+      <Box sx={{width: '100%', padding: '3em', border: 1, borderRadius: 10, borderColor: 'primary.main'}}>
+      <AutoTicketForm />
+      </Box>
+        
+      </InputRow>
     </div>
   );
 }
@@ -482,13 +488,22 @@ function TicketDetails() {
 function SessionForm() {
   return (
     <SessionBox>
-      <Box sx={{ fontSize: "1.5em", fontWeight: "600", color: "primary.main" }}>
+      <Box
+        sx={{
+          fontSize: "1.5em",
+          fontWeight: "600",
+          color: "primary.main",
+          marginBottom: "1em",
+        }}
+      >
         Session 01
       </Box>
       <SessionInputRow>
         <Box sx={{ width: "50%" }}>
-          <InputRow>
-            <DatePickerValue />
+          <InputRow sx={{ backgroundColor: "red" }}>
+            <div style={{ boxSizing: "initial", width: "100%" }}>
+              <DatePickerValue />
+            </div>
           </InputRow>
 
           <InputRow>
@@ -660,22 +675,6 @@ function SelectSession() {
     </Box>
   );
 }
-function DatePickerValue() {
-  const [value, setValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
-
-  return (
-    <Box sx={{ width: "100%", height: "4em" }}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={["DatePicker"]} sx={{ minHeight: "100%" }}>
-          <DatePicker
-            label="Basic date picker"
-            sx={{ minHeight: "100%" }}
-          ></DatePicker>
-        </DemoContainer>
-      </LocalizationProvider>
-    </Box>
-  );
-}
 
 function EventCalendar() {
   const [value, setValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
@@ -749,10 +748,127 @@ function TeamTable() {
   );
 }
 
+function DatePickerValue() {
+  const [value, setValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DemoContainer components={["DatePicker"]}>
+        <DatePicker
+          label="Date"
+          value={value}
+          onChange={(newValue) => setValue(newValue)}
+        />
+      </DemoContainer>
+    </LocalizationProvider>
+  );
+}
+
+function AutoGenerateSwitch() {
+  return (
+    <FormGroup>
+      <FormControlLabel
+        control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
+        label="Generate Tickets Here"
+      />
+    </FormGroup>
+  );
+}
+
+function AutoTicketForm() {
+  return (
+    <Box>
+      <InputRow>
+        <Box
+          sx={{
+            fontSize: "1.5em",
+            fontWeight: "600",
+            color: "primary.main",
+            marginBottom: "1em",
+          }}
+        >
+          Tickets for the Session on 2024-01-19 at 8.00 P.M
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <TicketTable />
+        <Button variant="outlined">Add Ticket Details</Button>
+      </InputRow>
+
+      <InputRow>
+        <Box sx={{ width: "100%" }}>
+          <TextField
+            id="outlined-multiline-static"
+            label="Special Notice"
+            multiline
+            rows={4}
+            placeholder="If any special notice"
+            sx={{ width: "100%" }}
+          />
+        </Box>
+      </InputRow>
+    </Box>
+  );
+}
+
+function createTicketData(
+  type: string,
+  price: number,
+  count: number,
+  seatType: string,
+  seatFrom: number,
+  seatTo: number
+) {
+  return { type, price, count, seatType, seatFrom, seatTo };
+}
+
+const ticketRows = [createTicketData("Gold", 2000, 100, "none", 0, 0)];
+
+function TicketTable() {
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Type</TableCell>
+            <TableCell align="right">Price</TableCell>
+            <TableCell align="right">Count</TableCell>
+            <TableCell align="right">Seat Type</TableCell>
+            <TableCell align="right">Seat No. From</TableCell>
+            <TableCell align="right">Seat No. To</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.Type}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.Type}
+              </TableCell>
+              <TableCell align="right">{row.price}</TableCell>
+              <TableCell align="right">{row.count}</TableCell>
+              <TableCell align="right">{row.seatType}</TableCell>
+              <TableCell align="right">{row.seatFrom}</TableCell>
+              <TableCell align="right">{row.seatTo}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
 function EventCreateShow(n: number) {
   if (n == 0) {
     return <EventDetails />;
   } else if (n == 1) {
+    return <TicketDetails />;
+  } else if (n == 2) {
+    return <TicketDetails />;
+  } else if (n == 3) {
     return <TicketDetails />;
   }
 }
