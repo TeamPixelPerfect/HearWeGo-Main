@@ -36,6 +36,7 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
+import ImageCropper from "../../components/ImageCropper";
 
 const options = [
   "None",
@@ -165,7 +166,7 @@ export default function Context() {
                 open={openPostScheduling}
                 onClose={handlePostSchedulingClose}
               >
-                <PostSchedulePopup sx={{backgroundColor:"#8D59CE"}}>
+                <PostSchedulePopup sx={{ backgroundColor: "#8D59CE" }}>
                   <Typography
                     variant="h5"
                     component="h5"
@@ -225,9 +226,7 @@ export default function Context() {
                       width: "100%",
                       height: "28%",
                     }}
-                  >
-                    hi
-                  </Box>
+                  ></Box>
                   <Box
                     sx={{
                       display: "flex",
@@ -374,7 +373,6 @@ export default function Context() {
               }}
               style={{ boxSizing: "initial" }}
             >
-              <SinglePRCampaign />
               <SinglePRCampaign />
               <SinglePRCampaign />
               <SinglePRCampaign />

@@ -5,6 +5,9 @@ import {
   CampaignMedia,
   CampaignContent,
   PostSchedulePopup,
+  BorderLinearProgress,
+  TabsNav,
+  TabItem,
 } from "../styles/pressRelease.style";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -13,9 +16,19 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-
+import TabList from "@mui/material/Tabs";
+import TabContext from "@mui/lab/TabContext";
+import TabPanel from "@mui/lab/TabPanel";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import Icon from "@mui/material/Icon";
+import Checkbox from "@mui/material/Checkbox";
 export default function SinglePRCampaign() {
+  const [value, setValue] = React.useState("1");
+  const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
   const [progress, setProgress] = React.useState(10);
+
   const [openSeeMore, setopenSeeMore] = React.useState(false);
   const handleSeeMoreOpen = () => setopenSeeMore(true);
   const handleSeeMoreClose = () => setopenSeeMore(false);
@@ -41,10 +54,69 @@ export default function SinglePRCampaign() {
             See More
           </Button>
           <Modal open={openSeeMore} onClose={handleSeeMoreClose}>
-            <PostSchedulePopup sx={{backgroundColor:"background.default"}}>
-              <Typography variant="h2">
-          
+            <PostSchedulePopup sx={{ backgroundColor: "background.default" }}>
+              <Typography variant="h6" sx={{ textAlign: "center" }}>
+                Classic Song Mixtape Album Cover
               </Typography>
+              <Box sx={{ flexGrow: 1, padding: "15px" }}>
+                <BorderLinearProgress variant="determinate" value={60} />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  color: "black",
+                }}
+              >
+                <Typography sx={{ paddingLeft: "10px" }}>Progress</Typography>
+                <Typography sx={{ paddingRight: "10px" }}>
+                  60% Completed
+                </Typography>
+              </Box>
+              <TabsNav sx={{ width: "100%", typography: "body1" }}>
+                <TabContext value={value}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      position: "relative",
+                      alignItems: "baseline",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
+                    <TabList
+                      onChange={handle01Change}
+                      aria-label="lab API tabs example"
+                      sx={{ justifyContent: "space-between", width: "100%" }}
+                    >
+                      <TabItem label="Tasks" value="1" />
+                      <TabItem label="Posts" value="2" />
+                    </TabList>
+                  </Box>
+
+                  <TabPanel
+                    value="1"
+                    sx={{ backgroundColor: "primary.main", minHeight: "100%" }}
+                  >
+                    <div>
+                      <SingleTask />
+                      <SingleTask />
+                      <SingleTask />
+                      <SingleTask />
+                      <SingleTask />
+                      <SingleTask />
+                    </div>
+                    <Button
+                      onClick={handleSeeMoreClose}
+                      variant="contained"
+                      sx={{ width: "25%" }}
+                    >
+                      Done
+                    </Button>
+                  </TabPanel>
+                  <TabPanel value="2">Item Two</TabPanel>
+                </TabContext>
+              </TabsNav>
             </PostSchedulePopup>
           </Modal>
         </CampaignContent>
@@ -52,6 +124,7 @@ export default function SinglePRCampaign() {
     </Box>
   );
 }
+
 function LinearProgressWithLabel(
   props: LinearProgressProps & { value: number }
 ) {
@@ -65,6 +138,41 @@ function LinearProgressWithLabel(
           props.value
         )}%`}</Typography>
       </Box>
+    </Box>
+  );
+}
+
+export function SingleTask() {
+  const [isChecked, setIsChecked] = React.useState(false);
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        padding: "5px",
+        display: "flex",
+        alignItems: "center",
+        backgroundColor: "background.default",
+        justifyContent: "space-between",
+        marginBottom: "10px",
+        borderRadius: "10px",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          textDecoration: isChecked ? "line-through" : "none",
+        }}
+      >
+        <Icon sx={{ color: "black", marginRight: "15px" }}>
+          <ListAltIcon />
+        </Icon>
+        <Typography sx={{ color: "black" }}>Organize a Meeting</Typography>
+      </Box>
+      <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
     </Box>
   );
 }
