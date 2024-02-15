@@ -2,7 +2,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { FooterContainer } from "../styles/footer.styles";
-import Logo from "../components/Logo";
+import Logo from "./Logo";
 import { useAppSelector } from "@/lib/hooks";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -42,7 +42,7 @@ const Footer = () => {
               }
         }
       >
-        <Logo img_url={app.logo_url} alt="HearWeGo" />
+        <Logo img_url={app.logo_url} />
         <Box sx={matches ? { display: "flex", gap: "10px" } : { display: "flex", gap: "10px", marginTop: "10px" }}>
           <MailOutlineIcon style={{ color: "#fff", fontSize: "2em" }} />
           <InstagramIcon style={{ color: "#fff", fontSize: "2em" }} />
