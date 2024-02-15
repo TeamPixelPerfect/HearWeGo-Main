@@ -1,0 +1,884 @@
+"use client";
+import * as React from "react";
+
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import { styled } from "@mui/material/styles";
+import Stack from "@mui/material/Stack";
+import Check from "@mui/icons-material/Check";
+import SettingsIcon from "@mui/icons-material/Settings";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import VideoLabelIcon from "@mui/icons-material/VideoLabel";
+import StepConnector, {
+  stepConnectorClasses,
+} from "@mui/material/StepConnector";
+import { StepIconProps } from "@mui/material/StepIcon";
+import FeedIcon from "@mui/icons-material/Feed";
+import LocalActivityIcon from "@mui/icons-material/LocalActivity";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormHelperText from "@mui/material/FormHelperText";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
+import {
+  Unstable_NumberInput as BaseNumberInput,
+  NumberInputProps,
+  numberInputClasses,
+} from "@mui/base/Unstable_NumberInput";
+import Autocomplete from "@mui/material/Autocomplete";
+import Chip from "@mui/material/Chip";
+import { TimeField } from "@mui/x-date-pickers/TimeField";
+import dayjs, { Dayjs } from "dayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import Typography from "@mui/material/Typography";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
+import {
+  CreateEventMainBox,
+  EventFormBody,
+  InputRow,
+  SessionBox,
+  SessionInputRow,
+  SessionInput,
+  CalendarArea,
+  SessionInfo,
+} from "../../../styles/artistDashboardCretaeEvent.styles";
+
+import { IOSSwitch } from "../../../styles/switch.styles";
+
+const QontoConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 10,
+    left: "calc(-50% + 16px)",
+    right: "calc(50% + 16px)",
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: "#784af4",
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: "#784af4",
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    borderColor:
+      theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
+    borderTopWidth: 3,
+    borderRadius: 1,
+  },
+}));
+
+const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
+  ({ theme, ownerState }) => ({
+    color: theme.palette.mode === "dark" ? theme.palette.grey[700] : "#eaeaf0",
+    display: "flex",
+    height: 22,
+    alignItems: "center",
+    ...(ownerState.active && {
+      color: "#784af4",
+    }),
+    "& .QontoStepIcon-completedIcon": {
+      color: "#784af4",
+      zIndex: 1,
+      fontSize: 18,
+    },
+    "& .QontoStepIcon-circle": {
+      width: 8,
+      height: 8,
+      borderRadius: "50%",
+      backgroundColor: "currentColor",
+    },
+  })
+);
+
+function QontoStepIcon(props: StepIconProps) {
+  const { active, completed, className } = props;
+
+  return (
+    <QontoStepIconRoot ownerState={{ active }} className={className}>
+      {completed ? (
+        <Check className="QontoStepIcon-completedIcon" />
+      ) : (
+        <div className="QontoStepIcon-circle" />
+      )}
+    </QontoStepIconRoot>
+  );
+}
+
+const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 22,
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      backgroundImage:
+        "linear-gradient( 95deg,#3730a3 0%,#4338ca 50% 50%,#6366f1 100%)",
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      backgroundImage:
+        "linear-gradient( 95deg,#3730a3 0%,#4338ca 50% 50%,#6366f1 100%)",
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    height: 3,
+    border: 0,
+    backgroundColor:
+      theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
+    borderRadius: 1,
+  },
+}));
+
+const ColorlibStepIconRoot = styled("div")<{
+  ownerState: { completed?: boolean; active?: boolean };
+}>(({ theme, ownerState }) => ({
+  backgroundColor:
+    theme.palette.mode === "dark" ? theme.palette.grey[700] : "#ccc",
+  zIndex: 1,
+  color: "#fff",
+  width: 50,
+  height: 50,
+  display: "flex",
+  borderRadius: "50%",
+  justifyContent: "center",
+  alignItems: "center",
+  ...(ownerState.active && {
+    backgroundImage:
+      "linear-gradient( 136deg, #3730a3 0%, #4338ca 50%, #6366f1 100%)",
+    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+  }),
+  ...(ownerState.completed && {
+    backgroundImage:
+      "linear-gradient( 136deg, #3730a3 0%, #4338ca 50%, #6366f1 100%)",
+  }),
+}));
+
+function ColorlibStepIcon(props: StepIconProps) {
+  const { active, completed, className } = props;
+
+  const icons: { [index: string]: React.ReactElement } = {
+    1: <FeedIcon />,
+    2: <LocalActivityIcon />,
+    3: <AttachMoneyIcon />,
+    4: <DoneAllIcon />,
+  };
+
+  return (
+    <ColorlibStepIconRoot
+      ownerState={{ completed, active }}
+      className={className}
+    >
+      {icons[String(props.icon)]}
+    </ColorlibStepIconRoot>
+  );
+}
+
+const steps = [
+  "Event Details",
+  "Ticket Details",
+  "Budget Details",
+  "Finishing Touches",
+];
+
+export default function createEvent() {
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [completed, setCompleted] = React.useState<{
+    [k: number]: boolean;
+  }>({});
+
+  const totalSteps = () => {
+    return steps.length;
+  };
+
+  const completedSteps = () => {
+    return Object.keys(completed).length;
+  };
+
+  const isLastStep = () => {
+    return activeStep === totalSteps() - 1;
+  };
+
+  const allStepsCompleted = () => {
+    return completedSteps() === totalSteps();
+  };
+
+  const handleNext = () => {
+    const newActiveStep =
+      isLastStep() && !allStepsCompleted()
+        ? // It's the last step, but not all steps have been completed,
+          // find the first step that has been completed
+          steps.findIndex((step, i) => !(i in completed))
+        : activeStep + 1;
+    setActiveStep(newActiveStep);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleStep = (step: number) => () => {
+    setActiveStep(step);
+  };
+
+  const handleComplete = () => {
+    const newCompleted = completed;
+    newCompleted[activeStep] = true;
+    setCompleted(newCompleted);
+    handleNext();
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+    setCompleted({});
+  };
+
+  const eventDetailsComponent = EventCreateShow(0);
+
+  const ticketDetailsComponent = EventCreateShow(1);
+  return (
+    <CreateEventMainBox>
+      <Stack sx={{ width: "100%" }} spacing={4}>
+        <Stepper
+          alternativeLabel
+          activeStep={activeStep}
+          connector={<ColorlibConnector />}
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel StepIconComponent={ColorlibStepIcon}>
+                {label}
+              </StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </Stack>
+      <Box sx={{ padding: "2em", paddingLeft: "7em", paddingRight: "7em" }}>
+        {allStepsCompleted() ? (
+          <React.Fragment>
+            <Typography sx={{ mt: 2, mb: 1 }}>
+              All steps completed - you&apos;re finished
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              <Box sx={{ flex: "1 1 auto" }} />
+              <Button onClick={handleReset}>Reset</Button>
+            </Box>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
+              Step {activeStep + 1}
+              <div>{EventCreateShow(activeStep)}</div>
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              <Button
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{ mr: 1 }}
+              >
+                Back
+              </Button>
+              <Box sx={{ flex: "1 1 auto" }} />
+              <Button onClick={handleNext} sx={{ mr: 1 }}>
+                Next
+              </Button>
+              {activeStep !== steps.length &&
+                (completed[activeStep] ? (
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "inline-block" }}
+                  >
+                    Step {activeStep + 1} already completed
+                  </Typography>
+                ) : (
+                  <Button onClick={handleComplete}>
+                    {completedSteps() === totalSteps() - 1
+                      ? "Finish"
+                      : "Complete Step"}
+                  </Button>
+                ))}
+            </Box>
+          </React.Fragment>
+        )}
+      </Box>
+    </CreateEventMainBox>
+  );
+}
+
+function EventDetails() {
+  const [age, setAge] = React.useState("");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setAge(event.target.value);
+  };
+
+  return (
+    <EventFormBody sx={{ marginTop: "1em" }}>
+      <InputRow>
+        <Box
+          component="form"
+          sx={{
+            "& > :not(style)": { width: "25ch" },
+            // backgroundColor: 'red',
+            width: "100%",
+          }}
+          noValidate
+          autoComplete="off"
+        >
+          <TextField
+            id="outlined-basic"
+            label="Event Name"
+            variant="outlined"
+            style={{ boxSizing: "initial" }}
+            sx={{ minWidth: "50%" }}
+          />
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <Box
+          component="form"
+          sx={{
+            "& > :not(style)": { width: "25ch" },
+            // backgroundColor: 'red',
+            width: "100%",
+          }}
+          noValidate
+          autoComplete="off"
+        >
+          <TextField
+            id="outlined-basic"
+            label="Event Type"
+            variant="outlined"
+            style={{ boxSizing: "initial" }}
+            sx={{ minWidth: "50%" }}
+          />
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <Box
+          sx={{
+            width: "30%",
+            // backgroundColor: "yellow",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <SelectAgeFrom />
+          <SelectAgeTo />
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <Box
+          sx={{
+            width: "30%",
+            // backgroundColor: "yellow",
+          }}
+        >
+          <SelectSession />
+        </Box>
+      </InputRow>
+
+      <InputRow
+        sx={{ border: 1, borderColor: "primary.main", borderRadius: 10 }}
+      >
+        <SessionForm />
+      </InputRow>
+
+      <InputRow>
+        <Box sx={{ width: "100%" }}>
+          <Stack spacing={3} sx={{ width: "50%" }}>
+            <Autocomplete
+              multiple
+              id="tags-outlined"
+              options={artists}
+              getOptionLabel={(option) => option.title}
+              defaultValue={[artists[1]]}
+              filterSelectedOptions
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Sponsers"
+                  placeholder="Sponsers"
+                />
+              )}
+            />
+          </Stack>
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <TeamTable />
+
+        <Button variant="outlined">Add New Team</Button>
+      </InputRow>
+
+      <InputRow>
+        <Box sx={{ width: "50%" }}>
+          <TextField
+            id="outlined-multiline-static"
+            label="Description"
+            multiline
+            rows={4}
+            placeholder="Description"
+            sx={{ width: "100%" }}
+          />
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <Stack direction="row" spacing={2}>
+          <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
+            Clear
+          </Button>
+          <Button variant="contained" endIcon={<NavigateNextIcon />}>
+            Next
+          </Button>
+        </Stack>
+      </InputRow>
+    </EventFormBody>
+  );
+}
+
+function TicketDetails() {
+  return (
+    <div>
+      Ticket Details
+      <InputRow>
+        <AutoGenerateSwitch />
+      </InputRow>
+      <InputRow>
+      <Box sx={{width: '100%', padding: '3em', border: 1, borderRadius: 10, borderColor: 'primary.main'}}>
+      <AutoTicketForm />
+      </Box>
+        
+      </InputRow>
+    </div>
+  );
+}
+
+function SessionForm() {
+  return (
+    <SessionBox>
+      <Box
+        sx={{
+          fontSize: "1.5em",
+          fontWeight: "600",
+          color: "primary.main",
+          marginBottom: "1em",
+        }}
+      >
+        Session 01
+      </Box>
+      <SessionInputRow>
+        <Box sx={{ width: "50%" }}>
+          <InputRow sx={{ backgroundColor: "red" }}>
+            <div style={{ boxSizing: "initial", width: "100%" }}>
+              <DatePickerValue />
+            </div>
+          </InputRow>
+
+          <InputRow>
+            <EventCalendar />
+          </InputRow>
+        </Box>
+
+        <SessionInfo>
+          <InputRow>
+            <Box sx={{ width: "50%" }}>
+              <TimeFieldValue />
+            </Box>
+          </InputRow>
+
+          <InputRow>
+            <Box sx={{ width: "50%" }}>
+              <TextField
+                id="outlined-number"
+                label="Duration (Hours)"
+                type="number"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                placeholder="Duration"
+                style={{ boxSizing: "initial" }}
+                sx={{ width: "100%" }}
+              />
+            </Box>
+          </InputRow>
+
+          <InputRow>
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": { width: "25ch" },
+                width: "50%",
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                id="outlined-basic"
+                label="Venue"
+                variant="outlined"
+                style={{ boxSizing: "initial" }}
+                sx={{ minWidth: "100%" }}
+              />
+            </Box>
+          </InputRow>
+
+          <InputRow>
+            <Box sx={{ width: "100%" }}>
+              <Stack spacing={3} sx={{ width: "100%" }}>
+                <Autocomplete
+                  multiple
+                  id="tags-outlined"
+                  options={artists}
+                  getOptionLabel={(option) => option.title}
+                  defaultValue={[artists[1]]}
+                  filterSelectedOptions
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Other Artists"
+                      placeholder="Artists"
+                    />
+                  )}
+                />
+              </Stack>
+            </Box>
+          </InputRow>
+
+          <InputRow>
+            <Box sx={{ width: "100%" }}>
+              <TextField
+                id="outlined-multiline-static"
+                label="Special Notice"
+                multiline
+                rows={4}
+                placeholder="If any special notice"
+                sx={{ width: "100%" }}
+              />
+            </Box>
+          </InputRow>
+        </SessionInfo>
+      </SessionInputRow>
+    </SessionBox>
+  );
+}
+
+function TimeFieldValue() {
+  const [value, setValue] = React.useState<Dayjs | null>(
+    dayjs("2022-04-17T15:30")
+  );
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={["TimeField", "TimeField"]}>
+          <TimeField
+            label="Time"
+            value={value}
+            onChange={(newValue) => setValue(newValue)}
+            style={{ boxSizing: "initial" }}
+            sx={{ width: "100%" }}
+          />
+        </DemoContainer>
+      </LocalizationProvider>
+    </Box>
+  );
+}
+
+function SelectAgeFrom() {
+  return (
+    <Box sx={{ width: "45%" }}>
+      <TextField
+        id="outlined-number"
+        label="Age"
+        type="number"
+        InputLabelProps={{
+          shrink: true,
+        }}
+        placeholder="From"
+        style={{ boxSizing: "initial" }}
+        sx={{ width: "100%" }}
+      />
+    </Box>
+  );
+}
+
+function SelectAgeTo() {
+  return (
+    <Box sx={{ width: "45%" }}>
+      <TextField
+        id="outlined-number"
+        label="Age"
+        type="number"
+        InputLabelProps={{
+          shrink: true,
+        }}
+        placeholder="To"
+        style={{ boxSizing: "initial" }}
+        sx={{ width: "100%" }}
+      />
+    </Box>
+  );
+}
+
+function SelectSession() {
+  const [sessionNo, SelectSessionNo] = React.useState("");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    SelectSessionNo(event.target.value);
+  };
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      <TextField
+        id="outlined-number"
+        label="No. of Sessions"
+        type="number"
+        InputLabelProps={{
+          shrink: true,
+        }}
+        placeholder="Sessions"
+        style={{ boxSizing: "initial" }}
+        sx={{ width: "100%" }}
+      />
+    </Box>
+  );
+}
+
+function EventCalendar() {
+  const [value, setValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
+
+  return (
+    <Box
+      sx={{
+        borderRadius: 5,
+        border: 2,
+        borderBlockColor: "primary.main",
+        marginRight: 15,
+      }}
+    >
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={["DateCalendar"]}>
+          <DemoItem label="Event Calendar">
+            <DateCalendar
+              value={value}
+              onChange={(newValue) => setValue(newValue)}
+              readOnly
+            />
+          </DemoItem>
+        </DemoContainer>
+      </LocalizationProvider>
+    </Box>
+  );
+}
+
+function createData(
+  Team: string,
+  Name: string,
+  Contact: string,
+  Email: string
+) {
+  return { Team, Name, Contact, Email };
+}
+
+const rows = [
+  createData("Team Type", "Team Name", "+94779184997", "hwg@gmail.com"),
+];
+
+function TeamTable() {
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Team</TableCell>
+            <TableCell align="right">Team Name</TableCell>
+            <TableCell align="right">Contact No.</TableCell>
+            <TableCell align="right">E-mail</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.Team}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.Team}
+              </TableCell>
+              <TableCell align="right">{row.Name}</TableCell>
+              <TableCell align="right">{row.Contact}</TableCell>
+              <TableCell align="right">{row.Email}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+function DatePickerValue() {
+  const [value, setValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DemoContainer components={["DatePicker"]}>
+        <DatePicker
+          label="Date"
+          value={value}
+          onChange={(newValue) => setValue(newValue)}
+        />
+      </DemoContainer>
+    </LocalizationProvider>
+  );
+}
+
+function AutoGenerateSwitch() {
+  return (
+    <FormGroup>
+      <FormControlLabel
+        control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
+        label="Generate Tickets Here"
+      />
+    </FormGroup>
+  );
+}
+
+function AutoTicketForm() {
+  return (
+    <Box>
+      <InputRow>
+        <Box
+          sx={{
+            fontSize: "1.5em",
+            fontWeight: "600",
+            color: "primary.main",
+            marginBottom: "1em",
+          }}
+        >
+          Tickets for the Session on 2024-01-19 at 8.00 P.M
+        </Box>
+      </InputRow>
+
+      <InputRow>
+        <TicketTable />
+        <Button variant="outlined">Add Ticket Details</Button>
+      </InputRow>
+
+      <InputRow>
+        <Box sx={{ width: "100%" }}>
+          <TextField
+            id="outlined-multiline-static"
+            label="Special Notice"
+            multiline
+            rows={4}
+            placeholder="If any special notice"
+            sx={{ width: "100%" }}
+          />
+        </Box>
+      </InputRow>
+    </Box>
+  );
+}
+
+function createTicketData(
+  type: string,
+  price: number,
+  count: number,
+  seatType: string,
+  seatFrom: number,
+  seatTo: number
+) {
+  return { type, price, count, seatType, seatFrom, seatTo };
+}
+
+const ticketRows = [createTicketData("Gold", 2000, 100, "none", 0, 0)];
+
+function TicketTable() {
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Type</TableCell>
+            <TableCell align="right">Price</TableCell>
+            <TableCell align="right">Count</TableCell>
+            <TableCell align="right">Seat Type</TableCell>
+            <TableCell align="right">Seat No. From</TableCell>
+            <TableCell align="right">Seat No. To</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.Type}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.Type}
+              </TableCell>
+              <TableCell align="right">{row.price}</TableCell>
+              <TableCell align="right">{row.count}</TableCell>
+              <TableCell align="right">{row.seatType}</TableCell>
+              <TableCell align="right">{row.seatFrom}</TableCell>
+              <TableCell align="right">{row.seatTo}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+function EventCreateShow(n: number) {
+  if (n == 0) {
+    return <EventDetails />;
+  } else if (n == 1) {
+    return <TicketDetails />;
+  } else if (n == 2) {
+    return <TicketDetails />;
+  } else if (n == 3) {
+    return <TicketDetails />;
+  }
+}
+
+const artists = [
+  { title: "The Shawshank Redemption", year: 1994 },
+  { title: "The Godfather", year: 1972 },
+  { title: "The Godfather: Part II", year: 1974 },
+  { title: "The Dark Knight", year: 2008 },
+  { title: "12 Angry Men", year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: "Pulp Fiction", year: 1994 },
+];

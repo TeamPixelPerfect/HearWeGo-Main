@@ -3,6 +3,9 @@ import { AppItem } from "../constants/models";
 import { base_url } from "../constants/keys";
 import ArtistDashboardSideNav from "../components/ArtistDashboardSideNav";
 import { ArtistDashboardLayout } from "../styles/artistDashboard.styles";
+import ArtistDashboardHeader from "../components/ArtistDashboaardHeader";
+import { EventMainBox } from "../styles/artistDashboardEventsPage.styles";
+//import { ArtistDashboardHeader } from "../styles/artistDashboardHeader.styles";
 
 export default async function Layout({
   children,
@@ -13,8 +16,9 @@ export default async function Layout({
         <ArtistDashboardSideNav />
       </div>
       <div className="ad-right">
-        {children}
-    </div>
+        <ArtistDashboardHeader />
+        <EventMainBox>{children}</EventMainBox>
+      </div>
     </ArtistDashboardLayout>
   );
 }

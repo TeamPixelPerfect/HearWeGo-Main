@@ -64,11 +64,14 @@ export const hearWeGoTheme = createTheme({
     primary: {
       main: "#7e22ce",
     },
+    background: {
+      default: "#ffffff",
+    },
     secondary: {
       main: "#4338ca",
     },
     background: {
-      default: "#ffffff",
+      default: "#FFFFFF",
     },
     text: {
       primary: "#787878",
