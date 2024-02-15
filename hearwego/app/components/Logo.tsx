@@ -7,12 +7,11 @@ interface Props {
 }
 
 const Logo = ({img_url}: Props) => {
-  const matches = useMediaQuery('(min-width:960px)');
+  const matches = useMediaQuery('(min-width:1000px)');
 
   return (
     <Box sx={{padding: 0}}>
-        {matches ? img_url ? <img src={img_url} alt='logo' width={180}/>: null :
-        img_url ? <img src={img_url} alt='logo' width={150}/> : null}
+        {img_url && <img src={img_url} alt='logo' width={matches?180:120}/>}
     </Box>
   )
 }

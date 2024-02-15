@@ -15,10 +15,15 @@ import {
 } from "./styles/home.styles";
 import { serviceItem } from "./constants/models";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const app = useAppSelector((state) => state.app);
   const matches = useMediaQuery("(max-width:960px)");
+
+  const Router = useRouter();
+
   return (
     <>
       <Header app={app} />
@@ -28,7 +33,7 @@ const Home = () => {
           <HomeTagline2>Live For Music.</HomeTagline2>
         </HomeTaglineContainer>
         <HomeBannerButtonContainer>
-          <HomeBannerButton>
+          <HomeBannerButton onClick={() => {Router.push('/auth/artistSignUp')}}>
             <span>Join as Artist</span>
           </HomeBannerButton>
           <HomeBannerButton
@@ -98,6 +103,7 @@ const Home = () => {
             })
           : "Loading..."}
       </HomeServicesContainer>
+      <Footer />
     </>
   );
 };
