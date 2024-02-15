@@ -6,9 +6,15 @@ import Grid from "@mui/material/Grid";
 import SingleFan from "@/app/components/Single Fan";
 import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
 import AddIcon from "@mui/icons-material/Add";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SinglePost from "@/app/components/SinglePost";
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 // Stack from "@mui/material";
 
@@ -24,6 +30,8 @@ import {
   ArtistDetailBox,
   ChatButton,
   FindMorebutton,
+  CreatePostPopup,
+  CreateContestPopup
 } from "../../styles/fanclub.styles";
 
 const userNames = [
@@ -53,10 +61,42 @@ const userNames = [
   },
 ];
 
+const options = [
+'Edit Profile',
+'Manage Posts'
+];
+const ITEM_HEIGHT = 24;
+
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
 export default function ArtistFanClub() {
   const [openCreatePost, setOpenCreatePost] = React.useState(false);
   const handleCreatePostOpen = () => setOpenCreatePost(true);
   const handleCreatePostClose = () => setOpenCreatePost(false);
+
+  const [openCreateContest, setOpenCreateContest] = React.useState(false);
+  const handleCreateContestOpen = () => setOpenCreateContest(true);
+  const handleCreateContestClose = () => setOpenCreateContest(false);
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
 
   return (
     <BorderBox>
@@ -133,69 +173,110 @@ export default function ArtistFanClub() {
         }}
       />
 
-      <Stack direction="row" spacing={2}>
-        <Box
+      <Box sx={{
+        display:'flex',
+        justifyContent:'right',
+        width:'100%',
+        
+      }}>
+
+      <Stack direction="row" spacing={1}>
+       <Button
+          onClick={handleCreatePostOpen}
+          variant="contained"
+          startIcon={<AddIcon />}
           sx={{
-            padding: "0em",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
+            fontSize: 14,
+            textTransform: "capitalize",
           }}
         >
-          <Button
-            onClick={handleCreatePostOpen}
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{
-              fontSize: 14,
-              textTransform: "capitalize",
-            }}
-          >
-            Create Post
-          </Button>
-
-          <Button
-            onClick={handleCreatePostOpen}
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{
-              fontSize: 14,
-              textTransform: "capitalize",
-            }}
-          >
-            Create Post
-          </Button>
-        </Box>
+          Add Post
+        </Button>
+        <Modal
+        open={openCreatePost}
+        onClose={handleCreatePostClose}
+        > 
+        <CreatePostPopup>
+          
+        </CreatePostPopup>
+     
+        </Modal>
+       
+        <Button
+          onClick={handleCreateContestOpen}
+          variant="contained"
+          startIcon={<EditNoteIcon />}
+          sx={{
+            fontSize: 14,
+            textTransform: "capitalize",
+          }}
+        >
+          Create Contest
+        </Button>
+        <Modal
+        open={openCreateContest}
+        onClose={handleCreateContestClose}
+        > 
+        <CreateContestPopup>
+          
+        </CreateContestPopup>
+     
+        </Modal>
       </Stack>
 
-      {/* <Modal
-                open={openCreatePost}
-                onClose={handleCreatePostClose}
-              >
-                <Box>
-                  <Box>
-                    <Typography variant="h6" component="h2">
-                      Create Post
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      padding: "15px",
-                      maxWidth: "100%",
-                      backgroundColor: "background.default",
-                    }}
-                  >
-                 <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        marginTop: "20px",
-                      }}
-                    >
-                      </Box>
-                  </Box> 
-                  </Box>
-                  </Modal> */}
+      
+
+      <div>
+        <IconButton
+          aria-label="more"
+          id="long-button"
+          aria-controls={open ? "long-menu" : undefined}
+          aria-expanded={open ? "true" : undefined}
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          id="long-menu"
+          MenuListProps={{
+            "aria-labelledby": "long-button",
+          }}
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          PaperProps={{
+            style: {
+              maxHeight: ITEM_HEIGHT * 4.5,
+              width: "20ch",
+              color:'black',
+              backgroundColor:'primary'
+            },
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem
+              key={option}
+              selected={option === "Pyxis"}
+              onClick={handleClose}
+            >
+              {option}
+            </MenuItem>
+          ))}
+        </Menu>
+      </div>
+ </Box>
+
+    <Box sx={{width:'100%',flexDirection:'column',display:'flex',alignItems:'center',marginTop:'20px'}}>
+      <SinglePost></SinglePost>
+      <SinglePost></SinglePost>
+    </Box>
+
+    <FindMorebutton color={"primary"} fullWidth>
+        Find Out More <ChevronRightRounded />
+      </FindMorebutton>
+      
+             
     </BorderBox>
   );
 }

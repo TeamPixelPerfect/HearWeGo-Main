@@ -208,6 +208,30 @@ export const BorderBox = styled(Box)(({ theme }) => ({
   padding: "15px 8px 8px 8px",
   backgroundColor: "#E0E7FF",
 }));
+export const CreatePostPopup = styled("div")(({ theme }) => ({
+  position: "relative",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "20%",
+  height: "20%",
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+  backgroundColor: "#ffff",
+  borderRadius: "10px",
+}));
+
+export const CreateContestPopup = styled("div")(({ theme }) => ({
+  position: "relative",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "20%",
+  height: "20%",
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+  backgroundColor: "#ffff",
+  borderRadius: "10px",
+}));
+
 
 
 
