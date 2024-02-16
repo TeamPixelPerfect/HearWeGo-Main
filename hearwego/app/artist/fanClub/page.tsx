@@ -107,7 +107,7 @@ export default function ArtistFanClub() {
   const [songFile, setSongFile] = React.useState("");
 
   return (
-    <BorderBox>
+    <>
       <CoverBackgroundCard>
         <CoverCardMedia
           image={
@@ -393,6 +393,6 @@ export default function ArtistFanClub() {
       <FindMorebutton color={"primary"} fullWidth>
         Find Out More <ChevronRightRounded />
       </FindMorebutton>
-    </BorderBox>
+    </>
   );
 }

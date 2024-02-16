@@ -1606,7 +1606,7 @@ function SessionInfoCard() {
             </Stack>
             <Stack
               sx={{ width: "100%", marginBottom: "1em" }}
-              direction="coloumn"
+              direction="column"
               spacing={1}
             >
               <Box sx={{ fontWeight: 600, width: "40%" }}>Other Artists</Box>
@@ -1628,7 +1628,7 @@ function SessionInfoCard() {
 
             <Stack
               sx={{ width: "100%", marginBottom: "1em" }}
-              direction="coloumn"
+              direction="column"
               spacing={1}
             >
               <Box sx={{ fontWeight: 600, width: "40%" }}>Ticket Details</Box>

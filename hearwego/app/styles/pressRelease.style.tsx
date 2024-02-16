@@ -57,7 +57,7 @@ export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   position: "relative",
   overflow: "initial",
   marginLeft: "20px ",
-  padding: "10px",
+  padding: "2px",
   marginBottom: "10px",
   backgroundColor: theme.palette.primary.main,
 }));
@@ -103,9 +103,9 @@ export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
   left: "53%",
   transform: "translate(-50%, -50%)",
   width: "30%",
-  height: "80%",
+  height: "fit-content",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  padding: "4px",
+  padding: "1em",
   borderRadius: "10px",
 }));
 
