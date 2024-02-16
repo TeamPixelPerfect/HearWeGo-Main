@@ -1,7 +1,11 @@
-import React from "react";
+import React from 'react'
 
-const ArtistPressRelease = () => {
-  return <div>Artist Dashboard Press Release</div>;
-};
+const page = () => {
+  return (
+    <div>
+      Press Releases
+    </div>
+  )
+}
 
-export default ArtistPressRelease;
+export default page

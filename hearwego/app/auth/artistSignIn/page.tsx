@@ -5,11 +5,8 @@ import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-const SignIn = () => {
-    const router = useRouter();
-
+const ArtistSignIn = () => {
     const [artistDetails, setArtistDetails] = React.useState({
         email: "",
         password: "",
@@ -45,15 +42,15 @@ const SignIn = () => {
           }}
         >
           <Typography
-            variant="h4"
+            variant="h5"
             sx={{
               color: "#fff",
-              fontWeight: "600",
+              fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
             }}
           >
-            Sign into HearWeGo
+            Sign into HearWeGo as an Artist
           </Typography>
           <AuthTextField
             id="email"
@@ -108,7 +105,7 @@ const SignIn = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => {router.replace("/")}}
+              onClick={() => {}}
             >
               Login
             </Button>
@@ -116,7 +113,7 @@ const SignIn = () => {
 
           <Typography variant="body1" sx={{ color: "#fff", marginTop: "40px" }}>
             Don't have an account?{" "}
-            <Link href="/auth/signUp" style={{ color: "#C084FC" }}>
+            <Link href="/auth/artistSignUp" style={{ color: "#C084FC" }}>
               Sign Up
             </Link>
           </Typography>
@@ -126,4 +123,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default ArtistSignIn;

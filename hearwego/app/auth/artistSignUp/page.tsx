@@ -47,8 +47,12 @@ import XIcon from "@mui/icons-material/X";
 import PublicIcon from "@mui/icons-material/Public";
 import { GiPartyPopper } from "react-icons/gi";
 import { TypeSpecimenOutlined } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import { countCommas, countNonEmptyItems } from "@/app/constants/functions";
 
 const ArtistSignUp = () => {
+  const router = useRouter();
+
   // Sign up stage
   const [step, setStep] = useState<number>(0);
 
@@ -122,6 +126,7 @@ const ArtistSignUp = () => {
       bankBranch: "",
       country: "",
     },
+    mobileVerified: false,
   });
 
   // Error Handling for Inputs
@@ -135,7 +140,11 @@ const ArtistSignUp = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
   const [mobileNumberError, setMobileNumberError] = useState(false);
   const [countryError, setCountryError] = useState(false);
-  const [verificationDocumentError, setVerificationDocumentError] = useState(false);
+  const [verificationDocumentError, setVerificationDocumentError] =
+    useState(false);
+  const [otpError, setOtpError] = useState(false);
+  const [bioError, setBioError] = useState(false);
+  const [profilePicError, setProfilePicError] = useState(false);
 
   // Increment Sign up stage (Next button)
   const incrementStep = (step: number) => {
@@ -157,7 +166,7 @@ const ArtistSignUp = () => {
   const handleArtistTypeSelect = (selectedType: string) => {
     setArtistTypeError(false);
     setType(selectedType);
-  }
+  };
 
   // Check if the selected genre is in the selected genres list
   const checkGenre = (selectedGenre: string) => {
@@ -212,7 +221,7 @@ const ArtistSignUp = () => {
     }
     setArtistNameError(false);
     incrementStep(1);
-  }
+  };
 
   const handleStageTwo = () => {
     if (type === "") {
@@ -222,7 +231,7 @@ const ArtistSignUp = () => {
     setArtistDetails({ ...artistDetails, artistType: type });
     setArtistTypeError(false);
     incrementStep(1);
-  }
+  };
 
   const handleStageThree = () => {
     if (selectedGenres.length === 0) {
@@ -232,36 +241,39 @@ const ArtistSignUp = () => {
     setArtistDetails({ ...artistDetails, musicGenres: selectedGenres });
     setGenreError(false);
     incrementStep(1);
-  }
+  };
 
   const handleStageFive = () => {
     if (selectedProfessions.length === 0) {
       setProfessionError(true);
       return;
     }
-    setArtistDetails({ ...artistDetails, artistProfession: selectedProfessions });
+    setArtistDetails({
+      ...artistDetails,
+      artistProfession: selectedProfessions,
+    });
     setProfessionError(false);
     incrementStep(1);
-  }
+  };
 
   const handleStageSix = () => {
-    if(artistDetails.email === ""){
+    if (artistDetails.email === "") {
       setEmailError(true);
       return;
     }
-    if(artistDetails.password === ""){
+    if (artistDetails.password === "") {
       setPasswordError(true);
       return;
     }
-    if(artistDetails.confirmPassword === ""){
+    if (artistDetails.confirmPassword === "") {
       setConfirmPasswordError(true);
       return;
     }
-    if(artistDetails.mobileNumber === ""){
+    if (artistDetails.mobileNumber === "") {
       setMobileNumberError(true);
       return;
     }
-    if(selectedCountry === ""){
+    if (selectedCountry === "") {
       setArtistDetails({ ...artistDetails, country: selectedCountry });
       setCountryError(true);
       return;
@@ -277,7 +289,117 @@ const ArtistSignUp = () => {
     setCountryError(false);
     setPasswordMismatchError(false);
     incrementStep(1);
+  };
+
+  const handleStageSeven = () => {
+    if (!verDoc) {
+      setVerificationDocumentError(true);
+      return;
+    }
+    setArtistDetails({ ...artistDetails, verificationDocuments: verDoc });
+    setVerificationDocumentError(false);
+    incrementStep(1);
+  };
+
+  const handleOtpStage = () => {
+    if (otp === "") {
+      setOtpError(true);
+      return;
+    }
+    if (otp.length < 4) {
+      setOtpError(true);
+      return;
+    }
+    setArtistDetails({ ...artistDetails, mobileVerified: true });
+    setOtpError(false);
+    incrementStep(1);
+  };
+
+  const handleCustomizeStage = () => {
+    if (artistDetails.artistBio === "") {
+      setBioError(true);
+      return;
+    }
+    if (!profilePicture) {
+      setProfilePicError(true);
+      return;
+    }
+    setArtistDetails({
+      ...artistDetails,
+      artistBio: artistDetails.profilePicture,
+    });
+    setBioError(false);
+    setProfilePicError(false);
+    incrementStep(1);
+  };
+
+  // handle add other alias
+  const handleAddAlias = (alias: string) => {
+    let aliasList: string[] = [];
+    if (alias.includes(",")) {
+      aliasList = alias.split(",");
+      console.log(aliasList);
+    } else {
+      return;
+    }
+    let commaCount = countCommas(alias);
+    console.log("Commacount: ", commaCount);
+    console.log("Length: ", countNonEmptyItems(aliasList));
+    if (commaCount === countNonEmptyItems(aliasList)) {
+      aliasList.forEach((alias) => {
+        console.log(alias);
+        if(!artistDetails.otherAliases.includes(alias)) {
+          setArtistDetails({
+            ...artistDetails,
+            otherAliases: [...artistDetails.otherAliases, alias],
+          });
+        };
+      });
+    }
+  };
+
+  // Remove an alias from list
+  const handleAliasRemove = (index: number) => {
+    setArtistDetails({
+      ...artistDetails,
+      otherAliases: artistDetails.otherAliases.filter((_, i) => i !== index),
+    });
+  };
+
+  interface AliasProps {
+    alias: string;
+    index: number;
   }
+
+  // Alias component
+  const AliasBox = ({ alias, index }: AliasProps) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#fff",
+          fontSize: "12px",
+          color: "#000",
+          fontWeight: "600",
+          padding: "4px 8px",
+          borderRadius: "8px",
+        }}
+      >
+        {alias}
+        <CloseIcon
+          sx={{
+            color: "#000",
+            cursor: "pointer",
+            fontSize: "12px",
+            marginLeft: "8px",
+          }}
+          onClick={() => handleAliasRemove(index)}
+        />
+      </Box>
+    );
+  };
 
   return (
     <AuthContainer>
@@ -336,7 +458,7 @@ const ArtistSignUp = () => {
           </Button>
           <Typography variant="body1" sx={{ color: "#fff", marginTop: "40px" }}>
             Already have an account?{" "}
-            <Link href="#" style={{ color: "#C084FC" }}>
+            <Link href="/auth/artistSignIn" style={{ color: "#C084FC" }}>
               Sign in
             </Link>
           </Typography>
@@ -368,72 +490,42 @@ const ArtistSignUp = () => {
             id="artist-name"
             label="Artist Name*"
             variant="outlined"
-            color={artistNameError?"error":"primary"}
+            color={artistNameError ? "error" : "primary"}
             defaultValue={artistDetails.artistName}
-            onChange={(e) => {setArtistDetails({ ...artistDetails, artistName: e.target.value })}}
-            inputRef={input => input && artistNameError && input.focus()}
+            onChange={(e) => {
+              setArtistDetails({
+                ...artistDetails,
+                artistName: e.target.value,
+              });
+            }}
+            inputRef={(input) => input && artistNameError && input.focus()}
             style={{ boxSizing: "initial" }}
           />
           <AuthTextField
             id="alias"
             label="Alias*"
             variant="outlined"
+            onChange={(e) => {
+              setArtistDetails({ ...artistDetails, alias: e.target.value });
+            }}
             style={{ boxSizing: "initial" }}
           />
           <AuthTextField
             id="alias"
             label="Other Alias(es)"
             variant="outlined"
+            onChange={(e) => {
+              handleAddAlias(e.target.value)
+            }}
             style={{ boxSizing: "initial" }}
           />
           <Stack spacing={1} direction="row" width="40%">
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                background: "#fff",
-                fontSize: "12px",
-                color: "#000",
-                fontWeight: "600",
-                padding: "4px 8px",
-                borderRadius: "8px",
-              }}
-            >
-              Alias 1
-              <CloseIcon
-                sx={{
-                  color: "#000",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  marginLeft: "8px",
-                }}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                background: "#fff",
-                fontSize: "12px",
-                color: "#000",
-                fontWeight: "600",
-                padding: "4px 8px",
-                borderRadius: "8px",
-              }}
-            >
-              Alias 2
-              <CloseIcon
-                sx={{
-                  color: "#000",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  marginLeft: "8px",
-                }}
-              />
-            </Box>
+            {artistDetails.otherAliases.length > 0 &&
+              artistDetails.otherAliases.map((alias, index) => {
+                return alias && <AliasBox alias={alias} index={index} />;
+              })}
           </Stack>
+
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
               size="large"
@@ -582,7 +674,7 @@ const ArtistSignUp = () => {
           </Box>
 
           <Typography color="error">
-            {artistTypeError && ("Please select an artist type!")}
+            {artistTypeError && "Please select an artist type!"}
           </Typography>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
@@ -660,6 +752,7 @@ const ArtistSignUp = () => {
               genres.map((genre) => {
                 return (
                   <AuthGenreBox
+                    key={genre}
                     style={
                       checkGenre(genre) && {
                         background: "rgba(255,255,255,0.4",
@@ -678,7 +771,7 @@ const ArtistSignUp = () => {
           </Box>
 
           <Typography color="error">
-            {genreError && ("Please select at lease one genre!")}
+            {genreError && "Please select at least one genre!"}
           </Typography>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
@@ -883,7 +976,7 @@ const ArtistSignUp = () => {
           </Box>
 
           <Typography color="error">
-            {professionError && ("Please select at lease one profession!")}
+            {professionError && "Please select at lease one profession!"}
           </Typography>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
@@ -946,33 +1039,46 @@ const ArtistSignUp = () => {
             label="Email*"
             variant="outlined"
             type="email"
-            color={emailError?"error":"primary"}
+            color={emailError ? "error" : "primary"}
             style={{ boxSizing: "initial" }}
             defaultValue={artistDetails.email}
-            onChange={(e) => {setArtistDetails({ ...artistDetails, email: e.target.value })}}
-            inputRef={input => input && emailError && input.focus()}
+            onChange={(e) => {
+              setArtistDetails({ ...artistDetails, email: e.target.value });
+            }}
+            inputRef={(input) => input && emailError && input.focus()}
           />
           <AuthTextField
             id="password"
             label="Password*"
             variant="outlined"
             type="password"
-            color={passwordError?"error":"primary"}
+            color={passwordError ? "error" : "primary"}
             style={{ boxSizing: "initial" }}
             defaultValue={artistDetails.password}
-            onChange={(e) => {setArtistDetails({ ...artistDetails, password: e.target.value })}}
-            inputRef={input => input && passwordError && input.focus()}
+            onChange={(e) => {
+              setArtistDetails({ ...artistDetails, password: e.target.value });
+            }}
+            inputRef={(input) => input && passwordError && input.focus()}
           />
           <AuthTextField
             id="confirm-password"
             label="Confirm Password*"
             variant="outlined"
             type="password"
-            color={confirmPasswordError?"error":"primary"}
+            color={confirmPasswordError ? "error" : "primary"}
             style={{ boxSizing: "initial" }}
             defaultValue={artistDetails.confirmPassword}
-            onChange={(e) => {setArtistDetails({ ...artistDetails, confirmPassword: e.target.value })}}
-            inputRef={input => input && (confirmPasswordError||passwordMismatchError) && input.focus()}
+            onChange={(e) => {
+              setArtistDetails({
+                ...artistDetails,
+                confirmPassword: e.target.value,
+              });
+            }}
+            inputRef={(input) =>
+              input &&
+              (confirmPasswordError || passwordMismatchError) &&
+              input.focus()
+            }
           />
 
           <Stack
@@ -1003,14 +1109,14 @@ const ArtistSignUp = () => {
                 onChange={handleCountryChange}
                 // autoWidth
                 label="Country"
-                color={countryError?"error":"primary"}
+                color={countryError ? "error" : "primary"}
                 sx={{
                   background: "rgba(255,255,255,0.1)",
                   borderRadius: "10px",
                   margin: "0",
                 }}
                 defaultValue={selectedCountry}
-                inputRef={input => input && countryError && input.focus()}
+                inputRef={(input) => input && countryError && input.focus()}
               >
                 <MenuItem value="">
                   <em>None</em>
@@ -1019,6 +1125,7 @@ const ArtistSignUp = () => {
                   return (
                     <MenuItem value={country}>
                       <ReactCountryFlag
+                        key={country}
                         countryCode={country}
                         svg
                         style={{
@@ -1039,11 +1146,16 @@ const ArtistSignUp = () => {
               label="Mobile Number*"
               variant="outlined"
               type="number"
-              color={mobileNumberError?"error":"primary"}
+              color={mobileNumberError ? "error" : "primary"}
               style={{ boxSizing: "initial", width: "100%" }}
               defaultValue={artistDetails.mobileNumber}
-              onChange={(e) => {setArtistDetails({ ...artistDetails, mobileNumber: e.target.value })}}
-              inputRef={input => input && mobileNumberError && input.focus()}
+              onChange={(e) => {
+                setArtistDetails({
+                  ...artistDetails,
+                  mobileNumber: e.target.value,
+                });
+              }}
+              inputRef={(input) => input && mobileNumberError && input.focus()}
             />
           </Stack>
 
@@ -1117,7 +1229,7 @@ const ArtistSignUp = () => {
             fileTypes="NIC,Passport,Driving License,"
             fileExtensions="PDF,PNG,JPEG"
             isCircular={false}
-            width="60%"
+            width="50%"
             height="300px"
             file={verDoc}
             setFile={setVerDoc}
@@ -1125,6 +1237,11 @@ const ArtistSignUp = () => {
             aspectY={3}
             shape="rect"
           />
+
+          <Typography color="error" sx={{ marginTop: "1em" }}>
+            {verificationDocumentError &&
+              "Verification documents are required!"}
+          </Typography>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
@@ -1152,7 +1269,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleStageSeven}
             >
               Next
             </Button>
@@ -1405,6 +1522,10 @@ const ArtistSignUp = () => {
             />
           </Box>
 
+          <Typography color="error">
+            {otpError && "Please enter the 4-digit OTP code!"}
+          </Typography>
+
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
               size="large"
@@ -1431,7 +1552,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleOtpStage}
             >
               Next
             </Button>
@@ -1488,6 +1609,12 @@ const ArtistSignUp = () => {
                 multiline
                 rows={6}
                 style={{ boxSizing: "initial" }}
+                onChange={(e) => {
+                  setArtistDetails({
+                    ...artistDetails,
+                    artistBio: e.target.value,
+                  });
+                }}
               />
               <Box>
                 <DropFile
@@ -1553,6 +1680,13 @@ const ArtistSignUp = () => {
             </Stack>
           </Box>
 
+          <Typography color="error" sx={{ marginTop: "1em" }}>
+            {bioError && "Artists bio is required!"}
+          </Typography>
+          <Typography color="error">
+            {profilePicError && "Please upload a profile picture!"}
+          </Typography>
+
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
               size="large"
@@ -1579,7 +1713,7 @@ const ArtistSignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleCustomizeStage}
             >
               Next
             </Button>
@@ -1819,6 +1953,7 @@ const ArtistSignUp = () => {
                 return (
                   <MenuItem value={country}>
                     <ReactCountryFlag
+                      key={country}
                       countryCode={country}
                       svg
                       style={{
@@ -1903,7 +2038,11 @@ const ArtistSignUp = () => {
             }}
           >
             <GiPartyPopper
-              style={{ fontSize: "100px", color: "#6366F1", marginRight: "30px" }}
+              style={{
+                fontSize: "100px",
+                color: "#6366F1",
+                marginRight: "30px",
+              }}
             />
             <Stack
               sx={{
@@ -1930,9 +2069,9 @@ const ArtistSignUp = () => {
                   textTransform: "capitalize",
                   padding: "8px 32px",
                   marginTop: "20px",
-                  fontSize: "20px"
+                  fontSize: "20px",
                 }}
-                onClick={() => incrementStep(0)}
+                onClick={() => router.push("/artist")}
               >
                 HearWeGo
               </Button>
