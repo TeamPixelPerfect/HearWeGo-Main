@@ -217,8 +217,9 @@ export const CreatePostPopup = styled("div")(({ theme }) => ({
   width: "50%",
   height: "97%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: "#ffff",
+  backgroundColor: '#ffff',
   borderRadius: "10px",
+  // overflow:'scroll'
 }));
 
 export const CreateContestPopup = styled("div")(({ theme }) => ({
