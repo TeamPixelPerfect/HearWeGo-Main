@@ -107,6 +107,7 @@ export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   padding: "1em",
   borderRadius: "10px",
+  background: theme.palette.background.default,
 }));
 
 export const ArtistDetail = muiStyled(Box)(({ theme }) => ({
