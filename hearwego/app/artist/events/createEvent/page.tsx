@@ -63,6 +63,7 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 // import Typography from '@mui/material/Typography';
 import { CardActionArea } from "@mui/material";
+import { countries } from "country-flag-icons";
 
 import {
   CreateEventMainBox,
@@ -78,6 +79,7 @@ import {
 import { IOSSwitch } from "../../../styles/switch.styles";
 
 import DropFile from "../../../components/DropFile";
+import ReactCountryFlag from "react-country-flag";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -269,7 +271,7 @@ export default function createEvent() {
   };
 
   return (
-    <CreateEventMainBox>
+    <>
       <Stack sx={{ width: "100%" }} spacing={4}>
         <Stepper
           alternativeLabel
@@ -333,7 +335,7 @@ export default function createEvent() {
           </React.Fragment>
         )}
       </Box>
-    </CreateEventMainBox>
+    </>
   );
 }
 
@@ -1481,9 +1483,20 @@ function SelectCountryCode() {
             label="Country Code"
             defaultValue="EUR"
           >
-            {countryCode.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+            {countries.map((option) => (
+              <MenuItem key={option} value={option}>
+                <ReactCountryFlag
+                  key={option}
+                  countryCode={option}
+                  svg
+                  style={{
+                    width: "1.5em",
+                    height: "1.5em",
+                    marginRight: "8px",
+                  }}
+                  title={option}
+                />
+                {option}
               </MenuItem>
             ))}
           </TextField>
@@ -1538,11 +1551,10 @@ function EventFormFinish() {
   return (
     <Box sx={{ display: "flex" }}>
       <Box sx={{ width: "50%" }}>
-        <Stack spacing={2} direction='column' sx={{width:'100%'}}>
-        <EventInfoCard />
-        <BudgetInfoCard />
+        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
+          <EventInfoCard />
+          <BudgetInfoCard />
         </Stack>
-        
       </Box>
       <Box sx={{ width: "50%" }}>
         <SessionInfoCard />
@@ -1553,7 +1565,7 @@ function EventFormFinish() {
 
 function SessionInfoCard() {
   return (
-    <Card sx={{ width: '100%' }}>
+    <Card sx={{ width: "100%" }}>
       <CardActionArea>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
@@ -1621,10 +1633,9 @@ function SessionInfoCard() {
             >
               <Box sx={{ fontWeight: 600, width: "40%" }}>Ticket Details</Box>
             </Stack>
-                <Box sx={{marginBottom: '1em'}}>
-                <TicketTable />
-                </Box>
-            
+            <Box sx={{ marginBottom: "1em" }}>
+              <TicketTable />
+            </Box>
 
             <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
               <Box sx={{ fontWeight: 600, width: "40%" }}>Special Notice</Box>
@@ -1642,16 +1653,18 @@ function SessionInfoCard() {
   );
 }
 
-function BudgetInfoCard(){
+function BudgetInfoCard() {
   return (
-    <Card sx={{ width: '90%' }}>
+    <Card sx={{ width: "90%" }}>
       <CardActionArea>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>Budget Details</Box>
+            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>
+              Budget Details
+            </Box>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-          <BudgetTable />
+            <BudgetTable />
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -1661,7 +1674,7 @@ function BudgetInfoCard(){
 
 function EventInfoCard() {
   return (
-    <Card sx={{ width: '90%' }}>
+    <Card sx={{ width: "90%" }}>
       <CardActionArea>
         <CardMedia
           component="img"
