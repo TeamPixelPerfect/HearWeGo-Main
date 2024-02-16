@@ -6,8 +6,7 @@ import { Box, Typography } from "@mui/material";
 import ImageCropper from "./ImageCropper";
 import Modal from "@mui/material/Modal";
 import { CropperModal } from "../styles/imageCropper.styles";
-
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { TbMusicPlus } from "react-icons/tb";
 
 interface Props {
   fileTypes: string;
@@ -22,7 +21,7 @@ interface Props {
   shape: 'rect'|'round'
 }
 
-const DropFile = ({
+const DropSong = ({
   fileTypes,
   fileExtensions,
   isCircular,
@@ -45,25 +44,7 @@ const DropFile = ({
 
   return (
     <>
-      <CropperModal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        {file ? (
-          <ImageCropper
-            image={file}
-            setImage={setFile}
-            handleClose={handleClose}
-            aspectX={aspectX}
-            aspectY={aspectY}
-            shape={shape}
-          />
-        ) : (
-          <Box>No image file selected</Box>
-        )}
-      </CropperModal>
+     
       <Dropzone onDrop={(acceptedFiles) => handleSelectFile(acceptedFiles)}>
         {({ getRootProps, getInputProps }) => (
           <section
@@ -107,7 +88,7 @@ const DropFile = ({
                 />
               ) : (
                 <>
-                  <AddPhotoAlternateIcon
+                  <TbMusicPlus
                     style={{
                       fontSize: isCircular ? "40px" : "60px",
                       color: "#9333EA",
@@ -146,4 +127,4 @@ const DropFile = ({
   );
 };
 
-export default DropFile;
+export default DropSong;

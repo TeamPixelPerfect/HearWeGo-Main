@@ -54,7 +54,7 @@ const page = () => {
             marginTop: "20px",
           }}
         >
-          <h1 style={{ margin: 0 }}>Add New Song</h1>
+          <h1 style={{ margin: 0 }}>Add New Album</h1>
         </div>
       </div>
 
