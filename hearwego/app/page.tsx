@@ -37,6 +37,7 @@ const Home = () => {
             <span>Join as Artist</span>
           </HomeBannerButton>
           <HomeBannerButton
+            onClick={() => Router.push("/auth/signUp")}
             style={{
               background: "transparent",
               border: "3px",

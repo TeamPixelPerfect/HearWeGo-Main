@@ -1,106 +1,80 @@
 "use client";
-import React from "react";
-import { Divider, Stack } from "@mui/material";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import SingleFan from "@/app/components/Single Fan";
-import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditNoteIcon from "@mui/icons-material/EditNote";
+import * as React from "react";
+import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SearchIcon from "@mui/icons-material/Search";
+import Tabs from "@mui/material/Tabs";
+import { Stack } from "@mui/material";
 import SinglePost from "@/app/components/SinglePost";
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
 
-// Stack from "@mui/material";
-
-// import { BorderBox } from "../../styles/fanclub.styles";
+import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 import {
-  BorderBox,
+  SearchBarPaper,
   CoverBackgroundCard,
   CoverCardMedia,
-  ProfilePicDiv,
   ProfilePicAvatar,
   ArtistNameBox,
   NoOfFollowersBox,
   ArtistDetailBox,
+  PostFeed,
+  JoinClubButton,
   ChatButton,
+  //NavigationBox,
+  PostCard,
+  PostPublishAvatar,
+  PublisherNameBox,
+  PublishedDateBox,
+} from "../../styles/fanclub.styles";
+import {
+  DescriptionBox,
+  PostImageCard,
+  NoOfLikesBox,
+  NoOfCommentsBox,
+  ProfilePicDiv,
   FindMorebutton,
-  CreatePostPopup,
-  CreateContestPopup
+  PhotosCard,
 } from "../../styles/fanclub.styles";
 
-const userNames = [
-  {
-    name: "Chandler Bing",
-    img: "https://pyxis.nymag.com/v1/imgs/079/792/3ed0d94be0a9bd3d023f00532889bab152-30-chandler-bing.rsquare.w330.jpg",
-  },
-  {
-    name: "Ross Geller",
-    img: "https://upload.wikimedia.org/wikipedia/en/6/6f/David_Schwimmer_as_Ross_Geller.jpg",
-  },
-  {
-    name: "Joey Tribbiani",
-    img: "https://upload.wikimedia.org/wikipedia/en/d/da/Matt_LeBlanc_as_Joey_Tribbiani.jpg",
-  },
-  {
-    name: "Monica Geller",
-    img: "https://home.adelphi.edu/~ni21572/Monica.jpg",
-  },
-  {
-    name: "Rachel Green",
-    img: "https://pyxis.nymag.com/v1/imgs/47c/71a/130bf1e557e534b3f2be3351afc2ecf952-17-rachel-green-jewish.rsquare.w400.jpg",
-  },
-  {
-    name: "Phoebe Buffay",
-    img: "https://upload.wikimedia.org/wikipedia/en/f/f6/Friendsphoebe.jpg",
-  },
-];
+export default function CustomizedInputBase() {
+  const [value, setValue] = React.useState("1");
 
-const options = [
-'Edit Profile',
-'Manage Posts'
-];
-const ITEM_HEIGHT = 24;
-
-const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
-export default function ArtistFanClub() {
-  const [openCreatePost, setOpenCreatePost] = React.useState(false);
-  const handleCreatePostOpen = () => setOpenCreatePost(true);
-  const handleCreatePostClose = () => setOpenCreatePost(false);
-
-  const [openCreateContest, setOpenCreateContest] = React.useState(false);
-  const handleCreateContestOpen = () => setOpenCreateContest(true);
-  const handleCreateContestClose = () => setOpenCreateContest(false);
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
 
   return (
-    <BorderBox>
+    <div
+      style={{
+        backgroundColor: "black",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <SearchBarPaper>
+          <IconButton sx={{ p: "10px" }} aria-label="menu"></IconButton>
+          <InputBase
+            sx={{
+              marginLeft: 1,
+              flex: 1,
+              textAlign: "center",
+              color: "9A9A9A",
+            }}
+            placeholder="Search"
+            inputProps={{ "aria-label": "search" }}
+          />
+          <IconButton type="button" aria-label="search">
+            <SearchIcon />
+          </IconButton>
+        </SearchBarPaper>
+      </div>
       <CoverBackgroundCard>
+        {/* <div style={{ padding: "6px", height: "100%" }}> */}
         <CoverCardMedia
           image={
             "https://png.pngtree.com/background/20230527/original/pngtree-purple-sound-waves-on-the-dark-background-picture-image_2754403.jpg"
@@ -124,159 +98,152 @@ export default function ArtistFanClub() {
           </Stack>
 
           <Stack direction="row" spacing={1}>
+            <JoinClubButton variant="contained" disableElevation>
+              Join Club
+            </JoinClubButton>
+
             <ChatButton variant="contained" disableElevation>
               Chat
             </ChatButton>
           </Stack>
         </ArtistDetailBox>
+        {/* </div> */}
       </CoverBackgroundCard>
 
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "100%",
-          margin: "15px 0",
-        }}
-      />
+      <Box sx={{ width: "100%", typography: "body1",backgroundColor:'black'}}>
+        <TabContext value={value}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider",backgroundColor:'black',display:'flex',justifyContent:'center' }}>
+            <TabList onChange={handleChange} aria-label="lab API tabs example">
+              <Tab label="Posts" value="1" />
+              <Tab label="Videos" value="2" />
+              <Tab label="Photos" value="3" />
+              <Tab label="Events" value="4" />
+              <Tab label="Contests" value="5" />
+            </TabList>
+          </Box>
+          <TabPanel value="1">
+            {" "}
+            <PostFeed>
+              <SinglePost></SinglePost>
+              <SinglePost></SinglePost>
+            </PostFeed>
+          </TabPanel>
 
-      <Box
-        sx={{
-          fontSize: 16,
-          fontWeight: "bold",
-          marginLeft: 3,
-          color: "#464141",
-        }}
-      >
-        Fans<br></br>
-        1,900 Fans
+          <TabPanel value="2">Videos</TabPanel>
+          <TabPanel value="3"><Photos/></TabPanel>
+          <TabPanel value="4">Events</TabPanel>
+          <TabPanel value="5">Contests</TabPanel>
+        </TabContext>
       </Box>
 
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {userNames.map(({ name, img }) => (
-          <Grid item xs={4} md={3} style={{ paddingLeft: 0 }}>
-            <SingleFan userName={name} userImg={img}></SingleFan>
-          </Grid>
-        ))}
-      </Grid>
-
-      <FindMorebutton color={"secondary"} fullWidth>
-        See all Fans <ChevronRightRounded />
-      </FindMorebutton>
-
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "100%",
-          margin: "15px 0",
-        }}
-      />
-
-      <Box sx={{
-        display:'flex',
-        justifyContent:'right',
-        width:'100%',
-        
-      }}>
-
-      <Stack direction="row" spacing={1}>
-       <Button
-          onClick={handleCreatePostOpen}
-          variant="contained"
-          startIcon={<AddIcon />}
-          sx={{
-            fontSize: 14,
-            textTransform: "capitalize",
-          }}
-        >
-          Add Post
-        </Button>
-        <Modal
-        open={openCreatePost}
-        onClose={handleCreatePostClose}
-        > 
-        <CreatePostPopup>
-          
-        </CreatePostPopup>
-     
-        </Modal>
-       
-        <Button
-          onClick={handleCreateContestOpen}
-          variant="contained"
-          startIcon={<EditNoteIcon />}
-          sx={{
-            fontSize: 14,
-            textTransform: "capitalize",
-          }}
-        >
-          Create Contest
-        </Button>
-        <Modal
-        open={openCreateContest}
-        onClose={handleCreateContestClose}
-        > 
-        <CreateContestPopup>
-          
-        </CreateContestPopup>
-     
-        </Modal>
-      </Stack>
-
-      
-
-      <div>
-        <IconButton
-          aria-label="more"
-          id="long-button"
-          aria-controls={open ? "long-menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-haspopup="true"
-          onClick={handleClick}
-        >
-          <MoreVertIcon />
-        </IconButton>
-        <Menu
-          id="long-menu"
-          MenuListProps={{
-            "aria-labelledby": "long-button",
-          }}
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          PaperProps={{
-            style: {
-              maxHeight: ITEM_HEIGHT * 4.5,
-              width: "20ch",
-              color:'black',
-              backgroundColor:'primary'
-            },
-          }}
-        >
-          {options.map((option) => (
-            <MenuItem
-              key={option}
-              selected={option === "Pyxis"}
-              onClick={handleClose}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
-      </div>
- </Box>
-
-    <Box sx={{width:'100%',flexDirection:'column',display:'flex',alignItems:'center',marginTop:'20px'}}>
-      <SinglePost></SinglePost>
-      <SinglePost></SinglePost>
-    </Box>
-
-    <FindMorebutton color={"primary"} fullWidth>
+      <FindMorebutton color={"primary"} fullWidth>
         Find Out More <ChevronRightRounded />
       </FindMorebutton>
-      
-             
-    </BorderBox>
+    </div>
   );
 }
+
+
+function Photos() {
+  function srcset(image: string, size: number, rows = 1, cols = 1) {
+    return {
+      src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
+      srcSet: `${image}?w=${size * cols}&h=${
+        size * rows
+      }&fit=crop&auto=format&dpr=2 2x`,
+    };
+  }
+  return(
+    <Box sx={{display:'flex',justifyContent:'center'}}>
+    <PhotosCard sx={{marginBottom:"8px"}}>
+        <Stack
+            direction="row"
+            sx={{
+              width: "100%",
+              padding: "0.2em",
+              display: "flex",
+              alignItems: "center",
+              
+            }}
+          ></Stack>
+           <ImageList
+      sx={{ width: 800, height: 800,overflowY:'hidden'}}
+      variant="quilted"
+      cols={4}
+      rowHeight={121}
+    >
+      {itemData.map((item) => (
+        <ImageListItem key={item.img} cols={item.cols || 1} rows={item.rows || 1}>
+          <img
+            {...srcset(item.img, 121, item.rows, item.cols)}
+            alt={item.title}
+            loading="lazy"
+          />
+        </ImageListItem>
+      ))}
+    </ImageList>
+ </PhotosCard>
+ </Box>
+   )
+}
+const itemData = [
+  {
+    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
+    title: 'Breakfast',
+    rows: 2,
+    cols: 2,
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
+    title: 'Burger',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
+    title: 'Camera',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
+    title: 'Coffee',
+    cols: 2,
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
+    title: 'Hats',
+    cols: 2,
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
+    title: 'Honey',
+    author: '@arwinneil',
+    rows: 2,
+    cols: 2,
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
+    title: 'Basketball',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
+    title: 'Fern',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
+    title: 'Mushrooms',
+    rows: 2,
+    cols: 2,
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
+    title: 'Tomato basil',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
+    title: 'Sea star',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
+    title: 'Bike',
+    cols: 2,
+  },
+
+];

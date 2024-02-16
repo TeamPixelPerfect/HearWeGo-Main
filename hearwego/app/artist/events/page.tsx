@@ -10,6 +10,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
 
 
 import ArtistSingleEvent from '../../components/ArtistDashboardSingleEvent'
@@ -44,9 +45,11 @@ export default function ArtistEvents() {
         </TabBar>
 
         <BtnSec>
-          <Button variant="contained" startIcon={<AddIcon />}>
+          <Link href='/artist/events/createEvent'>
+          <Button variant="contained" startIcon={<AddIcon />} >
             Create New Event
           </Button>
+          </Link>
         </BtnSec>
       </TopBar>
 
