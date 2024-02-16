@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import { RiImageAddFill } from "react-icons/ri";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import ImageCropper from "./ImageCropper";
 import Modal from "@mui/material/Modal";
 import { CropperModal } from "../styles/imageCropper.styles";
@@ -36,6 +36,8 @@ const DropFile = ({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const theme = useTheme();
+
   const handleSelectFile = (acceptedFiles: File[]) => {
     setFile(URL.createObjectURL(acceptedFiles[0]));
     handleOpen();
@@ -67,7 +69,7 @@ const DropFile = ({
           <section
             style={{
               background: "rgba(255,255,255,0.1)",
-              border: "1px solid #fff",
+              border: `1px solid ${theme.palette.text.primary}`,
               borderRadius: isCircular ? "50%" : "10px",
               width: isCircular ? "170px" : width,
               minWidth: isCircular ? "170px" : width,
@@ -85,7 +87,7 @@ const DropFile = ({
                 height: "80%",
                 borderWidth: "3px",
                 borderStyle: "dashed",
-                borderColor: "rgba(255,255,255,0.4)",
+                borderColor: theme.palette.text.primary,
                 borderRadius: isCircular ? "50%" : "10px",
                 display: "flex",
                 flexDirection: "column",
@@ -108,7 +110,7 @@ const DropFile = ({
                   <RiImageAddFill
                     style={{
                       fontSize: isCircular ? "40px" : "60px",
-                      color: "#fff",
+                      color: theme.palette.text.primary,
                     }}
                   />
                   <input {...getInputProps()} />
@@ -116,7 +118,7 @@ const DropFile = ({
                     variant="subtitle1"
                     sx={{
                       textAlign: "center",
-                      color: "#fff",
+                      color: theme.palette.text.primary,
                       fontSize: isCircular ? "12px" : "16px",
                     }}
                   >

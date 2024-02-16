@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import react from "react";
+import react, { useContext } from "react";
 import {
   HeaderBox,
   SearchArea,
@@ -10,7 +10,7 @@ import {
   ProfileDetailArea,
   ArtistDetail,
   ArtistName,
-  ArtistGenre
+  ArtistGenre,
 } from "../styles/artistDashboardHeader.styles";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -20,10 +20,32 @@ import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import Avatar from "@mui/material/Avatar";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useTheme } from "@mui/material/styles";
+import { ColorModeContext } from "../styles/CustomeTheme";
 
 const ArtistDashboardHeader = () => {
+  const theme = useTheme();
+  const colorMode = useContext(ColorModeContext);
   return (
     <HeaderBox>
+      <HitPredictorIco>
+        <Box sx={{ "& > :not(style)": { m: 1 } }}>
+          <HitPredictorBtn
+            color="primary"
+            aria-label="add"
+            onClick={colorMode.toggleColorMode}
+          >
+            {theme.palette.mode === "dark" ? (
+              <Brightness7Icon />
+            ) : (
+              <Brightness4Icon />
+            )}
+          </HitPredictorBtn>
+        </Box>
+      </HitPredictorIco>
+      
       <SearchArea>
         <Paper
           component="form"
@@ -33,8 +55,8 @@ const ArtistDashboardHeader = () => {
             alignItems: "center",
             width: "50%",
             height: "50%",
-            border: '1px solid #969696',
-            borderRadius: '50px'
+            border: "1px solid #969696",
+            borderRadius: "50px",
           }}
         >
           <InputBase
@@ -60,13 +82,8 @@ const ArtistDashboardHeader = () => {
         <ProfileDetailArea elevation={0}>
           <Avatar src={"https://i.pravatar.cc/300"} />
           <ArtistDetail>
-            <ArtistName>
-              The Rembrandts
-            </ArtistName>
-            <ArtistGenre>
-              Rock | Dance
-            </ArtistGenre>
-            
+            <ArtistName>The Rembrandts</ArtistName>
+            <ArtistGenre>Rock | Dance</ArtistGenre>
           </ArtistDetail>
         </ProfileDetailArea>
       </ProfileArea>
