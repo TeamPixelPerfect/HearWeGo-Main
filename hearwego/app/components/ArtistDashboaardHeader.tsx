@@ -80,7 +80,7 @@ const ArtistDashboardHeader = () => {
 
       <ProfileArea>
         <ProfileDetailArea elevation={0}>
-          <Avatar src={"https://i.pravatar.cc/300"} />
+          <Avatar src={"https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"} />
           <ArtistDetail>
             <ArtistName>The Rembrandts</ArtistName>
             <ArtistGenre>Rock | Dance</ArtistGenre>
