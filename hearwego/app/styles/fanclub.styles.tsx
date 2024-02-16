@@ -7,6 +7,7 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { Stack } from "@mui/material";
+import TextField from "@mui/material/TextField";
 
 export const SearchBarPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
@@ -213,11 +214,12 @@ export const CreatePostPopup = styled("div")(({ theme }) => ({
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "20%",
-  height: "20%",
+  width: "50%",
+  height: "97%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: "#ffff",
+  backgroundColor: '#ffff',
   borderRadius: "10px",
+  // overflow:'scroll'
 }));
 
 export const CreateContestPopup = styled("div")(({ theme }) => ({
@@ -225,11 +227,56 @@ export const CreateContestPopup = styled("div")(({ theme }) => ({
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "20%",
-  height: "20%",
+  width: "50%",
+  height: "95%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   backgroundColor: "#ffff",
   borderRadius: "10px",
+}));
+
+      
+
+
+export const ArtistDetail = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "10%",
+  padding: "5px",
+  marginTop: "10px",
+  position: "relative",
+  display: "flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
+}));
+
+
+export const PostTextField = styled(TextField)(({ theme }) => ({
+  boxSizing: "initial",
+  minWidth: "95%",
+  border: "2px solid",
+  padding: "10px",
+  borderRadius: "4px",
+  marginTop:'5px',
+  color: "primary",
+  display: "flex",
+  justifyContent: "center",
+
+}));
+
+export const SubmitButton = styled(Button)(({ theme }) => ({
+  width: "100px",
+  fontSize: "14px",
+  color: "#fff",
+  backgroundColor: theme.palette.primary.main,
+  textTransform: "capitalize",
+}));
+
+export const CancleButton = styled(Button)(({ theme }) => ({
+  width: "100px",
+  fontSize: "14px",
+  color: "#370660",
+  backgroundColor: 'white',
+  textTransform: "capitalize",
+  border: "1px solid",
 }));
 
 
