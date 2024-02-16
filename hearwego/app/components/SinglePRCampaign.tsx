@@ -33,6 +33,8 @@ export default function SinglePRCampaign() {
   };
   const [progress, setProgress] = React.useState(10);
 
+  const theme = useTheme();
+
   const [openSeeMore, setopenSeeMore] = React.useState(false);
   const handleSeeMoreOpen = () => setopenSeeMore(true);
   const handleSeeMoreClose = () => setopenSeeMore(false);
@@ -72,8 +74,8 @@ export default function SinglePRCampaign() {
                   color: "black",
                 }}
               >
-                <Typography sx={{ paddingLeft: "10px" }}>Progress</Typography>
-                <Typography sx={{ paddingRight: "10px" }}>
+                <Typography sx={{ paddingLeft: "10px" , color: theme.palette.text.primary}}>Progress</Typography>
+                <Typography sx={{ paddingRight: "10px", color: theme.palette.text.primary}}>
                   60% Completed
                 </Typography>
               </Box>

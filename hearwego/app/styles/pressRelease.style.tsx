@@ -152,7 +152,7 @@ export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
     backgroundColor:
       theme.palette.mode === "light"
         ? theme.palette.primary.main
-        : theme.palette.background.default,
+        : theme.palette.secondary.main,
   },
 }));
 
