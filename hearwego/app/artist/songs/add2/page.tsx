@@ -254,7 +254,7 @@ const page = () => {
           >
             <TextField
               fullWidth
-              label="Contains music"
+              label="Artist"
               id="fullWidth"
               style={{ boxSizing: "initial" }}
             />
@@ -263,7 +263,7 @@ const page = () => {
           <Box sx={{ display: "flex", width: "300px", marginLeft: "20px" }}>
             <TextField
               fullWidth
-              label="ISRC"
+              label="Composer"
               id="fullWidth"
               style={{ boxSizing: "initial" }}
             />
@@ -278,7 +278,7 @@ const page = () => {
           >
             <TextField
               fullWidth
-              label="Contains music"
+              label="Publisher"
               id="fullWidth"
               style={{ boxSizing: "initial" }}
             />
@@ -371,7 +371,7 @@ const page = () => {
             >
               <TextField
                 fullWidth
-                label="Contains music"
+                label="Record label"
                 id="fullWidth"
                 style={{ boxSizing: "initial" }}
               />
