@@ -1,16 +1,24 @@
 import { styled } from "@mui/material";
 import { serviceItem } from "../constants/models";
 
+const tranparentPaths = [
+  "/",
+  "/auth/artistSignUp",
+  "/auth/artistSignIn",
+  "/auth/signIn",
+  "/auth/signUp",
+];
+
 export const HeaderContainer = styled("div", {
   shouldForwardProp: (prop) => prop !== "pathName",
-})<{ pathName?: string }>(({ theme, pathName }) => ({
-  background: `${(pathName === "/" || pathName === "/auth/artistSignUp") ? "transparent" : "#000"}`,
+})<{ pathName: string }>(({ theme, pathName }) => ({
+  background: `${tranparentPaths.includes(pathName) ? "transparent" : "#000"}`,
   color: "#fff",
   maxHeight: "80px",
   display: "flex",
   alignItems: "center",
   padding: "1em 2em",
-  position:"relative",
+  position: "relative",
   zIndex: 99,
   justifyContent: "flex-start",
   "@media (max-width:960px)": {
