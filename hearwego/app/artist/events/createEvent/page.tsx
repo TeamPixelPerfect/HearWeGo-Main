@@ -6,6 +6,7 @@ import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import { styled } from "@mui/material/styles";
 import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
 import Check from "@mui/icons-material/Check";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -55,6 +56,13 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Modal from "@mui/material/Modal";
+import AddIcon from "@mui/icons-material/Add";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+// import Typography from '@mui/material/Typography';
+import { CardActionArea } from "@mui/material";
 
 import {
   CreateEventMainBox,
@@ -68,6 +76,8 @@ import {
 } from "../../../styles/artistDashboardCretaeEvent.styles";
 
 import { IOSSwitch } from "../../../styles/switch.styles";
+
+import DropFile from "../../../components/DropFile";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -258,9 +268,6 @@ export default function createEvent() {
     setCompleted({});
   };
 
-  const eventDetailsComponent = EventCreateShow(0);
-
-  const ticketDetailsComponent = EventCreateShow(1);
   return (
     <CreateEventMainBox>
       <Stack sx={{ width: "100%" }} spacing={4}>
@@ -292,7 +299,6 @@ export default function createEvent() {
         ) : (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-              Step {activeStep + 1}
               <div>{EventCreateShow(activeStep)}</div>
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
@@ -332,6 +338,8 @@ export default function createEvent() {
 }
 
 function EventDetails() {
+  const [songFile, setSongFile] = React.useState(null);
+
   const [age, setAge] = React.useState("");
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -340,6 +348,28 @@ function EventDetails() {
 
   return (
     <EventFormBody sx={{ marginTop: "1em" }}>
+      <InputRow>
+        <Box
+          sx={{
+            width: "250px",
+            borderRadius: 3,
+            backgroundBlendMode: "overlay",
+          }}
+        >
+          <DropFile
+            fileTypes="Music Track"
+            fileExtensions="JPEG,PNG,WEBP,SVG"
+            isCircular={false}
+            width="250px"
+            height="250px"
+            file={songFile}
+            setFile={setSongFile}
+            aspectX={1}
+            aspectY={1}
+            shape="rect"
+          />
+        </Box>
+      </InputRow>
       <InputRow>
         <Box
           component="form"
@@ -438,7 +468,11 @@ function EventDetails() {
       <InputRow>
         <TeamTable />
 
-        <Button variant="outlined">Add New Team</Button>
+        {/* <Button variant="outlined">Add New Team</Button> */}
+      </InputRow>
+
+      <InputRow>
+        <TeamModal />
       </InputRow>
 
       <InputRow>
@@ -453,17 +487,6 @@ function EventDetails() {
           />
         </Box>
       </InputRow>
-
-      <InputRow>
-        <Stack direction="row" spacing={2}>
-          <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
-            Clear
-          </Button>
-          <Button variant="contained" endIcon={<NavigateNextIcon />}>
-            Next
-          </Button>
-        </Stack>
-      </InputRow>
     </EventFormBody>
   );
 }
@@ -476,10 +499,17 @@ function TicketDetails() {
         <AutoGenerateSwitch />
       </InputRow>
       <InputRow>
-      <Box sx={{width: '100%', padding: '3em', border: 1, borderRadius: 10, borderColor: 'primary.main'}}>
-      <AutoTicketForm />
-      </Box>
-        
+        <Box
+          sx={{
+            width: "100%",
+            padding: "3em",
+            border: 1,
+            borderRadius: 10,
+            borderColor: "primary.main",
+          }}
+        >
+          <AutoTicketForm />
+        </Box>
       </InputRow>
     </div>
   );
@@ -500,7 +530,7 @@ function SessionForm() {
       </Box>
       <SessionInputRow>
         <Box sx={{ width: "50%" }}>
-          <InputRow sx={{ backgroundColor: "red" }}>
+          <InputRow>
             <div style={{ boxSizing: "initial", width: "100%" }}>
               <DatePickerValue />
             </div>
@@ -764,6 +794,116 @@ function DatePickerValue() {
   );
 }
 
+function BudgetDetails() {
+  return (
+    <div>
+      <InputRow>
+        <CurrencySelect />
+      </InputRow>
+
+      <InputRow>
+        <BudgetTable />
+      </InputRow>
+
+      <InputRow>
+        <BudgetModal />
+      </InputRow>
+    </div>
+  );
+}
+
+function createBudgetData(
+  title: string,
+  session: string,
+  type: string,
+  amount: number
+) {
+  return { title, session, type, amount };
+}
+
+const budgetRows = [createData("Hall Rent", "Session 01", "Expense", 20000)];
+
+function BudgetTable() {
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Title</TableCell>
+            <TableCell align="right">Session</TableCell>
+            <TableCell align="right">Type</TableCell>
+            <TableCell align="right">Amount</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.title}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.title}
+              </TableCell>
+              <TableCell align="right">{row.session}</TableCell>
+              <TableCell align="right">{row.type}</TableCell>
+              <TableCell align="right">{row.amount}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+function CurrencySelect() {
+  return (
+    <Box
+      component="form"
+      sx={{
+        "& .MuiTextField-root": { width: "25ch" },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+      <div>
+        <TextField
+          id="outlined-select-currency"
+          select
+          label="Currency"
+          defaultValue="EUR"
+          helperText="Please select your currency"
+          placeholder="Currency"
+        >
+          {currencies.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      </div>
+    </Box>
+  );
+}
+
+const currencies = [
+  {
+    value: "USD",
+    label: "$",
+  },
+  {
+    value: "EUR",
+    label: "€",
+  },
+  {
+    value: "BTC",
+    label: "฿",
+  },
+  {
+    value: "JPY",
+    label: "¥",
+  },
+];
+
 function AutoGenerateSwitch() {
   return (
     <FormGroup>
@@ -793,7 +933,10 @@ function AutoTicketForm() {
 
       <InputRow>
         <TicketTable />
-        <Button variant="outlined">Add Ticket Details</Button>
+      </InputRow>
+
+      <InputRow>
+        <TicketModal />
       </InputRow>
 
       <InputRow>
@@ -861,15 +1004,504 @@ function TicketTable() {
   );
 }
 
+function BudgetModal() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const [session, setSession] = React.useState("");
+
+  const handleSessionChange = (event: SelectChangeEvent) => {
+    setSession(event.target.value as string);
+  };
+
+  const [type, setType] = React.useState("");
+
+  const handleTypeChange = (event: SelectChangeEvent) => {
+    setType(event.target.value as string);
+  };
+
+  return (
+    <div>
+      <Button onClick={handleOpen}>Add New Budget</Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute" as "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Budget Details
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            <Box sx={{ marginTop: "2em" }}>
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Budget Title"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                    placeholder="Hall Rent"
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box sx={{ minWidth: 120 }}>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">
+                      Session
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={session}
+                      label="Session"
+                      onChange={handleSessionChange}
+                    >
+                      <MenuItem value={10}>Session 01</MenuItem>
+                      <MenuItem value={20}>Session 02</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box sx={{ minWidth: 120 }}>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={type}
+                      label="Type"
+                      onChange={handleTypeChange}
+                    >
+                      <MenuItem value={10}>Expense</MenuItem>
+                      <MenuItem value={20}>Income</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Amount"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Stack direction="row" spacing={2}>
+                  <Button variant="outlined" onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button variant="contained" endIcon={<AddIcon />}>
+                    Add
+                  </Button>
+                </Stack>
+              </InputRow>
+            </Box>
+          </Typography>
+        </Box>
+      </Modal>
+    </div>
+  );
+}
+
+function TeamModal() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  return (
+    <div>
+      <Button onClick={handleOpen}>Add New Team</Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute" as "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Team Details
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            <Box sx={{ marginTop: "2em" }}>
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Team Type"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                    placeholder="Organizing"
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Team Name"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <SelectCountryCode />
+
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "60%" },
+                    width: "60%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Phone Numner"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="E-mail"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                    placeholder="hwg@gmail.com"
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Stack direction="row" spacing={2}>
+                  <Button variant="outlined" onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button variant="contained" endIcon={<AddIcon />}>
+                    Add
+                  </Button>
+                </Stack>
+              </InputRow>
+            </Box>
+          </Typography>
+        </Box>
+      </Modal>
+    </div>
+  );
+}
+
+function TicketModal() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  return (
+    <div>
+      <Button onClick={handleOpen}>Add New Ticket</Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute" as "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Ticket Details
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            <Box sx={{ marginTop: "2em" }}>
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Ticket Type"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                    placeholder="Organizing"
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Ticket Price"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-number"
+                    label="Ticket Count"
+                    type="number"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "25ch" },
+                    width: "100%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Seat Type"
+                    variant="outlined"
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "45%" },
+                    width: "45%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-number"
+                    label="Seat No. From"
+                    type="number"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { width: "45%" },
+                    width: "45%",
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    id="outlined-number"
+                    label="Seat No. To"
+                    type="number"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    style={{ boxSizing: "initial" }}
+                    sx={{ minWidth: "100%" }}
+                  />
+                </Box>
+              </InputRow>
+
+              <InputRow>
+                <Stack direction="row" spacing={2}>
+                  <Button variant="outlined" onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button variant="contained" endIcon={<AddIcon />}>
+                    Add
+                  </Button>
+                </Stack>
+              </InputRow>
+            </Box>
+          </Typography>
+        </Box>
+      </Modal>
+    </div>
+  );
+}
+
+function SelectCountryCode() {
+  return (
+    <Box sx={{ width: "30%" }}>
+      <Box
+        component="form"
+        sx={{
+          "& .MuiTextField-root": { width: "100%" },
+        }}
+        noValidate
+        autoComplete="off"
+      >
+        <div>
+          <TextField
+            id="outlined-select-currency"
+            select
+            label="Country Code"
+            defaultValue="EUR"
+          >
+            {countryCode.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </div>
+      </Box>
+    </Box>
+  );
+}
+
 function EventCreateShow(n: number) {
   if (n == 0) {
     return <EventDetails />;
   } else if (n == 1) {
     return <TicketDetails />;
   } else if (n == 2) {
-    return <TicketDetails />;
+    return <BudgetDetails />;
   } else if (n == 3) {
-    return <TicketDetails />;
+    return <EventFormFinish />;
   }
 }
 
@@ -882,3 +1514,221 @@ const artists = [
   { title: "Schindler's List", year: 1993 },
   { title: "Pulp Fiction", year: 1994 },
 ];
+
+const countryCode = [
+  {
+    value: "SL",
+    label: "+94",
+  },
+  {
+    value: "USA",
+    label: "USA",
+  },
+  {
+    value: "BTC",
+    label: "฿",
+  },
+  {
+    value: "JPY",
+    label: "¥",
+  },
+];
+
+function EventFormFinish() {
+  return (
+    <Box sx={{ display: "flex" }}>
+      <Box sx={{ width: "50%" }}>
+        <Stack spacing={2} direction='column' sx={{width:'100%'}}>
+        <EventInfoCard />
+        <BudgetInfoCard />
+        </Stack>
+        
+      </Box>
+      <Box sx={{ width: "50%" }}>
+        <SessionInfoCard />
+      </Box>
+    </Box>
+  );
+}
+
+function SessionInfoCard() {
+  return (
+    <Card sx={{ width: '100%' }}>
+      <CardActionArea>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>Session 01</Box>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Date</Box>
+              <Box sx={{ width: "60%" }}>2024-02-19</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Time</Box>
+              <Box sx={{ width: "60%" }}>8.00 P.M.</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Duration</Box>
+              <Box sx={{ width: "60%" }}>3 Hours</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Venue</Box>
+              <Box sx={{ width: "60%" }}>Location</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="coloumn"
+              spacing={1}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Other Artists</Box>
+            </Stack>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ width: "100%", marginBottom: "1em" }}
+            >
+              <Chip avatar={<Avatar>M</Avatar>} label="Avatar" />
+              <Chip
+                avatar={
+                  <Avatar alt="Natacha" src="https://shorturl.at/bhKS9" />
+                }
+                label="Avatar"
+                variant="outlined"
+              />
+            </Stack>
+
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="coloumn"
+              spacing={1}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Ticket Details</Box>
+            </Stack>
+                <Box sx={{marginBottom: '1em'}}>
+                <TicketTable />
+                </Box>
+            
+
+            <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Special Notice</Box>
+              <Box sx={{ width: "100%", textAlign: "justify" }}>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima
+                itaque aliquid, maxime quia ab doloribus tenetur dolor,
+                similique molestiae modi nobis, porro eius vero animi ratione
+                odio laboriosam est asperiores!
+              </Box>
+            </Stack>
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+}
+
+function BudgetInfoCard(){
+  return (
+    <Card sx={{ width: '90%' }}>
+      <CardActionArea>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>Budget Details</Box>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+          <BudgetTable />
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+}
+
+function EventInfoCard() {
+  return (
+    <Card sx={{ width: '90%' }}>
+      <CardActionArea>
+        <CardMedia
+          component="img"
+          height="140"
+          image="https://shorturl.at/kotTU"
+          alt="green iguana"
+        />
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>
+              Event Infomation
+            </Box>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Event Name</Box>
+              <Box sx={{ width: "60%" }}>Naadagama</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Event Type</Box>
+              <Box sx={{ width: "60%" }}>Modern</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Age Limit</Box>
+              <Box sx={{ width: "60%" }}>None</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>No. of Sessions</Box>
+              <Box sx={{ width: "60%" }}>1</Box>
+            </Stack>
+            <Stack
+              sx={{ width: "100%", marginBottom: "1em" }}
+              direction="row"
+              spacing={4}
+            >
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Sponsors</Box>
+              <Box sx={{ width: "60%" }}>Sponsor01, Sponsor02</Box>
+            </Stack>
+
+            <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
+              <Box sx={{ fontWeight: 600, width: "40%" }}>Description</Box>
+              <Box sx={{ width: "100%", textAlign: "justify" }}>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima
+                itaque aliquid, maxime quia ab doloribus tenetur dolor,
+                similique molestiae modi nobis, porro eius vero animi ratione
+                odio laboriosam est asperiores!
+              </Box>
+            </Stack>
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+}
