@@ -352,18 +352,23 @@ function EventDetails() {
     <EventFormBody sx={{ marginTop: "1em" }}>
       <InputRow>
         <Box
+        id="img-box"
           sx={{
-            width: "250px",
+            width: "50%",
             borderRadius: 3,
-            backgroundBlendMode: "overlay",
+            // border: 1,
+            // display: 'flex',
+            // justifyContent: 'center',
+            // alignItems: 'center',
+            // backgroundBlendMode: "overlay",
           }}
         >
           <DropFile
-            fileTypes="Music Track"
+            fileTypes="Event Cover Image"
             fileExtensions="JPEG,PNG,WEBP,SVG"
             isCircular={false}
-            width="250px"
-            height="250px"
+            width="100%"
+            height={"500px"}
             file={songFile}
             setFile={setSongFile}
             aspectX={1}
@@ -823,7 +828,7 @@ function createBudgetData(
   return { title, session, type, amount };
 }
 
-const budgetRows = [createData("Hall Rent", "Session 01", "Expense", 20000)];
+const budgetRows = [createBudgetData("Hall Rent", "Session 01", "Expense", 20000)];
 
 function BudgetTable() {
   return (
@@ -838,7 +843,7 @@ function BudgetTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {budgetRows.map((row) => (
             <TableRow
               key={row.title}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -985,13 +990,13 @@ function TicketTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {ticketRows.map((row) => (
             <TableRow
-              key={row.Type}
+              key={row.type}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {row.Type}
+                {row.type}
               </TableCell>
               <TableCell align="right">{row.price}</TableCell>
               <TableCell align="right">{row.count}</TableCell>

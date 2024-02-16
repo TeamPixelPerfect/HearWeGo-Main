@@ -39,6 +39,7 @@ import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
 import ImageCropper from "../../components/ImageCropper";
 import DropFile from "../../components/DropFile";
+import { useTheme } from "@mui/material";
 
 const options = [
   "None",
@@ -68,6 +69,8 @@ export default function Context() {
   const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
+  const theme = useTheme();
 
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLElement>,
@@ -170,16 +173,18 @@ export default function Context() {
                 open={openPostScheduling}
                 onClose={handlePostSchedulingClose}
               >
-                <PostSchedulePopup sx={{ backgroundColor: "#8D59CE" }}>
+                <PostSchedulePopup>
                   <Typography
                     variant="h5"
                     component="h5"
                     sx={{
-                      color: "black",
+                      color: theme.palette.text.primary,
                       textAlign: "center",
                       padding: "10px",
                       borderColor: "divider",
                       borderBottom: "2px solid",
+                      textTransform: "uppercase",
+                      fontWeight: 600
                     }}
                   >
                     Create Post
@@ -197,11 +202,13 @@ export default function Context() {
                     <Typography
                       sx={{
                         paddingLeft: "10px",
-                        color: "black",
+                        color: theme.palette.text.primary,
                       }}
                     >
                       Damidu Thathsara<br></br>
+                      <Box sx={{fontSize:"12px"}}>
                       2021-09-20<br></br> 12:30:00
+                      </Box>
                     </Typography>
                   </ArtistDetail>
                   <Box
@@ -214,12 +221,12 @@ export default function Context() {
                   >
                     <PostTextField
                       multiline
-                      minRows={4}
+                      minRows={2}
                       placeholder="What's On Your Mind?"
                       variant="filled"
                       inputProps={{
                         style: {
-                          color: "black",
+                          color: theme.palette.text.primary,
                         },
                       }}
                     />
@@ -227,15 +234,15 @@ export default function Context() {
                   <Box
                     sx={{
                       width: "100%",
-                      height: "28%",
+                      // height: "28%",
                     }}
                   >
                     <DropFile
-                      fileTypes="Music Track"
+                      fileTypes="Post Image"
                       fileExtensions="JPEG,PNG,WEBP,SVG"
                       isCircular={false}
                       width="100%"
-                      height="195px"
+                      height="150px"
                       file={songFile}
                       setFile={setSongFile}
                       aspectX={1}
@@ -247,9 +254,10 @@ export default function Context() {
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
+                      alignItems:"center"
                     }}
                   >
-                    <Box
+                   <Box
                       sx={{
                         width: "50%",
                         textAlign: "center",
@@ -314,7 +322,7 @@ export default function Context() {
                     <Box
                       sx={{
                         backgroundColor: "#B2B1FF",
-                        padding: "20px",
+                        padding: "10px",
                         marginTop: "10px",
                         width: "50%",
                         textAlign: "center",
@@ -350,7 +358,8 @@ export default function Context() {
                         </DemoContainer>
                       </LocalizationProvider>
                     </Box>
-                  </Box>
+                   </Box>
+      
 
                   <Stack
                     direction="row"
