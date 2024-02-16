@@ -127,6 +127,7 @@ const page = () => {
             borderRadius: "20px"
           }}
         ></Box>
+           <p style={{ backgroundColor:"white",borderRadius:"5px",padding:"5px",marginTop:"120px",color:'#6366F1'}}>https://www.Hearwego.song.com</p>
           </Box>
         </Box>
       </Box>
@@ -169,7 +170,7 @@ const page = () => {
           <Button
             variant="contained"
             onClick={() => {
-              Router.replace("/artist/songs");
+              Router.replace("add4");
             }}
           >
             Save
