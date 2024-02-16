@@ -9,6 +9,7 @@ import {
   ArtistDetail,
   PostTextField,
   PostContextBox,
+  PostForPopup,
 } from "../../styles/pressRelease.style";
 import SinglePRCampaign from "../../components/SinglePRCampaign";
 import Button from "@mui/material/Button";
@@ -37,6 +38,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
 import ImageCropper from "../../components/ImageCropper";
+import DropFile from "../../components/DropFile";
 
 const options = [
   "None",
@@ -46,6 +48,8 @@ const options = [
 ];
 
 export default function Context() {
+  const [songFile, setSongFile] = React.useState(null);
+
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -222,11 +226,23 @@ export default function Context() {
                   </Box>
                   <Box
                     sx={{
-                      backgroundColor: "background.default",
                       width: "100%",
                       height: "28%",
                     }}
-                  ></Box>
+                  >
+                    <DropFile
+                      fileTypes="Music Track"
+                      fileExtensions="JPEG,PNG,WEBP,SVG"
+                      isCircular={false}
+                      width="100%"
+                      height="195px"
+                      file={songFile}
+                      setFile={setSongFile}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                    />
+                  </Box>
                   <Box
                     sx={{
                       display: "flex",
@@ -378,7 +394,7 @@ export default function Context() {
               <SinglePRCampaign />
             </Box>
           </TabPanel>
-          <TabPanel value="2">Item Two</TabPanel>
+          <TabPanel value="2"></TabPanel>
           <TabPanel value="3">Item Three</TabPanel>
           <TabPanel value="4">Item Four</TabPanel>
         </TabContext>

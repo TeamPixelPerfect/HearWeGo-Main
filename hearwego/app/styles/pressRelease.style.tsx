@@ -148,6 +148,20 @@ export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
   },
   [`& .${linearProgressClasses.bar}`]: {
     borderRadius: 5,
-    backgroundColor: theme.palette.mode === "light" ? theme.palette.primary.main:theme.palette.background.default ,
+    backgroundColor:
+      theme.palette.mode === "light"
+        ? theme.palette.primary.main
+        : theme.palette.background.default,
   },
+}));
+
+export const PostForPopup = muiStyled(Box)(({ theme }) => ({
+  width: "50%",
+  height: "200px",
+  backgroundImage: "url('https://source.unsplash.com/random')",
+  backgroundRepeat:"no-repeat",
+  backgroundSize:"cover",
+  display: "flex",
+  alignItems: "flex-end",
+  borderRadius: "10px",
 }));

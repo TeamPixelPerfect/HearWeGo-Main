@@ -8,6 +8,7 @@ import {
   BorderLinearProgress,
   TabsNav,
   TabItem,
+  PostForPopup,
 } from "../styles/pressRelease.style";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -22,6 +23,8 @@ import TabPanel from "@mui/lab/TabPanel";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import Icon from "@mui/material/Icon";
 import Checkbox from "@mui/material/Checkbox";
+import Stack from "@mui/material/Stack";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 export default function SinglePRCampaign() {
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
@@ -96,7 +99,10 @@ export default function SinglePRCampaign() {
 
                   <TabPanel
                     value="1"
-                    sx={{ backgroundColor: "primary.main", minHeight: "100%" }}
+                    sx={{
+                      backgroundColor: "primary.main",
+                      minHeight: "100%",
+                    }}
                   >
                     <div>
                       <SingleTask />
@@ -105,16 +111,85 @@ export default function SinglePRCampaign() {
                       <SingleTask />
                       <SingleTask />
                       <SingleTask />
+                      <SingleTask />
                     </div>
-                    <Button
-                      onClick={handleSeeMoreClose}
-                      variant="contained"
-                      sx={{ width: "25%" }}
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ justifyContent: "right", width: "100%" }}
                     >
-                      Done
-                    </Button>
+                      <Button
+                        onClick={handleSeeMoreClose}
+                        variant="contained"
+                        sx={{
+                          width: "25%",
+                          backgroundColor: "background.default",
+                          color: "primary.main",
+                        }}
+                      >
+                        Cancle
+                      </Button>
+                      <Button
+                        onClick={handleSeeMoreClose}
+                        variant="contained"
+                        sx={{ width: "25%" }}
+                      >
+                        Done
+                      </Button>
+                    </Stack>
                   </TabPanel>
-                  <TabPanel value="2">Item Two</TabPanel>
+                  <TabPanel value="2">
+                    <Box>
+                      <PostForPopup>
+                        <Box
+                          sx={{
+                            backgroundColor: "background.default",
+                            opacity: "0.8",
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "10px",
+                          }}
+                        >
+                          <Stack direction="row" spacing="2">
+                            <Typography
+                              variant="body1"
+                              component="p"
+                              sx={{ color: "black", alignItems: "center" }}
+                            >
+                              <Icon
+                                sx={{ color: "black", marginRight: "5 px" }}
+                              >
+                                <CalendarMonthIcon />
+                              </Icon>
+                              <br />
+                              2/06/2024
+                            </Typography>
+                            <Typography
+                              variant="body1"
+                              component="p"
+                              sx={{ color: "black" }}
+                            >
+                              <Icon
+                                sx={{ color: "black", marginRight: "5 px" }}
+                              >
+                                <CalendarMonthIcon />
+                              </Icon>
+                              <br />
+                              15:00P.M.
+                            </Typography>
+                            <Button
+                              onClick={handleSeeMoreClose}
+                              variant="contained"
+                              sx={{ width: "25%" }}
+                            >
+                              Done
+                            </Button>
+                          </Stack>
+                        </Box>
+                      </PostForPopup>
+                    </Box>
+                  </TabPanel>
                 </TabContext>
               </TabsNav>
             </PostSchedulePopup>
