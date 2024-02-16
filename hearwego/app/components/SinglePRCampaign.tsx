@@ -25,12 +25,15 @@ import Icon from "@mui/material/Icon";
 import Checkbox from "@mui/material/Checkbox";
 import Stack from "@mui/material/Stack";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { useTheme } from "@mui/material";
 export default function SinglePRCampaign() {
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
   const [progress, setProgress] = React.useState(10);
+
+  const theme = useTheme();
 
   const [openSeeMore, setopenSeeMore] = React.useState(false);
   const handleSeeMoreOpen = () => setopenSeeMore(true);
@@ -71,8 +74,8 @@ export default function SinglePRCampaign() {
                   color: "black",
                 }}
               >
-                <Typography sx={{ paddingLeft: "10px" }}>Progress</Typography>
-                <Typography sx={{ paddingRight: "10px" }}>
+                <Typography sx={{ paddingLeft: "10px" , color: theme.palette.text.primary}}>Progress</Typography>
+                <Typography sx={{ paddingRight: "10px", color: theme.palette.text.primary}}>
                   60% Completed
                 </Typography>
               </Box>
@@ -220,6 +223,8 @@ function LinearProgressWithLabel(
 export function SingleTask() {
   const [isChecked, setIsChecked] = React.useState(false);
 
+  const theme = useTheme();
+
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
   };
@@ -242,10 +247,10 @@ export function SingleTask() {
           textDecoration: isChecked ? "line-through" : "none",
         }}
       >
-        <Icon sx={{ color: "black", marginRight: "15px" }}>
+        <Icon sx={{ color: theme.palette.text.primary, marginRight: "15px" }}>
           <ListAltIcon />
         </Icon>
-        <Typography sx={{ color: "black" }}>Organize a Meeting</Typography>
+        <Typography sx={{ color: theme.palette.text.primary }}>Organize a Meeting</Typography>
       </Box>
       <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
     </Box>
