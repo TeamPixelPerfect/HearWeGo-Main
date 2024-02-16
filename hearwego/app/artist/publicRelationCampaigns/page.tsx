@@ -81,7 +81,7 @@ export default function Context() {
     setAnchorEl(null);
   };
   return (
-    <BorderBox>
+    <>
       <TabsNav sx={{ width: "100%", typography: "body1" }}>
         <TabContext value={value}>
           <Box
@@ -105,12 +105,12 @@ export default function Context() {
               <TabItem label="Scheduled Posts" value="4" />
             </TabList>
 
-            <Stack direction="row" spacing={4}>
+            <Stack direction="row" spacing={1}>
               <Button
                 onClick={handleCreateCampaignOpen}
                 variant="contained"
                 startIcon={<EditNoteIcon />}
-                sx={{ width: "60%" }}
+                // sx={{ width: "60%" }}
               >
                 Create Campaign
               </Button>
@@ -162,7 +162,7 @@ export default function Context() {
                 onClick={handlePostSchedulingOpen}
                 variant="contained"
                 startIcon={<ScheduleIcon />}
-                sx={{ width: "60%" }}
+                // sx={{ width: "60%" }}
               >
                 Post Scheduling
               </Button>
@@ -379,6 +379,7 @@ export default function Context() {
             value="1"
             style={{
               width: "100%",
+              padding: "1em 0"
             }}
           >
             <Box
@@ -399,6 +400,6 @@ export default function Context() {
           <TabPanel value="4">Item Four</TabPanel>
         </TabContext>
       </TabsNav>
-    </BorderBox>
+    </>
   );
 }
