@@ -7,7 +7,9 @@ import CardMedia from "@mui/material/CardMedia";
 import { Box } from "@mui/material";
 import styled from "styled-components";
 import TextField from "@mui/material/TextField";
-
+import LinearProgress, {
+  linearProgressClasses,
+} from "@mui/material/LinearProgress";
 
 export const TabItem = muiStyled(Tab)(({ theme }) => ({
   minHeight: 53,
@@ -55,7 +57,7 @@ export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   position: "relative",
   overflow: "initial",
   marginLeft: "20px ",
-  padding: "10px",
+  padding: "2px",
   marginBottom: "10px",
   backgroundColor: theme.palette.primary.main,
 }));
@@ -101,10 +103,11 @@ export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
   left: "53%",
   transform: "translate(-50%, -50%)",
   width: "30%",
-  height: "80%",
+  height: "fit-content",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  padding: "4px",
+  padding: "1em",
   borderRadius: "10px",
+  background: theme.palette.background.default,
 }));
 
 export const ArtistDetail = muiStyled(Box)(({ theme }) => ({
@@ -135,4 +138,31 @@ export const PostContextBox = muiStyled(Box)(({ theme }) => ({
   textAlign: "center",
   borderRadius: "10px",
   height: "40%",
+}));
+
+export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
+  height: "20px",
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor:
+      theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    backgroundColor:
+      theme.palette.mode === "light"
+        ? theme.palette.primary.main
+        : theme.palette.secondary.main,
+  },
+}));
+
+export const PostForPopup = muiStyled(Box)(({ theme }) => ({
+  width: "50%",
+  height: "200px",
+  backgroundImage: "url('https://source.unsplash.com/random')",
+  backgroundRepeat:"no-repeat",
+  backgroundSize:"cover",
+  display: "flex",
+  alignItems: "flex-end",
+  borderRadius: "10px",
 }));

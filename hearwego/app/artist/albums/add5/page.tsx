@@ -77,7 +77,7 @@ const page = () => {
             marginTop: "20px",
           }}
         >
-          <h1 style={{ margin: 0 }}>Add New Song</h1>
+          <h1 style={{ margin: 0 }}>Add New Album</h1>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ const page = () => {
                 sx={{
                   display: "flex",
                   width: "500px",
-                  maxWidth: "90%",
+                  maxWidth: "100%",
                   marginBottom: "30px",
                 }}
               >
@@ -127,7 +127,7 @@ const page = () => {
                 sx={{
                   display: "flex",
                   width: "500px",
-                  maxWidth: "90%",
+                  maxWidth: "100%",
                   marginBottom: "30px",
                 }}
               >
@@ -145,7 +145,7 @@ const page = () => {
                 sx={{
                   display: "flex",
                   width: "500px",
-                  maxWidth: "90%",
+                  maxWidth: "100%",
                   marginBottom: "30px",
                 }}
               >
@@ -160,7 +160,7 @@ const page = () => {
                 sx={{
                   display: "flex",
                   width: "476px",
-                  maxWidth: "90%",
+                  maxWidth: "100%",
                 }}
               >
                 <TextField

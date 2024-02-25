@@ -9,6 +9,7 @@ import {
   ArtistDetail,
   PostTextField,
   PostContextBox,
+  PostForPopup,
 } from "../../styles/pressRelease.style";
 import SinglePRCampaign from "../../components/SinglePRCampaign";
 import Button from "@mui/material/Button";
@@ -36,6 +37,9 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
+import ImageCropper from "../../components/ImageCropper";
+import DropFile from "../../components/DropFile";
+import { useTheme } from "@mui/material";
 
 const options = [
   "None",
@@ -45,6 +49,8 @@ const options = [
 ];
 
 export default function Context() {
+  const [songFile, setSongFile] = React.useState(null);
+
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -64,6 +70,8 @@ export default function Context() {
     setAnchorEl(event.currentTarget);
   };
 
+  const theme = useTheme();
+
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLElement>,
     index: number
@@ -76,7 +84,7 @@ export default function Context() {
     setAnchorEl(null);
   };
   return (
-    <BorderBox>
+    <>
       <TabsNav sx={{ width: "100%", typography: "body1" }}>
         <TabContext value={value}>
           <Box
@@ -100,12 +108,12 @@ export default function Context() {
               <TabItem label="Scheduled Posts" value="4" />
             </TabList>
 
-            <Stack direction="row" spacing={4}>
+            <Stack direction="row" spacing={1}>
               <Button
                 onClick={handleCreateCampaignOpen}
                 variant="contained"
                 startIcon={<EditNoteIcon />}
-                sx={{ width: "60%" }}
+                // sx={{ width: "60%" }}
               >
                 Create Campaign
               </Button>
@@ -157,7 +165,7 @@ export default function Context() {
                 onClick={handlePostSchedulingOpen}
                 variant="contained"
                 startIcon={<ScheduleIcon />}
-                sx={{ width: "60%" }}
+                // sx={{ width: "60%" }}
               >
                 Post Scheduling
               </Button>
@@ -165,16 +173,18 @@ export default function Context() {
                 open={openPostScheduling}
                 onClose={handlePostSchedulingClose}
               >
-                <PostSchedulePopup sx={{backgroundColor:"#8D59CE"}}>
+                <PostSchedulePopup>
                   <Typography
                     variant="h5"
                     component="h5"
                     sx={{
-                      color: "black",
+                      color: theme.palette.text.primary,
                       textAlign: "center",
                       padding: "10px",
                       borderColor: "divider",
                       borderBottom: "2px solid",
+                      textTransform: "uppercase",
+                      fontWeight: 600
                     }}
                   >
                     Create Post
@@ -192,11 +202,13 @@ export default function Context() {
                     <Typography
                       sx={{
                         paddingLeft: "10px",
-                        color: "black",
+                        color: theme.palette.text.primary,
                       }}
                     >
                       Damidu Thathsara<br></br>
+                      <Box sx={{fontSize:"12px"}}>
                       2021-09-20<br></br> 12:30:00
+                      </Box>
                     </Typography>
                   </ArtistDetail>
                   <Box
@@ -209,32 +221,43 @@ export default function Context() {
                   >
                     <PostTextField
                       multiline
-                      minRows={4}
+                      minRows={2}
                       placeholder="What's On Your Mind?"
                       variant="filled"
                       inputProps={{
                         style: {
-                          color: "black",
+                          color: theme.palette.text.primary,
                         },
                       }}
                     />
                   </Box>
                   <Box
                     sx={{
-                      backgroundColor: "background.default",
                       width: "100%",
-                      height: "28%",
+                      // height: "28%",
                     }}
                   >
-                    hi
+                    <DropFile
+                      fileTypes="Post Image"
+                      fileExtensions="JPEG,PNG,WEBP,SVG"
+                      isCircular={false}
+                      width="100%"
+                      height="150px"
+                      file={songFile}
+                      setFile={setSongFile}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                    />
                   </Box>
                   <Box
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
+                      alignItems:"center"
                     }}
                   >
-                    <Box
+                   <Box
                       sx={{
                         width: "50%",
                         textAlign: "center",
@@ -299,7 +322,7 @@ export default function Context() {
                     <Box
                       sx={{
                         backgroundColor: "#B2B1FF",
-                        padding: "20px",
+                        padding: "10px",
                         marginTop: "10px",
                         width: "50%",
                         textAlign: "center",
@@ -335,7 +358,8 @@ export default function Context() {
                         </DemoContainer>
                       </LocalizationProvider>
                     </Box>
-                  </Box>
+                   </Box>
+      
 
                   <Stack
                     direction="row"
@@ -364,6 +388,7 @@ export default function Context() {
             value="1"
             style={{
               width: "100%",
+              padding: "1em 0"
             }}
           >
             <Box
@@ -377,14 +402,13 @@ export default function Context() {
               <SinglePRCampaign />
               <SinglePRCampaign />
               <SinglePRCampaign />
-              <SinglePRCampaign />
             </Box>
           </TabPanel>
-          <TabPanel value="2">Item Two</TabPanel>
+          <TabPanel value="2"></TabPanel>
           <TabPanel value="3">Item Three</TabPanel>
           <TabPanel value="4">Item Four</TabPanel>
         </TabContext>
       </TabsNav>
-    </BorderBox>
+    </>
   );
 }

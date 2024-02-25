@@ -2,12 +2,11 @@
 import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import { RiImageAddFill } from "react-icons/ri";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import ImageCropper from "./ImageCropper";
 import Modal from "@mui/material/Modal";
 import { CropperModal } from "../styles/imageCropper.styles";
-
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { TbMusicPlus } from "react-icons/tb";
 
 interface Props {
   fileTypes: string;
@@ -22,7 +21,7 @@ interface Props {
   shape: 'rect'|'round'
 }
 
-const DropFile = ({
+const DropSong = ({
   fileTypes,
   fileExtensions,
   isCircular,
@@ -38,8 +37,6 @@ const DropFile = ({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const theme = useTheme();
-
   const handleSelectFile = (acceptedFiles: File[]) => {
     setFile(URL.createObjectURL(acceptedFiles[0]));
     handleOpen();
@@ -47,31 +44,13 @@ const DropFile = ({
 
   return (
     <>
-      <CropperModal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        {file ? (
-          <ImageCropper
-            image={file}
-            setImage={setFile}
-            handleClose={handleClose}
-            aspectX={aspectX}
-            aspectY={aspectY}
-            shape={shape}
-          />
-        ) : (
-          <Box>No image file selected</Box>
-        )}
-      </CropperModal>
+     
       <Dropzone onDrop={(acceptedFiles) => handleSelectFile(acceptedFiles)}>
         {({ getRootProps, getInputProps }) => (
           <section
             style={{
               background: "rgba(255,255,255,0.1)",
-              border: `1px solid ${theme.palette.text.primary}`,
+              border: "1px solid #9333EA",
               borderRadius: isCircular ? "50%" : "10px",
               width: isCircular ? "170px" : width,
               minWidth: isCircular ? "170px" : width,
@@ -89,7 +68,7 @@ const DropFile = ({
                 height: "80%",
                 borderWidth: "3px",
                 borderStyle: "dashed",
-                borderColor: theme.palette.text.primary,
+                borderColor: "rgba(147,51,234,0.4)",
                 borderRadius: isCircular ? "50%" : "10px",
                 display: "flex",
                 flexDirection: "column",
@@ -109,10 +88,10 @@ const DropFile = ({
                 />
               ) : (
                 <>
-                  <AddPhotoAlternateIcon
+                  <TbMusicPlus
                     style={{
                       fontSize: isCircular ? "40px" : "60px",
-                      color: theme.palette.text.primary,
+                      color: "#9333EA",
                     }}
                   />
                   <input {...getInputProps()} />
@@ -120,7 +99,7 @@ const DropFile = ({
                     variant="subtitle1"
                     sx={{
                       textAlign: "center",
-                      color: theme.palette.text.primary,
+                      color: "#9333EA",
                       fontSize: isCircular ? "12px" : "16px",
                     }}
                   >
@@ -148,4 +127,4 @@ const DropFile = ({
   );
 };
 
-export default DropFile;
+export default DropSong;
