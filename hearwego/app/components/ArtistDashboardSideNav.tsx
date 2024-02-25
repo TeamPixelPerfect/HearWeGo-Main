@@ -24,9 +24,14 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import ADNavItemGroup from "./ADNavItemGroup";
+import { useRouter } from "next/navigation";
 
 const ArtistDashboardSideNav = () => {
+  const Router = useRouter();
+
   const app = useAppSelector((state) => state.app);
+  const artist = useAppSelector((state) => state.artist.user);
+
   const [open, setOpen] = useState(true);
 
   const handleOpen = () => setOpen(true);
@@ -116,6 +121,13 @@ const ArtistDashboardSideNav = () => {
       ],
     },
   ];
+
+  useEffect(() => {
+    console.log("Artist:::", artist);
+    if (!artist) {
+      Router.replace("/auth/artistSignUp");
+    }
+  }, [artist]);
 
   return (
     <ArtistDashboardSideNavContainer>

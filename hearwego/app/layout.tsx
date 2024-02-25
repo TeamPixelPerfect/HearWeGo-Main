@@ -9,6 +9,7 @@ import { AppItem } from "./constants/models";
 import { base_url } from "./constants/keys";
 import React from "react";
 import CustomeThemeProvider from "./styles/CustomeTheme";
+import UserAuthProvider from "./auth/AuthProviders/UserAuthProvider";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -33,7 +34,9 @@ export default async function RootLayout({
         <CustomeThemeProvider>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <StoreProvider>
-              <Wrapper app={app} children={children}/>
+              <UserAuthProvider>
+                <Wrapper app={app} children={children} />
+              </UserAuthProvider>
             </StoreProvider>
           </AppRouterCacheProvider>
         </CustomeThemeProvider>

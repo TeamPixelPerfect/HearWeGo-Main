@@ -5,6 +5,7 @@ const initialState: AppItem = {
     logo_url: "",
     banner_imgs: [],
     site_main_menu: [],
+    service_items: [],
 }
 
 export const appSlice = createSlice({

@@ -18,8 +18,17 @@ import Link from "next/link";
 import ReactCountryFlag from "react-country-flag";
 import { countries } from "country-flag-icons";
 import { useRouter } from "next/navigation";
+import { handleRegister } from "@/app/services/AuthServices";
+import { useAppDispatch } from "@/lib/hooks";
+import { logInUser } from "@/lib/features/user.slice";
+
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const SignUp = () => {
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const [userDetails, setUserDetails] = React.useState({
@@ -29,9 +38,12 @@ const SignUp = () => {
     confirmPassword: "",
     country: "",
     mobileNumber: "",
+    gender: "",
+    birthDate: "",
   });
 
   const [selectedCountry, setSelectedCountry] = useState("LK");
+  const [selectedDay, setSelectedDay] = React.useState<Dayjs | null>();
 
   const [nameError, setNameError] = React.useState(false);
   const [emailError, setEmailError] = React.useState(false);
@@ -41,15 +53,60 @@ const SignUp = () => {
   const [mobileNumberError, setMobileNumberError] = React.useState(false);
   const [passwordMismatchError, setPasswordMismatchError] =
     React.useState(false);
+  const [genderError, setGenderError] = React.useState(false);
+  const [birthDateError, setBirthDateError] = React.useState(false);
 
   // Handle country change
   const handleCountryChange = (event: SelectChangeEvent) => {
     setSelectedCountry(event.target.value);
+    setUserDetails({ ...userDetails, country: event.target.value });
+  };
+
+  // Handle bday change
+  const handleBirthDateChange = (date: Dayjs | null) => {
+    setSelectedDay(date);
+    if (date)
+      setUserDetails({
+        ...userDetails,
+        birthDate: date.format("YYYY-MM-DD").toString(),
+      });
+  };
+
+  // Handle Sign up process
+  const handleSignUp = () => {
+    if (userDetails.name === "") {
+      setNameError(true);
+    } else if (userDetails.email === "") {
+      setEmailError(true);
+    } else if (userDetails.password === "") {
+      setPasswordError(true);
+    } else if (userDetails.confirmPassword === "") {
+      setConfirmPasswordError(true);
+    } else if (userDetails.country === "") {
+      setCountryError(true);
+    } else if (userDetails.mobileNumber === "") {
+      setMobileNumberError(true);
+    } else if (userDetails.password !== userDetails.confirmPassword) {
+      setPasswordMismatchError(true);
+    } else if (userDetails.gender === "") {
+      setGenderError(true);
+    } else if (userDetails.birthDate === "") {
+      setBirthDateError(true);
+    } else {
+      console.log(userDetails);
+      handleRegister(userDetails).then((res) => {
+        if (res) {
+          dispatch(logInUser(res?.user));
+          localStorage.setItem("hwg-user", JSON.stringify(res));
+          router.replace("/");
+        }
+      });
+    }
   };
 
   return (
     <AuthContainer>
-      <Stack sx={{ width: "100%", padding: "12px" }}>
+      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
         <CloseIcon
           sx={{
             color: "rgba(255,255,255,0.4)",
@@ -58,7 +115,7 @@ const SignUp = () => {
             alignSelf: "flex-end",
           }}
         />
-      </Stack>
+      </Stack> */}
       <Box>
         <Box
           id="artist-sign-in"
@@ -104,7 +161,7 @@ const SignUp = () => {
             variant="outlined"
             type="email"
             color={emailError ? "error" : "primary"}
-            style={{ boxSizing: "initial"}}
+            style={{ boxSizing: "initial" }}
             defaultValue={userDetails.email}
             onChange={(e) => {
               setUserDetails({ ...userDetails, email: e.target.value });
@@ -145,6 +202,45 @@ const SignUp = () => {
             }
           />
 
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              sx={{
+                background: "rgba(255,255,255,0.1)",
+                margin: "10px 0",
+                width: "40%",
+                minWidth: "300px",
+                color: "#fff",
+                borderRadius: "10px",
+                boxSizing: "initial",
+              }}
+              label="Birth Date*"
+              value={selectedDay}
+              onChange={handleBirthDateChange}
+              inputRef={(input) => input && birthDateError && input.focus()}
+            />
+          </LocalizationProvider>
+
+          <AuthTextField
+            id="gender"
+            label="Gender*"
+            variant="outlined"
+            select
+            color={genderError ? "error" : "primary"}
+            style={{ boxSizing: "initial" }}
+            defaultValue={userDetails.gender}
+            onChange={(e) => {
+              setUserDetails({
+                ...userDetails,
+                gender: e.target.value,
+              });
+            }}
+            inputRef={(input) => input && genderError && input.focus()}
+          >
+            <MenuItem value="Male">Male</MenuItem>
+            <MenuItem value="Female">Female</MenuItem>
+            <MenuItem value="Other">Other</MenuItem>
+          </AuthTextField>
+
           <Stack
             direction="row"
             sx={{
@@ -155,16 +251,7 @@ const SignUp = () => {
           >
             <FormControl sx={{ m: 1, minWidth: 80 }}>
               <InputLabel id="demo-simple-select-autowidth-label">
-                <ReactCountryFlag
-                  countryCode={selectedCountry}
-                  svg
-                  style={{
-                    width: "1.5em",
-                    height: "1.5em",
-                    marginRight: "8px",
-                  }}
-                  title={selectedCountry}
-                />
+                Country
               </InputLabel>
               <Select
                 labelId="demo-simple-select-autowidth-label"
@@ -249,13 +336,16 @@ const SignUp = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => {router.replace("/")}}
+              onClick={handleSignUp}
             >
               Sign up
             </Button>
           </Stack>
 
-          <Typography variant="body1" sx={{ color: "#fff", marginTop: "10px", paddingBottom:"20px" }}>
+          <Typography
+            variant="body1"
+            sx={{ color: "#fff", marginTop: "10px", paddingBottom: "20px" }}
+          >
             Already have an account?{" "}
             <Link href="/auth/signIn" style={{ color: "#C084FC" }}>
               Sign In
