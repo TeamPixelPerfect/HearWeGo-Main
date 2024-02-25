@@ -26,7 +26,7 @@ export const CoverBackgroundCard = styled(Card)(({ theme }) => ({
 
 export const CoverCardMedia = styled(CardMedia)(({ theme }) => ({
   width: "100%",
-  height: "250px",
+  //height: "2500px",
   
 }));
 
