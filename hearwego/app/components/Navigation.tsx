@@ -16,7 +16,7 @@ const Navigation = ({ menuItems }: Props) => {
         justifyContent: "flex-end",
       }}
     >
-      {menuItems.map((item: menuItem) => (
+      {menuItems?.map((item: menuItem) => (
         <Box key={item._id} sx={{ padding: 2 }}>
           <Link href={item.url} style={{color: "#fff"}}>{item.name}</Link>
         </Box>
