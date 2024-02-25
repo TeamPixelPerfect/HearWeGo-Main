@@ -15,6 +15,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
+import SingleAlbum from "@/app/components/SingleAlbum";
 
 import {
   Maindiv,
@@ -30,6 +31,40 @@ import {
   SearchPaper,
 } from "../../../styles/SingleArtistPage.styles";
 import { urPK } from "@mui/x-date-pickers";
+
+const userNames = [
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+
+]
 
 export default function SingleArtistPage() {
   return (
@@ -117,56 +152,20 @@ export default function SingleArtistPage() {
             
         </SearchPaper>
       </Box>
-      <Box style={{padding:'20px',color:'black',fontSize: "16px",fontWeight:'bold'}}>
+      <Box style={{padding:'10px 0px 0px 20px',color:'black',fontSize: "20px",fontWeight:'bold'}}>
       Albums
       </Box>
 
-
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-       <Grid item xs={4} md={3} style={{ paddingLeft: 0 }}>
-       <Box
-      sx={{
-        textAlign: "center",
-        color: "primary.main",
-        fontWeight: "bold",
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        padding: "1px",
-     
-      }}
-    >
-      <Box
-        sx={{
-          backgroundImage: "url(https://m.media-amazon.com/images/M/MV5BODhhZjJlYTktZDQ2MS00Yzk4LWFlOTQtYTgyOGE1ZGE5YWEyL2ltYWdlXkEyXkFqcGdeQXVyMzA5MjgyMjI@._V1_.jpg)",
-          minWidth: "80px",
-          minHeight: "80px",
-          width: "95%",
-          aspectRatio: "1/1",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          borderRadius: "14px",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <Box style={{
-        //position: "relative",
-        backgroundColor: "yellow",
-        width:'100%',
-        height:'30px',
-        padding:'20px',
- 
-    
-      }}></Box>
-      </Box>
-      
-      
-    </Box>
+        {userNames.map(({ name,year, img }) => (
+          <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
+            <SingleAlbum userName={name} year={year} userImg={img}></SingleAlbum>
           </Grid>
-      
+        ))}
       </Grid>
-     
+
+
+      
     </Maindiv>
   );
 }
