@@ -16,6 +16,8 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleAlbum from "@/app/components/SingleAlbum";
+import CardActions from "@mui/material/CardActions";
+import Card from "@mui/material/Card";
 
 import {
   Maindiv,
@@ -63,8 +65,7 @@ const userNames = [
     year: "1982",
     img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
   },
-
-]
+];
 
 export default function SingleArtistPage() {
   return (
@@ -144,7 +145,7 @@ export default function SingleArtistPage() {
           <InputBase
             sx={{ ml: 5, flex: 1 }}
             placeholder="Michael J"
-            inputProps={{ "aria-label": "search google maps" }}
+            inputProps={{ "aria-label": "search" }}
           />
           <IconButton type="button" sx={{ p: "10px" }} aria-label="Search">
             <SearchIcon />
@@ -152,19 +153,56 @@ export default function SingleArtistPage() {
             
         </SearchPaper>
       </Box>
-      <Box style={{padding:'10px 0px 0px 20px',color:'black',fontSize: "20px",fontWeight:'bold'}}>
-      Albums
+      <Box
+        style={{
+          padding: "10px 0px 0px 20px",
+          color: "black",
+          fontSize: "20px",
+          fontWeight: "bold",
+        }}
+      >
+        Albums
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {userNames.map(({ name,year, img }) => (
+        {userNames.map(({ name, year, img }) => (
           <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
-            <SingleAlbum userName={name} year={year} userImg={img}></SingleAlbum>
+            <SingleAlbum
+              userName={name}
+              year={year}
+              userImg={img}
+            ></SingleAlbum>
           </Grid>
         ))}
       </Grid>
+      <CardActions style={{ justifyContent: "right", padding: "10px" }}>
+        <Button size="small">Discover More</Button>
+      </CardActions>
 
+      <Box
+        style={{
+          padding: "10px 0px 0px 20px",
+          color: "black",
+          fontSize: "20px",
+          fontWeight: "bold",
+        }}
+      >
+        Songs
+      </Box>
 
+      <Box
+        style={{
+          margin: "1em auto",
+          width: "95%",
+          height: "70px",
+          backgroundColor: 'white',
+          display: "flex",
+          justifyContent: "center",
+        }}
+      ></Box>
+         
+         
+     
       
     </Maindiv>
   );
