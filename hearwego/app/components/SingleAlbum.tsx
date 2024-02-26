@@ -42,11 +42,13 @@ export default function SingleFan({ userName, year, userImg }: Props) {
             // position:'fixed'
           }}
         >
-          <Box style={{
-            position:'relative',
-            padding: "10%",
-            justifyContent: "space-between",
-          }}>
+          <Box
+            style={{
+              position: "relative",
+              padding: "10%",
+              justifyContent: "space-between",
+            }}
+          >
             <Box
               sx={{
                 //backgroundColor: "blue",
