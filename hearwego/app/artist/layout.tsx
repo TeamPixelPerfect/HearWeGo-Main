@@ -31,10 +31,8 @@ export default function Layout({
     } else {
       let path = location.pathname.split("/");
       path.shift();
-      if (path[0] === "artist" && path[1]) path.shift();
-      let pathString = path.join("/");
-      console.log(pathString);
-      router.replace(pathString);
+      path.shift();
+      router.replace("/artist/" + path.join("/"));
     }
   }, [artist]);
 
