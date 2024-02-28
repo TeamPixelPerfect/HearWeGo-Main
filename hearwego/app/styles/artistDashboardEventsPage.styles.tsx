@@ -8,7 +8,7 @@ export const EventMainBox = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     height: 'auto',
     borderRadius: 30,
-    padding: '1em',
+    // padding: '1em',
     marginTop: '1em'
 }));
 
