@@ -54,8 +54,8 @@ const ArtistDashboardHeader = () => {
             display: "flex",
             alignItems: "center",
             width: "50%",
-            height: "50%",
-            border: "1px solid #969696",
+            // height: "50%",
+            // border: "1px solid #969696",
             borderRadius: "50px",
           }}
         >

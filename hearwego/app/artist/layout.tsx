@@ -29,7 +29,10 @@ export default function Layout({
         dispatch(logInArtist(JSON.parse(_artist)));
       router.replace("/auth/artistSignUp");
     } else {
-      router.replace("/artist")
+      let path = location.pathname.split("/");
+      path.shift();
+      path.shift();
+      router.replace("/artist/" + path.join("/"));
     }
   }, [artist]);
 

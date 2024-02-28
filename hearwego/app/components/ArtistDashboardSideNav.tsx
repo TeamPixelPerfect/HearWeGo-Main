@@ -131,14 +131,21 @@ const ArtistDashboardSideNav = () => {
 
   return (
     <ArtistDashboardSideNavContainer>
-      <Box sx={{marginBottom: "1em"}}></Box>
-      {!matches ? (
-        <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
-      ) : (
-        <IconButton color="primary" sx={{ fontSize: "40px" }}>
-          <IoIosArrowDroprightCircle />
-        </IconButton>
-      )}
+      <Box sx={{ marginBottom: "1em" }}></Box>
+      <Box
+        sx={{ cursor: "pointer" }}
+        onClick={() => {
+          Router.push("/artist");
+        }}
+      >
+        {!matches ? (
+          <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
+        ) : (
+          <IconButton color="primary" sx={{ fontSize: "40px" }}>
+            <IoIosArrowDroprightCircle />
+          </IconButton>
+        )}
+      </Box>
       <Box>
         <Box
           sx={
