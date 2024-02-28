@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
@@ -17,7 +18,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleAlbum from "@/app/components/SingleAlbum";
 import CardActions from "@mui/material/CardActions";
-import Card from "@mui/material/Card";
 
 import {
   Maindiv,
@@ -33,8 +33,9 @@ import {
   SearchPaper,
 } from "../../../styles/SingleArtistPage.styles";
 import { urPK } from "@mui/x-date-pickers";
+import SingleSongRow from "@/app/components/SingleSongRow";
 
-const userNames = [
+const albumNames = [
   {
     name: "Thriller",
     year: "1982",
@@ -64,6 +65,45 @@ const userNames = [
     name: "Thriller",
     year: "1982",
     img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+];
+
+const songNames = [
+  {
+    index: 1,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 2,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 3,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 4,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 5,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 6,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
   },
 ];
 
@@ -110,26 +150,37 @@ export default function SingleArtistPage() {
                   <LanguageIcon style={{ color: "white", fontSize: "25px" }} />
                 </Button>
               </SocialMediaBox>
-              <p style={{ fontSize: "16px" }}>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "50%",
+                  display: "flex",
+                  padding: "30px 0px",
+                }}
+              >
                 Michael Joseph Jackson was an American singer,
                 songwriter,dancer, and philanthropist. Known as the "King of
                 Pop", he is regarded as one of the most significant cultural
                 figures ofthe 20th century.
-              </p>
+              </Box>
             </ArtistDetailBox>
 
             <OptionBox>
-              <Button>
-                <GroupAddIcon style={{ color: "white", fontSize: "35px" }} />
-              </Button>
-              <Button>
-                <StorefrontIcon style={{ color: "white", fontSize: "35px" }} />
-              </Button>
-              <Button>
-                <LocalActivityIcon
-                  style={{ color: "white", fontSize: "35px" }}
-                />
-              </Button>
+              <Stack direction="row" width="100%" spacing={"1px"}>
+                <Button>
+                  <GroupAddIcon style={{ color: "white", fontSize: "35px" }} />
+                </Button>
+                <Button>
+                  <StorefrontIcon
+                    style={{ color: "white", fontSize: "35px" }}
+                  />
+                </Button>
+                <Button>
+                  <LocalActivityIcon
+                    style={{ color: "white", fontSize: "35px" }}
+                  />
+                </Button>
+              </Stack>
             </OptionBox>
           </Stack>
         </AllMiddleBox>
@@ -165,23 +216,30 @@ export default function SingleArtistPage() {
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {userNames.map(({ name, year, img }) => (
+        {albumNames.map(({ name, year, img }) => (
           <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
             <SingleAlbum
-              userName={name}
+              albumName={name}
               year={year}
-              userImg={img}
+              albumImg={img}
             ></SingleAlbum>
           </Grid>
         ))}
       </Grid>
+
       <CardActions style={{ justifyContent: "right", padding: "10px" }}>
-        <Button size="small">Discover More</Button>
+        <Button
+          href="/main/artists/SingleArtistPage/MoreAlbums"
+          variant="contained"
+          size="small"
+        >
+          Discover More
+        </Button>
       </CardActions>
 
       <Box
         style={{
-          padding: "10px 0px 0px 20px",
+          padding: "0px 0px 0px 20px",
           color: "black",
           fontSize: "20px",
           fontWeight: "bold",
@@ -190,20 +248,20 @@ export default function SingleArtistPage() {
         Songs
       </Box>
 
-      <Box
-        style={{
-          margin: "1em auto",
-          width: "95%",
-          height: "70px",
-          backgroundColor: 'white',
-          display: "flex",
-          justifyContent: "center",
-        }}
-      ></Box>
-         
-         
-     
-      
+      {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
+        <SingleSongRow
+          index={index}
+          songImg={songImg}
+          songName={songName}
+          noOfFollowers={noOfFollowers}
+        ></SingleSongRow>
+      ))}
+
+      <CardActions style={{ justifyContent: "right", padding: "10px" }}>
+        <Button href="/main/artists/SingleArtistPage/MoreSongs" size="small">
+          Discover More
+        </Button>
+      </CardActions>
     </Maindiv>
   );
 }

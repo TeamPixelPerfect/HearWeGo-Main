@@ -1,13 +1,15 @@
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 
 interface Props {
-  userName: string;
-  userImg: string;
+  albumName: string;
+  albumImg: string;
   year: string;
 }
 
-export default function SingleFan({ userName, year, userImg }: Props) {
+export default function SingleAlbum({ albumName, year, albumImg }: Props) {
   return (
+
     <Box
       sx={{
         textAlign: "center",
@@ -19,9 +21,10 @@ export default function SingleFan({ userName, year, userImg }: Props) {
         //backgroundColor: "red",
       }}
     >
+   
       <Box
         sx={{
-          backgroundImage: `url(${userImg})`,
+          backgroundImage: `url(${albumImg})`,
           minWidth: "80px",
           minHeight: "80px",
           width: "95%",
@@ -60,7 +63,7 @@ export default function SingleFan({ userName, year, userImg }: Props) {
                 display: "flex",
               }}
             >
-              {userName}
+              {albumName}
             </Box>
             <Box
               sx={{
@@ -78,6 +81,8 @@ export default function SingleFan({ userName, year, userImg }: Props) {
           </Box>
         </div>
       </Box>
+     
     </Box>
+    
   );
 }

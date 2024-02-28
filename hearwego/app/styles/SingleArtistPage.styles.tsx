@@ -110,6 +110,14 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   borderRadius: "90px",
   height: "50px",
   position: "relative",
+}));
+
+
+//MoreAlbums Page
+export const AlbumMaindiv = styled("div")(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  width: "100%",
+  height: "100%",
 
 
 }));
