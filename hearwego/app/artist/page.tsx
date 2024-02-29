@@ -39,12 +39,7 @@ import {
 } from "../styles/songCard.styles";
 import { MdAlbum } from "react-icons/md";
 import { GiSoundWaves } from "react-icons/gi";
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
+import CustomTabPanel from "../components/CustomeTabPanel";
 
 interface HomeSongCardProps {
   songName: string;
@@ -61,26 +56,6 @@ interface HomeAlbumCardProps {
   albumLength: number;
 }
 
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
 const HomeSongCard = ({
   songName,
   albumName,
@@ -92,22 +67,24 @@ const HomeSongCard = ({
 
   return (
     <SongCard>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ display: "flex", alignItems: "center", width: "45%" }}>
         <SongCardCoverArt imgUrl={coverArt} />
         <Typography variant="h6">{songName}</Typography>
       </Box>
-      <SongCardItem>
+      <SongCardItem width="40%">
         <MdAlbum />
         <Typography variant="body1">{albumName}</Typography>
       </SongCardItem>
-      <SongCardItem>
+      <SongCardItem width="10%">
         <GiSoundWaves />
         <Typography variant="body2">{duration}</Typography>
       </SongCardItem>
 
-      <SongCardPlayButton onClick={toggle}>
+     <Box sx={{width:"5%"}}>
+     <SongCardPlayButton onClick={toggle}>
         {playing ? <IoIosPause /> : <IoIosPlay />}
       </SongCardPlayButton>
+     </Box>
     </SongCard>
   );
 };
@@ -205,7 +182,7 @@ const ADHomePage = () => {
               <Tab label="Upcoming" />
             </Tabs>
           </ADHomeTabBox>
-          <CustomTabPanel value={tabValue} index={0}>
+          <CustomTabPanel value={tabValue} index={0} fullWidth={false}>
             <HomeSongCard
               songName="I'll be there for you"
               albumName="L.P."
@@ -235,10 +212,10 @@ const ADHomePage = () => {
               coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
             />
           </CustomTabPanel>
-          <CustomTabPanel value={tabValue} index={1}>
+          <CustomTabPanel value={tabValue} index={1} fullWidth={false}>
             <Typography>Recent Songs</Typography>
           </CustomTabPanel>
-          <CustomTabPanel value={tabValue} index={2}>
+          <CustomTabPanel value={tabValue} index={2} fullWidth={false}>
             <Typography>Upcoming Songs</Typography>
           </CustomTabPanel>
         </FeaturedSongCard>
@@ -255,7 +232,7 @@ const ADHomePage = () => {
               albumTracks={15}
               albumLength={67.15}
             />
-             <HomeAlbumCard
+            <HomeAlbumCard
               albumCoverArt="https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg"
               albumName="L.P."
               albumTracks={15}

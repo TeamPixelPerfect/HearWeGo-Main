@@ -50,7 +50,7 @@ export interface User {
   isMobileVerified: boolean;
   role: string;
   joinedDate: string;
-};
+}
 
 export interface SocialMediaLink {
   facebook: string;
@@ -89,4 +89,23 @@ export interface Artist {
   webUrl: String;
   bankDetails: BankDetails;
   role: String;
+}
+
+export interface Song {
+  songName: string;
+  albumName: string;
+  duration: number;
+  songUrl: string;
+  coverArt: string;
+  impressions: string;
+  listeners: string;
+}
+
+export interface Album {
+  albumName: string;
+  albumCoverArt: string;
+  albumTracks: number;
+  albumLength: number;
+  impressions: string;
+  listners: string;
 }
