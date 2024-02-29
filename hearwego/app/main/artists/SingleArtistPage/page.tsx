@@ -1,42 +1,267 @@
 "use client";
 import * as React from "react";
+
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
+import Button from "@mui/material/Button";
+import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import XIcon from "@mui/icons-material/X";
+import LanguageIcon from "@mui/icons-material/Language";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import LocalActivityIcon from "@mui/icons-material/LocalActivity";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+import Grid from "@mui/material/Grid";
+import SingleAlbum from "@/app/components/SingleAlbum";
+import CardActions from "@mui/material/CardActions";
 
-import { 
-Maindiv,
-CoverCardMedia ,
-ProfilePicAvatar,
+import {
+  Maindiv,
+  CoverCardMedia,
+  ProfilePicAvatar,
+  ArtistNameBox,
+  GenreBox,
+  ArtistDetailBox,
+  OptionBox,
+  SocialMediaBox,
+  AllMiddleBox,
+  FlagBox,
+  SearchPaper,
+} from "../../../styles/SingleArtistPage.styles";
+import { urPK } from "@mui/x-date-pickers";
+import SingleSongRow from "@/app/components/SingleSongRow";
 
+const albumNames = [
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+  {
+    name: "Thriller",
+    year: "1982",
+    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+  },
+];
 
-} from "../../../styles/SingleArtistPage.styles" ;
-
-
+const songNames = [
+  {
+    index: 1,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 2,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 3,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 4,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 5,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+  {
+    index: 6,
+    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songName: "Billy Jean",
+    noOfFollowers: "1,234,450,000",
+  },
+];
 
 export default function SingleArtistPage() {
-    return (
+  return (
     <Maindiv>
-     
-    <CoverCardMedia
-          image="https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp">
-           <div style={{background:'black',height:'100%',position:'relative',opacity:'0.5'}}></div>
+      <CoverCardMedia image="https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp">
+        <div
+          style={{
+            background: "black",
+            height: "500px",
+            width: "100%",
+            opacity: "0.8",
+          }}
+        ></div>
 
-           <div>
-           
-        
-          <ProfilePicAvatar
-            src={
-              "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/170px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-            }
-          ></ProfilePicAvatar>
-          </div>
-   
-    
-          </CoverCardMedia>
+        <AllMiddleBox>
+          <Stack direction="row" width="100%" spacing={"1px"}>
+            <ProfilePicAvatar
+              src={
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/170px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+              }
+            ></ProfilePicAvatar>
 
+            <ArtistDetailBox>
+              <ArtistNameBox>
+                Michael Jackson
+                <FlagBox></FlagBox>
+              </ArtistNameBox>
+              <GenreBox>POP</GenreBox>
+              <SocialMediaBox>
+                <Button>
+                  <FacebookRoundedIcon
+                    style={{ color: "white", fontSize: "25px" }}
+                  />
+                </Button>
+                <Button>
+                  <InstagramIcon style={{ color: "white", fontSize: "25px" }} />
+                </Button>
+                <Button>
+                  <XIcon style={{ color: "white", fontSize: "25px" }} />
+                </Button>
+                <Button>
+                  <LanguageIcon style={{ color: "white", fontSize: "25px" }} />
+                </Button>
+              </SocialMediaBox>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "50%",
+                  display: "flex",
+                  padding: "30px 0px",
+                }}
+              >
+                Michael Joseph Jackson was an American singer,
+                songwriter,dancer, and philanthropist. Known as the "King of
+                Pop", he is regarded as one of the most significant cultural
+                figures ofthe 20th century.
+              </Box>
+            </ArtistDetailBox>
 
+            <OptionBox>
+              <Stack direction="row" width="100%" spacing={"1px"}>
+                <Button>
+                  <GroupAddIcon style={{ color: "white", fontSize: "35px" }} />
+                </Button>
+                <Button>
+                  <StorefrontIcon
+                    style={{ color: "white", fontSize: "35px" }}
+                  />
+                </Button>
+                <Button>
+                  <LocalActivityIcon
+                    style={{ color: "white", fontSize: "35px" }}
+                  />
+                </Button>
+              </Stack>
+            </OptionBox>
+          </Stack>
+        </AllMiddleBox>
+      </CoverCardMedia>
 
-  
+      <Box
+        style={{
+          display: "flex",
+          padding: "15px",
+        }}
+      >
+        <SearchPaper>
+          <InputBase
+            sx={{ ml: 5, flex: 1 }}
+            placeholder="Michael J"
+            inputProps={{ "aria-label": "search" }}
+          />
+          <IconButton type="button" sx={{ p: "10px" }} aria-label="Search">
+            <SearchIcon />
+          </IconButton>
+            
+        </SearchPaper>
+      </Box>
+      <Box
+        style={{
+          padding: "10px 0px 0px 20px",
+          color: "black",
+          fontSize: "20px",
+          fontWeight: "bold",
+        }}
+      >
+        Albums
+      </Box>
+
+      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+        {albumNames.map(({ name, year, img }) => (
+          <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
+            <SingleAlbum
+              albumName={name}
+              year={year}
+              albumImg={img}
+            ></SingleAlbum>
+          </Grid>
+        ))}
+      </Grid>
+
+      <CardActions style={{ justifyContent: "right", padding: "10px" }}>
+        <Button
+          href="/main/artists/SingleArtistPage/MoreAlbums"
+          variant="contained"
+          size="small"
+        >
+          Discover More
+        </Button>
+      </CardActions>
+
+      <Box
+        style={{
+          padding: "0px 0px 0px 20px",
+          color: "black",
+          fontSize: "20px",
+          fontWeight: "bold",
+        }}
+      >
+        Songs
+      </Box>
+
+      {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
+        <SingleSongRow
+          index={index}
+          songImg={songImg}
+          songName={songName}
+          noOfFollowers={noOfFollowers}
+        ></SingleSongRow>
+      ))}
+
+      <CardActions style={{ justifyContent: "right", padding: "10px" }}>
+        <Button href="/main/artists/SingleArtistPage/MoreSongs" size="small">
+          Discover More
+        </Button>
+      </CardActions>
     </Maindiv>
-  )
+  );
 }
-
