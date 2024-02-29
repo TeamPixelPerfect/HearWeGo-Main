@@ -203,26 +203,7 @@ export default function Artist() {
           Genre="Rock"
           img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
         />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
+        
       </Stack>
 
       <TableContainer component={Paper}>
@@ -340,102 +321,7 @@ export default function Artist() {
               popularity={""}
               country_img={""}
             />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
+           
           </TableBody>
         </Table>
       </TableContainer>
