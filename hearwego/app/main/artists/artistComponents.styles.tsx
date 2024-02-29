@@ -63,9 +63,7 @@ interface tableRow {
     album_name: string;
     album_img: string;
   };
-  Fans: {
-    fans: number;
-  };
+  Fans: number;
   popularity: string;
   country_img: string;
 }
@@ -107,7 +105,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 export const Maindiv = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   width: "100%",
-  height: "100vh",
+  height: "100%",
   paddingLeft: "30px",
 }));
 
@@ -117,7 +115,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   width: "50%",
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.palette.primary.light,
   borderRadius: "10px",
   height: "60px",
 }));
@@ -128,7 +126,14 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
   img_url,
 }) => {
   return (
-    <Card sx={{ position: "relative", maxWidth: "220px", height: "280px",marginBottom:0}}>
+    <Card
+      sx={{
+        position: "relative",
+        maxWidth: "220px",
+        height: "280px",
+        marginBottom: 0,
+      }}
+    >
       <CardActionArea
         style={{
           backgroundImage: `url(${img_url})`,
@@ -169,28 +174,87 @@ export const TrendingRow: React.FC<tableRow> = ({
   return (
     <TableRow>
       <TableCell align="center">
-        {Rank.rank_img}
-        {Rank.rank}
+        <Stack
+          direction={"row"}
+          spacing={4}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <div
+            style={{
+              backgroundImage: `url(${Rank.rank_img})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              width: "15px",
+              height: "15px",
+            }}
+          ></div>
+          <div>{Rank.rank.toString()}</div>
+        </Stack>
       </TableCell>
       <TableCell align="center">
-        {Artist.img_url}
-        {Artist.name}
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <div
+            style={{
+              backgroundImage: `url(${Artist.img_url})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              width: "25px",
+              height: "25px",
+            }}
+          ></div>
+          <div>{Artist.name}</div>
+        </Stack>
       </TableCell>
       <TableCell align="center">
-        {Latest_song.song_img}
-        {Latest_song.song_name}
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <div
+            style={{
+              backgroundImage: `url(${Latest_song.song_img})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              width: "25px",
+              height: "25px",
+            }}
+          ></div>
+          <div>{Latest_song.song_name}</div>
+        </Stack>
       </TableCell>
-      <TableCell align="center">
-        {Latest_album.album_img}
-        {Latest_album.album_name}
+      <TableCell>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <div
+            style={{
+              backgroundImage: `url(${Latest_album.album_img})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              width: "25px",
+              height: "25px",
+            }}
+          ></div>
+          <div>{Latest_album.album_name}</div>
+        </Stack>
       </TableCell>
       <TableCell align="center">{Fans.toString()}</TableCell>
       <TableCell align="center">{popularity}</TableCell>
-      <TableCell align="center">{Fans.toString()}</TableCell>
       <TableCell align="center">
-        <div style={{ backgroundImage: `url(${country_img})` }}>
-          {country_img}
-        </div>
+        <div
+          style={{
+            backgroundImage: `url(${country_img})`,
+            width: "15px",
+            height: "15px",
+          }}
+        ></div>
       </TableCell>
     </TableRow>
   );

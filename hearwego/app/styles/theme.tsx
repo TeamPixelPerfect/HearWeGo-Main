@@ -63,6 +63,7 @@ export const hearWeGoTheme = createTheme({
     mode: "light",
     primary: {
       main: "#7e22ce",
+      light :"#FFFF"
     },
     background: {
       default: "#ffffff",
@@ -85,6 +86,8 @@ export const hearWeGoDarkTheme = createTheme({
     mode: "dark",
     primary: {
       main: "#7e22ce",
+      light :"#000000"
+
     },
     secondary: {
       main: "#4338ca",

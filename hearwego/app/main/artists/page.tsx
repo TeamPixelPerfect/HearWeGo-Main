@@ -14,7 +14,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
-import { CustomSelect } from "./artistComponents.styles";
+import { CustomSelect, TrendingRow } from "./artistComponents.styles";
 import { Typography } from "@mui/material";
 import {
   Table,
@@ -171,7 +171,11 @@ export default function Artist() {
       >
         Featured Artists
       </Typography>
-      <Stack direction="row" spacing={5} sx={{ marginTop: "20px",marginBottom:"20px"}}>
+      <Stack
+        direction="row"
+        spacing={5}
+        sx={{ marginTop: "20px", marginBottom: "20px" }}
+      >
         <ArtistCard
           name="Michale Jackson"
           Genre="Pop"
@@ -202,8 +206,13 @@ export default function Artist() {
       </Stack>
 
       <TableContainer component={Paper}>
-        <Table sx={{width:"100%",backgroundColor:"background.default"}}>
-          <TableHead>
+        <Table
+          sx={{
+            width: "100%",
+            backgroundColor: "primary.light",
+          }}
+        >
+          <TableHead style={{ color: "primary.main" }}>
             <TableRow>
               <TableCell align="center">Rank</TableCell>
               <TableCell align="center">Artist Name</TableCell>
@@ -215,9 +224,198 @@ export default function Artist() {
             </TableRow>
           </TableHead>
           <TableBody>
-            
-
-
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
+            <TrendingRow
+              Rank={{
+                rank: 1,
+                rank_img:
+                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+              }}
+              Artist={{
+                name: "Michale Jackson",
+                img_url: "",
+              }}
+              Latest_song={{
+                song_name: "Leave Me Alone",
+                song_img:
+                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+              }}
+              Latest_album={{
+                album_name: "Scream",
+                album_img:
+                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+              }}
+              Fans={100_000_000}
+              popularity={""}
+              country_img={""}
+            />
           </TableBody>
         </Table>
       </TableContainer>
