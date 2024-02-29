@@ -173,7 +173,7 @@ export default function Artist() {
       </Typography>
       <Stack
         direction="row"
-        spacing={5}
+        spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
         <ArtistCard
@@ -197,6 +197,26 @@ export default function Artist() {
           name="Eminem"
           Genre="Hip Hop"
           img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
+        />
+        <ArtistCard
+          name="Freddie Mercury"
+          Genre="Rock"
+          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
+        />
+        <ArtistCard
+          name="Freddie Mercury"
+          Genre="Rock"
+          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
+        />
+        <ArtistCard
+          name="Freddie Mercury"
+          Genre="Rock"
+          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
+        />
+        <ArtistCard
+          name="Freddie Mercury"
+          Genre="Rock"
+          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
         />
         <ArtistCard
           name="Freddie Mercury"

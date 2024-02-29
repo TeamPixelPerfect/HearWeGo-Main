@@ -129,7 +129,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
     <Card
       sx={{
         position: "relative",
-        maxWidth: "220px",
+        width: "220px",
         height: "280px",
         marginBottom: 0,
       }}
