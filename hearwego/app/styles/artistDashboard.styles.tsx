@@ -201,6 +201,17 @@ export const FeaturedAlbumCard = styled(Card)(({ theme }) => ({
 
 export const ADHomeTabBox = styled(Box)(({ theme }) => ({
   padding: "1em",
+  // height: "90vh",
+  // background: "red",
+  "& .MuiTab-root": {
+   textTransform: "capitalize"
+  },
+}));
+
+export const ADTabBox = styled(Box)(({ theme }) => ({
+  padding: "1em",
+  height: "90vh",
+  // background: "red",
   "& .MuiTab-root": {
    textTransform: "capitalize"
   },
