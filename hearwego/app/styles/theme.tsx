@@ -63,7 +63,7 @@ export const hearWeGoTheme = createTheme({
     mode: "light",
     primary: {
       main: "#7e22ce",
-      light :"#FFFF"
+      
     },
 
     background: {
