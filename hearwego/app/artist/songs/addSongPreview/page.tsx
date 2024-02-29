@@ -26,8 +26,9 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import IconButton from "@mui/material/IconButton";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import { FaSpotify } from "react-icons/fa";
-import React from "react";
+import React, { useState } from "react";
 
 import {
   SongPreviewSong,
@@ -207,6 +208,40 @@ function SelectPlatform() {
   );
 }
 
+function ClickPlay() {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const togglePlay = () => {
+    setIsPlaying((prevState) => !prevState);
+  };
+
+  return (
+    <>
+      {isPlaying ? (
+        <IconButton sx={{ color: "text.primary", fontSize: 36 }}>
+          <PlayCircleIcon
+            sx={{ color: "text.secondary", fontSize: 54 }}
+            //   sx={{ width: "30%", height: "auto" }}
+            onClick={togglePlay}
+          />
+        </IconButton>
+      ) : (
+        <IconButton sx={{ color: "text.primary", fontSize: 36 }}>
+          <PauseCircleIcon
+            sx={{ color: "text.secondary", fontSize: 54 }}
+            //   sx={{ width: "30%", height: "auto" }}
+            onClick={togglePlay}
+          />
+        </IconButton>
+        // <PauseCircleIcon
+        //   sx={{ width: "30%", height: "auto" }}
+        //   onClick={togglePlay}
+        // />
+      )}
+    </>
+  );
+}
+
 function SongPreview() {
   return (
     <Paper
@@ -235,7 +270,9 @@ function SongPreview() {
             borderRadius: 1,
           }}
         >
-          <PlayCircleIcon sx={{ width: "30%", height: "auto" }} />
+          <ClickPlay />
+
+          {/* <PlayCircleIcon sx={{ width: "30%", height: "auto" }} /> */}
         </Box>
       </SongPreviewSong>
 
@@ -290,13 +327,24 @@ function SongPreview() {
           </Typography>
           <Stack
             direction="row"
-            spacing={2}
+            spacing={1}
             sx={{ marginBottom: "1em", fontSize: 32 }}
           >
-            <FaFacebook />
-            <AiFillInstagram />
-            <FaXTwitter />
-            <MdHeadset />
+            <IconButton>
+              <FaFacebook />
+            </IconButton>
+
+            <IconButton>
+              <AiFillInstagram />
+            </IconButton>
+
+            <IconButton>
+              <FaXTwitter />
+            </IconButton>
+
+            <IconButton>
+              <MdHeadset />
+            </IconButton>
           </Stack>
         </Box>
         <Box
@@ -305,11 +353,15 @@ function SongPreview() {
             backgroundColor: "primary.main",
             padding: "5px",
             borderTopLeftRadius: "20px",
+            display: 'flex',
+            alignItems: 'center'
           }}
         >
-          <Stack direction="row" spacing={1}>
-            <Box>https://www.hearwego.com/wq23s</Box>
-            <ContentCopyIcon />
+          <Stack direction="row" spacing={1} sx={{color: '#fff'}}>
+            <Box sx={{display: 'flex', alignItems:'center'}}>https://www.hearwego.com/wq23s</Box>
+            <IconButton>
+              <ContentCopyIcon sx={{color: '#fff'}}/>
+            </IconButton>
           </Stack>
         </Box>
       </SongPreviewShare>
