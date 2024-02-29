@@ -30,7 +30,7 @@ export default function SingleAlbum({
         margin: "1em auto",
         width: "90%",
         //height: "10%",
-        backgroundColor: "white",
+        backgroundColor: "primary.light",
         //display: "flex",
       }}
     >
@@ -43,7 +43,7 @@ export default function SingleAlbum({
             display: "flex",
             alignItems: "center",
             fontSize: "20px",
-            color: "#4B4B4B",
+            color: "primary.default",
           }}
         >
           {index}
@@ -80,7 +80,7 @@ export default function SingleAlbum({
                 fontSize: "20px",
                 fontFamily: "Roboto",
                 fontWeight: "bold",
-                color: "#4B4B4B",
+                color: "primary.default",
 
                 textAlign: "center",
                 //backgroundColor:'yellow'
@@ -95,7 +95,7 @@ export default function SingleAlbum({
                 fontSize: "12px",
                 fontFamily: "Roboto",
                 fontWeight: "bold",
-                color: "#787878",
+                color: "primary.default",
                 textAlign: "center",
                 //backgroundColor:'red'
               }}
@@ -152,6 +152,7 @@ export default function SingleAlbum({
             position: "relative",
             display: "flex",
             right: "5%",
+         
           }}
         >
           <MoreVertIcon />
