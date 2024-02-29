@@ -128,7 +128,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
   img_url,
 }) => {
   return (
-    <Card sx={{ position: "relative", maxWidth: "220px", height: "280px" }}>
+    <Card sx={{ position: "relative", maxWidth: "220px", height: "280px",marginBottom:0}}>
       <CardActionArea
         style={{
           backgroundImage: `url(${img_url})`,
@@ -138,10 +138,9 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
           width: "100%",
         }}
       >
-        <CardContent
-          style={{
-            bottom: 0,
-            left: 0,
+        <Box
+          sx={{
+            margin: "0px",
             padding: "16px",
             backgroundColor: "rgba(0, 0, 0, 0.82)",
             color: "background.default",
@@ -152,7 +151,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
             {name}
           </Typography>
           <Typography variant="body2">{Genre}</Typography>
-        </CardContent>
+        </Box>
       </CardActionArea>
     </Card>
   );
@@ -188,7 +187,11 @@ export const TrendingRow: React.FC<tableRow> = ({
       <TableCell align="center">{Fans.toString()}</TableCell>
       <TableCell align="center">{popularity}</TableCell>
       <TableCell align="center">{Fans.toString()}</TableCell>
-      <TableCell align="center"><div style={{backgroundImage:`url(${country_img})`}}>{country_img}</div></TableCell>
+      <TableCell align="center">
+        <div style={{ backgroundImage: `url(${country_img})` }}>
+          {country_img}
+        </div>
+      </TableCell>
     </TableRow>
   );
 };
