@@ -8,16 +8,11 @@ import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import LanguageIcon from "@mui/icons-material/Language";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import StorefrontIcon from "@mui/icons-material/Storefront";
-import InputBase from "@mui/material/InputBase";
-import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
-import Grid from "@mui/material/Grid";
-import SingleAlbum from "@/app/components/SingleAlbum";
+import { BsSpotify } from "react-icons/bs";
+import { SiApplemusic } from "react-icons/si";
+import { SiYoutubemusic } from "react-icons/si";
+import SingleSongRow from "@/app/components/SingleSongRow";
 import CardActions from "@mui/material/CardActions";
-import Link from "next/link";
 
 import {
   Maindiv,
@@ -29,44 +24,7 @@ import {
   OptionBox,
   SocialMediaBox,
   AllMiddleBox,
-  FlagBox,
-  SearchPaper,
-} from "../../../styles/SingleArtistPage.styles";
-import { urPK } from "@mui/x-date-pickers";
-import SingleSongRow from "@/app/components/SingleSongRow";
-
-const albumNames = [
-  {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-];
+} from "../../../../styles/SingleArtistPage.styles";
 
 const songNames = [
   {
@@ -110,13 +68,13 @@ const songNames = [
 export default function SingleArtistPage() {
   return (
     <Maindiv>
-      <CoverCardMedia image="https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp">
+      <CoverCardMedia image="https://www.cnn.com/interactive/2023/12/style/thriller-dance-video-40-year-anniversary/media/images/4xGHmgXB.jpeg">
         <div
           style={{
             background: "black",
             height: "500px",
             width: "100%",
-            opacity: "0.8",
+            opacity: "0.7",
           }}
         ></div>
 
@@ -124,16 +82,13 @@ export default function SingleArtistPage() {
           <Stack direction="row" width="100%" spacing={"1px"}>
             <ProfilePicAvatar
               src={
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/170px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6nb_Cit59ogQsc692zoACe-QkVCDG_8NNAFvXWTIfFgatco6C-4-TcPLyl5nDcGWUkw&usqp=CAU"
               }
             ></ProfilePicAvatar>
 
             <ArtistDetailBox>
-              <ArtistNameBox>
-                Michael Jackson
-                <FlagBox></FlagBox>
-              </ArtistNameBox>
-              <GenreBox>POP</GenreBox>
+              <ArtistNameBox>Thriller</ArtistNameBox>
+              <GenreBox>1983</GenreBox>
               <SocialMediaBox>
                 <Button>
                   <FacebookRoundedIcon
@@ -158,89 +113,36 @@ export default function SingleArtistPage() {
                   padding: "30px 0px",
                 }}
               >
-                Michael Joseph Jackson was an American singer,
-                songwriter,dancer, and philanthropist. Known as the "King of
-                Pop", he is regarded as one of the most significant cultural
-                figures ofthe 20th century.
+                Thriller is the sixth studio album by the American singer and
+                songwriter Michael Jackson, released on November 29, 1982, by
+                Epic Records. It was produced by Quincy Jones, who had
+                previously worked with Jackson on his 1979 album Off the Wall
+                and who would later produce his 1987 album Bad.
               </Box>
             </ArtistDetailBox>
 
             <OptionBox>
               <Stack direction="row" width="100%" spacing={"1px"}>
                 <Button>
-                  <GroupAddIcon style={{ color: "white", fontSize: "35px" }} />
+                  <BsSpotify style={{ color: "white", fontSize: "35px" }} />
                 </Button>
                 <Button>
-                  <StorefrontIcon
+                  <SiYoutubemusic
                     style={{ color: "white", fontSize: "35px" }}
                   />
                 </Button>
                 <Button>
-                  <LocalActivityIcon
-                    style={{ color: "white", fontSize: "35px" }}
-                  />
+                  <SiApplemusic style={{ color: "white", fontSize: "35px" }} />
                 </Button>
               </Stack>
             </OptionBox>
           </Stack>
         </AllMiddleBox>
       </CoverCardMedia>
-
       <Box
         style={{
-          display: "flex",
-          padding: "15px",
-        }}
-      >
-        <SearchPaper>
-          <InputBase
-            sx={{ ml: 5, flex: 1 }}
-            placeholder="Michael J"
-            inputProps={{ "aria-label": "search" }}
-          />
-          <IconButton type="button" sx={{ p: "10px" }} aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-            
-        </SearchPaper>
-      </Box>
-      <Box
-        style={{
-          padding: "10px 0px 0px 20px",
+          padding: "40px 0px 0px 20px",
           color: "primary.default",
-          fontSize: "20px",
-          fontWeight: "bold",
-        }}
-      >
-        Albums
-      </Box>
-
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {albumNames.map(({ name, year, img }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
-            <SingleAlbum
-              albumName={name}
-              year={year}
-              albumImg={img}
-            ></SingleAlbum>
-          </Grid>
-        ))}
-      </Grid>
-
-      <CardActions style={{ justifyContent: "right", padding: "10px" }}>
-        <Button
-          href="/main/artists/SingleArtistPage/MoreAlbums"
-          //variant="contained"
-          size="small"
-        >
-          Discover More
-        </Button>
-      </CardActions>
-
-      <Box
-        style={{
-          padding: "0px 0px 0px 20px",
-          color: "prmary.default",
           fontSize: "20px",
           fontWeight: "bold",
         }}
@@ -258,7 +160,11 @@ export default function SingleArtistPage() {
       ))}
 
       <CardActions style={{ justifyContent: "right", padding: "10px" }}>
-        <Button href="/main/artists/SingleArtistPage/MoreSongs" size="small">
+        <Button
+          href="/main/artists/SingleArtistPage/MoreSongs"
+          //variant="contained"
+          size="small"
+        >
           Discover More
         </Button>
       </CardActions>

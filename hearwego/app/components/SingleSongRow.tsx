@@ -1,8 +1,9 @@
 import Box from "@mui/material/Box";
-import { Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
-import PauseCircleIcon from '@mui/icons-material/PauseCircleFilled';
-import React, { useState } from 'react';
+import PauseCircleIcon from "@mui/icons-material/PauseCircleFilled";
+import React, { useState } from "react";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface Props {
   index: number;
@@ -17,20 +18,19 @@ export default function SingleAlbum({
   songName,
   noOfFollowers,
 }: Props) {
-    const [isPlaying, setIsPlaying] = useState(false);
-   
+  const [isPlaying, setIsPlaying] = useState(false);
 
-    const togglePlay = () => {
-      setIsPlaying(prevState => !prevState);
-    };
-    
+  const togglePlay = () => {
+    setIsPlaying((prevState) => !prevState);
+  };
+
   return (
     <Box
       sx={{
         margin: "1em auto",
         width: "90%",
         //height: "10%",
-        backgroundColor: "white",
+        backgroundColor: "primary.light",
         //display: "flex",
       }}
     >
@@ -43,6 +43,7 @@ export default function SingleAlbum({
             display: "flex",
             alignItems: "center",
             fontSize: "20px",
+            color: "primary.default",
           }}
         >
           {index}
@@ -79,6 +80,7 @@ export default function SingleAlbum({
                 fontSize: "20px",
                 fontFamily: "Roboto",
                 fontWeight: "bold",
+                color: "primary.default",
 
                 textAlign: "center",
                 //backgroundColor:'yellow'
@@ -93,7 +95,7 @@ export default function SingleAlbum({
                 fontSize: "12px",
                 fontFamily: "Roboto",
                 fontWeight: "bold",
-
+                color: "primary.default",
                 textAlign: "center",
                 //backgroundColor:'red'
               }}
@@ -124,26 +126,37 @@ export default function SingleAlbum({
             }}
           >
             {isPlaying ? (
-        <PauseCircleIcon
-          sx={{
-            fontSize: "40px",
-            color: "primary.main",
-          }}
-          onClick={togglePlay}
-        />
-      ) : (
-           
-            <PlayCircleIcon
-              sx={{
-                fontSize: "40px",
-                color: "primary.main",
-              }}
-              onClick={togglePlay}
-
-            />
-      )}
+              <PauseCircleIcon
+                sx={{
+                  fontSize: "40px",
+                  color: "primary.main",
+                }}
+                onClick={togglePlay}
+              />
+            ) : (
+              <PlayCircleIcon
+                sx={{
+                  fontSize: "40px",
+                  color: "primary.main",
+                }}
+                onClick={togglePlay}
+              />
+            )}
           </Box>
         </Box>
+
+        <Button
+          href="/main/artists/SingleArtistPage/SingleSong"
+          size="small"
+          sx={{
+            position: "relative",
+            display: "flex",
+            right: "5%",
+         
+          }}
+        >
+          <MoreVertIcon />
+        </Button>
       </Stack>
     </Box>
   );
