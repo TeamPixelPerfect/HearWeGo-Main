@@ -29,9 +29,9 @@ import {
 const songNames = [
   {
     index: 1,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://i.discogs.com/RTFGo4KUqbx8PhupphvPjzv5hdijnj5ks_gaEzyEexY/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQzMTc3/Ni0xNjY5OTcyOTcx/LTI3NjIuanBlZw.jpeg",
+    songName: "Wanna Be Startin’ Somethin’",
+    noOfFollowers: "2,234,450,000",
   },
   {
     index: 2,
@@ -41,21 +41,21 @@ const songNames = [
   },
   {
     index: 3,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://i.scdn.co/image/ab67616d0000b273de437d960dda1ac0a3586d97",
+    songName: "Baby Be Mine",
+    noOfFollowers: "1,284,453,300",
   },
   {
     index: 4,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
+    songImg: "https://f4.bcbits.com/img/a2068708402_10.jpg",
+    songName: "The Lady in My Life",
     noOfFollowers: "1,234,450,000",
   },
   {
     index: 5,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://miro.medium.com/v2/resize:fit:500/0*U2KdecQg1CLUbMZc.jpg",
+    songName: "Beat It",
+    noOfFollowers: "1,034,450,900",
   },
   {
     index: 6,
@@ -65,7 +65,7 @@ const songNames = [
   },
 ];
 
-export default function SingleArtistPage() {
+export default function SingleAlbumPage() {
   return (
     <Maindiv>
       <CoverCardMedia image="https://www.cnn.com/interactive/2023/12/style/thriller-dance-video-40-year-anniversary/media/images/4xGHmgXB.jpeg">
