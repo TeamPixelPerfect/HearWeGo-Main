@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Link from "next/link";
 
 interface Props {
   albumName: string;
@@ -9,8 +10,9 @@ interface Props {
 
 export default function SingleAlbum({ albumName, year, albumImg }: Props) {
   return (
-
+    <Link href="/main/artists/SingleArtistPage/SingleAlbum">
     <Box
+
       sx={{
         textAlign: "center",
         color: "primary.main",
@@ -20,7 +22,8 @@ export default function SingleAlbum({ albumName, year, albumImg }: Props) {
         flexDirection: "column",
         //backgroundColor: "red",
       }}
-    >
+    >                
+
    
       <Box
         sx={{
@@ -81,8 +84,8 @@ export default function SingleAlbum({ albumName, year, albumImg }: Props) {
           </Box>
         </div>
       </Box>
-     
+   
     </Box>
-    
+    </Link>
   );
 }
