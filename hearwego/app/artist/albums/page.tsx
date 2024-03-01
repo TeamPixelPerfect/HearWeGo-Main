@@ -23,6 +23,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { FaEdit, FaEye } from "react-icons/fa";
 import { FaHeadphonesSimple } from "react-icons/fa6";
@@ -39,6 +40,7 @@ const MainAlbumCard = ({
   impressions,
   listners,
 }: Album) => {
+  const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -46,9 +48,13 @@ const MainAlbumCard = ({
   };
 
   return (
-    <AlbumCard>
+    <AlbumCard
+      onClick={() => {
+        router.push("/artist/albums/a001");
+      }}
+    >
       <Box sx={{ display: "flex", alignItems: "center", width: "50%" }}>
-        <AlbumCardCoverArt imgUrl={albumCoverArt} />
+        <AlbumCardCoverArt imgUrl={albumCoverArt ? albumCoverArt: ""} />
         <Typography variant="h6">{albumName}</Typography>
       </Box>
       <SongCardItem width="12%">

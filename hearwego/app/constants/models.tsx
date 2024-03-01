@@ -67,28 +67,31 @@ export interface BankDetails {
 }
 
 export interface Artist {
-  email: String;
-  password: String;
-  artistName: String;
-  alias: String;
-  otherAliases: [String];
-  profilePicture: String;
-  artistType: String;
-  musicGenres: [String];
-  artistProfession: [String];
-  mobileNumber: String;
-  country: String;
-  gender: String;
-  birthDate: String;
-  isEmailVerified: Boolean;
-  isMobileVerified: Boolean;
-  isAdminApproved: Boolean;
-  artistBio: String;
-  artistCovers: [String];
-  socialMediaLinks: SocialMediaLink;
-  webUrl: String;
-  bankDetails: BankDetails;
-  role: String;
+  user: {
+    email: String;
+    password: String;
+    artistName: String;
+    alias: String;
+    otherAliases: [String];
+    profilePicture: String;
+    artistType: String;
+    musicGenres: [String];
+    artistProfession: [String];
+    mobileNumber: String;
+    country: String;
+    gender: String;
+    birthDate: String;
+    isEmailVerified: Boolean;
+    isMobileVerified: Boolean;
+    isAdminApproved: Boolean;
+    artistBio: String;
+    artistCovers: [String];
+    socialMediaLinks: SocialMediaLink;
+    webUrl: String;
+    bankDetails: BankDetails;
+    role: String;
+  };
+  token: string;
 }
 
 export interface Song {
@@ -99,13 +102,29 @@ export interface Song {
   coverArt: string;
   impressions: string;
   listeners: string;
+  genres?: string[];
+  isrc?: string;
+  releaseData?: string;
+  songStatus?: string;
+  privacy?: string;
+  langauge?: string;
+  label?: string;
+  songWriters?: string[],
+  producers?: string[],
+  lyrics?: string,
+  artists?: string[]
 }
 
 export interface Album {
-  albumName: string;
-  albumCoverArt: string;
-  albumTracks: number;
-  albumLength: number;
-  impressions: string;
-  listners: string;
+  albumName?: string;
+  artists?: string[];
+  albumCoverArt?: string;
+  albumTracks?: number;
+  albumLength?: number;
+  impressions?: string;
+  listners?: string;
+  genres?: string[];
+  privacy?: string;
+  releaseDate?: string;
+  albumStatus?: string;
 }

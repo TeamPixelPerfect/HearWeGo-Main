@@ -35,27 +35,15 @@ import { FaEdit, FaEye } from "react-icons/fa";
 import { FaHeadphonesSimple } from "react-icons/fa6";
 import { bool } from "aws-sdk/clients/signer";
 import { Song } from "@/app/constants/models";
+import { useRouter } from "next/navigation";
 
 interface HomeSongCardProps {
-  songName: string;
-  albumName: string;
-  duration: number;
-  songUrl: string;
-  coverArt: string;
-  impressions: string;
-  listners: string;
+  songData: Song;
 }
 
-const MainSongCard = ({
-  songName,
-  albumName,
-  duration,
-  songUrl,
-  coverArt,
-  impressions,
-  listners,
-}: HomeSongCardProps) => {
-  const { playing, toggle } = useAudio({ url: songUrl });
+export const MainSongCard = ({ songData }: HomeSongCardProps) => {
+  const router = useRouter();
+  const { playing, toggle } = useAudio({ url: songData.songUrl });
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -63,26 +51,30 @@ const MainSongCard = ({
   };
 
   return (
-    <SongCard>
+    <SongCard
+      onClick={() => {
+        router.push("/artist/songs/s001");
+      }}
+    >
       <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
-        <SongCardCoverArt imgUrl={coverArt} />
-        <Typography variant="h6">{songName}</Typography>
+        <SongCardCoverArt imgUrl={songData.coverArt} />
+        <Typography variant="h6">{songData.songName}</Typography>
       </Box>
       <SongCardItem width="20%">
         <MdAlbum />
-        <Typography variant="body1">{albumName}</Typography>
+        <Typography variant="body1">{songData.albumName}</Typography>
       </SongCardItem>
       <SongCardItem width="15%">
         <FaEye />
-        <Typography variant="body1">{impressions}</Typography>
+        <Typography variant="body1">{songData.impressions}</Typography>
       </SongCardItem>
       <SongCardItem width="15%">
         <FaHeadphonesSimple />
-        <Typography variant="body1">{listners}</Typography>
+        <Typography variant="body1">{songData.listeners}</Typography>
       </SongCardItem>
       <SongCardItem width="15%">
         <GiSoundWaves />
-        <Typography variant="body2">{duration}</Typography>
+        <Typography variant="body2">{songData.duration}</Typography>
       </SongCardItem>
 
       <Box sx={{ width: "10%", display: "flex", justifyContent: "flex-end" }}>
@@ -111,6 +103,7 @@ const MainSongCard = ({
 
 const ArtistSongs = () => {
   const theme = useTheme();
+  const router = useRouter();
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -191,7 +184,7 @@ const ArtistSongs = () => {
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh"}}>
+      <Card sx={{ width: "100%", minHeight: "100vh" }}>
         <Box
           sx={{
             width: "100%",
@@ -215,6 +208,9 @@ const ArtistSongs = () => {
             variant="contained"
             startIcon={<IoAddOutline />}
             sx={{ textTransform: "capitalize" }}
+            onClick={() => {
+              router.push("/artist/songs/add");
+            }}
           >
             Add New Song
           </Button>
@@ -229,17 +225,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
             {popularSongs.length > 0 ? (
               popularSongs.map((song) => {
-                return (
-                  <MainSongCard
-                    songName={song.songName}
-                    albumName={song.albumName}
-                    songUrl={song.songUrl}
-                    coverArt={song.coverArt}
-                    impressions={song.impressions}
-                    listners={song.listeners}
-                    duration={song.duration}
-                  />
-                );
+                return <MainSongCard songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -251,17 +237,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
             {recentSongs.length > 0 ? (
               recentSongs.map((song) => {
-                return (
-                  <MainSongCard
-                    songName={song.songName}
-                    albumName={song.albumName}
-                    songUrl={song.songUrl}
-                    coverArt={song.coverArt}
-                    impressions={song.impressions}
-                    listners={song.listeners}
-                    duration={song.duration}
-                  />
-                );
+                return <MainSongCard songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -273,17 +249,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
             {upcomingSongs.length > 0 ? (
               upcomingSongs.map((song) => {
-                return (
-                  <MainSongCard
-                    songName={song.songName}
-                    albumName={song.albumName}
-                    songUrl={song.songUrl}
-                    coverArt={song.coverArt}
-                    impressions={song.impressions}
-                    listners={song.listeners}
-                    duration={song.duration}
-                  />
-                );
+                return <MainSongCard songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -295,17 +261,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>
             {draftSongs.length > 0 ? (
               draftSongs.map((song) => {
-                return (
-                  <MainSongCard
-                    songName={song.songName}
-                    albumName={song.albumName}
-                    songUrl={song.songUrl}
-                    coverArt={song.coverArt}
-                    impressions={song.impressions}
-                    listners={song.listeners}
-                    duration={song.duration}
-                  />
-                );
+                return <MainSongCard songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -320,10 +276,15 @@ const ArtistSongs = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            padding: "2em 0"
+            padding: "2em 0",
           }}
         >
-          <Pagination count={10} page={page} onChange={handlePageChange} color="secondary"/>
+          <Pagination
+            count={10}
+            page={page}
+            onChange={handlePageChange}
+            color="secondary"
+          />
         </Box>
       </Card>
     </Grid>
