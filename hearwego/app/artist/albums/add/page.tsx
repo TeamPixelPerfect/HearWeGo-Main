@@ -10,6 +10,10 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import DropSong from "@/app/components/DropSong";
 import { useRouter } from "next/navigation";
+import Card from '@mui/material/Card';
+
+import CardContent from '@mui/material/CardContent';
+import { Box } from "@mui/material";
 
 const AddSong = () => {
   const Router = useRouter();
@@ -21,38 +25,30 @@ const AddSong = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
+    
+    <Box sx={{ minWidth: 275 }}>
+      <Card variant="outlined">
+      <React.Fragment>
+    <CardContent>
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-
-        justifyContent: "center",
-        height: "100vh",
-        backgroundColor: "#E0E7FF",
-        padding: "10px",
-        borderRadius: "15px",
+       
       }}
     >
       <div
         style={{
           width: "100%",
           display: "flex",
-          justifyContent: "center",
+          
           height: "Auto",
         }}
       >
         <div
           style={{
-            display: "flex",
-            width: "90%",
-            maxWidth: "800px",
-            background: "white",
-            borderRadius: "15px",
-            justifyContent: "center",
-            marginTop: "20px",
+           
           }}
         >
-          <h1 style={{ margin: 0 }}>Add New Album</h1>
+          <h1 style={{  }}>Add New Album</h1>
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -81,8 +77,8 @@ const AddSong = () => {
             fileTypes="Music Track"
             fileExtensions="MP3,AAC,M4A"
             isCircular={false}
-            width="600px"
-            height="200px"
+            width="800px"
+          height="300px"
             file={songFile}
             setFile={setSongFile}
             aspectX={1}
@@ -138,6 +134,15 @@ const AddSong = () => {
         </Stack>
       </div>
     </div>
+     
+    </CardContent>
+    
+  </React.Fragment>
+        
+        </Card>
+    </Box>
+    
+  
   );
 };
 

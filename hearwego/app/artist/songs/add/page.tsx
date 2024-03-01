@@ -7,8 +7,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import DropSong from "@/app/components/DropSong";
-import { Button, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
+import Card from '@mui/material/Card';
+
+import CardContent from '@mui/material/CardContent';
 
 const AddSong = () => {
   const Router = useRouter();
@@ -20,29 +23,17 @@ const AddSong = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
+    <Box sx={{ minWidth: 275  }}>
+    <Card variant="outlined">
+    <React.Fragment>
+  <CardContent>
     <>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#E0E7FF",
-          height: "100vh",
-          padding: "10px",
-          borderRadius: "15px",
-        }}
+        
       >
         <div
           style={{
-            marginBlockEnd: "80px",
-            display: "flex",
-            width: "90%",
-            maxWidth: "800px",
-            background: "white",
-            borderRadius: "15px",
-            justifyContent: "center",
-            marginTop: "20px",
+            
           }}
         >
           <h1 style={{ margin: 0 }}>Add New Song</h1>
@@ -55,12 +46,20 @@ const AddSong = () => {
             <p>Drag and drop your track here</p>
         )}
     </div> */}
-        <DropSong
+    <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+         <DropSong
           fileTypes="Music Track"
           fileExtensions="MP3,AAC,M4A"
           isCircular={false}
-          width="600px"
-          height="200px"
+          width="800px"
+          height="300px"
           file={songFile}
           setFile={setSongFile}
           aspectX={1}
@@ -105,6 +104,8 @@ const AddSong = () => {
           Popular searches
         </p>
       </div>
+      </div>
+       
       <div
         style={{
           display: "flex",
@@ -132,6 +133,13 @@ const AddSong = () => {
         </Stack>
       </div>
     </>
+    </CardContent>
+    
+    </React.Fragment>
+          
+          </Card>
+      </Box>
+      
   );
 };
 
