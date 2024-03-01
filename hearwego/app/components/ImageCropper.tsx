@@ -11,6 +11,8 @@ import {
 import getCroppedImg from "../handlers/cropImage";
 import { PixelCropArea } from "../constants/models";
 import { Pixelify_Sans } from "next/font/google";
+import { handleImageUpload } from "../services/FileServices";
+import { uploadImage } from "../handlers/uploadFiles";
 
 interface Props {
   image: string;
@@ -56,6 +58,7 @@ const ImageCropper = ({
       );
       setCroppedImage(croppedImage);
       setImage(croppedImage);
+      uploadImage("test", croppedImage as string);
       handleClose();
     } catch (e) {
       console.error(e);

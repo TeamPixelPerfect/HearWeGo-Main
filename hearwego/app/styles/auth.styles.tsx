@@ -1,10 +1,12 @@
 import { Height } from "@mui/icons-material";
 import { Box, Select, TextField, styled } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
 
 export const AuthContainer = styled("div")(({ theme }) => ({
   width: "70vw",
   minWidth: "400px",
-  height: "600px",
+  height: "fit-content",
+  padding: "80px 40px",
   minHeight: "600px",
   background: "rgba(0,0,0,0.8)",
   margin: "100px auto",
@@ -13,6 +15,16 @@ export const AuthContainer = styled("div")(({ theme }) => ({
 }));
 
 export const AuthTextField = styled(TextField)(({ theme }) => ({
+  background: "rgba(255,255,255,0.1)",
+  margin: "10px 0",
+  width: "40%",
+  minWidth: "300px",
+  boxSizing: "border-box",
+  color: "#fff",
+  borderRadius: "10px",
+}));
+
+export const AuthDatePicker = styled(DatePicker)(({ theme }) => ({
   background: "rgba(255,255,255,0.1)",
   margin: "10px 0",
   width: "40%",

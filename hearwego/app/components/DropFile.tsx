@@ -41,6 +41,7 @@ const DropFile = ({
   const theme = useTheme();
 
   const handleSelectFile = (acceptedFiles: File[]) => {
+    // console.log(acceptedFiles[0]);
     setFile(URL.createObjectURL(acceptedFiles[0]));
     handleOpen();
   };

@@ -6,8 +6,9 @@ import Card from "@mui/material/Card";
 export const HeaderBox = styled("div")(({ theme }) => ({
   width: "100%",
   bgColor: "#000",
-  height: "100px",
+  height: "fit-content",
   display: "flex",
+  alignItems: "center",
 }));
 
 export const SearchArea = styled("div")(({ theme }) => ({
@@ -31,7 +32,7 @@ export const HitPredictorBtn = styled(Fab)(({ theme }) => ({
   width: "50px",
   borderRadius: "50px",
 }));
-
+ 
 export const ProfileArea = styled("div")(({ theme }) => ({
   height: "100%",
   width: "20%",
@@ -44,7 +45,7 @@ export const ProfileDetailArea = styled(Card)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: '1em',
+  padding: '8px',
   width: "100%",
   height: "70%",
   backgroundColor: "#F3E8FF",
@@ -60,7 +61,7 @@ export const ProfileDetailArea = styled(Card)(({ theme }) => ({
 
 export const ArtistDetail = styled("div")(({ theme }) => ({
     height: "100%",
-    width: "60%",
+    // width: "60%",
     // backgroundColor: "#F3E800",
   }));
 
@@ -76,6 +77,7 @@ export const ArtistName = styled("div")(({ theme }) => ({
     fontSize: '1em',
     marginLeft: '10px',
     fontFamily: "Dancing Script",
-    fontWeight: 700
+    fontWeight: 700,
+    color: theme.palette.secondary.main
   }));
 

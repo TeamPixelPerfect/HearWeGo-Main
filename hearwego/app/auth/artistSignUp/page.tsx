@@ -403,7 +403,7 @@ const ArtistSignUp = () => {
 
   return (
     <AuthContainer>
-      <Stack sx={{ width: "100%", padding: "12px" }}>
+      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
         <CloseIcon
           sx={{
             color: "rgba(255,255,255,0.4)",
@@ -412,7 +412,7 @@ const ArtistSignUp = () => {
             alignSelf: "flex-end",
           }}
         />
-      </Stack>
+      </Stack> */}
       <Box
         sx={{
           width: "100%",

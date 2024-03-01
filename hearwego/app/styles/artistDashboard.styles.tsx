@@ -5,6 +5,7 @@ import Link from "next/link";
 export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
+  background: theme.palette.background.default,
   ".ad-left": {
     width: "16%",
     minWidth: "60px",

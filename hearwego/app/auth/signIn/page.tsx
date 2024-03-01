@@ -6,21 +6,41 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { handleLogin } from "@/app/services/AuthServices";
+import { useAppDispatch } from "@/lib/hooks";
+import { logInUser } from "@/lib/features/user.slice";
 
 const SignIn = () => {
-    const router = useRouter();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
-    const [artistDetails, setArtistDetails] = React.useState({
-        email: "",
-        password: "",
-    });
+  const [userDetails, setUserDetails] = React.useState({
+    email: "",
+    password: "",
+  });
 
-    const [emailError, setEmailError] = React.useState(false);
-    const [passwordError, setPasswordError] = React.useState(false);
+  const [emailError, setEmailError] = React.useState(false);
+  const [passwordError, setPasswordError] = React.useState(false);
+
+  const handleSignIn = () => {
+    if (userDetails.email === "") {
+      setEmailError(true);
+    } else if (userDetails.password === "") {
+      setPasswordError(true);
+    } else {
+      handleLogin(userDetails).then((res) => {
+        if (res) {
+          dispatch(logInUser(res?.user));
+          localStorage.setItem("hwg-user", JSON.stringify(res));
+          router.replace("/");
+        }
+      });
+    }
+  };
 
   return (
     <AuthContainer>
-      <Stack sx={{ width: "100%", padding: "12px" }}>
+      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
         <CloseIcon
           sx={{
             color: "rgba(255,255,255,0.4)",
@@ -29,7 +49,7 @@ const SignIn = () => {
             alignSelf: "flex-end",
           }}
         />
-      </Stack>
+      </Stack> */}
       <Box>
         <Box
           id="artist-sign-in"
@@ -61,10 +81,10 @@ const SignIn = () => {
             variant="outlined"
             type="email"
             color={emailError ? "error" : "primary"}
-            style={{ boxSizing: "initial", marginTop: "30px"}}
-            defaultValue={artistDetails.email}
+            style={{ boxSizing: "initial", marginTop: "30px" }}
+            defaultValue={userDetails.email}
             onChange={(e) => {
-              setArtistDetails({ ...artistDetails, email: e.target.value });
+              setUserDetails({ ...userDetails, email: e.target.value });
             }}
             inputRef={(input) => input && emailError && input.focus()}
           />
@@ -75,9 +95,9 @@ const SignIn = () => {
             type="password"
             color={passwordError ? "error" : "primary"}
             style={{ boxSizing: "initial" }}
-            defaultValue={artistDetails.password}
+            defaultValue={userDetails.password}
             onChange={(e) => {
-              setArtistDetails({ ...artistDetails, password: e.target.value });
+              setUserDetails({ ...userDetails, password: e.target.value });
             }}
             inputRef={(input) => input && passwordError && input.focus()}
           />
@@ -108,7 +128,7 @@ const SignIn = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => {router.replace("/")}}
+              onClick={handleSignIn}
             >
               Login
             </Button>

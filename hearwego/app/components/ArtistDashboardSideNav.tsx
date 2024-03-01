@@ -24,9 +24,14 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import ADNavItemGroup from "./ADNavItemGroup";
+import { useRouter } from "next/navigation";
 
 const ArtistDashboardSideNav = () => {
+  const Router = useRouter();
+
   const app = useAppSelector((state) => state.app);
+  const artist = useAppSelector((state) => state.artist.user);
+
   const [open, setOpen] = useState(true);
 
   const handleOpen = () => setOpen(true);
@@ -117,16 +122,30 @@ const ArtistDashboardSideNav = () => {
     },
   ];
 
+  useEffect(() => {
+    console.log("Artist:::", artist);
+    if (!artist) {
+      Router.replace("/auth/artistSignUp");
+    }
+  }, [artist]);
+
   return (
     <ArtistDashboardSideNavContainer>
-      <Box sx={{marginBottom: "1em"}}></Box>
-      {!matches ? (
-        <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
-      ) : (
-        <IconButton color="primary" sx={{ fontSize: "40px" }}>
-          <IoIosArrowDroprightCircle />
-        </IconButton>
-      )}
+      <Box sx={{ marginBottom: "1em" }}></Box>
+      <Box
+        sx={{ cursor: "pointer" }}
+        onClick={() => {
+          Router.push("/artist");
+        }}
+      >
+        {!matches ? (
+          <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
+        ) : (
+          <IconButton color="primary" sx={{ fontSize: "40px" }}>
+            <IoIosArrowDroprightCircle />
+          </IconButton>
+        )}
+      </Box>
       <Box>
         <Box
           sx={
