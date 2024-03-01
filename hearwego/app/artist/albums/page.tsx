@@ -101,6 +101,7 @@ const MainAlbumCard = ({
 
 const ArtistAlbums = () => {
   const theme = useTheme();
+  const router = useRouter();
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -155,6 +156,7 @@ const ArtistAlbums = () => {
             variant="contained"
             startIcon={<IoAddOutline />}
             sx={{ textTransform: "capitalize" }}
+            onClick={() => {router.push("/artist/albums/addAlbumsTracks")}}
           >
             Add New Album
           </Button>
