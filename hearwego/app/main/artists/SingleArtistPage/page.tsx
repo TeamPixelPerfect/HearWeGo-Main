@@ -18,6 +18,7 @@ import Grid from "@mui/material/Grid";
 import SingleAlbum from "@/app/components/SingleAlbum";
 import CardActions from "@mui/material/CardActions";
 import Link from "next/link";
+import SingleSongRow from "@/app/components/SingleSongRow";
 
 import {
   Maindiv,
@@ -33,7 +34,7 @@ import {
   SearchPaper,
 } from "../../../styles/SingleArtistPage.styles";
 import { urPK } from "@mui/x-date-pickers";
-import SingleSongRow from "@/app/components/SingleSongRow";
+
 
 const albumNames = [
   {
@@ -42,29 +43,29 @@ const albumNames = [
     img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
   },
   {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+    name: "Off the Wall",
+    year: "1979",
+    img: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Off_the_wall.jpg/220px-Off_the_wall.jpg",
   },
   {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+    name: "Bad",
+    year: "1987",
+    img: "https://upload.wikimedia.org/wikipedia/en/5/51/Michael_Jackson_-_Bad.png",
   },
   {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+    name: "Ben",
+    year: "1972",
+    img: "https://upload.wikimedia.org/wikipedia/en/1/17/BenMichaelJackson.jpg",
   },
   {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+    name: "Invincible",
+    year: "2001",
+    img: "https://upload.wikimedia.org/wikipedia/en/9/98/Mjinvincible.jpg",
   },
   {
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
+    name: "Manila",
+    year: "1996",
+    img: "https://i.scdn.co/image/ab67616d0000b273655f0aa6bcd03fb68905c38e",
   },
 ];
 
@@ -77,31 +78,31 @@ const songNames = [
   },
   {
     index: 2,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://miro.medium.com/v2/resize:fit:500/0*U2KdecQg1CLUbMZc.jpg",
+    songName: "Beat It",
+    noOfFollowers: "2,234,450,800",
   },
   {
     index: 3,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://i1.sndcdn.com/artworks-1OHOA4uZkbc36Prf-ht3dkw-t500x500.jpg",
+    songName: "Smooth Criminal",
+    noOfFollowers: "1,034,450,090",
   },
   {
     index: 4,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://upload.wikimedia.org/wikipedia/en/3/3e/Earth_Song_cover.jpg",
+    songName: "Earth Song",
+    noOfFollowers: "4,234,989,000",
   },
   {
     index: 5,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
+    songImg: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGwiHncfzBj2eBDZJ2huqgU27ESCyRXgf4wA&usqp=CAU",
+    songName: "You Are Not Alone",
+    noOfFollowers: "3,234,490,600",
   },
   {
     index: 6,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
+    songImg: "https://i.ytimg.com/vi/B87SGx0OADY/maxresdefault.jpg",
     songName: "Billy Jean",
     noOfFollowers: "1,234,450,000",
   },
@@ -248,6 +249,8 @@ export default function SingleArtistPage() {
         Songs
       </Box>
 
+      <Stack>
+
       {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
         <SingleSongRow
           index={index}
@@ -256,6 +259,7 @@ export default function SingleArtistPage() {
           noOfFollowers={noOfFollowers}
         ></SingleSongRow>
       ))}
+      </Stack>
 
       <CardActions style={{ justifyContent: "right", padding: "10px" }}>
         <Button href="/main/artists/SingleArtistPage/MoreSongs" size="small">

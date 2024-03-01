@@ -10,8 +10,6 @@ export const Maindiv = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   width: "100%",
   height: "100%",
-
-
 }));
 
 export const CoverCardMedia = styled(CardMedia)(({ theme }) => ({
@@ -19,8 +17,7 @@ export const CoverCardMedia = styled(CardMedia)(({ theme }) => ({
   height: "500px",
   marginTop: "0px",
   position: "relative",
-   display: "flex",
-
+  display: "flex",
 }));
 export const AllMiddleBox = styled(Box)(({ theme }) => ({
   //backgroundColor: "red",
@@ -108,9 +105,48 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   width: "40%",
   backgroundColor: theme.palette.background.default,
   borderRadius: "90px",
-  height: "50px",
+  height: "50px",
   position: "relative",
 }));
 
+//Tabal
+export const TableContainer = styled("table")({
+  margin: "80px",
+  padding: "10px",
+  //backgroundColor: "red",
+  width: "50%",
+  height: "70%",
+  display: "flex",
+  //borderRadius:'20px'
+});
 
+export const TableRow = styled("tr")({});
 
+export const TableCell = styled("td")({
+  padding: "8px",
+  textAlign: "left",
+  fontSize: "16px",
+  fontWeight: "bold",
+
+  "&:nth-child(odd)": {
+    backgroundColor: "#4338CA",
+    //borderRight:'none',
+    color: "white",
+  },
+  "&:nth-child(even)": {
+    backgroundColor: "white",
+    width: "70%",
+    color: "#4B4B4B",
+    borderLeft: "none",
+  },
+});
+
+export const RightBox = styled(Box)({
+  backgroundColor: "#3B0764",
+  width: "40%",
+  height: "500px",
+  padding: "20px",
+  borderRadius: "15px",
+  margin: "10px 50px",
+  position: "relative",
+});
