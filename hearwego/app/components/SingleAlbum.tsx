@@ -59,7 +59,7 @@ export default function SingleAlbum({ albumName, year, albumImg }: Props) {
               sx={{
                 //backgroundColor: "blue",
                 color: "white",
-                width: "40%",
+                width: "100%",
                 fontSize: "24px",
                 fontWeight: "bold",
                 position: "relative",
