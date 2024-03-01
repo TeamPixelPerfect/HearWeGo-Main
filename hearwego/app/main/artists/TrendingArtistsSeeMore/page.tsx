@@ -1,17 +1,10 @@
 "use client";
-import React from "react";
-import SearchIcon from "@mui/icons-material/Search";
-import { Box } from "@mui/material";
-import { Stack } from "@mui/material";
-import { Maindiv, ArtistCard } from "./artistComponents.styles";
-import InputBase from "@mui/material/InputBase";
-import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
-import { SearchPaper } from "./artistComponents.styles";
-import Link from "@mui/material/Link";
-import { CustomSelect, TrendingRow } from "./artistComponents.styles";
-import { Typography } from "@mui/material";
+import * as React from "react";
 import {
+  Box,
+  IconButton,
+  InputBase,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -19,44 +12,24 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { Stack } from "@mui/material";
+import {
+  SearchPaper,
+  CustomSelect,
+  TrendingRow,
+} from "../artistComponents.styles";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  genreOptions,
+  professionOptions,
+  genderOptions,
+  countryOptions,
+  typeOptions,
+} from "../page";
+import { Maindiv } from "../artistComponents.styles";
+import { Typography } from "@mui/material";
 
-export const genreOptions = [
-  { value: "pop", label: "Pop" },
-  { value: "rock", label: "Rock" },
-  { value: "hiphop", label: "Hip Hop" },
-  { value: "jazz", label: "Jazz" },
-  { value: "classical", label: "Classical" },
-];
-
-export const professionOptions = [
-  { value: "singer", label: "Singer" },
-  { value: "guitarist", label: "Guitarist" },
-  { value: "drummer", label: "Drummer" },
-  { value: "pianist", label: "Pianist" },
-  { value: "bassist", label: "Bassist" },
-];
-
-export const genderOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
-];
-
-export const countryOptions = [
-  { value: "usa", label: "USA" },
-  { value: "uk", label: "UK" },
-  { value: "canada", label: "Canada" },
-  { value: "australia", label: "Australia" },
-  { value: "japan", label: "Japan" },
-];
-
-export const typeOptions = [
-  { value: "solo", label: "Solo" },
-  { value: "band", label: "Band" },
-];
-
-export default function Artist() {
+export default function TrendingArtistsMore() {
   const [genre, setGenre] = React.useState("");
   const [profession, setProfession] = React.useState("");
   const [gender, setGender] = React.useState("");
@@ -85,14 +58,6 @@ export default function Artist() {
 
   const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setType(event.target.value as string);
-  };
-
-  const [value, setValue] = React.useState(0);
-  const handleScrollChange = (
-    event: React.SyntheticEvent,
-    newValue: number
-  ) => {
-    setValue(newValue);
   };
   return (
     <Maindiv>
@@ -173,45 +138,6 @@ export default function Artist() {
           />
         </Stack>
       </Box>
-      <Typography
-        variant="h6"
-        sx={{ marginTop: "20px", color: "text.primary" }}
-      >
-        Featured Artists
-      </Typography>
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ marginTop: "20px", marginBottom: "20px" }}
-      >
-        <ArtistCard
-          name="Michale Jackson"
-          Genre="Pop"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-        />
-
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-      </Stack>
       <Typography
         variant="h6"
         sx={{ marginTop: "20px", color: "text.primary" }}
@@ -339,64 +265,6 @@ export default function Artist() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Box
-        sx={{
-          width: "100%",
-          justifyContent: "right",
-          position: "relative",
-          display: "flex",
-        }}
-      >
-        <Link href="/main/artists/TrendingArtistsSeeMore/">
-          <Typography
-            variant="body1"
-            sx={{ color: "primary.main", padding: "20px", display: "flex" }}
-          >
-            <ArrowDropDownIcon />
-            Show all Artists
-          </Typography>
-        </Link>
-      </Box>
-      <Typography
-        variant="h6"
-        sx={{ marginTop: "20px", color: "text.primary" }}
-      >
-        Recently Joined Artists
-      </Typography>
-
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ marginTop: "20px", marginBottom: "20px" }}
-      >
-        <ArtistCard
-          name="Michale Jackson"
-          Genre="Pop"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-        />
-
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
-      </Stack>
     </Maindiv>
   );
 }

@@ -1,28 +1,12 @@
 "use client";
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
 import Paper from "@mui/material/Paper";
-import Divider from "@mui/material/Divider";
-import {
-  Box,
-  Button,
-  InputAdornment,
-  TextField,
-  CardActionArea,
-  CardActions,
-} from "@mui/material";
-import { hearWeGoTheme } from "../../styles/theme";
+import { Box, CardActionArea, CardActions } from "@mui/material";
 import { Stack } from "@mui/material";
 import { InputLabel, Select, MenuItem } from "@mui/material";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import { TableCell, TableRow } from "@mui/material";
 
 interface Option {
@@ -87,9 +71,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         }
         label={label}
         sx={{
-          width: "150px",
-          backgroundColor: "primary.main",
+          width: "100px",
+          backgroundColor: "secondary.main",
           color: "background.default",
+          height: "40px",
         }}
       >
         {options.map((option, index) => (
@@ -107,6 +92,7 @@ export const Maindiv = styled("div")(({ theme }) => ({
   width: "100%",
   height: "100%",
   paddingLeft: "30px",
+  paddingRight: "10px",
 }));
 
 export const SearchPaper = styled(Paper)(({ theme }) => ({
@@ -114,10 +100,10 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   p: "2px 4px",
   display: "flex",
   alignItems: "center",
-  width: "50%",
+  width: "40%",
   backgroundColor: theme.palette.primary.light,
-  borderRadius: "10px",
-  height: "60px",
+  borderRadius: "30px",
+  height: "100%",
 }));
 
 export const ArtistCard: React.FC<ArtistCardProps> = ({
@@ -125,14 +111,22 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
   Genre,
   img_url,
 }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
   return (
     <Card
       sx={{
         position: "relative",
-        width: "220px",
-        height: "280px",
+        width: "190px",
+        height: "230px",
         marginBottom: 0,
+        borderRadius: "30px",
+        transition: "transform 0.2s ease-in-out", // Add transition for smooth hover effect
+        transform: isHovered ? "scale(1.10)" : "scale(1)",
+        marginRight: "20px",
+        marginTop: "20px",
       }}
+      onMouseEnter={() => setIsHovered(true)} // Set isHovered to true when mouse enters
+      onMouseLeave={() => setIsHovered(false)} // Set isHovered to false when mouse leaves
     >
       <CardActionArea
         style={{
@@ -148,14 +142,14 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
             margin: "0px",
             padding: "16px",
             backgroundColor: "rgba(0, 0, 0, 0.82)",
-            color: "background.default",
+            color: "background.paper",
             textAlign: "right",
           }}
         >
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant="h6" component="div">
             {name}
           </Typography>
-          <Typography variant="body2">{Genre}</Typography>
+          <Typography variant="body1">{Genre}</Typography>
         </Box>
       </CardActionArea>
     </Card>
