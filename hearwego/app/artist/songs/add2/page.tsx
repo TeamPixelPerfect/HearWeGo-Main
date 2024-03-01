@@ -225,7 +225,6 @@ const page = () => {
               </div>
 
               <CustomTabPanel value={value} index={1}>
-                Metadata
                 <SongMetaData />
               </CustomTabPanel>
               <div
