@@ -10,6 +10,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import RadioGroup from "@mui/material/RadioGroup";
+import { DateField } from "@mui/x-date-pickers/DateField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
@@ -21,6 +22,8 @@ import { styled } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import FormGroup from "@mui/material/FormGroup";
 import Checkbox from "@mui/material/Checkbox";
+import dayjs, { Dayjs } from "dayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,6 +31,11 @@ import DropFile from "@/app/components/DropFile";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Unstable_Grid2";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import InputAdornment from "@mui/material/InputAdornment";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -217,339 +225,8 @@ const page = () => {
               </div>
 
               <CustomTabPanel value={value} index={1}>
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      marginLeft: "20px",
-                      width: "400px",
-
-                      marginBottom: "30px",
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label="Contains music"
-                      id="fullWidth"
-                      style={{ boxSizing: "initial" }}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      width: "400px",
-                      marginLeft: "200px",
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label="ISRC"
-                      id="fullWidth"
-                      style={{ boxSizing: "initial" }}
-                    />
-                    <HelpOutlineIcon />
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    backgroundColor: "white",
-
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "10px",
-                    padding: "50px",
-                    justifyContent: "space-evenly",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-
-                      width: "300px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label="Contains music"
-                      id="fullWidth"
-                      style={{ boxSizing: "initial" }}
-                    />
-                  </Box>
-
-                  <Box
-                    sx={{ display: "flex", width: "300px", marginLeft: "20px" }}
-                  >
-                    <TextField
-                      fullWidth
-                      label="ISRC"
-                      id="fullWidth"
-                      style={{ boxSizing: "initial" }}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      marginLeft: "20px",
-                      width: "300px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label="Contains music"
-                      id="fullWidth"
-                      style={{ boxSizing: "initial" }}
-                    />
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    marginTop: "40px",
-
-                    display: "flex",
-                    backgroundColor: "white",
-                    flexDirection: "column",
-
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <div style={{ marginLeft: "10px" }}>
-                    <h2>Release date</h2>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker />
-                    </LocalizationProvider>
-                    <p>
-                      Setting your release date to at least 1-week in the future
-                      increases your chances of getting added to playlists.
-                    </p>
-
-                    <p>
-                      If it's important that your album goes live in all stores
-                      on the same day, click here for info.
-                    </p>
-                  </div>
-                </Box>
-
-                <Box
-                  sx={{
-                    marginTop: "40px",
-
-                    display: "flex",
-                    backgroundColor: "white",
-                    flexDirection: "column",
-
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <h2 style={{ marginLeft: "10px" }}>Album title</h2>
-                  <Box
-                    sx={{
-                      marginLeft: "10px",
-                      display: "flex",
-                      width: "800px",
-                      maxWidth: "80%",
-                      marginBottom: "30px",
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label=" Album Title"
-                      id="fullWidth"
-                      style={{ boxSizing: "initial" }}
-                    />
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex" }}>
-                  <Box
-                    sx={{
-                      marginTop: "40px",
-
-                      display: "flex",
-                      backgroundColor: "white",
-                      flexDirection: "column",
-
-                      width: "50%",
-                      height: "auto",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    <h2 style={{ marginLeft: "10px" }}>Record label</h2>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        marginLeft: "20px",
-                        width: "300px",
-                        maxWidth: "50%",
-                        marginBottom: "20px",
-                      }}
-                    >
-                      <TextField
-                        fullWidth
-                        label="Contains music"
-                        id="fullWidth"
-                        style={{ boxSizing: "initial" }}
-                      />
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      marginTop: "40px",
-                      marginLeft: "20px",
-                      display: "flex",
-                      backgroundColor: "white",
-                      flexDirection: "column",
-
-                      width: "50%",
-                      height: "auto",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    <h2 style={{ marginLeft: "10px" }}>Language</h2>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        marginLeft: "10px",
-                        width: "400px",
-                        maxWidth: "50%",
-                        marginBottom: "30px",
-                      }}
-                    >
-                      <Autocomplete
-                        disablePortal
-                        id="combo-box-demo"
-                        options={Language}
-                        style={{ boxSizing: "initial", width: "90%" }}
-                        renderInput={(params) => (
-                          <TextField {...params} label="Language" />
-                        )}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex" }}>
-                  <Box
-                    sx={{
-                      marginTop: "40px",
-
-                      display: "flex",
-                      backgroundColor: "white",
-                      flexDirection: "column",
-
-                      width: "100%",
-                      height: "auto",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    <h2 style={{ marginLeft: "10px" }}>Primary Genre</h2>
-                    <Box
-                      sx={{
-                        marginLeft: "10px",
-                        display: "flex",
-                        width: "800px",
-                        maxWidth: "80%",
-                        marginBottom: "30px",
-                      }}
-                    >
-                      <TextField
-                        fullWidth
-                        label=" Language"
-                        id="fullWidth"
-                        style={{ boxSizing: "initial" }}
-                      />
-                    </Box>
-                    <Box
-                      sx={{
-                        marginLeft: "10px",
-                        display: "flex",
-                        width: "800px",
-                        maxWidth: "80%",
-                        marginBottom: "30px",
-                      }}
-                    >
-                      <TextField
-                        fullWidth
-                        label="Electronic subgenre "
-                        id="fullWidth"
-                        style={{ boxSizing: "initial" }}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-                <Box>
-                  <Box
-                    sx={{
-                      marginTop: "40px",
-
-                      display: "flex",
-                      backgroundColor: "white",
-                      flexDirection: "column",
-                      padding: "10px",
-                      width: "100%",
-                      height: "auto",
-                      borderRadius: "20px",
-                    }}
-                  >
-                    <h2 style={{ marginLeft: "10px" }}>Add Lyrics</h2>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        width: "90%",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      <TextField
-                        fullWidth
-                        label="Add Lyrics"
-                        id="fullWidth"
-                        multiline
-                        rows={10}
-                        style={{ boxSizing: "initial", width: "100%" }}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    marginTop: "40px",
-
-                    display: "flex",
-                    backgroundColor: "white",
-                    flexDirection: "column",
-
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <h2 style={{ marginLeft: "10px" }}>
-                    Important checkboxes (mandatory)
-                  </h2>
-                  <div style={{ marginLeft: "20px" }}>
-                    <FormGroup>
-                      <FormControlLabel
-                        required
-                        control={<Checkbox />}
-                        label="I recorded this music, and am authorized to sell it in stores worldwide & collect all royalties."
-                      />
-                      <FormControlLabel
-                        required
-                        control={<Checkbox />}
-                        label="I'm not using any other artist's name in my name, song titles, or album title, without their approval."
-                      />
-                      <FormControlLabel
-                        required
-                        control={<Checkbox />}
-                        label="I have read and agree to the terms of the HearWeGo Distribution Agreement"
-                      />
-                    </FormGroup>
-                  </div>
-                </Box>
+                Metadata
+                <SongMetaData />
               </CustomTabPanel>
               <div
                 style={{
@@ -584,6 +261,481 @@ const page = () => {
     </Box>
   );
 };
+
+function SongMetaData() {
+  return (
+    <>
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          // sx={{ marginLeft: "1em" }}
+        >
+          <Grid xs={6}>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox defaultChecked />}
+                label="Contain Music"
+              />
+            </FormGroup>
+          </Grid>
+          <Grid xs={6}>
+            <TextField
+              label="ISRC"
+              id="filled-start-adornment"
+              sx={{ width: "100%" }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <HelpOutlineIcon />
+                  </InputAdornment>
+                ),
+              }}
+              variant="filled"
+            />
+          </Grid>
+          <Grid xs={6}></Grid>
+          <Grid xs={6}></Grid>
+        </Grid>
+      </Paper>
+
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Typography component="div" sx={{ marginBottom: "1em", fontSize: 18 }}>
+          Artist, Composer and Songwriter Details
+        </Typography>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{ margin: 0 }}
+        >
+          <Grid xs={6}>
+            <ArtistTags />
+          </Grid>
+          <Grid xs={6}>
+            <ComposerTags />
+          </Grid>
+          <Grid xs={6}>
+            <SongWriterTags />
+          </Grid>
+          <Grid xs={6}></Grid>
+        </Grid>
+      </Paper>
+
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Typography component="div" sx={{ marginBottom: "1em", fontSize: 18 }}>
+          Release Date
+        </Typography>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{ margin: 0 }}
+        >
+          <Grid xs={6}>
+            <ReleaseDate />
+          </Grid>
+          <Grid xs={6}></Grid>
+          <Grid xs={6}></Grid>
+        </Grid>
+
+        <Typography component="div" sx={{ fontSize: 14, marginTop: "1em" }}>
+          Setting your release date to at least 1-week in the future increases
+          your chances of getting added to playlists.
+        </Typography>
+        <Typography component="div" sx={{ fontSize: 14 }}>
+          If it's important that your album goes live in all stores on the same
+          day, click here for info.
+        </Typography>
+      </Paper>
+
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Typography component="div" sx={{ marginBottom: "1em", fontSize: 18 }}>
+          Album, Language and Record Label
+        </Typography>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{ margin: 0 }}
+        >
+          <Grid xs={6}>
+            <TextField
+              id="filled-basic"
+              label="Album Title (Optional)"
+              variant="filled"
+              sx={{ width: "90%" }}
+            />
+          </Grid>
+          <Grid xs={6}>
+            <LanguageSelect />
+          </Grid>
+          <Grid xs={6}>
+            <TextField
+              id="filled-basic"
+              label="Record Label (Optional)"
+              variant="filled"
+              sx={{ width: "90%" }}
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Typography component="div" sx={{ marginBottom: "1em", fontSize: 18 }}>
+          Genre Details
+        </Typography>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{ margin: 0 }}
+        >
+          <Grid xs={6}>
+            <GenreSelect />
+          </Grid>
+          <Grid xs={6}>
+            <ElectrinocGenreSelect />
+          </Grid>
+          <Grid xs={6}>
+            <OtherGenreSelect />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Typography component="div" sx={{ marginBottom: "1em", fontSize: 18 }}>
+          Lyrics
+        </Typography>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{ margin: 0 }}
+        >
+          <Grid xs={12}>
+            <TextField
+              id="filled-multiline-flexible"
+              label="Multiline"
+              multiline
+              // maxRows={20}
+              variant="filled"
+              sx={{width: "95%"}}
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper
+        sx={{
+          width: "100%",
+          padding: "2em",
+          marginBottom: "1em",
+        }}
+        elevation={3}
+      >
+        <Typography component="div" sx={{ marginBottom: "1em", fontSize: 18 }}>
+        Important checkboxes (mandatory)
+        </Typography>
+
+        <FormGroup>
+        <FormControlLabel required control={<Checkbox />} label="I recorded this music, and am authorized to sell it in stores worldwide & collect all royalties." />
+      <FormControlLabel required control={<Checkbox />} label="I'm not using any other artist's name in my name, song titles, or album title, without their approval." />
+      <FormControlLabel required control={<Checkbox />} label="I have read and agree to the terms of the HearWeGo Distribution Agreement" />
+    </FormGroup>
+        </Paper>
+    </>
+  );
+}
+
+function GenreSelect() {
+  const [genre, setGenre] = React.useState("");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setGenre(event.target.value as string);
+  };
+
+  return (
+    <Box sx={{ minWidth: 120 }}>
+      <FormControl sx={{ width: "90%" }}>
+        <InputLabel id="demo-simple-select-label">Primary Genre</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={genre}
+          label="Primary Genre"
+          onChange={handleChange}
+          variant="filled"
+        >
+          <MenuItem value={10}>Genre 01</MenuItem>
+          <MenuItem value={20}>Genre 02</MenuItem>
+          <MenuItem value={30}>Genre 03</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+  );
+}
+
+function ElectrinocGenreSelect() {
+  const [genre, setGenre] = React.useState("");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setGenre(event.target.value as string);
+  };
+
+  return (
+    <Box sx={{ minWidth: 120 }}>
+      <FormControl sx={{ width: "90%" }}>
+        <InputLabel id="demo-simple-select-label">
+          Electronic Sub Genre
+        </InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={genre}
+          label="Primary Genre"
+          onChange={handleChange}
+          variant="filled"
+        >
+          <MenuItem value={10}>Genre 01</MenuItem>
+          <MenuItem value={20}>Genre 02</MenuItem>
+          <MenuItem value={30}>Genre 03</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+  );
+}
+
+function OtherGenreSelect() {
+  const [genre, setGenre] = React.useState("");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setGenre(event.target.value as string);
+  };
+
+  return (
+    <Box sx={{ minWidth: 120 }}>
+      <FormControl sx={{ width: "90%" }}>
+        <InputLabel id="demo-simple-select-label">
+          Other Genres (Optional)
+        </InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={genre}
+          label="Primary Genre"
+          onChange={handleChange}
+          variant="filled"
+        >
+          <MenuItem value={10}>Genre 01</MenuItem>
+          <MenuItem value={20}>Genre 02</MenuItem>
+          <MenuItem value={30}>Genre 03</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+  );
+}
+
+function LanguageSelect() {
+  return (
+    <Autocomplete
+      multiple
+      id="languageTag"
+      options={languages.map((option) => option.title)}
+      // defaultValue={[top100Films[12].title, top100Films[13].title]}
+      // readOnly
+      renderInput={(params) => (
+        <TextField
+          variant="filled"
+          {...params}
+          sx={{ width: "100%", margin: 0 }}
+          label="Language(s)"
+        />
+      )}
+      sx={{ width: "80%", margin: 0 }}
+    />
+  );
+}
+
+const languages = [
+  { title: "The Shawshank Redemption", year: 1994 },
+  { title: "The Godfather", year: 1972 },
+  { title: "The Godfather: Part II", year: 1974 },
+  { title: "The Dark Knight", year: 2008 },
+  { title: "12 Angry Men", year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: "Pulp Fiction", year: 1994 },
+  {
+    title: "The Lord of the Rings: The Return of the King",
+    year: 2003,
+  },
+];
+
+function ReleaseDate() {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DemoContainer components={["DateField"]}>
+        <DateField
+          label="Release Date"
+          defaultValue={dayjs("2022-04-17")}
+          format="LL"
+          variant="filled"
+          sx={{ width: "90%" }}
+        />
+      </DemoContainer>
+    </LocalizationProvider>
+  );
+}
+
+function ArtistTags() {
+  return (
+    <Autocomplete
+      multiple
+      id="artistTag"
+      options={artists.map((option) => option.title)}
+      // defaultValue={[top100Films[12].title, top100Films[13].title]}
+      // readOnly
+      renderInput={(params) => (
+        <TextField
+          variant="filled"
+          {...params}
+          sx={{ width: "100%", margin: 0 }}
+          label="Artist(s)"
+        />
+      )}
+      sx={{ width: "80%", margin: 0 }}
+    />
+  );
+}
+
+// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
+const artists = [
+  { title: "The Shawshank Redemption", year: 1994 },
+  { title: "The Godfather", year: 1972 },
+  { title: "The Godfather: Part II", year: 1974 },
+  { title: "The Dark Knight", year: 2008 },
+  { title: "12 Angry Men", year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: "Pulp Fiction", year: 1994 },
+  {
+    title: "The Lord of the Rings: The Return of the King",
+    year: 2003,
+  },
+];
+
+function ComposerTags() {
+  return (
+    <Autocomplete
+      multiple
+      id="composerTag"
+      options={composers.map((option) => option.title)}
+      // defaultValue={[top100Films[12].title, top100Films[13].title]}
+      // readOnly
+      renderInput={(params) => (
+        <TextField
+          variant="filled"
+          {...params}
+          sx={{ width: "100%", margin: 0 }}
+          label="Composer(s)"
+        />
+      )}
+      sx={{ width: "80%", margin: 0 }}
+    />
+  );
+}
+
+const composers = [
+  { title: "The Shawshank Redemption", year: 1994 },
+  { title: "The Godfather", year: 1972 },
+  { title: "The Godfather: Part II", year: 1974 },
+  { title: "The Dark Knight", year: 2008 },
+  { title: "12 Angry Men", year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: "Pulp Fiction", year: 1994 },
+  {
+    title: "The Lord of the Rings: The Return of the King",
+    year: 2003,
+  },
+];
+
+function SongWriterTags() {
+  return (
+    <Autocomplete
+      multiple
+      id="artistTag"
+      options={songWriters.map((option) => option.title)}
+      // defaultValue={[top100Films[12].title, top100Films[13].title]}
+      // readOnly
+      renderInput={(params) => (
+        <TextField
+          variant="filled"
+          {...params}
+          sx={{ width: "100%", margin: 0 }}
+          label="Song Writer(s)"
+        />
+      )}
+      sx={{ width: "80%", margin: 0 }}
+    />
+  );
+}
+
+// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
+const songWriters = [
+  { title: "The Shawshank Redemption", year: 1994 },
+  { title: "The Godfather", year: 1972 },
+  { title: "The Godfather: Part II", year: 1974 },
+  { title: "The Dark Knight", year: 2008 },
+  { title: "12 Angry Men", year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: "Pulp Fiction", year: 1994 },
+  {
+    title: "The Lord of the Rings: The Return of the King",
+    year: 2003,
+  },
+];
 
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
