@@ -11,7 +11,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import { BsSpotify } from "react-icons/bs";
 import { SiApplemusic } from "react-icons/si";
 import { SiYoutubemusic } from "react-icons/si";
-
+import { Container } from "@mui/material";
 
 import {
   Maindiv,
@@ -23,11 +23,25 @@ import {
   OptionBox,
   SocialMediaBox,
   AllMiddleBox,
+  TableContainer,
+  TableRow,
+  TableCell,
+  RightBox,
 } from "../../../../styles/SingleArtistPage.styles";
 
-
-
 export default function SingleSongPage() {
+  const tableData = [
+    { key: 1, attribute: "Released", value: "January 2, 1983" },
+    { key: 2, attribute: "Recorded", value: "1982" },
+    { key: 3, attribute: "Length", value: "04:57" },
+    { key: 4, attribute: "Label", value: "Epic" },
+    { key: 5, attribute: "Songwriter(s)", value: "Michael Jackson" },
+    {
+      key: 6,
+      attribute: "Producer(s)",
+      value: "Quincy Jones, Michael Jackson",
+    },
+  ];
   return (
     <Maindiv>
       <CoverCardMedia image="https://www.billboard.com/wp-content/uploads/media/Michael-Jackson-1986-concert-billboard-1548.jpg">
@@ -75,9 +89,10 @@ export default function SingleSongPage() {
                     height: "50%",
                     display: "flex",
                     padding: "50px 0px 0px 0px",
-                    //backgroundColor:'white'
+                    //backgroundColor: "white",
                   }}
-                >Album : Thriller 
+                >
+                  Album : Thriller
                 </Box>
                 <Box
                   sx={{
@@ -85,11 +100,12 @@ export default function SingleSongPage() {
                     height: "50%",
                     display: "flex",
                     padding: "5px 0px 0px 0px",
-                    //backgroundColor:'white'
+                    //backgroundColor: "white",
                   }}
-                >Genre(s) : Rhythm and blues, Dance-pop, Pop, Disco, Classic, Rock 
+                >
+                  Genre(s) : Rhythm and blues, Dance-pop, Pop, Disco, Classic,
+                  Rock
                 </Box>
-
               </Box>
             </ArtistDetailBox>
             <OptionBox>
@@ -111,10 +127,69 @@ export default function SingleSongPage() {
         </AllMiddleBox>
       </CoverCardMedia>
 
-    
-
-      
-
+      <Box sx={{ display: "flex", padding: "40px" }}>
+        <TableContainer>
+          <table
+            style={{
+              width: "100%",
+              //borderCollapse: "collapse",
+              border: "1.5px solid black",
+              //borderRadius: "20px",
+            }}
+          >
+            {tableData.map((row, rowIndex) => (
+              <TableRow key={row.key}>
+                <TableCell>{row.attribute}</TableCell>
+                <TableCell>{row.value}</TableCell>
+              </TableRow>
+            ))}
+          </table>
+        </TableContainer>
+        <RightBox>
+          <Box
+            sx={{
+              fontSize: "20px",
+              color: "white",
+            }}
+          >
+            {" "}
+            Lyrics
+          </Box>
+          <Box
+            sx={{
+              fontSize: "10px",
+              color: "white",
+              padding: "20px",
+              display: "flex",
+            }}
+          >
+            She was more like a beauty queen from a movie scene<br></br>I said
+            don't mind, but what do you mean I am the one Who will dance on the
+            floor in the round She said I am the one<br></br>
+            Who will dance on the floor in the round She told me her name was
+            Billie Jean as she caused a scene Then every head turned with eyes
+            that dreamed of being the one Who will dance on the floor in the
+            round People always told me be careful of what you do Don't go
+            around breaking young <br></br>
+            She was more like a beauty queen from a movie scene<br></br>I said
+            don't mind, but what do you mean I am the one Who will dance on the
+            floor in the round She said I am the one<br></br>
+            Who will dance on the floor in the round She told me her name was
+            Billie Jean as she caused a scene Then every head turned with eyes
+            that dreamed of being the one Who will dance on the floor in the
+            round People always told me be careful of what you do Don't go
+            around breaking young<br></br>
+            She was more like a beauty queen from a movie scene<br></br>I said
+            don't mind, but what do you mean I am the one Who will dance on the
+            floor in the round She said I am the one<br></br>
+            Who will dance on the floor in the round She told me her name was
+            Billie Jean as she caused a scene Then every head turned with eyes
+            that dreamed of being the one Who will dance on the floor in the
+            round People always told me be careful of what you do Don't go
+            around breaking young
+          </Box>
+        </RightBox>
+      </Box>
     </Maindiv>
   );
 }
