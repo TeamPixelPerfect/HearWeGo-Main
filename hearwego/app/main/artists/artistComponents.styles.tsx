@@ -124,11 +124,11 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
 
 export const ArtistCard: React.FC<ArtistCardProps> = ({
   name,
-  Genre,
+  Genre, 
   img_url,
 }) => {
   return (
-    <Card sx={{ position: "relative", maxWidth: "220px", height: "280px",marginBottom:0}}>
+    <Card sx={{ position: "relative", width: "220px", height: "280px",marginBottom:0}}>
       <CardActionArea
         style={{
           backgroundImage: `url(${img_url})`,

@@ -171,7 +171,7 @@ export default function Artist() {
       >
         Featured Artists
       </Typography>
-      <Stack direction="row" spacing={5} sx={{ marginTop: "20px",marginBottom:"20px"}}>
+      <Stack direction="row" spacing={2} sx={{ marginTop: "20px",marginBottom:"20px"}}>
         <ArtistCard
           name="Michale Jackson"
           Genre="Pop"
