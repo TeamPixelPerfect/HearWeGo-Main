@@ -5,8 +5,15 @@ import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
+import { handleArtistLogin } from "@/app/services/AuthServices";
+import { useAppDispatch } from "@/lib/hooks";
+import { useRouter } from "next/navigation";
+import { logInArtist } from "@/lib/features/artist.slice";
 
 const ArtistSignIn = () => {
+    const dispatch = useAppDispatch();
+    const router = useRouter();
+
     const [artistDetails, setArtistDetails] = React.useState({
         email: "",
         password: "",
@@ -15,9 +22,27 @@ const ArtistSignIn = () => {
     const [emailError, setEmailError] = React.useState(false);
     const [passwordError, setPasswordError] = React.useState(false);
 
+    const handleSignIn = () => {
+        if (!artistDetails.email) {
+            setEmailError(true);
+            return;
+        }
+        if (!artistDetails.password) {
+            setPasswordError(true);
+            return;
+        }
+        handleArtistLogin(artistDetails).then((res) => {
+          if (res) {
+            dispatch(logInArtist(res));
+            localStorage.setItem("hwg-artist", JSON.stringify(res));
+            router.replace("/artist");
+          }
+        })
+    }
+
   return (
     <AuthContainer>
-      <Stack sx={{ width: "100%", padding: "12px" }}>
+      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
         <CloseIcon
           sx={{
             color: "rgba(255,255,255,0.4)",
@@ -26,7 +51,7 @@ const ArtistSignIn = () => {
             alignSelf: "flex-end",
           }}
         />
-      </Stack>
+      </Stack> */}
       <Box>
         <Box
           id="artist-sign-in"
@@ -105,7 +130,7 @@ const ArtistSignIn = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => {}}
+              onClick={handleSignIn}
             >
               Login
             </Button>
