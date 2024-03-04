@@ -31,7 +31,7 @@ const SignIn = () => {
       handleLogin(userDetails).then((res) => {
         if (res) {
           dispatch(logInUser(res?.user));
-          localStorage.setItem("hwg-user", JSON.stringify(res));
+          sessionStorage.setItem("hwg-user", JSON.stringify(res));
           router.replace("/");
         }
       });

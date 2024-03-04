@@ -3,6 +3,7 @@
 import useAudio from "@/app/Hooks/useAudio";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { Album } from "@/app/constants/models";
+import { getAlbums } from "@/app/services/SongServices";
 import { ADHomeTabBox, ADTabBox } from "@/app/styles/artistDashboard.styles";
 import { EventMainBox } from "@/app/styles/artistDashboardEventsPage.styles";
 import {
@@ -11,6 +12,7 @@ import {
   SongCardButtonGroup,
   SongCardItem,
 } from "@/app/styles/songCard.styles";
+import { useAppSelector } from "@/lib/hooks";
 import {
   Box,
   Button,
@@ -24,7 +26,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEdit, FaEye } from "react-icons/fa";
 import { FaHeadphonesSimple } from "react-icons/fa6";
 import { GiSoundWaves } from "react-icons/gi";
@@ -54,7 +56,7 @@ const MainAlbumCard = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "50%" }}>
-        <AlbumCardCoverArt imgUrl={albumCoverArt ? albumCoverArt: ""} />
+        <AlbumCardCoverArt imgUrl={albumCoverArt ? albumCoverArt : ""} />
         <Typography variant="h6">{albumName}</Typography>
       </Box>
       <SongCardItem width="12%">
@@ -103,6 +105,7 @@ const ArtistAlbums = () => {
   const theme = useTheme();
   const router = useRouter();
 
+  const artist = useAppSelector((state) => state.artist.user);
   const [tabValue, setTabValue] = useState(0);
 
   const [albums, setAlbums] = useState<Album[]>([
@@ -130,6 +133,15 @@ const ArtistAlbums = () => {
     setPage(value);
   };
 
+  useEffect(() => {
+    if (artist?.token) {
+      getAlbums(artist?.token).then((albums) => {
+        console.log("Albums:::", albums);
+        setAlbums(albums);
+      });
+    }
+  }, []);
+
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
       <Card sx={{ width: "100%", minHeight: "100vh" }}>
@@ -156,7 +168,9 @@ const ArtistAlbums = () => {
             variant="contained"
             startIcon={<IoAddOutline />}
             sx={{ textTransform: "capitalize" }}
-            onClick={() => {router.push("/artist/albums/addAlbumsTracks")}}
+            onClick={() => {
+              router.push("/artist/albums/addAlbumsTracks");
+            }}
           >
             Add New Album
           </Button>

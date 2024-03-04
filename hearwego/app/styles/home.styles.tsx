@@ -129,14 +129,14 @@ export const HomeServicesContainer = styled("div", {
 
 export const HomeServiceItemOdd = styled("div", {
   shouldForwardProp: (prop) => prop !== "services",
-})<{ service?: serviceItem }>(({ service }) => ({
+})<{ service?: serviceItem }>(({ theme, service }) => ({
   width: "100%",
   // height: "300px",
   display: "flex",
   padding: "32px 0",
   gap: "30px",
   'h2': {
-    color: "#4B4B4B",
+    color: theme.palette.text.primary,
     fontWeight: 700,
     textAlign:"right",
     margin:0,
@@ -179,14 +179,14 @@ export const HomeServiceItemOdd = styled("div", {
 
 export const HomeServiceItemEven = styled("div", {
   shouldForwardProp: (prop) => prop !== "services",
-})<{ service?: serviceItem }>(({ service }) => ({
+})<{ service?: serviceItem }>(({ theme, service }) => ({
   width: "100%",
   // height: "300px",
   display: "flex",
   padding: "32px 0",
   gap: "30px",
   'h2': {
-    color: "#4B4B4B",
+    color: theme.palette.text.primary,
     fontWeight: 700,
     textAlign:"left",
     margin:0,

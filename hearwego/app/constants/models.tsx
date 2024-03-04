@@ -95,24 +95,33 @@ export interface Artist {
 }
 
 export interface Song {
-  songName: string;
-  albumName: string;
-  duration: number;
-  songUrl: string;
-  coverArt: string;
-  impressions: string;
-  listeners: string;
-  genres?: string[];
+  song_id: string;
+  song_title: string;
+  album_title: string;
+  song_length: number;
+  song_track: string;
+  song_img: string;
+  no_of_impressions?: number;
+  no_of_plays?: number;
+  no_of_shares?: number;
+  primary_genre?: string[];
+  song_genre?: string[];
+  electronic_sub_genre?: string[];
   isrc?: string;
-  releaseData?: string;
+  release_date?: string;
   songStatus?: string;
-  privacy?: string;
+  privacy_status?: string;
   langauge?: string;
-  label?: string;
-  songWriters?: string[],
-  producers?: string[],
+  record_label?: string;
+  song_writers?: string[],
+  composer?: string[],
   lyrics?: string,
   artists?: string[]
+  platform_links?: [
+    {platform_name: string, link: string,}
+  ],
+  publisher?: string[],
+  contain_music?: string,
 }
 
 export interface Album {

@@ -100,7 +100,7 @@ function SongPreview({ songData }: SongPreviewProps) {
         <CardMedia
           component="img"
           sx={{ width: "100%", borderRadius: 1 }}
-          image={songData.coverArt}
+          image={songData.song_img}
           alt="Live from space album cover"
         />
         <Box
@@ -118,7 +118,7 @@ function SongPreview({ songData }: SongPreviewProps) {
             borderRadius: 1,
           }}
         >
-          <ClickPlay songUrl={songData.songUrl} />
+          <ClickPlay songUrl={songData.song_track} />
 
           {/* <PlayCircleIcon sx={{ width: "30%", height: "auto" }} /> */}
         </Box>
@@ -129,10 +129,10 @@ function SongPreview({ songData }: SongPreviewProps) {
           ISRC: {songData?.isrc && songData?.isrc}
         </Typography>
         <Typography component="div" sx={{ fontSize: 28, fontWeight: 600 }}>
-          {songData.songName}
+          {songData.song_title}
         </Typography>
         <Typography variant="h6" component="div" sx={{ fontSize: 16 }}>
-          {songData?.artists?.join(',')} - {songData.albumName}
+          {songData?.artists?.join(',')} - {songData.album_title}
         </Typography>
 
         <Stack
@@ -140,17 +140,26 @@ function SongPreview({ songData }: SongPreviewProps) {
           spacing={1}
           sx={{ marginBottom: "1em", fontSize: 12 }}
         >
-          {songData?.genres?.map((genre) => {
-            return <Chip label={genre} color="primary" sx={{ fontSize: 12 }} />;
+          {songData?.primary_genre?.map((genre) => {
+            return <Chip key={genre} label={genre} color="primary" sx={{ fontSize: 12 }} />;
+          })}
+        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ marginBottom: "1em", fontSize: 12 }}
+        >
+          {songData?.song_genre?.map((genre) => {
+            return <Chip key={genre} label={genre} color="primary" sx={{ fontSize: 12 }} />;
           })}
         </Stack>
 
         <Chip
           icon={
-            songData?.privacy === "private" ? <LockIcon /> : <FaGlobeAsia />
+            songData?.privacy_status === "private" ? <LockIcon /> : <FaGlobeAsia />
           }
           sx={{ marginBottom: "1em" }}
-          label={songData?.privacy === "private" ? "Private" : "Public"}
+          label={songData?.privacy_status === "private" ? "Private" : "Public"}
         />
 
         <Alert
@@ -237,25 +246,26 @@ const SongDetails = ({ params: { id } }: Props) => {
   const theme = useTheme();
 
   const [songDetails, setSongDetails] = useState<Song>({
-    songName: "I'll be there for you",
+    song_id: "s001",
+    song_title: "I'll be there for you",
     artists: ["The Rembrandts"],
-    albumName: "L.P.",
-    duration: 3.08,
-    songUrl:
+    album_title: "L.P.",
+    song_length: 3.08,
+    song_track:
       "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-    coverArt:
+    song_img:
       "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-    impressions: "10.5M",
-    listeners: "3.4M",
-    genres: ["pop", "rock"],
+    no_of_impressions: 10,
+    no_of_plays: 4,
+    song_genre: ["pop", "rock"],
     isrc: "USEE10001295",
-    releaseData: "2024-03-01",
+    release_date: "2024-03-01",
     songStatus: "Released",
-    privacy: "private",
+    privacy_status: "private",
     langauge: "English",
-    label: "Elektra",
-    songWriters: ["David Crane", "Marta Kauffman", "Allee Willis"],
-    producers: ["Gavin Mackillop", "David Crane"],
+    record_label: "Elektra",
+    song_writers: ["David Crane", "Marta Kauffman", "Allee Willis"],
+    composer: ["Gavin Mackillop", "David Crane"],
     lyrics: `
     So no one told you life was gonna be this way
     Your job's a joke, you're broke
@@ -297,7 +307,7 @@ const SongDetails = ({ params: { id } }: Props) => {
               }}
             >
               Songs <FaChevronRight style={{ fontSize: "12px" }} />{" "}
-              {songDetails.songName}
+              {songDetails.song_title}
             </Typography>
           </Box>
           <ButtonGroup variant="outlined">
@@ -315,7 +325,7 @@ const SongDetails = ({ params: { id } }: Props) => {
             Release Date
           </SongDetailTitle>
           <SongDetailData item xs={9} md={10}>
-            {songDetails?.releaseData}
+            {songDetails?.release_date}
           </SongDetailData>
 
           <SongDetailTitleEven item xs={3} md={2}>
@@ -329,21 +339,21 @@ const SongDetails = ({ params: { id } }: Props) => {
             Length
           </SongDetailTitle>
           <SongDetailData item xs={9} md={10}>
-            {songDetails?.duration}
+            {songDetails?.song_length}
           </SongDetailData>
 
           <SongDetailTitleEven item xs={3} md={2}>
             Label
           </SongDetailTitleEven>
           <SongDetailDataEven item xs={9} md={10}>
-            {songDetails?.label}
+            {songDetails?.record_label}
           </SongDetailDataEven>
 
           <SongDetailTitle item xs={3} md={2}>
             Songwriter(s)
           </SongDetailTitle>
           <SongDetailData item xs={9} md={10}>
-            {songDetails?.songWriters?.map((writer) => {
+            {songDetails?.song_writers?.map((writer) => {
               return <Box>{writer}</Box>;
             })}
           </SongDetailData>
@@ -352,8 +362,17 @@ const SongDetails = ({ params: { id } }: Props) => {
             Producer(s)
           </SongDetailTitleEven>
           <SongDetailDataEven item xs={9} md={10}>
-            {songDetails?.producers?.map((producer) => {
+            {songDetails?.composer?.map((producer) => {
               return <Box>{producer}</Box>;
+            })}
+          </SongDetailDataEven>
+
+          <SongDetailTitleEven item xs={3} md={2}>
+            Publisher(s)
+          </SongDetailTitleEven>
+          <SongDetailDataEven item xs={9} md={10}>
+            {songDetails?.publisher?.map((publisher) => {
+              return <Box>{publisher}</Box>;
             })}
           </SongDetailDataEven>
 

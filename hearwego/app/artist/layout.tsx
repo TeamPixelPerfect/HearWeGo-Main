@@ -24,7 +24,7 @@ export default function Layout({
 
   useEffect(() => {
     if (!artist) {
-      const _artist = localStorage.getItem("hwg-artist");
+      const _artist = sessionStorage.getItem("hwg-artist");
       if (_artist)
         dispatch(logInArtist(JSON.parse(_artist)));
       router.replace("/auth/artistSignUp");

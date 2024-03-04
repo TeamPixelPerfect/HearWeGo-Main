@@ -34,7 +34,7 @@ const ArtistSignIn = () => {
         handleArtistLogin(artistDetails).then((res) => {
           if (res) {
             dispatch(logInArtist(res));
-            localStorage.setItem("hwg-artist", JSON.stringify(res));
+            sessionStorage.setItem("hwg-artist", JSON.stringify(res));
             router.replace("/artist");
           }
         })

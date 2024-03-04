@@ -18,7 +18,7 @@ import {
   duration,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoAddOutline, IoClose } from "react-icons/io5";
 import { IoIosPause, IoIosPlay, IoMdMore } from "react-icons/io";
 import { MdAlbum, MdDelete } from "react-icons/md";
@@ -36,6 +36,8 @@ import { FaHeadphonesSimple } from "react-icons/fa6";
 import { bool } from "aws-sdk/clients/signer";
 import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
+import { getSongs } from "@/app/services/SongServices";
+import { useAppSelector } from "@/lib/hooks";
 
 interface HomeSongCardProps {
   songData: Song;
@@ -43,7 +45,7 @@ interface HomeSongCardProps {
 
 export const MainSongCard = ({ songData }: HomeSongCardProps) => {
   const router = useRouter();
-  const { playing, toggle } = useAudio({ url: songData.songUrl });
+  const { playing, toggle } = useAudio({ url: songData.song_track });
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -53,28 +55,28 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
   return (
     <SongCard
       onClick={() => {
-        router.push("/artist/songs/s001");
+        router.push(`/artist/songs/${songData.song_id}`);
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
-        <SongCardCoverArt imgUrl={songData.coverArt} />
-        <Typography variant="h6">{songData.songName}</Typography>
+        <SongCardCoverArt imgUrl={songData.song_img} />
+        <Typography variant="h6">{songData.song_title}</Typography>
       </Box>
       <SongCardItem width="20%">
         <MdAlbum />
-        <Typography variant="body1">{songData.albumName}</Typography>
+        <Typography variant="body1">{songData.album_title}</Typography>
       </SongCardItem>
       <SongCardItem width="15%">
         <FaEye />
-        <Typography variant="body1">{songData.impressions}</Typography>
+        <Typography variant="body1">{songData.no_of_impressions}</Typography>
       </SongCardItem>
       <SongCardItem width="15%">
         <FaHeadphonesSimple />
-        <Typography variant="body1">{songData.listeners}</Typography>
+        <Typography variant="body1">{songData.no_of_plays}</Typography>
       </SongCardItem>
       <SongCardItem width="15%">
         <GiSoundWaves />
-        <Typography variant="body2">{songData.duration}</Typography>
+        <Typography variant="body2">{songData.song_length}</Typography>
       </SongCardItem>
 
       <Box sx={{ width: "10%", display: "flex", justifyContent: "flex-end" }}>
@@ -105,65 +107,10 @@ const ArtistSongs = () => {
   const theme = useTheme();
   const router = useRouter();
 
+  const artist = useAppSelector((state) => state.artist.user);
   const [tabValue, setTabValue] = useState(0);
 
-  const [popularSongs, setPopularSongs] = useState<Song[]>([
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-  ]);
+  const [popularSongs, setPopularSongs] = useState<Song[]>([]);
 
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
   const [upcomingSongs, setUpcomingSongs] = useState<Song[]>([]);
@@ -181,6 +128,30 @@ const ArtistSongs = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    if (artist?.token) {
+      // fetch popular songs
+      getSongs(artist?.token).then((songs) => {
+        console.log("Songs:::", songs);
+        setPopularSongs(songs);
+      });
+
+      // fetch recent songs
+      getSongs(artist?.token).then((songs) => {
+        console.log("Songs:::", songs);
+        setRecentSongs(songs);
+      });
+
+      // fetch upcoming songs
+      getSongs(artist?.token).then((songs) => {
+        console.log("Songs:::", songs);
+        setUpcomingSongs(songs);
+      });
+
+      // fetch draft songs
+    }
+  }, []);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -223,9 +194,9 @@ const ArtistSongs = () => {
             <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            {popularSongs.length > 0 ? (
-              popularSongs.map((song) => {
-                return <MainSongCard songData={song} />;
+            {popularSongs?.length > 0 ? (
+              popularSongs?.map((song) => {
+                return <MainSongCard key={song.song_id} songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -237,7 +208,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
             {recentSongs.length > 0 ? (
               recentSongs.map((song) => {
-                return <MainSongCard songData={song} />;
+                return <MainSongCard key={song.song_id} songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -249,7 +220,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
             {upcomingSongs.length > 0 ? (
               upcomingSongs.map((song) => {
-                return <MainSongCard songData={song} />;
+                return <MainSongCard key={song.song_id} songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -261,7 +232,7 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>
             {draftSongs.length > 0 ? (
               draftSongs.map((song) => {
-                return <MainSongCard songData={song} />;
+                return <MainSongCard key={song.song_id} songData={song} />;
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>

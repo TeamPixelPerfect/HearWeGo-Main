@@ -12,7 +12,7 @@ const UserAuthProvider = ({
 
   const checkUser = () => {
     if (!user) {
-      const u = localStorage.getItem("hwg-user");
+      const u = sessionStorage.getItem("hwg-user");
       if (u) {
         dispatch(logInUser(JSON.parse(u)));
       }
