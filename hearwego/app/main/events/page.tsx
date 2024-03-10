@@ -8,6 +8,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import SingleEvent from "@/app/components/SingleEvent";
+import { Button } from "@mui/material";
+import CardActions from "@mui/material/CardActions";
 
 import {
   Maindiv,
@@ -20,24 +22,164 @@ import {
 } from "@/app/styles/eventsMW.styles";
 import { CustomSelect } from "@/app/components/eventsDropDown";
 
-const eventNames = [
+const interestEvents = [
   {
     name: "Beats",
-   img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-   date: "Jan 12",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
     day: "Wednesday",
     time: "8:00 PM",
     artist: "Kaizer Kaize",
   },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+];
 
-]
+const trendingEvents = [
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+];
+
+const allEvents = [
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wednesday",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+];
 
 export const TypeOptions = [
   { value: "concerts", label: "Concerts" },
   { value: "festivals", label: "Festivals" },
   { value: "nightClubs", label: "Night Clubs" },
   { value: "other", label: "Other" },
- 
 ];
 
 export const LocationOptions = [
@@ -182,30 +324,53 @@ export default function EventsPage() {
           </Stack>
         </Box>
       </Box>
-      <Divider sx={{
-        width: "90%",
-        height: "2px",
-        // size: "50px",
-        margin: "auto",
-       backgroundColor: "primary.default",
-      
-      }}>
+      <Divider
+        sx={{
+          width: "90%",
+          height: "2px",
+          // size: "50px",
+          margin: "auto",
+          backgroundColor: "primary.default",
+        }}
+      ></Divider>
 
-      </Divider>
       <Box
-        style={{
-          padding: "10px 0px 0px 60px",
-          color: "primary.default",
-          fontSize: "36px",
-          fontWeight: "bold",
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "100%",
+          justifyContent: "space-between",
+          //alignItems: "right",
+          //backgroundColor: "blue",
+          //padding: "20px",
         }}
       >
-        My Interest
+        <Box
+          style={{
+            padding: "10px 0px 0px 60px",
+            color: "primary.default",
+            fontSize: "32px",
+            fontWeight: "bold",
+            //backgroundColor: "yellow",
+          }}
+        >
+          My Interest
+        </Box>
+        <CardActions style={{ padding: "20px" }}>
+          <Button
+            href="/main/events/MoreInterestEvents"
+            //variant="contained"
+            size="small"
+          >
+            Show All
+          </Button>
+        </CardActions>
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {eventNames.map(({ name,img,date,day,time,artist }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
+        {interestEvents.map(({ name, img, date, day, time, artist }) => (
+          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
             <SingleEvent
               eventName={name}
               eventImg={img}
@@ -213,11 +378,109 @@ export default function EventsPage() {
               eventDay={day}
               eventTime={time}
               artistName={artist}
-              
             ></SingleEvent>
           </Grid>
         ))}
       </Grid>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "100%",
+          justifyContent: "space-between",
+          //alignItems: "right",
+          //backgroundColor: "blue",
+          //padding: "20px",
+        }}
+      >
+        <Box
+          style={{
+            padding: "10px 0px 0px 60px",
+            color: "primary.default",
+            fontSize: "32px",
+            fontWeight: "bold",
+            //backgroundColor: "yellow",
+          }}
+        >
+          Trending Events
+        </Box>
+        <CardActions style={{ padding: "20px" }}>
+          <Button
+            href="/main/events/MoreTrendingEvents"
+            //variant="contained"
+            size="small"
+          >
+            Show All
+          </Button>
+        </CardActions>
+      </Box>
+
+      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+        {trendingEvents.map(({ name, img, date, day, time, artist }) => (
+          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+            <SingleEvent
+              eventName={name}
+              eventImg={img}
+              eventDate={date}
+              eventDay={day}
+              eventTime={time}
+              artistName={artist}
+            ></SingleEvent>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "100%",
+          justifyContent: "space-between",
+          //alignItems: "right",
+          //backgroundColor: "blue",
+          //padding: "20px",
+        }}
+      >
+        <Box
+          style={{
+            padding: "10px 0px 0px 60px",
+            color: "primary.default",
+            fontSize: "32px",
+            fontWeight: "bold",
+            //backgroundColor: "yellow",
+          }}
+        >
+          All Events
+        </Box>
+        <CardActions style={{ padding: "20px" }}>
+          <Button
+            href="/main/events/allEvents"
+            //variant="contained"
+            size="small"
+          >
+            Show All
+          </Button>
+        </CardActions>
+      </Box>
+
+      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+        {allEvents.map(({ name, img, date, day, time, artist }) => (
+          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+            <SingleEvent
+              eventName={name}
+              eventImg={img}
+              eventDate={date}
+              eventDay={day}
+              eventTime={time}
+              artistName={artist}
+            ></SingleEvent>
+          </Grid>
+        ))}
+      </Grid>
+      
       
     </Maindiv>
   );

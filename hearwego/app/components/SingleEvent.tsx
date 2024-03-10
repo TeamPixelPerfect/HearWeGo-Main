@@ -11,77 +11,81 @@ interface Props {
   artistName: string;
 }
 
-export default function SingleEvent({eventName, eventImg, eventDate, eventDay, eventTime, artistName}: Props) {
+export default function SingleEvent({
+  eventName,
+  eventImg,
+  eventDate,
+  eventDay,
+  eventTime,
+  artistName,
+}: Props) {
   return (
     <Link href="/main/events">
-    <Box
-
-      sx={{
-        textAlign: "center",
-        color: "primary.main",
-        fontWeight: "bold",
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        //backgroundColor: "red",
-      }}
-    >     
-               
-
-   
       <Box
-        sx={{
-          backgroundImage: `url(${eventImg})`,
-          minWidth: "80px",
-          minHeight: "80px",
-          width: "95%",
-          aspectRatio: "1/1",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          borderRadius: "14px",
-          //position:'relavant'
-        }}
+        // sx={{
+        //   textAlign: "center",
+        //   color: "primary.main",
+        //   fontWeight: "bold",
+        //   position: "relative",
+        //   display: "flex",
+        //   alignItems: "center",
+        //   flexDirection: "column",
+        //   backgroundColor: "red",
+        //   width: "100%",
+        // }}
       >
         <div
-           style={{
-            background: "black",
-             width: "100%",
-             height: "100%",
-             borderRadius: "14px",
-             opacity: "0.6",
-              //position:'fixed'
-          }}
+         style={{
+           background: "black",
+           width: "150px",
+           height: "200px",
+          //  width: "100%",
+          //  height: "100%",
+           borderRadius: "14px",
+           display: "flex",
+           justifyContent: "center",
+        }}
         >
           <Box
-           style={{
-            position: "relative",
-            padding: "10%",
-            justifyContent: "space-between",
-          }}
-        
+            sx={{
+              backgroundImage: `url(${eventImg})`,
+              minwidth: "100px",
+              minheight: "120px",
+              width: "100%",
+              height: "100%",
+              aspectRatio: "1/1",
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "cover",
+              borderRadius: "14px",
+              opacity: "0.4",
+              //position:'relavant'
+            }}
           >
-            <Box
-              sx={{
-                backgroundColor: "black",
-                color: "white",
-                width: "100%",
-                height:'50px',
-                fontSize: "24px",
-                fontWeight: "bold",
-                position: "relative",
-                display: "flex",
-                opacity:'0.9'
-              }}
-            >
-              {eventDate}
-            </Box>
-            
+           <Box
+                  sx={{
+                    backgroundColor: "black",
+                    color: "white",
+                    width: "50%",
+                    height: "30px",
+                    fontSize: "16px",
+                    borderRadius: "14px",
+                    fontWeight: "bold",
+                    position: "relative",
+                    margin: "5px 0px 0px 5px",
+                    justifyContent: "center",
+                    padding: "2px",
+                    display: "flex",
+                    opacity: "0.9",
+                  }}
+                >
+                  {eventDate}
+                
+                </Box>
+              
             
           </Box>
         </div>
       </Box>
-   
-    </Box>
     </Link>
   );
 }
