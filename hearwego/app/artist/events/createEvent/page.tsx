@@ -7,6 +7,7 @@ import StepLabel from "@mui/material/StepLabel";
 import { styled } from "@mui/material/styles";
 import Stack from "@mui/material/Stack";
 import Avatar from "@mui/material/Avatar";
+import Checkbox from "@mui/material/Checkbox";
 import Check from "@mui/icons-material/Check";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -339,18 +340,115 @@ function CreateEvent() {
   );
 }
 
-function EventDetails() {
-  const [songFile, setSongFile] = React.useState(null);
-
-  const [age, setAge] = React.useState("");
+function SelectEventType() {
+  const [type, setType] = React.useState("");
 
   const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
+    setType(event.target.value);
   };
 
   return (
-    <>
+    <div>
+      <FormControl variant="filled" sx={{ width: "100%" }}>
+        <InputLabel id="demo-simple-select-standard-label">
+          Event Type
+        </InputLabel>
+        <Select
+          labelId="event_type"
+          id="event_type"
+          value={type}
+          onChange={handleChange}
+          label="Event Type"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value={10}>Classical</MenuItem>
+          <MenuItem value={20}>Club Party</MenuItem>
+          <MenuItem value={30}>Other</MenuItem>
+        </Select>
+      </FormControl>
+    </div>
+  );
+}
 
+function EventDetails() {
+  const [imgFile, setImgFile] = React.useState(null);
+  return (
+    <>
+      <Paper sx={{ width: "100%", padding: "2em" }} elevation={3}>
+        <Typography variant="h5" component="div" sx={{marginBottom:"1em"}}>
+          Basic Event Details
+        </Typography>
+
+        <Box sx={{ width: "100%", display: "flex" }}>
+          <Box sx={{ width: "50%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <DropFile
+              fileTypes="Event Cover Image"
+              fileExtensions="JPEG,PNG,WEBP,SVG"
+              isCircular={false}
+              width="250px"
+              height="250px"
+              file={imgFile}
+              setFile={setImgFile}
+              aspectX={1}
+              aspectY={1}
+              shape="rect"
+            />
+          </Box>
+          <Box sx={{ width: "50%" }}>
+            <Stack spacing={2}>
+              <TextField
+                id="event_name"
+                label="Event Name"
+                variant="filled"
+                sx={{ width: "100%" }}
+              />
+              <SelectEventType />
+
+              <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
+              <Box sx={{width: "66%", display: "flex", justifyContent: "space-between"}}>
+                <TextField
+                  id="age-from"
+                  label="Age From"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="filled"
+                  sx={{ width: "48%" }}
+                />
+
+                <TextField
+                  id="age-to"
+                  label="Age To"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="filled"
+                  sx={{ width: "48%" }}
+                />
+                </Box>
+
+                <FormControlLabel control={<Checkbox />} label="Age Limits" />
+              </Stack>
+
+              <TextField
+                  id="no_of_sessions"
+                  label="No. of Sessions"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="filled"
+                  sx={{ width: "66%" }}
+                />
+
+            </Stack>
+          </Box>
+        </Box>
+      </Paper>
     </>
   );
 }
@@ -685,7 +783,9 @@ function createBudgetData(
   return { title, session, type, amount };
 }
 
-const budgetRows = [createBudgetData("Hall Rent", "Session 01", "Expense", 20000)];
+const budgetRows = [
+  createBudgetData("Hall Rent", "Session 01", "Expense", 20000),
+];
 
 function BudgetTable() {
   return (
