@@ -45,7 +45,7 @@ interface HomeSongCardProps {
 
 export const MainSongCard = ({ songData }: HomeSongCardProps) => {
   const router = useRouter();
-  const { playing, toggle } = useAudio({ url: songData.song_track });
+  const { playing, toggle } = useAudio({ url: songData.song_track? songData.song_track: "" });
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -59,7 +59,7 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
-        <SongCardCoverArt imgUrl={songData.song_img} />
+        <SongCardCoverArt imgUrl={songData.song_img ? songData.song_img: ""} />
         <Typography variant="h6">{songData.song_title}</Typography>
       </Box>
       <SongCardItem width="20%">
@@ -134,19 +134,19 @@ const ArtistSongs = () => {
       // fetch popular songs
       getSongs(artist?.token).then((songs) => {
         console.log("Songs:::", songs);
-        setPopularSongs(songs);
+        setPopularSongs(songs.data);
       });
 
       // fetch recent songs
       getSongs(artist?.token).then((songs) => {
         console.log("Songs:::", songs);
-        setRecentSongs(songs);
+        setRecentSongs(songs.data);
       });
 
       // fetch upcoming songs
       getSongs(artist?.token).then((songs) => {
         console.log("Songs:::", songs);
-        setUpcomingSongs(songs);
+        setUpcomingSongs(songs.data);
       });
 
       // fetch draft songs

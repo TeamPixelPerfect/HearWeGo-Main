@@ -38,7 +38,7 @@ export const addSong = async (token: string, data: any) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
@@ -56,7 +56,7 @@ export const updateSong = async (token: string, songId: string, data: any) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs/${songId}`, {
     method: "PATCH",
     headers: {
-      Authorization: `Bearer ${token}`,
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),

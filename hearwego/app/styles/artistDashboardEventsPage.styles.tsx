@@ -7,7 +7,7 @@ export const EventMainBox = styled(Box)(({ theme }) => ({
     width: '100%',
     backgroundColor: theme.palette.background.default,
     height: 'auto',
-    borderRadius: 30,
+    borderRadius: 30, 
     // padding: '1em',
     marginTop: '1em'
 }));

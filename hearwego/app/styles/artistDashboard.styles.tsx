@@ -7,20 +7,26 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
   width: "100%",
   background: theme.palette.background.default,
   ".ad-left": {
-    width: "16%",
+    width: "16%", 
     minWidth: "60px",
     height: "100vh",
   },
   ".ad-right": {
     width: "84%",
     maxWidth: "100%",
-    minWidth: "800px",
+    minWidth: "300px",
     padding: "1em 1em 1em 0",
     marginLeft: "1em",
   },
   "@media (max-width:960px)": {
     ".ad-left": {
-      width: "60px",
+      width: "0",
+      minWidth: "0",
+    },
+    ".ad-right": {
+      width: "100%",
+      padding: "1em",
+      margin : "0",
     },
   },
 }));
@@ -40,7 +46,7 @@ export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
   zIndex: "10",
   borderRadius: "0 30px 0 0",
   boxShadow: "1px 1px 3px rgba(0,0,0,0.2)",
-  // transition: "width 1s",
+  transition: "width 1s",
   // transform: "translateX(-100%)",
   a: {
     textDecoration: "none",
@@ -51,6 +57,10 @@ export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
       fontSize: "14px",
     },
   },
+  "@media (max-width:960px)": {
+    display: "none",
+    width: "0"
+  }
 }));
 
 export const ADNavItemGroupBox = styled("div")(({ theme }) => ({

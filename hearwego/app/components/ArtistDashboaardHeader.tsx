@@ -24,12 +24,25 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../styles/CustomeTheme";
+import { FaBars } from "react-icons/fa";
 
 const ArtistDashboardHeader = () => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
   return (
     <HeaderBox>
+      <HitPredictorIco>
+        <Box sx={{ "& > :not(style)": { m: 1 } }}>
+          <HitPredictorBtn
+            color="primary"
+            aria-label="add"
+            onClick={() => console.log("clicked")}
+          >
+           <FaBars />
+          </HitPredictorBtn>
+        </Box>
+      </HitPredictorIco>
+
       <HitPredictorIco>
         <Box sx={{ "& > :not(style)": { m: 1 } }}>
           <HitPredictorBtn

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "final-form": "^4.20.10",
+    "final-form-focus": "^1.1.2",
+    "react-final-form": "^6.5.9"
+  }
+}

@@ -1,12 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import { RiImageAddFill } from "react-icons/ri";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import ImageCropper from "./ImageCropper";
 import Modal from "@mui/material/Modal";
 import { CropperModal } from "../styles/imageCropper.styles";
 import { TbMusicPlus } from "react-icons/tb";
+import { AudioVisualizer } from "react-audio-visualize";
 
 interface Props {
   fileTypes: string;
@@ -16,9 +17,9 @@ interface Props {
   height: string;
   file: any;
   setFile: (file: any) => void;
-  aspectX: number,
-  aspectY: number,
-  shape: 'rect'|'round'
+  aspectX: number;
+  aspectY: number;
+  shape: "rect" | "round";
 }
 
 const DropSong = ({
@@ -31,21 +32,30 @@ const DropSong = ({
   setFile,
   aspectX,
   aspectY,
-  shape
+  shape,
 }: Props) => {
+  const theme = useTheme();
+
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const [blob, setBlob] = useState<Blob>();
+  const visualizerRef = useRef<HTMLCanvasElement>(null);
+
   const handleSelectFile = (acceptedFiles: File[]) => {
-    setFile(URL.createObjectURL(acceptedFiles[0]));
-    handleOpen();
+    setFile(acceptedFiles[0]);
+    var blob = new Blob([acceptedFiles[0]], { type: "audio/mp3" });
+    setBlob(blob);
+    handleOpen(); 
   };
 
   return (
     <>
-     
-      <Dropzone onDrop={(acceptedFiles) => handleSelectFile(acceptedFiles)}>
+      <Dropzone
+        accept={{ "audio/*": [] }}
+        onDrop={(acceptedFiles) => handleSelectFile(acceptedFiles)}
+      >
         {({ getRootProps, getInputProps }) => (
           <section
             style={{
@@ -77,15 +87,28 @@ const DropSong = ({
                 objectFit: "cover",
               }}
             >
-              {file ? (
-                <img
-                  src={file}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: isCircular ? "50%" : "10px",
-                  }}
+              {blob ? (
+                <Box>
+                  <AudioVisualizer
+                  ref={visualizerRef}
+                  blob={blob}
+                  width={500}
+                  height={100}
+                  barWidth={2}
+                  gap={1}
+                  barColor={theme.palette.primary.main}
                 />
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    textAlign: "center",
+                    color: theme.palette.text.primary,
+                    fontSize: isCircular ? "12px" : "16px",
+                  }}>
+                  {file.name}
+                  </Typography>
+                </Box>
+                
               ) : (
                 <>
                   <TbMusicPlus
