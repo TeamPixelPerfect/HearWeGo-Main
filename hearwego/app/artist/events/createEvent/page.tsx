@@ -218,7 +218,7 @@ const steps = [
   "Finishing Touches",
 ];
 
-export default function createEvent() {
+function CreateEvent() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
@@ -349,152 +349,9 @@ function EventDetails() {
   };
 
   return (
-    <EventFormBody sx={{ marginTop: "1em" }}>
-      <InputRow>
-        <Box
-        id="img-box"
-          sx={{
-            width: "50%",
-            borderRadius: 3,
-            // border: 1,
-            // display: 'flex',
-            // justifyContent: 'center',
-            // alignItems: 'center',
-            // backgroundBlendMode: "overlay",
-          }}
-        >
-          <DropFile
-            fileTypes="Event Cover Image"
-            fileExtensions="JPEG,PNG,WEBP,SVG"
-            isCircular={false}
-            width="100%"
-            height={"500px"}
-            file={songFile}
-            setFile={setSongFile}
-            aspectX={1}
-            aspectY={1}
-            shape="rect"
-          />
-        </Box>
-      </InputRow>
-      <InputRow>
-        <Box
-          component="form"
-          sx={{
-            "& > :not(style)": { width: "25ch" },
-            // backgroundColor: 'red',
-            width: "100%",
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <TextField
-            id="outlined-basic"
-            label="Event Name"
-            variant="outlined"
-            style={{ boxSizing: "initial" }}
-            sx={{ minWidth: "50%" }}
-          />
-        </Box>
-      </InputRow>
+    <>
 
-      <InputRow>
-        <Box
-          component="form"
-          sx={{
-            "& > :not(style)": { width: "25ch" },
-            // backgroundColor: 'red',
-            width: "100%",
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <TextField
-            id="outlined-basic"
-            label="Event Type"
-            variant="outlined"
-            style={{ boxSizing: "initial" }}
-            sx={{ minWidth: "50%" }}
-          />
-        </Box>
-      </InputRow>
-
-      <InputRow>
-        <Box
-          sx={{
-            width: "30%",
-            // backgroundColor: "yellow",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <SelectAgeFrom />
-          <SelectAgeTo />
-        </Box>
-      </InputRow>
-
-      <InputRow>
-        <Box
-          sx={{
-            width: "30%",
-            // backgroundColor: "yellow",
-          }}
-        >
-          <SelectSession />
-        </Box>
-      </InputRow>
-
-      <InputRow
-        sx={{ border: 1, borderColor: "primary.main", borderRadius: 10 }}
-      >
-        <SessionForm />
-      </InputRow>
-
-      <InputRow>
-        <Box sx={{ width: "100%" }}>
-          <Stack spacing={3} sx={{ width: "50%" }}>
-            <Autocomplete
-              multiple
-              id="tags-outlined"
-              options={artists}
-              getOptionLabel={(option) => option.title}
-              defaultValue={[artists[1]]}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Sponsers"
-                  placeholder="Sponsers"
-                />
-              )}
-            />
-          </Stack>
-        </Box>
-      </InputRow>
-
-      <InputRow>
-        <TeamTable />
-
-        {/* <Button variant="outlined">Add New Team</Button> */}
-      </InputRow>
-
-      <InputRow>
-        <TeamModal />
-      </InputRow>
-
-      <InputRow>
-        <Box sx={{ width: "50%" }}>
-          <TextField
-            id="outlined-multiline-static"
-            label="Description"
-            multiline
-            rows={4}
-            placeholder="Description"
-            sx={{ width: "100%" }}
-          />
-        </Box>
-      </InputRow>
-    </EventFormBody>
+    </>
   );
 }
 
@@ -1750,3 +1607,33 @@ function EventInfoCard() {
     </Card>
   );
 }
+
+export default function ArtistEvents() {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  return (
+    <>
+      <Box sx={{ width: "100%" }}>
+        <Card variant="outlined">{EventsDisplay}</Card>
+      </Box>
+    </>
+  );
+}
+
+const EventsDisplay = (
+  <React.Fragment>
+    <CardContent>
+      <Box sx={{ width: "100%" }}>
+        <CreateEvent />
+      </Box>
+      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+        Word of the Day
+      </Typography>
+      <Typography variant="h5" component="div"></Typography>
+    </CardContent>
+  </React.Fragment>
+);

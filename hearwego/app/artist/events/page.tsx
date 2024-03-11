@@ -15,7 +15,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import { CardActionArea, CardActions } from "@mui/material";
+import { CardActionArea, CardActions, Grid } from "@mui/material";
 import CardMedia from "@mui/material/CardMedia";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -25,6 +25,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import PaidIcon from "@mui/icons-material/Paid";
+import Pagination from "@mui/material/Pagination";
 
 import ArtistSingleEvent from "../../components/ArtistDashboardSingleEvent";
 
@@ -145,43 +146,153 @@ function EventTabs() {
   );
 }
 
+const singleEventDetails = [
+  {
+    event_name: "Nadagama",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-01-10",
+    event_time: "8.00 P.M.",
+    event_interest: "1000",
+  },
+  {
+    event_name: "Ridma",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-04-10",
+    event_time: "9.00 P.M.",
+    event_interest: "1000",
+  },
+  {
+    event_name: "Ridma",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-04-10",
+    event_time: "9.00 P.M.",
+    event_interest: "1000",
+  },
+  {
+    event_name: "Ridma",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-04-10",
+    event_time: "9.00 P.M.",
+    event_interest: "1000",
+  },
+  {
+    event_name: "Ridma",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-04-10",
+    event_time: "9.00 P.M.",
+    event_interest: "1000",
+  },
+  {
+    event_name: "Ridma",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-04-10",
+    event_time: "9.00 P.M.",
+    event_interest: "1000",
+  },
+  {
+    event_name: "Ridma",
+    event_image: "https://shorturl.at/qxDV8",
+    event_date: "2024-04-10",
+    event_time: "9.00 P.M.",
+    event_interest: "1000",
+  },
+];
+
 function EventArea() {
   return (
-    <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
-      <EventCard />
-      <EventCard />
-      <EventCard />
-      <EventCard />
-      <EventCard />
-    </Box>
+    <>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "1em",
+        }}
+      >
+        <Typography
+          variant="h5"
+          color="secondary.main"
+          component="div"
+          sx={{ fontWeight: 500 }}
+        >
+          My Upcoming Events
+        </Typography>
+        <Button variant="contained" startIcon={<AddIcon />}>
+          Add New Event
+        </Button>
+      </Box>
+      <Box sx={{ width: "100%" }}>
+        <Grid
+          container
+          columnGap={5}
+          rowGap={2}
+          sx={{  width: "100%" }}
+        >
+          {singleEventDetails.map(
+            ({
+              event_name,
+              event_image,
+              event_date,
+              event_time,
+              event_interest,
+            }) => (
+              <Grid item xs={4} md={2} spacing={10} style={{ }}>
+                <EventCard
+                  event_name={event_name}
+                  event_image={event_image}
+                  event_date={event_date}
+                  event_time={event_time}
+                  event_interest={event_interest}
+                ></EventCard>
+              </Grid>
+            )
+          )}
+        </Grid>
+      </Box>
+
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <Pagination count={10} color="primary" />
+      </Box>
+    </>
   );
 }
 
-function EventCard() {
+interface Props {
+  event_name: string;
+  event_image: string;
+  event_date: string;
+  event_time: string;
+  event_interest: string;
+}
+
+function EventCard({
+  event_name,
+  event_image,
+  event_date,
+  event_time,
+  event_interest,
+}: Props) {
   return (
-    <Card sx={{ width: 220, marginRight: "0.5em", marginBottom: "1em" }}>
+    <Box sx={{ width: 230 }}>
+      <Card sx={{ width: "100%" }}>
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image="https://shorturl.at/qxDV8"
-        />
+        <CardMedia component="img" height="140" image={event_image} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            Nadagama
+            {event_name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <EventDetailRow direction="row" spacing={10}>
               <CalendarMonthIcon />
-              2024 - 03 - 01
+              {event_date}
             </EventDetailRow>
             <EventDetailRow direction="row" spacing={10}>
               <AccessTimeFilledIcon />
-              7.00 P.M.
+              {event_time}
             </EventDetailRow>
             <EventDetailRow direction="row" spacing={10}>
               <FavoriteIcon />
-              1.2K
+              {event_interest}
             </EventDetailRow>
           </Typography>
         </CardContent>
@@ -203,5 +314,7 @@ function EventCard() {
         </Stack>
       </CardActions>
     </Card>
+    </Box>
+    
   );
 }
