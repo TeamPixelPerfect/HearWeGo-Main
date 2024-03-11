@@ -78,3 +78,61 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   height: "40px",
   position: "relative",
 }));
+
+
+//Single event page Styles
+
+export const CoverEventCardMedia = styled(CardMedia)(({ theme }) => ({
+  width: "100%",
+  height: "500px",
+  marginTop: "0px",
+  position: "relative",
+  display: "flex",
+  backgroundSize: "repeat",
+  //backgroundPosition: "center",
+  flexDirection:'row'
+}));
+
+export const EventBox = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  display: "flex",
+  width: "40%",
+  height: "35%",
+  padding: "1em",
+  margin: "0px 0px 0px 2%",
+   //backgroundColor:'blue',
+  top: "60%",
+  flexDirection: "column",
+}));
+export const EventNameBox = styled(Box)(({ theme }) => ({
+  position: "relative",
+  display: "flex",
+  fontSize: "56px",
+  //fontFamily: "Roboto",
+  fontWeight: "bold",
+  color: "white",
+  textAlign: "center",
+  //backgroundColor:'yellow'
+}));
+
+export const ArtistNameBox = styled(Box)(({ theme }) => ({
+  height: "100%",
+  width:'100%',
+  //padding: "8px 0px 0px 0px",
+  position: "relative",
+  display: "flex",
+  fontSize: "32px",
+  //fontFamily: "Roboto",
+  fontWeight: "semi-bol",
+  color: "#A5B4FC",
+  textAlign: "center",
+  //backgroundColor:'red'
+}));
+export const OptionBox = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  width: "30%",
+  top: "80%",
+  left: "70%",
+  //backgroundColor:'yellow',
+  alignItems:'right'
+}));
