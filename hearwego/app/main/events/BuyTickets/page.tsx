@@ -7,7 +7,7 @@ import {
   Typography,
   stepConnectorClasses,
 } from "@mui/material";
-import { TicketCover } from "../../../styles/BuyTickets.styles";
+import { TicketCover, Ticketdetails } from "../../../styles/BuyTickets.styles";
 import { Maindiv } from "../../../styles/SingleArtistPage.styles";
 import { styled } from "@mui/material/styles";
 import { Step, StepLabel, Stepper, StepConnector } from "@mui/material";
@@ -21,8 +21,8 @@ import { FillDetails } from "../../../styles/BuyTickets.styles";
 function EventCreateShow(n: number) {
   if (n == 0) {
     return <FillDetails />;
-    // } else if (n == 1) {
-    //   return < />;
+  } else if (n == 1) {
+    return <Ticketdetails />;
     // } else if (n == 2) {
     //   return < />;
     // } else if (n == 3) {
@@ -146,6 +146,7 @@ function ColorlibStepIcon(props: StepIconProps) {
     1: <FeedIcon />,
     2: <LocalActivityIcon />,
     3: <AttachMoneyIcon />,
+    4: <Check />,
   };
 
   return (
@@ -158,7 +159,7 @@ function ColorlibStepIcon(props: StepIconProps) {
   );
 }
 
-const steps = ["Ticket Details", "Payment", "Successful"];
+const steps = ["Your Details", "Ticket Details", "Payment", "Successful"];
 
 export default function Page() {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -220,7 +221,7 @@ export default function Page() {
         img="https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png"
       />
 
-      <Stack sx={{ width: "100%",paddingTop:"20px" }} spacing={4}>
+      <Stack sx={{ width: "100%", paddingTop: "20px" }} spacing={4}>
         <Stepper
           alternativeLabel
           activeStep={activeStep}
@@ -262,7 +263,12 @@ export default function Page() {
               </Button>
               <Box sx={{ flex: "1 1 auto" }} />
               <Button onClick={handleComplete} variant="contained">
-                {completedSteps() === totalSteps() - 1 ? "Finish" : "Next"}
+                {completedSteps() === 1
+                  ? "Checkout"
+                  : completedSteps() === totalSteps() - 1
+                  ? "Finish"
+                  : "Next"}
+                {/* {completedSteps() === totalSteps() - 1 ? "Finish" : "Next"} */}
               </Button>
             </Box>
           </React.Fragment>

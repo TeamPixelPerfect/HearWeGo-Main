@@ -1,9 +1,11 @@
 "use client";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, Box, Stack, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Stack, Typography } from "@mui/material";
 import { CardMedia } from "@mui/material";
 import TextField from "@mui/material/TextField";
-
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 interface TicketCoverProps {
   children?: React.ReactNode;
   event_name: string;
@@ -497,8 +499,6 @@ export function FillDetails() {
   return (
     <Box
       sx={{
-        // display: "flex",
-        // flexDirection: "column",
         alignItems: "left",
         justifyContent: "left",
         height: "100%",
@@ -608,7 +608,7 @@ export function FillDetails() {
         <TextField
           id="filled-textarea"
           style={{
-            width: "40%",
+            width: "35%",
             marginBottom: "20px",
             boxSizing: "initial",
           }}
@@ -616,6 +616,37 @@ export function FillDetails() {
           variant="filled"
         />
       </Box>
+      <FormControlLabel
+        control={<Checkbox />}
+        label="Agree with the terms & conditions"
+      />
+    </Box>
+  );
+}
+
+export function Ticketdetails() {
+  return (
+    <Box
+      sx={{
+        alignItems: "left",
+        justifyContent: "left",
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <Typography variant="h3" fontWeight="bold" gutterBottom>
+        Ticket Details
+      </Typography>
+
+      <Button variant="contained" sx={{width:"40%",justifyContent:"space-between"}}>
+        <AddCircleIcon />
+        <Typography>
+          Gold
+        </Typography>
+        <Typography>
+          Gold
+        </Typography>
+      </Button>
     </Box>
   );
 }
