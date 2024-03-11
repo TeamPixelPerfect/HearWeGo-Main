@@ -30,7 +30,7 @@ export const CaptionBox = styled(Box)(({ theme }) => ({
   height: "35%",
   padding: "1em",
   margin: "0px 0px 0px 2%",
-  //backgroundColor:'blue',
+ // backgroundColor:'blue',
   top: "60%",
   flexDirection: "column",
 }));
@@ -41,7 +41,7 @@ export const Caption01Box = styled(Box)(({ theme }) => ({
   fontSize: "56px",
   //fontFamily: "Roboto",
   fontWeight: "bold",
-  color: "primary.main",
+  color: "white",
   textAlign: "center",
   //backgroundColor:'yellow'
 }));
@@ -64,7 +64,7 @@ export const Caption03Box = styled(Box)(({ theme }) => ({
   fontSize: "40px",
   marginLeft: "8px",
   fontWeight: "bold",
-  color: "primary.main",
+  color: "white",
 }));
 
 export const SearchPaper = styled(Paper)(({ theme }) => ({
