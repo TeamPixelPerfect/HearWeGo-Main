@@ -3,7 +3,7 @@
 import useAudio from "@/app/Hooks/useAudio";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { Album } from "@/app/constants/models";
-import { getAlbums } from "@/app/services/SongServices";
+import { getAlbumForArtists, getAlbums } from "@/app/services/SongServices";
 import { ADHomeTabBox, ADTabBox } from "@/app/styles/artistDashboard.styles";
 import { EventMainBox } from "@/app/styles/artistDashboardEventsPage.styles";
 import {
@@ -134,10 +134,10 @@ const ArtistAlbums = () => {
   };
 
   useEffect(() => {
-    if (artist?.token) {
-      getAlbums(artist?.token).then((albums) => {
+    if (artist?.token && artist?.user?.artist_id) {
+      getAlbumForArtists(artist?.token, artist?.user?.artist_id).then((albums) => {
         console.log("Albums:::", albums);
-        setAlbums(albums);
+        setAlbums(albums.data);
       });
     }
   }, []);
@@ -183,7 +183,7 @@ const ArtistAlbums = () => {
             <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            {albums ? (
+            {albums.length > 0 ? (
               albums.map((album) => {
                 return (
                   <MainAlbumCard

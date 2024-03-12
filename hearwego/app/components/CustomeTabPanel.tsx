@@ -17,9 +17,10 @@ function CustomTabPanel(props: TabPanelProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}
+      style={{overflowY: "scroll", height: "100%"}}
     >
       {value === index && (
-        <Box sx={{ p: fullWidth?"1em 0":3 }}>
+        <Box sx={{ p: fullWidth?"1em 0":3, mb: "1em" }}>
           <Typography>{children}</Typography>
         </Box>
       )}

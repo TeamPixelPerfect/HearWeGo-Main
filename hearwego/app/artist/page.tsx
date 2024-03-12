@@ -40,6 +40,7 @@ import {
 import { MdAlbum } from "react-icons/md";
 import { GiSoundWaves } from "react-icons/gi";
 import CustomTabPanel from "../components/CustomeTabPanel";
+import { useAppSelector } from "@/lib/hooks";
 
 interface HomeSongCardProps {
   songName: string;
@@ -121,6 +122,8 @@ const ADHomePage = () => {
 
   const [tabValue, setTabValue] = React.useState(0);
 
+  const artist = useAppSelector((state) => state.artist.user)
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
@@ -131,10 +134,10 @@ const ADHomePage = () => {
         <ADHomeCoverBox imgUrl={coverPic}>
           <ADHomeNameArea>
             <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-              <ADHomeProfilePicture imgUrl={profilePic} />
+              <ADHomeProfilePicture imgUrl={artist?.user.profilePicture} />
               <Box sx={{ ml: 1 }}>
-                <ADHomeName>The Rembrandts</ADHomeName>
-                <ADArtistInfo>American Rock Duo</ADArtistInfo>
+                <ADHomeName>{artist?.user.artistName}</ADHomeName>
+                <ADArtistInfo>{artist?.user.artistBio}</ADArtistInfo>
                 <ADArtistPageUrl>
                   <Link href="">http://www.hearwego.com/wq23s</Link>
                   <FaCopy />

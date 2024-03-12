@@ -25,40 +25,51 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../styles/CustomeTheme";
 import { FaBars } from "react-icons/fa";
+import { useMediaQuery } from "@mui/material";
+import { useAppSelector } from "@/lib/hooks";
 
 const ArtistDashboardHeader = () => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const matches = useMediaQuery("(max-width:960px)");
+
   return (
     <HeaderBox>
-      <HitPredictorIco>
-        <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <HitPredictorBtn
-            color="primary"
-            aria-label="add"
-            onClick={() => console.log("clicked")}
-          >
-           <FaBars />
-          </HitPredictorBtn>
-        </Box>
-      </HitPredictorIco>
+      {matches ? (
+        <HitPredictorIco>
+          <Box sx={{ "& > :not(style)": { m: 1 } }}>
+            <HitPredictorBtn
+              color="primary"
+              aria-label="add"
+              onClick={() => console.log("clicked")}
+            >
+              <FaBars />
+            </HitPredictorBtn>
+          </Box>
+        </HitPredictorIco>
+      ) : null}
 
-      <HitPredictorIco>
-        <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <HitPredictorBtn
-            color="primary"
-            aria-label="add"
-            onClick={colorMode.toggleColorMode}
-          >
-            {theme.palette.mode === "dark" ? (
-              <Brightness7Icon />
-            ) : (
-              <Brightness4Icon />
-            )}
-          </HitPredictorBtn>
-        </Box>
-      </HitPredictorIco>
-      
+      {!matches ? (
+        <HitPredictorIco>
+          <Box sx={{ "& > :not(style)": { m: 1 } }}>
+            <HitPredictorBtn
+              color="primary"
+              aria-label="add"
+              onClick={colorMode.toggleColorMode}
+            >
+              {theme.palette.mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </HitPredictorBtn>
+          </Box>
+        </HitPredictorIco>
+      ) : null}
+
       <SearchArea>
         <Paper
           component="form"
@@ -93,10 +104,12 @@ const ArtistDashboardHeader = () => {
 
       <ProfileArea>
         <ProfileDetailArea elevation={0}>
-          <Avatar src={"https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"} />
+          <Avatar
+            src={artist?.user.profilePicture}
+          />
           <ArtistDetail>
-            <ArtistName>The Rembrandts</ArtistName>
-            <ArtistGenre>Rock | Dance</ArtistGenre>
+            <ArtistName>{artist?.user.artistName}</ArtistName>
+            <ArtistGenre>{artist?.user.musicGenres[0]} | {artist?.user.artistType}</ArtistGenre>
           </ArtistDetail>
         </ProfileDetailArea>
       </ProfileArea>

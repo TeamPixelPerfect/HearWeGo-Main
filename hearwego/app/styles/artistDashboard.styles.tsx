@@ -152,11 +152,11 @@ export const ADArtistPageUrl = styled(Box)(({ theme }) => ({
 
 export const ADHomeProfilePicture = styled(Box, {
   shouldForwardProp: (prop) => prop !== "imgUrl",
-})<{imgUrl : string}>(({ theme, imgUrl }) => ({
+})<{imgUrl : String|undefined}>(({ theme, imgUrl }) => ({
   width: "200px",
   height: "200px",
   borderRadius: "50%",
-  background: `url(${imgUrl}) no-repeat`,
+  background: `url('${imgUrl}') no-repeat`,
   backgroundPosition: "center",
   backgroundSize: "cover",
   borderWidth: "2px",

@@ -1,6 +1,6 @@
 "use client";
 import { relative } from "path";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Radio from "@mui/material/Radio";
 import Tabs from "@mui/material/Tabs";
@@ -42,6 +42,7 @@ import { Song } from "@/app/constants/models";
 import { createFilterOptions } from "@mui/material";
 import { useAppSelector } from "@/lib/hooks";
 import { addSong } from "@/app/services/SongServices";
+import { getAllArtists } from "@/app/services/ArtistServices";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -110,7 +111,7 @@ const AddSongData = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const Router = useRouter();
 
-  if(songTrack === ""){
+  if (songTrack === "") {
     Router.push("add");
   }
 
@@ -136,6 +137,7 @@ const AddSongData = () => {
     song_img: "",
     song_track: songTrack,
     privacy_status: "Public",
+    added_by: artist ? artist.user.artist_id : "",
   });
   const [songFile, setSongFile] = useState("");
   const [value, setValue] = React.useState(0);
@@ -257,10 +259,10 @@ const AddSongData = () => {
     setLanguageError(false);
 
     setUploading(true);
-    addSong(artist? artist.token : "", songData).then((res) => {
+    addSong(artist ? artist.token : "", songData).then((res) => {
       console.log("Response:::", res);
       setUploading(false);
-      Router.push("/artist/songs/addSongPreview");
+      Router.push("/artist/songs/addSongPreview/"+res.song_id);
     });
   };
 
@@ -1024,6 +1026,18 @@ function ReleaseDate({ songData, setSongData, error }: InputProps) {
 }
 
 function ArtistTags({ songData, setSongData, error }: InputProps) {
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const getArtists = () => {
+    getAllArtists().then((res) => {
+      const data = res?.data.map((opt: any) => ({
+        label: opt.artistName,
+        _id: opt.artist_id,
+      }));
+      setArtists(data);
+    });
+  };
+
   const [artists, setArtists] = useState([
     { label: "Michael Jackson", _id: "ar1" },
     { label: "Guns N' Roses", _id: "ar2" },
@@ -1043,6 +1057,10 @@ function ArtistTags({ songData, setSongData, error }: InputProps) {
       return { ...data, artist: artists };
     });
   };
+
+  useEffect(() => {
+    getArtists();
+  }, []);
 
   return (
     <>
@@ -1080,9 +1098,19 @@ function ComposerTags({ songData, setSongData, error }: InputProps) {
     { label: "Shawn Mendes", _id: "ar4" },
   ]);
 
+  const getArtists = () => {
+    getAllArtists().then((res) => {
+      const data = res?.data.map((opt: any) => ({
+        label: opt.artistName,
+        _id: opt.artist_id,
+      }));
+      setComposers(data);
+    });
+  };
+
   const handleChange = (
     event: React.SyntheticEvent<Element>,
-    value:{ label: string; _id?: string }[]
+    value: { label: string; _id?: string }[]
   ) => {
     const composers = value.map((artist) => ({
       artist_name: artist.label,
@@ -1091,6 +1119,10 @@ function ComposerTags({ songData, setSongData, error }: InputProps) {
       return { ...data, composer: composers };
     });
   };
+
+  useEffect(() => {
+    getArtists();
+  }, []);
 
   return (
     <>
@@ -1128,6 +1160,13 @@ function SongWriterTags({ songData, setSongData, error }: InputProps) {
     { label: "Shawn Mendes", _id: "ar4" },
   ]);
 
+  const getArtists = () => {
+    getAllArtists().then((res) => {
+      const data = res?.data.map((opt: any) => ({label: opt.artistName, _id: opt.artist_id}))
+      setWriters(data);
+    })
+  }
+
   const handleChange = (
     event: React.SyntheticEvent<Element>,
     value: { label: string; _id?: string }[]
@@ -1139,6 +1178,10 @@ function SongWriterTags({ songData, setSongData, error }: InputProps) {
       return { ...data, song_writers: writers };
     });
   };
+
+  useEffect(() => {
+    getArtists();
+  } ,[])
 
   return (
     <>
@@ -1215,10 +1258,7 @@ const handleTagFilter = (options, params) => {
   const filtered = filter(options, params);
   const { inputValue } = params;
 
-  if (
-    inputValue !== "" &&
-    !options.some((option) => option === inputValue)
-  ) {
+  if (inputValue !== "" && !options.some((option) => option === inputValue)) {
     filtered.push(inputValue);
   }
 

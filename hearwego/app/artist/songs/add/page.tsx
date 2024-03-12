@@ -16,7 +16,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CardContent from "@mui/material/CardContent";
 import { useTheme } from "@mui/material";
 import { uploadSong } from "@/app/handlers/uploadFiles";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setSong } from "@/lib/features/song.slice";
 
 const AddSong = () => {

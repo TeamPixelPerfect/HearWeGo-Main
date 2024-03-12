@@ -17,15 +17,105 @@ import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { GiSoundWaves } from "react-icons/gi";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import DropFile from "../../../components/DropFile";
+import { useTheme } from "@emotion/react";
+import { Song } from "@/app/constants/models";
+import useAudio from "@/app/Hooks/useAudio";
+import { getSong, getSongsForArtist } from "@/app/services/SongServices";
+import { useAppSelector } from "@/lib/hooks";
 
 export default function AddAlbumTracks() {
+  const theme = useTheme();
+
+  const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
+
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ width: "100%", marginBottom: "1em" }}>
-        <Card variant="outlined">{AddAlbumTrackCard}</Card>
+        <Card variant="outlined">
+          <CardContent>
+            <Typography
+              variant="h4"
+              color="secondary"
+              sx={{
+                fontSize: "20px",
+                fontWeight: "500",
+                padding: "1em",
+              }}
+            >
+              Add New Album
+            </Typography>
+
+            <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
+              <Box
+                sx={{ width: "30%", display: "flex", justifyContent: "center" }}
+              >
+                <DropAlbumImage />
+              </Box>
+
+              <Box sx={{ width: "70%" }}>
+                <Typography
+                  component="div"
+                  sx={{ marginBottom: "1em", fontSize: 14 }}
+                >
+                  Add Song to the Album
+                </Typography>
+
+                <Box sx={{ width: "100%", display: "flex" }}>
+                  <Box sx={{ width: "95%" }}>
+                    <SongSelectBox setAlbumSongs={setAlbumSongs} />
+                  </Box>
+                  <Box
+                    sx={{ width: "5%", display: "flex", justifyContent: "end" }}
+                  >
+                    <IconButton
+                      aria-label="delete"
+                      size="large"
+                      sx={{ color: "primary.main" }}
+                    >
+                      <AddCircleIcon
+                        sx={{ color: "primary.main" }}
+                        fontSize="inherit"
+                      />
+                    </IconButton>
+                  </Box>
+                </Box>
+
+                <Box sx={{ width: "100%", marginTop: "1em" }}>
+                  {albumSongs.map((song, index) => (
+                    <SongCard
+                      key={index}
+                      songData={song}
+                      setAlbumSongs={setAlbumSongs}
+                    />
+                  ))}
+                </Box>
+
+                <Box sx={{ width: "100%", marginTop: "1em" }}>
+                  <Button variant="contained" startIcon={<AddCircleIcon />}>
+                    Add New Song
+                  </Button>
+                </Box>
+
+                <Box
+                  sx={{
+                    width: "100%",
+                    marginTop: "1em",
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                >
+                  <Stack direction="row" spacing={2}>
+                    <Button variant="outlined">Reset</Button>
+                    <Button variant="contained">Save</Button>
+                  </Stack>
+                </Box>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
     </Box>
   );
@@ -49,80 +139,33 @@ function DropAlbumImage() {
   );
 }
 
-const AddAlbumTrackCard = (
-  <React.Fragment>
-    <CardContent>
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Add New Album
-      </Typography>
+interface SongCardProps {
+  songData: any;
+  setAlbumSongs?: any;
+}
 
-      <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
-        <Box sx={{ width: "30%", display: "flex", justifyContent: "center" }}>
-          <DropAlbumImage />
-        </Box>
+function SongCard({ songData, setAlbumSongs }: SongCardProps) {
+  const [song, setSong] = useState<Song>();
+  const token = useAppSelector((state) => state.artist.user?.token);
 
-        <Box sx={{ width: "70%" }}>
-          <Typography
-            component="div"
-            sx={{ marginBottom: "1em", fontSize: 14 }}
-          >
-            Add Song to the Album
-          </Typography>
+  useEffect(() => {
+    getSong(token ? token : "", songData?.value ? songData.value : "").then(
+      (song) => {
+        console.log("Song:::", song);
+        setSong(song);
+      }
+    );
+  }, []);
 
-          <Box sx={{ width: "100%", display: "flex" }}>
-            <Box sx={{ width: "95%" }}>
-              <SongSelectBox />
-            </Box>
-            <Box sx={{ width: "5%", display: "flex", justifyContent: "end" }}>
-              <IconButton
-                aria-label="delete"
-                size="large"
-                sx={{ color: "primary.main" }}
-              >
-                <AddCircleIcon
-                  sx={{ color: "primary.main" }}
-                  fontSize="inherit"
-                />
-              </IconButton>
-            </Box>
-          </Box>
+  const handleDelete = () => {
+    console.log("Delete Song:::", song?.song_id, song?.song_title);
+    setAlbumSongs((prev: any) => {
+      const newSongs = prev.filter((s: any) => s.value !== song?.song_id);
+      console.log(newSongs);
+      return newSongs;
+    });
+  };
 
-          <Box sx={{ width: "100%", marginTop: "1em" }}>
-            <SongCard />
-            <SongCard />
-            <SongCard />
-          </Box>
-
-          <Box sx={{ width: "100%", marginTop: "1em" }}>
-            <Button variant="contained" startIcon={<AddCircleIcon />}>
-              Add New Song
-            </Button>
-          </Box>
-
-          <Box
-            sx={{
-              width: "100%",
-              marginTop: "1em",
-              display: "flex",
-              justifyContent: "end",
-            }}
-          >
-            <Stack direction="row" spacing={2}>
-              <Button variant="outlined">
-                Reset
-              </Button>
-              <Button variant="contained">
-                Save
-              </Button>
-            </Stack>
-          </Box>
-        </Box>
-      </Box>
-    </CardContent>
-  </React.Fragment>
-);
-
-function SongCard() {
   return (
     <Paper
       elevation={3}
@@ -139,13 +182,10 @@ function SongCard() {
         spacing={2}
         sx={{ display: "flex", alignItems: "center" }}
       >
-        <Avatar
-          alt="SongCover"
-          src="https://i.pinimg.com/originals/48/0a/db/480adb1a2b9491734ad23fd6a68f3d33.jpg"
-        />
+        <Avatar alt="SongCover" src={song && song.song_img} />
 
         <Typography component="div" sx={{ marginBottom: "1em", fontSize: 16 }}>
-          I’ll be There For You
+          {song && song.song_title}
         </Typography>
       </Stack>
 
@@ -167,7 +207,7 @@ function SongCard() {
             component="div"
             sx={{ marginBottom: "1em", fontSize: 14 }}
           >
-            3.08
+            {song && song.song_length}
           </Typography>
         </Stack>
 
@@ -177,11 +217,11 @@ function SongCard() {
           sx={{ display: "flex", alignItems: "center" }}
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ClickPlay />
+            <ClickPlay song_track={song ? song.song_track : ""} />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton sx={{ color: "text.primary" }}>
+            <IconButton sx={{ color: "text.primary" }} onClick={handleDelete}>
               <CloseIcon sx={{ color: "text.secondary", fontSize: 24 }} />
             </IconButton>
           </Box>
@@ -191,21 +231,17 @@ function SongCard() {
   );
 }
 
-function ClickPlay() {
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const togglePlay = () => {
-    setIsPlaying((prevState) => !prevState);
-  };
+function ClickPlay({ song_track }: { song_track: string }) {
+  const { playing, toggle } = useAudio({ url: song_track });
 
   return (
     <>
-      {isPlaying ? (
+      {!playing ? (
         <IconButton sx={{ color: "primary.main" }}>
           <PlayCircleIcon
             sx={{ color: "primary.main", fontSize: 36 }}
             //   sx={{ width: "30%", height: "auto" }}
-            onClick={togglePlay}
+            onClick={toggle}
           />
         </IconButton>
       ) : (
@@ -213,7 +249,7 @@ function ClickPlay() {
           <PauseCircleIcon
             sx={{ color: "primary.main", fontSize: 36 }}
             //   sx={{ width: "30%", height: "auto" }}
-            onClick={togglePlay}
+            onClick={toggle}
           />
         </IconButton>
         // <PauseCircleIcon
@@ -225,13 +261,31 @@ function ClickPlay() {
   );
 }
 
-function SongSelectBox() {
+function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
+  const [songs, setSongs] = useState<Song[]>([]);
+  const artist = useAppSelector((state) => state.artist.user);
+
+  useEffect(() => {
+    if (artist?.user.artist_id && artist.token) {
+      getSongsForArtist(artist.token, artist.user.artist_id).then((songs) => {
+        const data = songs.data.map((song: any) => ({
+          label: song.song_title,
+          value: song.song_id,
+        }));
+        setSongs(data);
+      });
+    }
+  }, []);
+
   return (
     <Autocomplete
       disablePortal
       id="combo-box-demo"
-      options={songSet}
+      options={songs}
       sx={{ width: "90%" }}
+      onChange={(event, newValue) => {
+        setAlbumSongs((prev: any) => [...prev, newValue]);
+      }}
       renderInput={(params) => (
         <TextField
           sx={{ width: "100%" }}

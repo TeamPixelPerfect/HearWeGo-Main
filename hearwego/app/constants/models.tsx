@@ -68,6 +68,7 @@ export interface BankDetails {
 
 export interface Artist {
   user: {
+    artist_id?: string;
     email: String;
     password: String;
     artistName: String;
@@ -122,6 +123,7 @@ export interface Song {
   contain_music?: string;
   additional_tags?: string[];
   description?: string;
+  added_by?: string;
 }
 
 export interface Album {

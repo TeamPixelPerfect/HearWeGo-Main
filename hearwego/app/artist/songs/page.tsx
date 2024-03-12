@@ -36,7 +36,7 @@ import { FaHeadphonesSimple } from "react-icons/fa6";
 import { bool } from "aws-sdk/clients/signer";
 import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
-import { getSongs } from "@/app/services/SongServices";
+import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
 
 interface HomeSongCardProps {
@@ -117,6 +117,7 @@ const ArtistSongs = () => {
   const [draftSongs, setDraftSongs] = useState<Song[]>([]);
 
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -130,28 +131,28 @@ const ArtistSongs = () => {
   };
 
   useEffect(() => {
-    if (artist?.token) {
+    if (artist?.token && artist?.user?.artist_id) {
       // fetch popular songs
-      getSongs(artist?.token).then((songs) => {
+      getSongsForArtist(artist?.token, artist?.user?.artist_id, page, limit).then((songs) => {
         console.log("Songs:::", songs);
         setPopularSongs(songs.data);
       });
 
       // fetch recent songs
-      getSongs(artist?.token).then((songs) => {
+      getSongsForArtist(artist?.token, artist?.user?.artist_id, page, limit).then((songs) => {
         console.log("Songs:::", songs);
         setRecentSongs(songs.data);
       });
 
       // fetch upcoming songs
-      getSongs(artist?.token).then((songs) => {
+      getSongsForArtist(artist?.token, artist?.user?.artist_id, page, limit).then((songs) => {
         console.log("Songs:::", songs);
         setUpcomingSongs(songs.data);
       });
 
       // fetch draft songs
     }
-  }, []);
+  }, [page]);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
