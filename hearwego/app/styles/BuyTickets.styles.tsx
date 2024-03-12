@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import React from "react";
+import React, { useEffect, useState } from "react";
 interface TicketCoverProps {
   children?: React.ReactNode;
   event_name: string;
@@ -21,8 +21,20 @@ interface CountryType {
 }
 interface TicketDetailsProps {
   children?: React.ReactNode;
-  Ticket_Price: Number[];
-  Ticket_Type: string[];
+  Ticket_Data: {
+    Ticket_Price: number;
+    Ticket_Type: string;
+    count: number;
+  }[];
+  setTicketDetails: React.Dispatch<
+    React.SetStateAction<
+      {
+        Ticket_Price: number;
+        Ticket_Type: string;
+        count: number;
+      }[]
+    >
+  >;
 }
 const countries: readonly CountryType[] = [
   { code: "AD", label: "Andorra", phone: "376" },
@@ -456,20 +468,38 @@ export const Maindiv = styled("div")(({ theme }) => ({
 }));
 
 function TicketAddBtn({
-  Ticket_Price,
-  Ticket_Type,
-  n,
+  Ticket_Data,
+  setTicketDetails,
 }: {
-  Ticket_Price: Number[];
-  Ticket_Type: string[];
-  n: number;
+  Ticket_Data: {
+    Ticket_Price: number;
+    Ticket_Type: string;
+    count: number;
+  };
+  setTicketDetails: React.Dispatch<
+    React.SetStateAction<{
+      Ticket_Price: Number;
+      Ticket_Type: string;
+      count: number;
+    }>
+  >;
 }) {
-  const [ticketCount, setTicketCount] = React.useState(0); // Initialize ticket count to 0
+  // const [ticketCount, setTicketCount] = React.useState(0); // Initialize ticket count to 0
   const [totalExpense, setTotalExpense] = React.useState(0); // Initialize total expense to 0
 
   const handleAddTicket = () => {
-    const ticketPrice = Number(Ticket_Price[n]);
-    setTicketCount(ticketCount + 1);
+    const ticketPrice = Number(Ticket_Data.Ticket_Price);
+    setTicketDetails((prev) => {
+      return prev.map((ticket: { Ticket_Type: string; count: number }) => {
+        if (ticket.Ticket_Type === Ticket_Data.Ticket_Type) {
+          return {
+            ...ticket,
+            count: ticket.count + 1,
+          };
+        }
+        return ticket;
+      });
+    });
     setTotalExpense(totalExpense + ticketPrice);
   };
   return (
@@ -484,10 +514,10 @@ function TicketAddBtn({
       onClick={handleAddTicket}
     >
       <AddCircleIcon />
-      <Typography>{Ticket_Type[n]}</Typography>
-      <Typography>LKR {Ticket_Price[n].toString()}</Typography>
-      <Typography>{ticketCount}</Typography>
-      <Typography>LKR {totalExpense}</Typography>
+      <Typography>{Ticket_Data.Ticket_Type}</Typography>
+      <Typography>
+        LKR {Ticket_Data.Ticket_Price.toFixed(2).toString()}
+      </Typography>
     </Button>
   );
 }
@@ -664,10 +694,10 @@ export function FillDetails() {
   );
 }
 
-export const Ticketdetails: React.FC<TicketDetailsProps> = ({
-  Ticket_Price,
-  Ticket_Type,
-}) => {
+export const Ticketdetails = ({
+  Ticket_Data,
+  setTicketDetails,
+}: TicketDetailsProps) => {
   return (
     <Box
       sx={{
@@ -688,36 +718,25 @@ export const Ticketdetails: React.FC<TicketDetailsProps> = ({
           width: "100%",
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", width: "50%" }}>
-          <TicketAddBtn
-            Ticket_Price={Ticket_Price}
-            Ticket_Type={Ticket_Type}
-            n={0}
-          />
-          <TicketAddBtn
-            Ticket_Price={Ticket_Price}
-            Ticket_Type={Ticket_Type}
-            n={1}
-          />
-          <TicketAddBtn
-            Ticket_Price={Ticket_Price}
-            Ticket_Type={Ticket_Type}
-            n={2}
-          />
+        <Box sx={{ display: "flex", flexDirection: "column", width: "40%" }}>
+          {Ticket_Data.map((ticket, index) => (
+            <TicketAddBtn
+              Ticket_Data={ticket}
+              setTicketDetails={setTicketDetails}
+            />
+          ))}
         </Box>
         <Box
           sx={{
             width: "50%",
-            height: "500px",
+            height: "100%",
             backgroundColor: "primary.main",
             borderRadius: "20px",
           }}
         >
-          <AddedTickets
-            Ticket_Price={Ticket_Price}
-            Ticket_Type={Ticket_Type}
-            n={0}
-          />
+          <AddedTickets Ticket_Data={Ticket_Data} n={0} />
+          <AddedTickets Ticket_Data={Ticket_Data} n={1} />
+          <AddedTickets Ticket_Data={Ticket_Data} n={2} />
         </Box>
       </Box>
     </Box>
@@ -725,12 +744,14 @@ export const Ticketdetails: React.FC<TicketDetailsProps> = ({
 };
 
 function AddedTickets({
-  Ticket_Price,
-  Ticket_Type,
+  Ticket_Data,
   n,
 }: {
-  Ticket_Price: Number[];
-  Ticket_Type: string[];
+  Ticket_Data: {
+    Ticket_Price: number;
+    Ticket_Type: string;
+    count: number;
+  }[];
   n: number;
 }) {
   return (
@@ -740,14 +761,19 @@ function AddedTickets({
         flexDirection: "row",
         justifyContent: "space-between",
         width: "100%",
-        color: "white",
+        color: "background.default",
         padding: "10px",
       }}
     >
-      <Typography>
-        {Ticket_Type[n]} Tickets <br />x{" "}
+      <Typography variant="h6">
+        {Ticket_Data[n].Ticket_Type} Tickets <br />x {Ticket_Data[n].count}
       </Typography>
-      <Typography>LKR 1</Typography>
+      <Typography variant="h6">
+        LKR{" "}
+        {(Ticket_Data[n].Ticket_Price * Ticket_Data[n].count)
+          .toFixed(2)
+          .toString()}
+      </Typography>
     </Box>
   );
 }
@@ -767,15 +793,18 @@ export const PaymentDetails: React.FC = () => {
       <Box
         sx={{
           alignItems: "center",
-          backgroundColor: "white",
+          backgroundColor: "background.default",
           width: "50%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
         }}
       >
-        <Typography variant="h3" fontWeight="bold" gutterBottom>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
           Checkout Details
+        </Typography>
+        <Typography variant="h5" sx={{ color: "primary.main" }}>
+          Your Payment : LKR 5500.00
         </Typography>
       </Box>
       <Box
@@ -788,7 +817,7 @@ export const PaymentDetails: React.FC = () => {
           height: "100%",
           width: "50%",
           backgroundColor: "background.default",
-          borderRadius: "20px",
+          paddingTop: "20px",
         }}
       >
         <Box
@@ -852,7 +881,7 @@ export const PaymentDetails: React.FC = () => {
                 marginBottom: "20px",
                 boxSizing: "initial",
               }}
-              placeholder="Enter your CVV"
+              placeholder="Enter CVV"
               variant="filled"
             />
           </Box>

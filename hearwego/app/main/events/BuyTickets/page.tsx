@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -22,20 +22,42 @@ import { Check } from "@mui/icons-material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { FillDetails } from "../../../styles/BuyTickets.styles";
 
+const tickets = [
+  {
+    Ticket_Type: "Bronze",
+    Ticket_Price: 1000.0,
+    count: 0,
+  },
+  {
+    Ticket_Type: "Silver",
+    Ticket_Price: 2000.0,
+    count: 0,
+  },
+  {
+    Ticket_Type: "Gold",
+    Ticket_Price: 2500.0,
+    count: 0,
+  },
+];
+
 function EventCreateShow(n: number) {
+  const [ticketData, setTicketData] = useState(tickets);
+
   if (n == 0) {
     return <FillDetails />;
   } else if (n == 1) {
     return (
       <Ticketdetails
-        Ticket_Price={[1000.0, 2000.0, 2500.0]}
-        Ticket_Type={["Regular", "VIP", "Premium"]}
+        Ticket_Data={ticketData}
+        setTicketDetails={setTicketData}
       />
     );
   } else if (n == 2) {
     return <PaymentDetails />;
   } else if (n == 3) {
-    //   return <EventFormFinish />;
+    return <div>Successful</div>;
+  } else {
+    return null;
   }
 }
 
@@ -245,7 +267,14 @@ export default function Page() {
           ))}
         </Stepper>
       </Stack>
-      <Box sx={{ padding: "2em", paddingLeft: "7em", paddingRight: "7em" }}>
+      <Box
+        sx={{
+          padding: "2em",
+          paddingLeft: "7em",
+          paddingRight: "7em",
+          overflow: "hidden",
+        }}
+      >
         {allStepsCompleted() ? (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
