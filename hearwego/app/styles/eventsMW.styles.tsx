@@ -135,4 +135,5 @@ export const OptionBox = styled(Box)(({ theme }) => ({
   left: "70%",
   //backgroundColor:'yellow',
   alignItems:'right'
+  
 }));
