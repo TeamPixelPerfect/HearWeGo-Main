@@ -11,7 +11,9 @@ import { IoLocationSharp } from "react-icons/io5";
 import { SlCalender } from "react-icons/sl";
 import { FaClock } from "react-icons/fa6";
 import { BsPersonStanding } from "react-icons/bs";
-import SpatialTrackingIcon from '@mui/icons-material/SpatialTracking';
+import SpatialTrackingIcon from "@mui/icons-material/SpatialTracking";
+import SingleEventComponent from "@/app/components/SingleEvent";
+import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import CardMedia from "@mui/material/CardMedia";
@@ -34,8 +36,73 @@ import {
   EventNameBox,
   ArtistNameBox,
   OptionBox,
+  MiddleEventImageBox,
+  LeftBox,
+  LocationDescriptionBox,
+  DateDescriptionBox,
+  TimeDescriptionBox,
+  YearDescriptionBox,
+  NoOfArtistDescriptionBox,
+  RightBox,
 } from "../../../styles/eventsMW.styles";
 
+const interestEvents = [
+  {
+    event_id: "e1",
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    event_id: "e1",
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    event_id: "e1",
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    event_id: "e1",
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    event_id: "e1",
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    event_id: "e1",
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+
+]
 export default function SingleEvent({ params: { id } }: Props) {
   console.log("Event_id::", id);
   return (
@@ -71,7 +138,7 @@ export default function SingleEvent({ params: { id } }: Props) {
                   borderRadius: "40px",
                   width: "100%",
                 }}
-                href="/main/artists/SingleArtistPage/MoreAlbums"
+                href="/main/events/TicketDetails"
                 variant="contained"
                 //size="small"
               >
@@ -95,37 +162,9 @@ export default function SingleEvent({ params: { id } }: Props) {
           //margin: "10px",
         }}
       >
-        <Box
-          sx={{
-            width: "20%",
-            height: "90%",
-            //backgroundColor: "red",
-            padding: "10px",
-            //margin: "10px",
-            display: "flex",
-            position: "relative",
-            left: "40%",
-            borderRadius: "10px",
-            backgroundImage:
-              "url('https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></Box>
+        <MiddleEventImageBox></MiddleEventImageBox>
 
-        <Box
-          sx={{
-            width: "25%",
-            height: "65%",
-            backgroundColor: "#3B0764",
-            borderRadius: "10px",
-            //padding:'10px'
-            //margin: "10px",
-            display: "flex",
-            position: "relative",
-            left: "-3%",
-          }}
-        >
+        <LeftBox>
           <Box
             sx={{
               width: "100%",
@@ -144,133 +183,59 @@ export default function SingleEvent({ params: { id } }: Props) {
                 width: "90%",
                 height: "20%",
                 margin: "0px",
-                //backgroundColor: "black",
-                //alignItems: "center",
                 display: "flex",
                 position: "relative",
                 justifyContent: "left",
-                //padding: "20px 0px 0px 50px",
               }}
             >
               <IoLocationSharp style={{ color: "white", fontSize: "35px" }} />
-
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "60%",
-                  margin: "5px",
-                  //backgroundColor: "white",
-                  //alignItems: "center",
-                  display: "flex",
-                  position: "relative",
-                  justifyContent: "left",
-                  padding: "0px 0px 0px 20px",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                }}
-              >
-                XYZ Hall
-              </Box>
+              <LocationDescriptionBox>XYZ Hall</LocationDescriptionBox>
             </Box>
+
             <Box
               sx={{
                 width: "90%",
                 height: "20%",
                 margin: "0px",
-                //backgroundColor: "blue",
-                //alignItems: "center",
                 display: "flex",
                 position: "relative",
                 justifyContent: "left",
-                //padding: "20px 0px 0px 50px",
               }}
             >
               <SlCalender style={{ color: "white", fontSize: "35px" }} />
 
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "60%",
-                  margin: "5px",
-                  //backgroundColor: "white",
-                  //alignItems: "center",
-                  display: "flex",
-                  position: "relative",
-                  justifyContent: "left",
-                  padding: "0px 0px 0px 20px",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                }}
-              >
-                2024-01-19
-              </Box>
+              <DateDescriptionBox>2024-01-19</DateDescriptionBox>
             </Box>
             <Box
               sx={{
                 width: "90%",
                 height: "20%",
                 margin: "0px",
-                //backgroundColor: "black",
-                //alignItems: "center",
                 display: "flex",
                 position: "relative",
                 justifyContent: "left",
-                //padding: "20px 0px 0px 50px",
               }}
             >
               <FaClock style={{ color: "white", fontSize: "30px" }} />
 
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "60%",
-                  margin: "5px",
-                  //backgroundColor: "white",
-                  //alignItems: "center",
-                  display: "flex",
-                  position: "relative",
-                  justifyContent: "left",
-                  padding: "0px 0px 0px 20px",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                }}
-              >
-                8.00 - 11.00.P.M
-              </Box>
+              <TimeDescriptionBox>8.00 - 11.00.P.M</TimeDescriptionBox>
             </Box>
+
             <Box
               sx={{
                 width: "90%",
                 height: "20%",
                 margin: "0px",
-                //backgroundColor: "black",
-                //alignItems: "center",
                 display: "flex",
                 position: "relative",
                 justifyContent: "left",
-                //padding: "20px 0px 0px 50px",
               }}
             >
               <BsPersonStanding style={{ color: "white", fontSize: "35px" }} />
 
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "60%",
-                  margin: "5px",
-                 // backgroundColor: "white",
-                  //alignItems: "center",
-                  display: "flex",
-                  position: "relative",
-                  justifyContent: "left",
-                  padding: "0px 0px 0px 20px",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                }}
-              >
-                18 years above
-              </Box>
+              <YearDescriptionBox>18 years above</YearDescriptionBox>
             </Box>
+
             <Box
               sx={{
                 width: "90%",
@@ -284,43 +249,119 @@ export default function SingleEvent({ params: { id } }: Props) {
                 //padding: "20px 0px 0px 50px",
               }}
             >
-              <SpatialTrackingIcon style={{ color: "white", fontSize: "35px" }} />
+              <SpatialTrackingIcon
+                style={{ color: "white", fontSize: "35px" }}
+              />
 
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "60%",
-                  margin: "5px",
-                  //backgroundColor: "white",
-                  //alignItems: "center",
-                  display: "flex",
-                  position: "relative",
-                  justifyContent: "left",
-                  padding: "0px 0px 0px 20px",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                }}
-              >
-                -
-              </Box>
+              <NoOfArtistDescriptionBox> - </NoOfArtistDescriptionBox>
             </Box>
           </Box>
-        </Box>
+        </LeftBox>
 
-        <Box
-          sx={{
-            width: "25%",
-            height: "65%",
-            backgroundColor: "#6B21A8",
-            borderRadius: "10px",
-            //padding:'10px'
-            //margin: "10px",
-            display: "flex",
-            position: "relative",
-            left: "13%",
-          }}
-        ></Box>
+        <RightBox>
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              //backgroundColor: "white",
+              position: "relative",
+              display: "flex",
+              borderRadius: "14px",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                height: "20%",
+                // backgroundColor:'black',
+                display: "flex",
+                position: "relative",
+                fontSize: "20px",
+                fontWeight: "bold",
+                color: "white",
+                padding: "10px 0px 0px 25px",
+              }}
+            >
+              Description :
+            </Box>
+            <Box
+              sx={{
+                width: "100%",
+                height: "80%",
+                // backgroundColor: "black",
+                display: "flex",
+                position: "relative",
+                fontSize: "12px",
+                padding: "10px 0px 0px 25px",
+                //fontWeight: "bold",
+                //color: "white",
+                //padding: "15px 0px 0px 25px",
+              }}
+            >
+              Lorem ipsum dolor sit amet consectetur. Dui porttitor eu id
+              venenatis blandit lorem egestas. At adipiscing orci pulvinar
+              sodales arcu. Ultricies et enim molestie felis amet facilisi
+              nullam nunc consectetur. Sapien viverra magna a nunc aliquam odio
+              :
+            </Box>
+          </Box>
+        </RightBox>
       </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "100%",
+          justifyContent: "space-between",
+          //alignItems: "right",
+          //backgroundColor: "blue",
+          //padding: "20px",
+        }}
+      >
+        <Box
+          style={{
+            padding: "10px 0px 0px 60px",
+            color: "primary.default",
+            fontSize: "32px",
+            fontWeight: "bold",
+            //backgroundColor: "yellow",
+          }}
+        >
+          Recommend by Artist
+        </Box>
+        <CardActions style={{ padding: "20px" }}>
+          <Button
+            href="/main/events/MoreInterestEvents"
+            //variant="contained"
+            size="small"
+          >
+            Show All
+          </Button>
+        </CardActions>
+      </Box>
+
+      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+        {interestEvents.map(
+          ({ name, img, date, day, time, artist, event_id }) => (
+            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+              <SingleEventComponent
+                eventID={event_id}
+                eventName={name}
+                eventImg={img}
+                eventDate={date}
+                eventDay={day}
+                eventTime={time}
+                artistName={artist}
+              ></SingleEventComponent>
+            </Grid>
+          )
+        )}
+      </Grid>
     </Maindiv>
   );
 }

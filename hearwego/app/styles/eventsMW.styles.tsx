@@ -88,7 +88,8 @@ export const CoverEventCardMedia = styled(CardMedia)(({ theme }) => ({
   marginTop: "0px",
   position: "relative",
   display: "flex",
-  backgroundSize: "repeat",
+  backgroundRepeat:'repeat-x',
+  
   //backgroundPosition: "center",
   flexDirection:'row'
 }));
@@ -136,4 +137,112 @@ export const OptionBox = styled(Box)(({ theme }) => ({
   //backgroundColor:'yellow',
   alignItems:'right'
   
+}));
+export const MiddleEventImageBox = styled(Box)(({ theme }) => ({
+  width: "20%",
+  height: "90%",
+  //backgroundColor: "red",
+  padding: "10px",
+  //margin: "10px",
+  display: "flex",
+  position: "relative",
+  left: "40%",
+  borderRadius: "10px",
+  backgroundImage:
+    "url('https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+}));
+
+export const LeftBox = styled(Box)(({ theme }) => ({
+  width: "25%",
+  height: "65%",
+  backgroundColor: "#3B0764",
+  borderRadius: "10px",
+  //padding:'10px'
+  //margin: "10px",
+  display: "flex",
+  position: "relative",
+  left: "-3%",
+}));
+
+export const LocationDescriptionBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "60%",
+  margin: "5px",
+  //backgroundColor: "white",
+  //alignItems: "center",
+  display: "flex",
+  position: "relative",
+  justifyContent: "left",
+  padding: "0px 0px 0px 20px",
+  fontSize: "18px",
+  fontWeight: "bold",
+}));
+
+
+export const DateDescriptionBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "60%",
+  margin: "5px",
+  //backgroundColor: "white",
+  //alignItems: "center",
+  display: "flex",
+  position: "relative",
+  justifyContent: "left",
+  padding: "0px 0px 0px 20px",
+  fontSize: "18px",
+  fontWeight: "bold",
+}));
+
+export const TimeDescriptionBox = styled(Box)(({ theme }) => ({
+   width: "100%",
+  height: "60%",
+  margin: "5px",
+  //backgroundColor: "white",
+  //alignItems: "center",
+  display: "flex",
+  position: "relative",
+  justifyContent: "left",
+  padding: "0px 0px 0px 20px",
+  fontSize: "18px",
+  fontWeight: "bold",
+}));
+export const YearDescriptionBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "60%",
+  margin: "5px",
+  // backgroundColor: "white",
+  //alignItems: "center",
+  display: "flex",
+  position: "relative",
+  justifyContent: "left",
+  padding: "0px 0px 0px 20px",
+  fontSize: "18px",
+  fontWeight: "bold",
+}));
+export const NoOfArtistDescriptionBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "60%",
+  margin: "5px",
+  //backgroundColor: "white",
+  //alignItems: "center",
+  display: "flex",
+  position: "relative",
+  justifyContent: "left",
+  padding: "0px 0px 0px 20px",
+  fontSize: "18px",
+  fontWeight: "bold",
+}));
+
+export const RightBox = styled(Box)(({ theme }) => ({
+  width: "25%",
+  height: "65%",
+  backgroundColor: "#6B21A8",
+  borderRadius: "10px",
+  //padding:'10px'
+  //margin: "10px",
+  display: "flex",
+  position: "relative",
+  left: "13%",
 }));
