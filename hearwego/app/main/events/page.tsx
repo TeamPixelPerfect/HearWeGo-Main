@@ -24,6 +24,7 @@ import { CustomSelect } from "@/app/components/eventsDropDown";
 
 const interestEvents = [
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -32,6 +33,7 @@ const interestEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -40,6 +42,7 @@ const interestEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -48,6 +51,7 @@ const interestEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -56,6 +60,7 @@ const interestEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -64,6 +69,7 @@ const interestEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -75,6 +81,7 @@ const interestEvents = [
 
 const trendingEvents = [
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -83,6 +90,7 @@ const trendingEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e2",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -91,6 +99,7 @@ const trendingEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e3",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -99,6 +108,7 @@ const trendingEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e4",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -107,6 +117,7 @@ const trendingEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e5",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -115,6 +126,7 @@ const trendingEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e6",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -126,6 +138,7 @@ const trendingEvents = [
 
 const allEvents = [
   {
+    event_id: "e1",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -134,6 +147,7 @@ const allEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e2",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -142,6 +156,7 @@ const allEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e3",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -150,6 +165,7 @@ const allEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e4",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -158,6 +174,7 @@ const allEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e5",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -166,6 +183,7 @@ const allEvents = [
     artist: "Kaizer Kaize",
   },
   {
+    event_id: "e6",
     name: "Beats",
     img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
     date: "Jan 12",
@@ -369,18 +387,21 @@ export default function EventsPage() {
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {interestEvents.map(({ name, img, date, day, time, artist }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
-            <SingleEvent
-              eventName={name}
-              eventImg={img}
-              eventDate={date}
-              eventDay={day}
-              eventTime={time}
-              artistName={artist}
-            ></SingleEvent>
-          </Grid>
-        ))}
+        {interestEvents.map(
+          ({ name, img, date, day, time, artist, event_id }) => (
+            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+              <SingleEvent
+                eventID={event_id}
+                eventName={name}
+                eventImg={img}
+                eventDate={date}
+                eventDay={day}
+                eventTime={time}
+                artistName={artist}
+              ></SingleEvent>
+            </Grid>
+          )
+        )}
       </Grid>
 
       <Box
@@ -418,18 +439,21 @@ export default function EventsPage() {
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {trendingEvents.map(({ name, img, date, day, time, artist }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
-            <SingleEvent
-              eventName={name}
-              eventImg={img}
-              eventDate={date}
-              eventDay={day}
-              eventTime={time}
-              artistName={artist}
-            ></SingleEvent>
-          </Grid>
-        ))}
+        {trendingEvents.map(
+          ({ name, img, date, day, time, artist, event_id }) => (
+            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+              <SingleEvent
+                eventID={event_id}
+                eventName={name}
+                eventImg={img}
+                eventDate={date}
+                eventDay={day}
+                eventTime={time}
+                artistName={artist}
+              ></SingleEvent>
+            </Grid>
+          )
+        )}
       </Grid>
 
       <Box
@@ -467,9 +491,10 @@ export default function EventsPage() {
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {allEvents.map(({ name, img, date, day, time, artist }) => (
+        {allEvents.map(({ name, img, date, day, time, artist, event_id }) => (
           <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
             <SingleEvent
+              eventID={event_id}
               eventName={name}
               eventImg={img}
               eventDate={date}
@@ -480,8 +505,6 @@ export default function EventsPage() {
           </Grid>
         ))}
       </Grid>
-      
-      
     </Maindiv>
   );
 }

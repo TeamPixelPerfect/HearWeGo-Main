@@ -84,7 +84,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
 
 export const CoverEventCardMedia = styled(CardMedia)(({ theme }) => ({
   width: "100%",
-  height: "500px",
+  height: "400px",
   marginTop: "0px",
   position: "relative",
   display: "flex",

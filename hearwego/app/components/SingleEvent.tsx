@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import Link from "next/link";
 
 interface Props {
+  eventID: string;
   eventName: string;
   eventImg: string;
   eventDate: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function SingleEvent({
+  eventID,
   eventName,
   eventImg,
   eventDate,
@@ -20,7 +22,7 @@ export default function SingleEvent({
   artistName,
 }: Props) {
   return (
-    <Link href="/main/events/SingleEvent">
+    <Link href={`/main/events/`+eventID}>
       <Box
       // sx={{
       //   textAlign: "center",
