@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import React from "react";
 interface TicketCoverProps {
   children?: React.ReactNode;
   event_name: string;
@@ -17,6 +18,11 @@ interface CountryType {
   label: string;
   phone: string;
   suggested?: boolean;
+}
+interface TicketDetailsProps {
+  children?: React.ReactNode;
+  Ticket_Price: Number[];
+  Ticket_Type: string[];
 }
 const countries: readonly CountryType[] = [
   { code: "AD", label: "Andorra", phone: "376" },
@@ -449,23 +455,57 @@ export const Maindiv = styled("div")(({ theme }) => ({
   height: "100%",
 }));
 
+function TicketAddBtn({
+  Ticket_Price,
+  Ticket_Type,
+  n,
+}: {
+  Ticket_Price: Number[];
+  Ticket_Type: string[];
+  n: number;
+}) {
+  const [ticketCount, setTicketCount] = React.useState(0); // Initialize ticket count to 0
+  const [totalExpense, setTotalExpense] = React.useState(0); // Initialize total expense to 0
+
+  const handleAddTicket = () => {
+    const ticketPrice = Number(Ticket_Price[n]);
+    setTicketCount(ticketCount + 1);
+    setTotalExpense(totalExpense + ticketPrice);
+  };
+  return (
+    <Button
+      variant="contained"
+      sx={{
+        width: "95%",
+        justifyContent: "space-between",
+        padding: "10px",
+        margin: "5px",
+      }}
+      onClick={handleAddTicket}
+    >
+      <AddCircleIcon />
+      <Typography>{Ticket_Type[n]}</Typography>
+      <Typography>LKR {Ticket_Price[n].toString()}</Typography>
+      <Typography>{ticketCount}</Typography>
+      <Typography>LKR {totalExpense}</Typography>
+    </Button>
+  );
+}
+
 export const TicketCover: React.FC<TicketCoverProps> = ({
   event_name,
   img,
   artist_name,
 }) => {
   return (
-    <CardMedia
-      image={img}
+    <Box
       style={{
         width: "100%",
         height: "45vh",
         marginTop: "0px",
         position: "relative",
-        display: "flex",
-        backgroundColor: "black",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundImage: `url(${img})`,
+        backgroundRepeat: "repeat-x",
       }}
     >
       <div
@@ -491,7 +531,7 @@ export const TicketCover: React.FC<TicketCoverProps> = ({
         </div>
         <div style={{ fontSize: "30px", color: "#A5B4FC" }}>{artist_name}</div>
       </Box>
-    </CardMedia>
+    </Box>
   );
 };
 
@@ -624,7 +664,10 @@ export function FillDetails() {
   );
 }
 
-export function Ticketdetails() {
+export const Ticketdetails: React.FC<TicketDetailsProps> = ({
+  Ticket_Price,
+  Ticket_Type,
+}) => {
   return (
     <Box
       sx={{
@@ -637,16 +680,184 @@ export function Ticketdetails() {
       <Typography variant="h3" fontWeight="bold" gutterBottom>
         Ticket Details
       </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", width: "50%" }}>
+          <TicketAddBtn
+            Ticket_Price={Ticket_Price}
+            Ticket_Type={Ticket_Type}
+            n={0}
+          />
+          <TicketAddBtn
+            Ticket_Price={Ticket_Price}
+            Ticket_Type={Ticket_Type}
+            n={1}
+          />
+          <TicketAddBtn
+            Ticket_Price={Ticket_Price}
+            Ticket_Type={Ticket_Type}
+            n={2}
+          />
+        </Box>
+        <Box
+          sx={{
+            width: "50%",
+            height: "500px",
+            backgroundColor: "primary.main",
+            borderRadius: "20px",
+          }}
+        >
+          <AddedTickets
+            Ticket_Price={Ticket_Price}
+            Ticket_Type={Ticket_Type}
+            n={0}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
-      <Button variant="contained" sx={{width:"40%",justifyContent:"space-between"}}>
-        <AddCircleIcon />
-        <Typography>
-          Gold
-        </Typography>
-        <Typography>
-          Gold
-        </Typography>
-      </Button>
+function AddedTickets({
+  Ticket_Price,
+  Ticket_Type,
+  n,
+}: {
+  Ticket_Price: Number[];
+  Ticket_Type: string[];
+  n: number;
+}) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
+        color: "white",
+        padding: "10px",
+      }}
+    >
+      <Typography>
+        {Ticket_Type[n]} Tickets <br />x{" "}
+      </Typography>
+      <Typography>LKR 1</Typography>
     </Box>
   );
 }
+
+export const PaymentDetails: React.FC = () => {
+  return (
+    <Box
+      sx={{
+        alignItems: "center",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      <Box
+        sx={{
+          alignItems: "center",
+          backgroundColor: "white",
+          width: "50%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant="h3" fontWeight="bold" gutterBottom>
+          Checkout Details
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          width: "50%",
+          backgroundColor: "background.default",
+          borderRadius: "20px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "35%",
+            justifyContent: "center",
+          }}
+        >
+          <Typography sx={{ justifyContent: "center" }}>Card Number</Typography>
+          <TextField
+            id="filled-textarea"
+            style={{
+              width: "100%",
+              marginBottom: "20px",
+              boxSizing: "initial",
+            }}
+            placeholder="Enter your card number"
+            variant="filled"
+          />
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: "column", width: "35%" }}>
+          <Typography>CardHolder Name</Typography>
+          <TextField
+            id="filled-textarea"
+            style={{
+              width: "100%",
+              marginBottom: "20px",
+              boxSizing: "initial",
+            }}
+            placeholder="Enter your Name"
+            variant="filled"
+          />
+        </Box>
+        <Stack direction="row" spacing={10} sx={{ width: "35%" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", width: "50%" }}>
+            <Typography>Expiry Date</Typography>
+            <TextField
+              style={{
+                width: "100%",
+                boxSizing: "initial",
+              }}
+              placeholder="MM/YY"
+              variant="filled"
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "50%",
+              marginBottom: "10px",
+            }}
+          >
+            <Typography>CVV/CVC</Typography>
+            <TextField
+              id="filled-textarea"
+              style={{
+                width: "100%",
+                marginBottom: "20px",
+                boxSizing: "initial",
+              }}
+              placeholder="Enter your CVV"
+              variant="filled"
+            />
+          </Box>
+        </Stack>
+      </Box>
+    </Box>
+  );
+};

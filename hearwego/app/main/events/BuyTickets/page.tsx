@@ -7,7 +7,11 @@ import {
   Typography,
   stepConnectorClasses,
 } from "@mui/material";
-import { TicketCover, Ticketdetails } from "../../../styles/BuyTickets.styles";
+import {
+  PaymentDetails,
+  TicketCover,
+  Ticketdetails,
+} from "../../../styles/BuyTickets.styles";
 import { Maindiv } from "../../../styles/SingleArtistPage.styles";
 import { styled } from "@mui/material/styles";
 import { Step, StepLabel, Stepper, StepConnector } from "@mui/material";
@@ -22,10 +26,15 @@ function EventCreateShow(n: number) {
   if (n == 0) {
     return <FillDetails />;
   } else if (n == 1) {
-    return <Ticketdetails />;
-    // } else if (n == 2) {
-    //   return < />;
-    // } else if (n == 3) {
+    return (
+      <Ticketdetails
+        Ticket_Price={[1000.0, 2000.0, 2500.0]}
+        Ticket_Type={["Regular", "VIP", "Premium"]}
+      />
+    );
+  } else if (n == 2) {
+    return <PaymentDetails />;
+  } else if (n == 3) {
     //   return <EventFormFinish />;
   }
 }
