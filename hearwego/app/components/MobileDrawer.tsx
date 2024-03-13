@@ -81,7 +81,7 @@ export default function PersistentDrawerLeft({
         </DrawerHeader>
         <Divider />
         <List>
-          {menuItems.map((item, index) => (
+          {menuItems?.map((item, index) => (
             <ListItem key={item._id} disablePadding>
               <ListItemButton onClick={() => router.push(item.url)}>
                 <ListItemText primary={item.name} />

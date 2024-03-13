@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Artist = () => {
+const page = () => {
   return (
     <div>
-      Artist
+      Press Releases
     </div>
   )
 }
 
-export default Artist
+export default page

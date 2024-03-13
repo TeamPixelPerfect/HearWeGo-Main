@@ -1,5 +1,5 @@
 "use client";
-import ThemeProvider from "@mui/material/styles/ThemeProvider";
+import { ThemeProvider } from "@mui/material/styles";
 import { hearWeGoDarkTheme, hearWeGoTheme } from "./theme";
 import {
   CssBaseline,

@@ -8,7 +8,7 @@ import { base_url } from "../constants/keys";
 import { IconButton, Button, Stack, PaletteMode } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CellTowerIcon from "@mui/icons-material/CellTower";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setApp } from "@/lib/features/app.slice";
 import { usePathname } from "next/navigation";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -19,6 +19,7 @@ import { ColorModeContext } from "../styles/CustomeTheme";
 import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useSelector } from "react-redux";
 
 interface Props {
   app: AppItem;
@@ -34,6 +35,8 @@ const Header = ({ app }: Props) => {
 
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+
+  const user = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
     dispatch(setApp(app));
@@ -56,7 +59,7 @@ const Header = ({ app }: Props) => {
         {matches ? (
           <Box>
             <IconButton
-              sx={{ ml: 1 }}
+              sx={{ ml: 1, mr: 2 }}
               onClick={colorMode.toggleColorMode}
               color="inherit"
             >
@@ -66,13 +69,15 @@ const Header = ({ app }: Props) => {
                 <Brightness4Icon />
               )}
             </IconButton>
-            <IconButton
-              aria-label="user-profile"
-              size="large"
-              style={{ margin: "0 16px" }}
-            >
-              <AccountCircleIcon sx={{ color: "#fff" }} fontSize="large" />
-            </IconButton>
+            {user ? (
+              <IconButton
+                aria-label="user-profile"
+                size="large"
+                style={{ marginRight: "16px" }}
+              >
+                <AccountCircleIcon sx={{ color: "#fff" }} fontSize="large" />
+              </IconButton>
+            ) : null}
             <Button
               component="label"
               color="secondary"

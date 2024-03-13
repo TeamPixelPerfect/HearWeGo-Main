@@ -1,0 +1,22 @@
+"use client";
+import { styled } from "@mui/material";
+import { Box } from "@mui/material";
+
+export const SongPreviewSong = styled(Box)(({ theme }) => ({
+    width: '20%',
+    position: "relative"
+  }));
+
+export const SongPreviewDetails = styled(Box)(({ theme }) => ({
+    width: '55%',
+    paddingLeft: '1em',
+    paddingTop: '10px',
+  }));
+
+  export const SongPreviewShare = styled(Box)(({ theme }) => ({
+    width: '25%',
+    display: 'flex',
+    // backgroundColor: 'yellow',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
+  }));
