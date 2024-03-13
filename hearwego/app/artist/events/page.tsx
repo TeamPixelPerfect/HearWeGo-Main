@@ -156,57 +156,6 @@ function EventTabs() {
   );
 }
 
-const singleEventDetails = [
-  {
-    event_name: "Nadagama",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-01-10",
-    event_time: "8.00 P.M.",
-    event_interest: "1000",
-  },
-  {
-    event_name: "Ridma",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-04-10",
-    event_time: "9.00 P.M.",
-    event_interest: "1000",
-  },
-  {
-    event_name: "Ridma",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-04-10",
-    event_time: "9.00 P.M.",
-    event_interest: "1000",
-  },
-  {
-    event_name: "Ridma",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-04-10",
-    event_time: "9.00 P.M.",
-    event_interest: "1000",
-  },
-  {
-    event_name: "Ridma",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-04-10",
-    event_time: "9.00 P.M.",
-    event_interest: "1000",
-  },
-  {
-    event_name: "Ridma",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-04-10",
-    event_time: "9.00 P.M.",
-    event_interest: "1000",
-  },
-  {
-    event_name: "Ridma",
-    event_image: "https://shorturl.at/qxDV8",
-    event_date: "2024-04-10",
-    event_time: "9.00 P.M.",
-    event_interest: "1000",
-  },
-];
 
 function EventArea() {
   const artist = useAppSelector((state) => state.artist.user);
@@ -269,14 +218,6 @@ function EventArea() {
       </Box>
     </>
   );
-}
-
-interface Props {
-  event_name: string;
-  event_image: string;
-  event_date: string;
-  event_time: string;
-  event_interest: string;
 }
 
 interface EventCardProps {

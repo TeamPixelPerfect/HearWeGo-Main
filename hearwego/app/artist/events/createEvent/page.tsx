@@ -434,6 +434,25 @@ function SelectEventType() {
 }
 
 function EventDetails() {
+  const [numberOfSessions, setNumberOfSessions] = useState(0);
+
+  const handleNumberOfSessionsChange = (event) => {
+    const value = parseInt(event.target.value);
+    setNumberOfSessions(isNaN(value) ? 0 : value);
+  };
+
+  const generateDivs = () => {
+    const divs = [];
+    for (let i = 0; i < numberOfSessions; i++) {
+      divs.push(
+        <div key={i}>
+          <SessionForm />
+        </div>
+      );
+    }
+    return divs;
+  };
+
   const [imgFile, setImgFile] = React.useState(null);
   return (
     <>
@@ -520,16 +539,23 @@ function EventDetails() {
                 }}
                 variant="filled"
                 sx={{ width: "66%" }}
+                onChange={handleNumberOfSessionsChange}
               />
             </Stack>
           </Box>
         </Box>
       </Paper>
-
-      <SessionArea />
-
+      <Paper
+        sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+        elevation={3}
+      >
+        <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+          Sessions
+        </Typography>
+        {generateDivs()}
+      </Paper>
+    
       <SponsorField />
-
       <TeamField />
     </>
   );
@@ -608,7 +634,7 @@ function SessionForm() {
     dayjs("2022-04-17T15:30")
   );
   return (
-    <Paper sx={{ width: "100%", padding: "2em" }} elevation={3}>
+    <Paper sx={{ width: "100%", padding: "2em", marginBottom: "1em" }} elevation={3}>
       <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
         Session 01
       </Typography>
@@ -906,9 +932,40 @@ const sponsorModalStyle = {
 };
 
 function SponsorModal() {
+  const [sponsorType, setSponsorType] = useState('');
+  const [sponsorName, setSponsorName] = useState('');
+  const [sponsorContact, setSponsorContact] = useState('');
+  const [sponsorEmail, setSponsorEmail] = useState('');
+
+  const handleSponsorTypeChange = (event) => {
+    setSponsorType(event.target.value);
+  };
+
+  const handleSponsorNameChange = (event) => {
+    setSponsorName(event.target.value);
+  };
+
+  const handleSponsorContactChange = (event) => {
+    setSponsorContact(event.target.value);
+  };
+
+  const handleSponsorEmailChange = (event) => {
+    setSponsorEmail(event.target.value);
+  };
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const addNewSponsor = ()=> {
+    sponsorRows.push({
+      id: sponsorRows.length+1,
+  sponsorType: sponsorType, 
+  sponsorName: sponsorName, 
+  sponsorContact: sponsorContact,
+  sponsorEmail: sponsorEmail, 
+    })
+  }
 
   return (
     <div>
@@ -934,6 +991,7 @@ function SponsorModal() {
             label="Sponsor Type"
             variant="filled"
             sx={{ width: "100%", marginBottom: 2 }}
+            onChange={handleSponsorTypeChange}
           />
 
           <TextField
@@ -941,6 +999,7 @@ function SponsorModal() {
             label="Sponsor Name"
             variant="filled"
             sx={{ width: "100%", marginBottom: 2 }}
+            onChange={handleSponsorNameChange}
           />
 
           <TextField
@@ -948,6 +1007,7 @@ function SponsorModal() {
             label="Contact No."
             variant="filled"
             sx={{ width: "100%", marginBottom: 2 }}
+            onChange={handleSponsorContactChange}
           />
 
           <TextField
@@ -955,7 +1015,13 @@ function SponsorModal() {
             label="Email"
             variant="filled"
             sx={{ width: "100%", marginBottom: 2 }}
+            onChange={handleSponsorEmailChange}
           />
+        <Stack direction='row' spacing={2}>
+        <Button variant="outlined" onClick={handleClose}>Close</Button>
+        <Button variant="contained" onClick={addNewSponsor}>Add</Button>
+        </Stack>
+        
         </Box>
 
         {/* <Stack direction="row" spacing={2}>
@@ -977,7 +1043,7 @@ const sponsorColumns: GridColDef[] = [
   { field: "sponsorEmail", headerName: "E-mail", width: 250 },
 ];
 
-const sponsorRows = [
+var sponsorRows = [
   {
     id: 1,
     sponsorType: "Main",

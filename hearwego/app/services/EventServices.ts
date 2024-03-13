@@ -24,3 +24,21 @@ export const getEvents = async (
     throw new Error(error.message);
   }
 };
+
+export const addEvent = async (token: string, data: any) => {
+  const res = await fetch(`${base_url}/EventsManager/events`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const event = await res.json();
+    return event;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
