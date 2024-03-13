@@ -5,13 +5,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Stack from "@mui/material/Stack";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+
 import { Grid } from "@mui/material";
 import SingleEventComponent from "../../../components/SingleEvent";
 
@@ -150,78 +144,11 @@ export default function Tickets({ params: { id } }: Props) {
           //backgroundColor: "black",
           display: "flex",
           flexDirection: "row",
-          justifyContent: "center",
+          justifyContent: "right",
           //alignItems: "center",
         }}
       >
-        <TableContainer
-          sx={{
-            width: "30%",
-            margin: "50px 0px 0px 80px",
-            height: "30%",
-            border: "1px solid black",
-            alignItems: "center",
-            borderRadius: "16px",
-          }}
-          component={Paper}
-        >
-          <Table
-            sx={{
-              width: "100%",
-              height: "100%",
-              //backgroundColor:'blue'
-              alignItems: "center",
-            }}
-          >
-            <TableHead
-              sx={{
-                backgroundColor: "#3B0764",
-              }}
-            >
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontSize: "16px",
-                    color: "white",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Ticket Type
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontSize: "16px",
-                    color: "white",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Price
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody
-              sx={{
-                backgroundColor: "primary.light",
-                //alignItems:'center',
-              }}
-            >
-              <TableRow sx={{}}>
-                <TableCell sx={{ fontSize: "16px" }}>Gold</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>2000</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: "16px" }}>Silver</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>1000</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: "16px" }}>Bronze</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>500</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        
         <Box
           sx={{
             backgroundColor: "#6B21A8",
