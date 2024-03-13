@@ -11,7 +11,6 @@ import { url } from "inspector";
 import CardActions from "@mui/material";
 import { FaFilePdf } from "react-icons/fa";
 
-
 interface RenderedTicketprops {
   Event_img: string;
   Ref_No: string;
@@ -931,9 +930,31 @@ export const SuccessfulDetails: React.FC = () => {
           padding: "30px 30px 20px 30px",
         }}
       >
-        <Typography variant="h4" gutterBottom>
-          Your Tickets
-        </Typography>
+        <Box sx={{display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
+          <Typography variant="h4" gutterBottom>
+            Your Tickets
+          </Typography>
+          <Button
+            sx={{
+              width: "15%",
+              height: "5%",
+              color: "white",
+              fontSize: "20px",
+              fontWeight: "bold",           
+              borderRadius: "5px",
+             
+            }}
+            variant="contained"
+            size="small"
+          >
+            PDF
+            <FaFilePdf
+              style={{
+                margin: "10px",
+              }}
+            ></FaFilePdf>
+          </Button>
+        </Box>
         <RenderedTicket
           Ref_No="R0001"
           Event_Name="Beats"
@@ -1016,7 +1037,7 @@ const SuccessfullPDF: React.FC = () => {
           color: "white",
         }}
       >
-        Oreder Details
+        Order Details
       </Box>
       <Box
         sx={{
@@ -1428,33 +1449,36 @@ const SuccessfullPDF: React.FC = () => {
         </Box>
       </Box>
 
-  <Box sx={{
-  //   width:'20%',
-  //    margin:'20px',
-  //  height:'20%',
-    
-  }}>
-      <Button sx={{
-        width:'15%',
-        height:'5%',
-        //backgroundColor:'#A5B4FC',
-        color:'white',
-        fontSize:'20px',
-        fontWeight:'bold',
-        padding:'10px',
-        borderRadius:'5px',
-        margin:'60px',
-      
-      }}
-        //href="/main/events/MoreInterestEvents"
-        variant="contained"
-        size="small"
+      <Box
+        sx={
+          {
+            //   width:'20%',
+            //    margin:'20px',
+            //  height:'20%',
+          }
+        }
       >
-        PDF 
-        <FaFilePdf style={{
-          margin:'10px',
-        }}></FaFilePdf>
-      </Button>
+        <Button
+          sx={{
+            width: "15%",
+            height: "5%",
+            color: "white",
+            fontSize: "20px",
+            fontWeight: "bold",
+            padding: "10px",
+            borderRadius: "5px",
+            margin: "60px",
+          }}
+          variant="contained"
+          size="small"
+        >
+          PDF
+          <FaFilePdf
+            style={{
+              margin: "10px",
+            }}
+          ></FaFilePdf>
+        </Button>
       </Box>
     </Box>
   );
