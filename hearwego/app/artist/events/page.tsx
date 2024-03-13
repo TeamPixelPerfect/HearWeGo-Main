@@ -47,10 +47,10 @@ export default function ArtistEvents() {
 
   useEffect(() => {
     // Fetch event data from the API route
-    fetch('http://localhost:5000/api/EventsManager/events')
-      .then(response => response.json())
-      .then(data => setEventDetails(data))
-      .catch(error => console.error('Error fetching event data:', error));
+    fetch("http://localhost:5000/api/EventsManager/events")
+      .then((response) => response.json())
+      .then((data) => setEventDetails(data))
+      .catch((error) => console.error("Error fetching event data:", error));
   }, []);
 
   const [value, setValue] = React.useState(0);
@@ -209,7 +209,6 @@ const singleEventDetails = [
 ];
 
 function EventArea() {
-
   const artist = useAppSelector((state) => state.artist.user);
 
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
@@ -223,7 +222,6 @@ function EventArea() {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
       });
-
     }
   }, [page]);
 
@@ -250,25 +248,19 @@ function EventArea() {
         </Button>
       </Box>
       <Box sx={{ width: "100%" }}>
-        <Grid
-          container
-          columnGap={5}
-          rowGap={2}
-          sx={{  width: "100%" }}
-        >
-          {singleEventDetails.map(
-            (events) => (
-              <Grid item xs={4} md={2} spacing={10} style={{ }}>
+        <Grid container columnGap={5} rowGap={2} sx={{ width: "100%" }}>
+          {upcomingEvents.map((events, index) => {
+            return events.sessions?.map((event) => (
+              <Grid item xs={4} md={2} spacing={10} style={{}}>
                 <EventCard
                   event_name={events.event_name}
-                  event_image={events.event_image}
-                  event_date={events.event_date}
-                  event_time={events.event_time}
-                  event_interest={events.event_interest}
+                  event_date={event.session_date}
+                  event_time={event.session_time}
+                  event_img={events.event_img}
                 ></EventCard>
               </Grid>
-            )
-          )}
+            ));
+          })}
         </Grid>
       </Box>
 
@@ -288,63 +280,62 @@ interface Props {
 }
 
 interface EventCardProps {
-  eventData: Event;
+  event_name: string;
+  event_img: string;
+  event_date: string;
+  event_time: string;
+  no_of_interests?: number;
 }
 
 function EventCard({
-  eventData
+  event_name,
+  event_img,
+  event_date,
+  event_time,
+  no_of_interests,
 }: EventCardProps) {
   return (
     <Box sx={{ width: 230 }}>
       <Card sx={{ width: "100%" }}>
-      <CardActionArea>
-        <CardMedia component="img" height="140" image={eventData.event_img} />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {eventData.event_name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {eventData?.sessions && eventData.sessions.map((session)=>{
-              return (
-                <>
-                <EventDetailRow direction="row" spacing={10}>
+        <CardActionArea>
+          <CardMedia component="img" height="140" image={event_img} />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+              {event_name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <EventDetailRow direction="row" spacing={10}>
                 <CalendarMonthIcon />
-                {session.session_date}
+                {event_date}
               </EventDetailRow>
               <EventDetailRow direction="row" spacing={10}>
-              <AccessTimeFilledIcon />
-              {session.session_time}
-            </EventDetailRow>
-            <EventDetailRow direction="row" spacing={10}>
-              <FavoriteIcon />
-              {0}
-            </EventDetailRow>
-            </>
-              )
-            })}
-            
-            
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-      <CardActions>
-        <Stack direction="row" spacing={1}>
-          <IconButton aria-label="share">
-            <ShareIcon />
-          </IconButton>
-          <IconButton aria-label="ticket">
-            <LocalActivityIcon />
-          </IconButton>
-          <IconButton aria-label="budget">
-            <PaidIcon />
-          </IconButton>
-          <IconButton aria-label="add to shopping cart">
-            <DeleteIcon />
-          </IconButton>
-        </Stack>
-      </CardActions>
-    </Card>
+                <AccessTimeFilledIcon />
+                {event_time}
+              </EventDetailRow>
+              <EventDetailRow direction="row" spacing={10}>
+                <FavoriteIcon />
+                {0}
+              </EventDetailRow>
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions>
+          <Stack direction="row" spacing={1}>
+            <IconButton aria-label="share">
+              <ShareIcon />
+            </IconButton>
+            <IconButton aria-label="ticket">
+              <LocalActivityIcon />
+            </IconButton>
+            <IconButton aria-label="budget">
+              <PaidIcon />
+            </IconButton>
+            <IconButton aria-label="add to shopping cart">
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
+        </CardActions>
+      </Card>
     </Box>
-    
   );
 }
