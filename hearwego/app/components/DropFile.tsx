@@ -139,8 +139,8 @@ const DropFile = ({
                     variant="body1"
                     sx={{
                       textAlign: "center",
-                      padding: "20px 0",
-                      fontSize: isCircular ? "10px" : "12px",
+                      padding: "10px 0",
+                      fontSize: isCircular ? "8px" : "12px",
                     }}
                   >
                     <em>Supports {fileExtensions}</em>
