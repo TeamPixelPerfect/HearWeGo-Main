@@ -121,7 +121,7 @@ export default function Tickets({ params: { id } }: Props) {
                   width: "100%",
                   left: "80%",
                 }}
-                href="/main/events/TicketDetails"
+                href="/main/events/BuyTickets"
                 variant="contained"
                 //size="small"
               >
