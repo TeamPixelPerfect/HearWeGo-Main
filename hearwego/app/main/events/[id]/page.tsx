@@ -46,7 +46,7 @@ import {
   RightBox,
 } from "../../../styles/eventsMW.styles";
 
-const interestEvents = [
+const recommendEvents = [
   {
     event_id: "e1",
     name: "Beats",
@@ -346,7 +346,7 @@ export default function SingleEvent({ params: { id } }: Props) {
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {interestEvents.map(
+        {recommendEvents.map(
           ({ name, img, date, day, time, artist, event_id }) => (
             <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
               <SingleEventComponent

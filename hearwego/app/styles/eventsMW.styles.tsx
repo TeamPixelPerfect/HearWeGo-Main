@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 //import { theme } from "@/app/styles/theme";
 
+
 export const Maindiv = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   width: "100%",
@@ -246,3 +247,6 @@ export const RightBox = styled(Box)(({ theme }) => ({
   position: "relative",
   left: "13%",
 }));
+
+
+//Tickets 
