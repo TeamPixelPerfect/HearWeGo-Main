@@ -554,26 +554,26 @@ function EventDetails() {
         </Typography>
         {generateDivs()}
       </Paper>
-    
+
       <SponsorField />
       <TeamField />
     </>
   );
 }
 
-function SessionArea() {
-  return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Sessions
-      </Typography>
-      <SessionForm />
-    </Paper>
-  );
-}
+// function SessionArea() {
+//   return (
+//     <Paper
+//       sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+//       elevation={3}
+//     >
+//       <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+//         Sessions
+//       </Typography>
+//       <SessionForm />
+//     </Paper>
+//   );
+// }
 
 function TicketDetails() {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
@@ -634,7 +634,10 @@ function SessionForm() {
     dayjs("2022-04-17T15:30")
   );
   return (
-    <Paper sx={{ width: "100%", padding: "2em", marginBottom: "1em" }} elevation={3}>
+    <Paper
+      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+      elevation={3}
+    >
       <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
         Session 01
       </Typography>
@@ -931,11 +934,21 @@ const sponsorModalStyle = {
   p: 4,
 };
 
+let sponsorRows = [
+  {
+    id: 1,
+    sponsorType: "Main",
+    sponsorName: "Pepsi",
+    sponsorContact: "077-9999999",
+    sponsorEmail: "pepsi@gmail.com",
+  },
+];
+
 function SponsorModal() {
-  const [sponsorType, setSponsorType] = useState('');
-  const [sponsorName, setSponsorName] = useState('');
-  const [sponsorContact, setSponsorContact] = useState('');
-  const [sponsorEmail, setSponsorEmail] = useState('');
+  const [sponsorType, setSponsorType] = useState("");
+  const [sponsorName, setSponsorName] = useState("");
+  const [sponsorContact, setSponsorContact] = useState("");
+  const [sponsorEmail, setSponsorEmail] = useState("");
 
   const handleSponsorTypeChange = (event) => {
     setSponsorType(event.target.value);
@@ -957,15 +970,20 @@ function SponsorModal() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const addNewSponsor = ()=> {
-    sponsorRows.push({
-      id: sponsorRows.length+1,
-  sponsorType: sponsorType, 
-  sponsorName: sponsorName, 
-  sponsorContact: sponsorContact,
-  sponsorEmail: sponsorEmail, 
-    })
-  }
+  const addNewSponsor = () => {
+    const newId = sponsorRows.length + 1;
+    const newSponsor = {
+      id: newId,
+      sponsorType: sponsorType,
+      sponsorName: sponsorName,
+      sponsorContact: sponsorContact,
+      sponsorEmail: sponsorEmail,
+    };
+
+    const newSponsorRows = [...sponsorRows, newSponsor];
+
+    sponsorRows = newSponsorRows;
+  };
 
   return (
     <div>
@@ -1017,11 +1035,14 @@ function SponsorModal() {
             sx={{ width: "100%", marginBottom: 2 }}
             onChange={handleSponsorEmailChange}
           />
-        <Stack direction='row' spacing={2}>
-        <Button variant="outlined" onClick={handleClose}>Close</Button>
-        <Button variant="contained" onClick={addNewSponsor}>Add</Button>
-        </Stack>
-        
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" onClick={handleClose}>
+              Close
+            </Button>
+            <Button variant="contained" onClick={addNewSponsor}>
+              Add
+            </Button>
+          </Stack>
         </Box>
 
         {/* <Stack direction="row" spacing={2}>
@@ -1043,20 +1064,17 @@ const sponsorColumns: GridColDef[] = [
   { field: "sponsorEmail", headerName: "E-mail", width: 250 },
 ];
 
-var sponsorRows = [
-  {
-    id: 1,
-    sponsorType: "Main",
-    sponsorName: "Pepsi",
-    sponsorContact: "077-9999999",
-    sponsorEmail: "pepsi@gmail.com",
-  },
-];
-
 function SponsorTable() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
+        key={refreshKey}
         rows={sponsorRows}
         columns={sponsorColumns}
         initialState={{
@@ -1067,6 +1085,7 @@ function SponsorTable() {
         pageSizeOptions={[5, 10]}
         checkboxSelection
       />
+      <Button onClick={refreshTable}>Refresh Table</Button>
     </div>
   );
 }
