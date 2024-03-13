@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import {
   PaymentDetails,
+  SuccessfulDetails,
   TicketCover,
   Ticketdetails,
 } from "../../../styles/BuyTickets.styles";
@@ -55,7 +56,7 @@ function EventCreateShow(n: number) {
   } else if (n == 2) {
     return <PaymentDetails />;
   } else if (n == 3) {
-    return <div>Successful</div>;
+    return <SuccessfulDetails /> ;
   } else {
     return null;
   }

@@ -7,6 +7,22 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import React, { useEffect, useState } from "react";
+import { url } from "inspector";
+
+interface RenderedTicketprops {
+  Event_img: string;
+  Ref_No: string;
+  Event_Name: string;
+  session: string;
+  date: Date;
+  Time: string;
+  Venue: string;
+  Ticket_Type: string;
+  Seat_Type: string;
+  Seat_No: number;
+  QR_Code: string;
+  Ticket_Price: number;
+}
 interface TicketCoverProps {
   children?: React.ReactNode;
   event_name: string;
@@ -886,6 +902,91 @@ export const PaymentDetails: React.FC = () => {
             />
           </Box>
         </Stack>
+      </Box>
+    </Box>
+  );
+};
+
+export const SuccessfulDetails: React.FC = () => {
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Box
+        sx={{
+          width: "80%",
+          backgroundColor: "#581C87",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "left",
+          padding: "30px 30px 20px 30px",
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Your Tickets
+        </Typography>
+        <RenderedTicket
+          Ref_No="123456"
+          Event_Name="Beats"
+          session="1"
+          Event_img={
+            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png"
+          }
+          date={new Date()}
+          Time={"19:00 PM"}
+          Venue={"XYZ Hall"}
+          Ticket_Type={"General"}
+          Seat_Type={"Premium"}
+          Seat_No={1}
+          QR_Code={""}
+          Ticket_Price={1000.0}
+        />
+      </Box>
+    </Box>
+  );
+};
+
+const RenderedTicket: React.FC<RenderedTicketprops> = ({
+  Event_img,
+  Ref_No,
+  Event_Name,
+  session,
+  date,
+  Time,
+  Venue,
+  Ticket_Type,
+  Seat_Type,
+  Seat_No,
+  QR_Code,
+  Ticket_Price,
+}) => {
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        height: "300px",
+        backgroundColor: "black",
+        display: "flex",
+        justifyContent: "center",
+        padding: "20px",
+      }}
+    >
+      <Box sx={{ width: "95%", backgroundColor: "white", height: "100%" }}>
+        <Box
+          sx={{
+            height: "100%",
+            width: "25%",
+            backgroundImage: `url(${Event_img})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            
+          }}
+        ></Box>
       </Box>
     </Box>
   );

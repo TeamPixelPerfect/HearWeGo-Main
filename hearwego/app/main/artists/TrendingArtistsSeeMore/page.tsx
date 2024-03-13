@@ -167,6 +167,7 @@ export default function TrendingArtistsMore() {
           </TableHead>
           <TableBody>
             <TrendingRow
+              LinkPage="/main/artists/SingleArtistPage"
               Rank={{
                 rank: 1,
                 rank_img:
@@ -191,8 +192,9 @@ export default function TrendingArtistsMore() {
               country_img={""}
             />
             <TrendingRow
+              LinkPage="/main/artists/SingleArtistPage"
               Rank={{
-                rank: 1,
+                rank: 2,
                 rank_img:
                   "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
               }}
@@ -215,8 +217,9 @@ export default function TrendingArtistsMore() {
               country_img={""}
             />
             <TrendingRow
+              LinkPage="/main/artists/SingleArtistPage"
               Rank={{
-                rank: 1,
+                rank: 3,
                 rank_img:
                   "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
               }}
@@ -239,8 +242,9 @@ export default function TrendingArtistsMore() {
               country_img={""}
             />
             <TrendingRow
+              LinkPage="/main/artists/SingleArtistPage/"
               Rank={{
-                rank: 1,
+                rank: 4,
                 rank_img:
                   "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
               }}
