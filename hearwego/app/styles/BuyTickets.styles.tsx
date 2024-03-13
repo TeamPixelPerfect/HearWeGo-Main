@@ -931,7 +931,7 @@ export const SuccessfulDetails: React.FC = () => {
           Your Tickets
         </Typography>
         <RenderedTicket
-          Ref_No="123456"
+          Ref_No="R0001"
           Event_Name="Beats"
           session="1"
           Event_img={
@@ -940,10 +940,48 @@ export const SuccessfulDetails: React.FC = () => {
           date={new Date()}
           Time={"19:00 PM"}
           Venue={"XYZ Hall"}
-          Ticket_Type={"General"}
+          Ticket_Type={"Gold"}
           Seat_Type={"Premium"}
           Seat_No={1}
-          QR_Code={""}
+          QR_Code={
+            "https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg"
+          }
+          Ticket_Price={2500.0}
+        />
+        <RenderedTicket
+          Ref_No="R0002"
+          Event_Name="Beats"
+          session="1"
+          Event_img={
+            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png"
+          }
+          date={new Date()}
+          Time={"19:00 PM"}
+          Venue={"XYZ Hall"}
+          Ticket_Type={"Silver"}
+          Seat_Type={"Premium"}
+          Seat_No={1}
+          QR_Code={
+            "https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg"
+          }
+          Ticket_Price={2000.0}
+        />
+        <RenderedTicket
+          Ref_No="R0003"
+          Event_Name="Beats"
+          session="1"
+          Event_img={
+            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png"
+          }
+          date={new Date()}
+          Time={"19:00 PM"}
+          Venue={"XYZ Hall"}
+          Ticket_Type={"Bronze"}
+          Seat_Type={"Premium"}
+          Seat_No={1}
+          QR_Code={
+            "https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg"
+          }
           Ticket_Price={1000.0}
         />
       </Box>
@@ -970,23 +1008,190 @@ const RenderedTicket: React.FC<RenderedTicketprops> = ({
       sx={{
         width: "100%",
         height: "300px",
-        backgroundColor: "black",
+        backgroundColor: "#D8B4FE",
         display: "flex",
         justifyContent: "center",
         padding: "20px",
+        marginBottom: "20px",
       }}
     >
-      <Box sx={{ width: "95%", backgroundColor: "white", height: "100%" }}>
+      <Box sx={{ width: "95%", height: "100%" }}>
         <Box
           sx={{
+            width: "100%",
             height: "100%",
-            width: "25%",
-            backgroundImage: `url(${Event_img})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            
+            display: "flex",
+            flexDirection: "row",
           }}
-        ></Box>
+        >
+          <Box
+            sx={{
+              height: "100%",
+              width: "30%",
+              backgroundImage: `url(${Event_img})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              borderRadius: "20px",
+            }}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "70%",
+              justifyContent: "space-between",
+            }}
+          >
+            <Stack
+              spacing={2.5}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                paddingLeft: "20px",
+                width: "40%",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Ref. No :
+                </Typography>
+                <Typography color="black">{Ref_No}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Event Name :
+                </Typography>
+                <Typography color="black">{Event_Name}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Session :
+                </Typography>
+                <Typography color="black">{session}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Date :
+                </Typography>
+                <Typography color="black">{date.toDateString()}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Time :
+                </Typography>
+                <Typography color="black">{Time}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Venue :
+                </Typography>
+                <Typography color="black">{Venue}</Typography>
+              </Box>
+            </Stack>
+            <Stack
+              spacing={2.5}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                paddingLeft: "20px",
+                width: "40%",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Ticket Type :
+                </Typography>
+                <Typography color="black">{Ticket_Type}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Seat Type :
+                </Typography>
+                <Typography color="black">{Seat_Type}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography fontWeight="bold" color="black">
+                  Seat No :
+                </Typography>
+                <Typography color="black">{Seat_No}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  sx={{
+                    height: "110px",
+                    backgroundImage: `url(${QR_Code})`,
+                    width: "50%",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                ></Box>
+                <Typography variant="h6" fontWeight="bold" color="black">
+                  {Ticket_Price} LKR
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+        </Box>
       </Box>
     </Box>
   );
