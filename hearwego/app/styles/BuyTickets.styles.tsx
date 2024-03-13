@@ -1449,36 +1449,33 @@ const SuccessfullPDF: React.FC = () => {
         </Box>
       </Box>
 
-      <Box
-        sx={
-          {
-            //   width:'20%',
-            //    margin:'20px',
-            //  height:'20%',
-          }
-        }
+  <Box sx={{
+  //   width:'20%',
+  //    margin:'20px',
+  //  height:'20%',
+    
+  }}>
+      <Button sx={{
+        width:'15%',
+        height:'5%',
+        //backgroundColor:'#A5B4FC',
+        color:'white',
+        fontSize:'20px',
+        fontWeight:'bold',
+        padding:'10px',
+        borderRadius:'5px',
+        margin:'60px',
+      
+      }}
+        //href="/main/events/MoreInterestEvents"
+        variant="contained"
+        size="small"
       >
-        <Button
-          sx={{
-            width: "15%",
-            height: "5%",
-            color: "white",
-            fontSize: "20px",
-            fontWeight: "bold",
-            padding: "10px",
-            borderRadius: "5px",
-            margin: "60px",
-          }}
-          variant="contained"
-          size="small"
-        >
-          PDF
-          <FaFilePdf
-            style={{
-              margin: "10px",
-            }}
-          ></FaFilePdf>
-        </Button>
+        PDF 
+        <FaFilePdf style={{
+          margin:'10px',
+        }}></FaFilePdf>
+      </Button>
       </Box>
     </Box>
   );
