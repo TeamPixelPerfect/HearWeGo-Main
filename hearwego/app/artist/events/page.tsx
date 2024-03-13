@@ -26,6 +26,9 @@ import ShareIcon from "@mui/icons-material/Share";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import PaidIcon from "@mui/icons-material/Paid";
 import Pagination from "@mui/material/Pagination";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "@/lib/hooks";
+import { Event } from "@/app/constants/models";
 
 import ArtistSingleEvent from "../../components/ArtistDashboardSingleEvent";
 
@@ -37,8 +40,19 @@ import {
   EventSec,
   EventDetailRow,
 } from "../../styles/artistDashboardEventsPage.styles";
+import { getEvents } from "@/app/services/EventServices";
 
 export default function ArtistEvents() {
+  const [eventDetails, setEventDetails] = useState([]);
+
+  useEffect(() => {
+    // Fetch event data from the API route
+    fetch('http://localhost:5000/api/EventsManager/events')
+      .then(response => response.json())
+      .then(data => setEventDetails(data))
+      .catch(error => console.error('Error fetching event data:', error));
+  }, []);
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -60,10 +74,6 @@ const EventsDisplay = (
       <Box sx={{ width: "100%" }}>
         <EventTabs />
       </Box>
-      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-        Word of the Day
-      </Typography>
-      <Typography variant="h5" component="div"></Typography>
     </CardContent>
   </React.Fragment>
 );
@@ -199,6 +209,24 @@ const singleEventDetails = [
 ];
 
 function EventArea() {
+
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
+
+  useEffect(() => {
+    if (artist?.token) {
+      getEvents(artist?.token, page, limit).then((events) => {
+        console.log("Events:::", events);
+        setUpcomingEvents(events.data);
+      });
+
+    }
+  }, [page]);
+
   return (
     <>
       <Box
@@ -229,20 +257,14 @@ function EventArea() {
           sx={{  width: "100%" }}
         >
           {singleEventDetails.map(
-            ({
-              event_name,
-              event_image,
-              event_date,
-              event_time,
-              event_interest,
-            }) => (
+            (events) => (
               <Grid item xs={4} md={2} spacing={10} style={{ }}>
                 <EventCard
-                  event_name={event_name}
-                  event_image={event_image}
-                  event_date={event_date}
-                  event_time={event_time}
-                  event_interest={event_interest}
+                  event_name={events.event_name}
+                  event_image={events.event_image}
+                  event_date={events.event_date}
+                  event_time={events.event_time}
+                  event_interest={events.event_interest}
                 ></EventCard>
               </Grid>
             )
@@ -265,35 +287,43 @@ interface Props {
   event_interest: string;
 }
 
+interface EventCardProps {
+  eventData: Event;
+}
+
 function EventCard({
-  event_name,
-  event_image,
-  event_date,
-  event_time,
-  event_interest,
-}: Props) {
+  eventData
+}: EventCardProps) {
   return (
     <Box sx={{ width: 230 }}>
       <Card sx={{ width: "100%" }}>
       <CardActionArea>
-        <CardMedia component="img" height="140" image={event_image} />
+        <CardMedia component="img" height="140" image={eventData.event_img} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {event_name}
+            {eventData.event_name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <EventDetailRow direction="row" spacing={10}>
-              <CalendarMonthIcon />
-              {event_date}
-            </EventDetailRow>
-            <EventDetailRow direction="row" spacing={10}>
+            {eventData?.sessions && eventData.sessions.map((session)=>{
+              return (
+                <>
+                <EventDetailRow direction="row" spacing={10}>
+                <CalendarMonthIcon />
+                {session.session_date}
+              </EventDetailRow>
+              <EventDetailRow direction="row" spacing={10}>
               <AccessTimeFilledIcon />
-              {event_time}
+              {session.session_time}
             </EventDetailRow>
             <EventDetailRow direction="row" spacing={10}>
               <FavoriteIcon />
-              {event_interest}
+              {0}
             </EventDetailRow>
+            </>
+              )
+            })}
+            
+            
           </Typography>
         </CardContent>
       </CardActionArea>
