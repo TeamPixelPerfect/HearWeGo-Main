@@ -8,6 +8,9 @@ import Checkbox from "@mui/material/Checkbox";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import React, { useEffect, useState } from "react";
 import { url } from "inspector";
+import CardActions from "@mui/material";
+import { FaFilePdf } from "react-icons/fa";
+
 
 interface RenderedTicketprops {
   Event_img: string;
@@ -957,7 +960,7 @@ const SuccessfullPDF: React.FC = () => {
     <Box
       sx={{
         width: "80%",
-        height: "400px",
+        height: "100%",
         backgroundColor: "#581C87",
         margin: "20px",
         borderRadius: "5px",
@@ -969,9 +972,10 @@ const SuccessfullPDF: React.FC = () => {
           height: "10%",
           //backgroundColor: "white",
           margin: "10px",
-          fontSize: "20px",
+          fontSize: "24px",
           fontWeight: "bold",
           padding: "10px",
+          color: "white",
         }}
       >
         Oreder Details
@@ -987,9 +991,10 @@ const SuccessfullPDF: React.FC = () => {
         <Box
           sx={{
             width: "50%",
-            height: "50%",
-            backgroundColor: "white",
-            margin: "10px",
+            height: "40%",
+            //backgroundColor: "white",
+            margin: "30px",
+            justifyContent: "space-between",
           }}
         >
           <Box
@@ -998,16 +1003,16 @@ const SuccessfullPDF: React.FC = () => {
               height: "100%",
               display: "flex",
               flexDirection: "row",
-              backgroundColor: "blue",
+              //backgroundColor: "blue",
             }}
           >
             <Box
               sx={{
                 width: "100%",
-                height: "35%",
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                backgroundColor: "purple",
+                // backgroundColor: "purple",
               }}
             >
               <Box
@@ -1016,7 +1021,7 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   flexDirection: "row",
-                  backgroundColor: "green",
+                  //backgroundColor: "green",
                 }}
               >
                 <Box
@@ -1024,13 +1029,13 @@ const SuccessfullPDF: React.FC = () => {
                     width: "50%",
                     height: "100%",
                     display: "flex",
-                    justifyContent: "center",
-                    backgroundColor: "red",
-                    margin: "10px 0px 0px 10px",
+                    justifyContent: "left",
+                    //backgroundColor: "red",
+                    //margin: "10px 0px 0px 10px",
                     fontSize: "20px",
                     fontWeight: "bold",
                     color: "white",
-                    //padding: "10px",
+                    padding: "0px 0px 0px 40px",
                   }}
                 >
                   Order Id
@@ -1038,14 +1043,15 @@ const SuccessfullPDF: React.FC = () => {
 
                 <Box
                   sx={{
-                    width: "50%",
+                    width: "30%",
                     height: "100%",
-                    backgroundColor: "yellow",
+                    //backgroundColor: "yellow",
                     //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "right",
                     //padding: "10px",
-                    fontSize: "20px",
+                    fontSize: "16px",
+                    padding: "5px 0px 0px 40px",
                   }}
                 >
                   0001
@@ -1058,39 +1064,40 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   flexDirection: "row",
-                  backgroundColor: "green",
+                  //backgroundColor: "green",
                 }}
               >
                 <Box
                   sx={{
-                    width: "50%",
+                    width: "20%",
                     height: "100%",
                     display: "flex",
-                    justifyContent: "center",
-                    backgroundColor: "orange",
+                    justifyContent: "left",
+                    //backgroundColor: "orange",
                     //margin: "10px 0px 0px 10px",
                     fontSize: "20px",
                     fontWeight: "bold",
                     color: "white",
-                    //padding: "10px",
+                    padding: "0px 0px 0px 40px",
                   }}
                 >
-                  Order Id
+                  Name
                 </Box>
 
                 <Box
                   sx={{
-                    width: "50%",
+                    width: "60%",
                     height: "100%",
-                    backgroundColor: "black",
+                    //backgroundColor: "black",
                     //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "right",
                     //padding: "10px",
-                    fontSize: "20px",
+                    fontSize: "16px",
+                    padding: "5px 0px 0px 40px",
                   }}
                 >
-                  0001
+                  Dasun Madusanka
                 </Box>
               </Box>
 
@@ -1100,7 +1107,7 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   flexDirection: "row",
-                  backgroundColor: "green",
+                  //backgroundColor: "green",
                 }}
               >
                 <Box
@@ -1108,31 +1115,32 @@ const SuccessfullPDF: React.FC = () => {
                     width: "50%",
                     height: "100%",
                     display: "flex",
-                    justifyContent: "center",
-                    backgroundColor: "orange",
+                    justifyContent: "left",
+                    //backgroundColor: "orange",
                     //margin: "10px 0px 0px 10px",
                     fontSize: "20px",
                     fontWeight: "bold",
                     color: "white",
-                    //padding: "10px",
+                    padding: "0px 0px 0px 40px",
                   }}
                 >
-                  Order Id
+                  Contact No.
                 </Box>
 
                 <Box
                   sx={{
-                    width: "50%",
+                    width: "30%",
                     height: "100%",
-                    backgroundColor: "black",
+                    //backgroundColor: "black",
                     //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "right",
                     //padding: "10px",
-                    fontSize: "20px",
+                    fontSize: "16px",
+                    padding: "5px 0px 0px 40px",
                   }}
                 >
-                  0001
+                  +94779999999
                 </Box>
               </Box>
 
@@ -1142,7 +1150,7 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   flexDirection: "row",
-                  backgroundColor: "green",
+                  //: "green",
                 }}
               >
                 <Box
@@ -1150,46 +1158,265 @@ const SuccessfullPDF: React.FC = () => {
                     width: "50%",
                     height: "100%",
                     display: "flex",
-                    justifyContent: "center",
-                    backgroundColor: "orange",
+                    justifyContent: "left",
+                    //backgroundColor: "orange",
                     //margin: "10px 0px 0px 10px",
                     fontSize: "20px",
                     fontWeight: "bold",
                     color: "white",
-                    //padding: "10px",
+                    padding: "0px 0px 0px 40px",
                   }}
                 >
-                  Order Id
+                  E-mail
                 </Box>
 
                 <Box
                   sx={{
-                    width: "50%",
+                    width: "30%",
                     height: "100%",
-                    backgroundColor: "black",
+                    //backgroundColor: "black",
                     //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "right",
                     //padding: "10px",
-                    fontSize: "20px",
+                    fontSize: "16px",
+                    padding: "5px 0px 0px 0px",
                   }}
                 >
-                  0001
+                  hearwego@gmail.com
                 </Box>
               </Box>
-
-              
             </Box>
           </Box>
         </Box>
         <Box
           sx={{
-            width: "50%",
+            width: "40%",
             height: "50%",
-            backgroundColor: "white",
-            margin: "10px",
+            //backgroundColor: "white",
+            margin: "20px",
           }}
-        ></Box>
+        >
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              //backgroundColor: "purple",
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                // height: "100%",
+                display: "flex",
+                flexDirection: "row",
+                ////backgroundColor: "green",
+                padding: "5px",
+                // margin: "10px",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "left",
+                  //backgroundColor: "red",
+                  //margin: "10px 0px 0px 10px",
+                  fontSize: "20px",
+                  // fontWeight: "bold",
+                  color: "white",
+                  // padding: "0px 0px 0px 20px",
+                  flexDirection: "column",
+                }}
+              >
+                Gold Tickets
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    //backgroundColor: "yellow",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    //justifyContent: "right",
+                    //padding: "10px",
+                    fontSize: "12px",
+                    padding: "0px 0px 0px 0px",
+                  }}
+                >
+                  x1
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "100%",
+                  // backgroundColor: "yellow",
+                  //margin: "10px 0px 0px 10px",
+                  display: "flex",
+                  justifyContent: "right",
+                  //padding: "10px",
+                  fontSize: "16px",
+                  //padding: "0px 0px 0px 40px",
+                }}
+              >
+                LKR 2500.00
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                width: "100%",
+                // height: "100%",
+                display: "flex",
+                flexDirection: "row",
+                //backgroundColor: "green",
+                padding: "5px",
+                // margin: "10px",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "left",
+                  //backgroundColor: "red",
+                  //margin: "10px 0px 0px 10px",
+                  fontSize: "20px",
+                  // fontWeight: "bold",
+                  color: "white",
+                  // padding: "0px 0px 0px 20px",
+                  flexDirection: "column",
+                }}
+              >
+                Silver Tickets
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    //backgroundColor: "yellow",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    //justifyContent: "right",
+                    //padding: "10px",
+                    fontSize: "12px",
+                    padding: "0px 0px 0px 0px",
+                  }}
+                >
+                  x1
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "100%",
+                  // backgroundColor: "yellow",
+                  //margin: "10px 0px 0px 10px",
+                  display: "flex",
+                  justifyContent: "right",
+                  //padding: "10px",
+                  fontSize: "16px",
+                  //padding: "0px 0px 0px 40px",
+                }}
+              >
+                LKR 2000.00
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                width: "100%",
+                // height: "100%",
+                display: "flex",
+                flexDirection: "row",
+                // backgroundColor: "green",
+                padding: "5px",
+                // margin: "10px",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "left",
+                  //backgroundColor: "red",
+                  //margin: "10px 0px 0px 10px",
+                  fontSize: "20px",
+                  // fontWeight: "bold",
+                  color: "white",
+                  // padding: "0px 0px 0px 20px",
+                  flexDirection: "column",
+                }}
+              >
+                Bronze Tickets
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    //backgroundColor: "yellow",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    //justifyContent: "right",
+                    //padding: "10px",
+                    fontSize: "12px",
+                    padding: "0px 0px 0px 0px",
+                  }}
+                >
+                  x1
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "50%",
+                  height: "100%",
+                  //backgroundColor: "yellow",
+                  //margin: "10px 0px 0px 10px",
+                  display: "flex",
+                  justifyContent: "right",
+                  //padding: "10px",
+                  fontSize: "16px",
+                  //padding: "0px 0px 0px 40px",
+                }}
+              >
+                LKR 1000.00
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+  <Box sx={{
+  //   width:'20%',
+  //    margin:'20px',
+  //  height:'20%',
+    
+  }}>
+      <Button sx={{
+        width:'15%',
+        height:'5%',
+        //backgroundColor:'#A5B4FC',
+        color:'white',
+        fontSize:'20px',
+        fontWeight:'bold',
+        padding:'10px',
+        borderRadius:'5px',
+        margin:'60px',
+      
+      }}
+        //href="/main/events/MoreInterestEvents"
+        variant="contained"
+        size="small"
+      >
+        PDF 
+        <FaFilePdf style={{
+          margin:'10px',
+        }}></FaFilePdf>
+      </Button>
       </Box>
     </Box>
   );

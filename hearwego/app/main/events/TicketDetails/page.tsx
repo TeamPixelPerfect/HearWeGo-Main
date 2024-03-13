@@ -209,15 +209,15 @@ export default function Tickets({ params: { id } }: Props) {
             >
               <TableRow sx={{}}>
                 <TableCell sx={{ fontSize: "16px" }}>Gold</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>2000</TableCell>
+                <TableCell sx={{ fontSize: "16px" }}>2500</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontSize: "16px" }}>Silver</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>1000</TableCell>
+                <TableCell sx={{ fontSize: "16px" }}>2000</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontSize: "16px" }}>Bronze</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>500</TableCell>
+                <TableCell sx={{ fontSize: "16px" }}>1000</TableCell>
               </TableRow>
             </TableBody>
           </Table>
