@@ -917,6 +917,7 @@ export const SuccessfulDetails: React.FC = () => {
         alignItems: "center",
       }}
     >
+      <SuccessfullPDF />
       <Box
         sx={{
           width: "80%",
@@ -946,6 +947,249 @@ export const SuccessfulDetails: React.FC = () => {
           QR_Code={""}
           Ticket_Price={1000.0}
         />
+      </Box>
+    </Box>
+  );
+};
+
+const SuccessfullPDF: React.FC = () => {
+  return (
+    <Box
+      sx={{
+        width: "80%",
+        height: "400px",
+        backgroundColor: "#581C87",
+        margin: "20px",
+        borderRadius: "5px",
+      }}
+    >
+      <Box
+        sx={{
+          width: "90%",
+          height: "10%",
+          //backgroundColor: "white",
+          margin: "10px",
+          fontSize: "20px",
+          fontWeight: "bold",
+          padding: "10px",
+        }}
+      >
+        Oreder Details
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <Box
+          sx={{
+            width: "50%",
+            height: "50%",
+            backgroundColor: "white",
+            margin: "10px",
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "row",
+              backgroundColor: "blue",
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                height: "35%",
+                display: "flex",
+                flexDirection: "column",
+                backgroundColor: "purple",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  backgroundColor: "green",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "red",
+                    margin: "10px 0px 0px 10px",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    color: "white",
+                    //padding: "10px",
+                  }}
+                >
+                  Order Id
+                </Box>
+
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    backgroundColor: "yellow",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    justifyContent: "center",
+                    //padding: "10px",
+                    fontSize: "20px",
+                  }}
+                >
+                  0001
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  backgroundColor: "green",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "orange",
+                    //margin: "10px 0px 0px 10px",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    color: "white",
+                    //padding: "10px",
+                  }}
+                >
+                  Order Id
+                </Box>
+
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    backgroundColor: "black",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    justifyContent: "center",
+                    //padding: "10px",
+                    fontSize: "20px",
+                  }}
+                >
+                  0001
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  backgroundColor: "green",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "orange",
+                    //margin: "10px 0px 0px 10px",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    color: "white",
+                    //padding: "10px",
+                  }}
+                >
+                  Order Id
+                </Box>
+
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    backgroundColor: "black",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    justifyContent: "center",
+                    //padding: "10px",
+                    fontSize: "20px",
+                  }}
+                >
+                  0001
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  backgroundColor: "green",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "orange",
+                    //margin: "10px 0px 0px 10px",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    color: "white",
+                    //padding: "10px",
+                  }}
+                >
+                  Order Id
+                </Box>
+
+                <Box
+                  sx={{
+                    width: "50%",
+                    height: "100%",
+                    backgroundColor: "black",
+                    //margin: "10px 0px 0px 10px",
+                    display: "flex",
+                    justifyContent: "center",
+                    //padding: "10px",
+                    fontSize: "20px",
+                  }}
+                >
+                  0001
+                </Box>
+              </Box>
+
+              
+            </Box>
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            width: "50%",
+            height: "50%",
+            backgroundColor: "white",
+            margin: "10px",
+          }}
+        ></Box>
       </Box>
     </Box>
   );
@@ -984,7 +1228,6 @@ const RenderedTicket: React.FC<RenderedTicketprops> = ({
             backgroundImage: `url(${Event_img})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            
           }}
         ></Box>
       </Box>
