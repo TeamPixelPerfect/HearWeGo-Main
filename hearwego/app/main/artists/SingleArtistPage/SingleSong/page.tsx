@@ -36,10 +36,7 @@ export default function SingleSongPage() {
     { key: 3, attribute: "Length", value: "04:57" },
     { key: 4, attribute: "Label", value: "Epic" },
     { key: 5, attribute: "Songwriter(s)", value: "Michael Jackson" },
-    {
-      key: 6,
-      attribute: "Producer(s)",
-      value: "Quincy Jones, Michael Jackson",
+    {key: 6,attribute: "Producer(s)",value: "Quincy Jones, Michael Jackson",
     },
   ];
   return (
