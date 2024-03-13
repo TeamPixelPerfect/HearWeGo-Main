@@ -145,7 +145,7 @@ const ArtistAlbums = () => {
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh" }}>
+      <Card sx={{ width: "100%", minHeight: "100vh",background: theme.palette.background.default }}>
         <Box
           sx={{
             width: "100%",

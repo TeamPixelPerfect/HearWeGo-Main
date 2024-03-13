@@ -65,10 +65,9 @@ export const hearWeGoTheme = createTheme({
       main: "#7e22ce",
       light: "#ffff",
     },
-
     background: {
       default: "#ffffff",
-      paper: "#F3E8FF",
+      // paper: "#F3E8FF",
     },
     secondary: {
       main: "#4338ca",
