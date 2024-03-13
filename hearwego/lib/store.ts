@@ -3,6 +3,7 @@ import appReducer from "./features/app.slice";
 import userReducer from "./features/user.slice";
 import artistReducer from "./features/artist.slice";
 import songReducer from "./features/song.slice";
+import albumReducer from "./features/album.slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -11,6 +12,7 @@ export const makeStore = () => {
       user: userReducer,
       artist: artistReducer,
       song: songReducer,
+      album: albumReducer,
     },
   });
 };

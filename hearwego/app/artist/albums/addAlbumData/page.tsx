@@ -1,6 +1,6 @@
 "use client";
 import { relative } from "path";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Radio from "@mui/material/Radio";
 import Tabs from "@mui/material/Tabs";
@@ -28,7 +28,12 @@ import DropFile from "@/app/components/DropFile";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { useAppSelector } from "@/lib/hooks";
+import { Album } from "@/app/constants/models";
+import LoadingButton from "@mui/lab/LoadingButton";
+import SaveIcon from "@mui/icons-material/Save";
+import { addAlbum, addSong } from "@/app/services/SongServices";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -58,14 +63,102 @@ const Language = [
   "Hindi",
 ];
 
-const page = () => {
+const ErrorMessage = () => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        color: "red",
+        paddingTop: 0,
+      }}
+    >
+      <HelpOutlineIcon />
+      <p style={{ marginLeft: "10px" }}>This field is required</p>
+    </div>
+  );
+};
+
+const AddAlbumData = () => {
   const Router = useRouter();
-  const [songFile, setSongFile] = useState("");
+
+  const artist = useAppSelector((state) => state.artist.user);
+  const albumDraft = useAppSelector((state) => state.album);
+
+  const [imageFile, setImageFile] = useState("");
   const [value, setValue] = React.useState(0);
+
+  const [albumData, setAlbumData] = useState<Album>({
+    album_title: "",
+    artist: [],
+    album_img: imageFile,
+    no_of_tracks: albumDraft.song_tracks.length,
+    album_length: 0,
+    album_genre: [],
+    privacy: "Private",
+    release_date: "",
+    album_status: "To Release",
+    additional_tags: [],
+    description: "",
+    song: albumDraft.song_tracks.map((song) => song.song_id),
+  });
+
+  const [titleError, setTitleError] = useState(false);
+  const [trackError, setTrackError] = useState(false);
+  const [dateError, setDateError] = useState(false);
+  const [genreError, setGenreError] = useState(false);
+
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const handleAddAlbumData = () => {
+    const errors = [false, false, false, false, false];
+    if (!albumData.album_title) {
+      setTitleError(true);
+      errors[0] = true;
+    }
+    if (!albumData.no_of_tracks) {
+      setTrackError(true);
+      errors[1] = true;
+    }
+    if (!albumData.release_date) {
+      setDateError(true);
+      errors[2] = true;
+    }
+    if (!albumData.album_genre || albumData.album_genre.length === 0) {
+      setGenreError(true);
+      errors[3] = true;
+    }
+    if (errors.includes(true)) {
+      return;
+    }
+
+    console.log(albumData);
+    setUploading(true);
+    addAlbum(artist?.token ? artist.token : "", albumData).then((res) => {
+      console.log(res);
+      setUploading(false);
+      Router.push("/artist/albums");
+    });
+  };
+
+  useEffect(() => {
+    console.log(albumDraft);
+    setImageFile(albumDraft.album_img);
+    setAlbumData({
+      ...albumData,
+      album_img: albumDraft.album_img,
+      artist: [
+        {
+          artist_id: artist?.user.artist_id,
+          artist_name: artist?.user.artistName,
+        },
+      ],
+    });
+  }, []);
 
   return (
     <Box sx={{ minWidth: 275 }}>
@@ -73,11 +166,17 @@ const page = () => {
         <React.Fragment>
           <CardContent>
             <div>
-              <div style={{}}>
-                <div style={{}}>
-                  <h1 style={{ margin: 0 }}>Add New Album</h1>
-                </div>
-              </div>
+              <Typography
+                variant="h4"
+                color="secondary"
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "500",
+                  padding: "1em",
+                }}
+              >
+                Add New Album
+              </Typography>
 
               <Box sx={{ width: "100%" }}>
                 <Tabs
@@ -99,12 +198,13 @@ const page = () => {
                         isCircular={false}
                         width="300px"
                         height="300px"
-                        file={songFile}
-                        setFile={setSongFile}
+                        file={imageFile}
+                        setFile={setImageFile}
                         aspectX={1}
                         aspectY={1}
                         shape="rect"
                       />
+                      {!imageFile && <ErrorMessage />}
                     </Box>
                     <Box sx={{ width: "50%", marginLeft: "100px" }}>
                       <Box
@@ -118,10 +218,18 @@ const page = () => {
                         }}
                       >
                         <TextField
-                          id="filled-basic"
+                          id="album-title"
                           label="Title"
                           variant="filled"
+                          color={titleError ? "error" : "primary"}
+                          onChange={(e) => {
+                            setAlbumData({
+                              ...albumData,
+                              album_title: e.target.value,
+                            });
+                          }}
                         />
+                        {titleError && <ErrorMessage />}
                       </Box>
                       <Box
                         component="form"
@@ -134,10 +242,23 @@ const page = () => {
                         }}
                       >
                         <TextField
-                          id="filled-basic"
-                          label="No of Tracks (2 added)"
+                          id="no_of_tracks"
+                          label={
+                            "No of Tracks (" +
+                            albumDraft.song_tracks.length +
+                            " added)"
+                          }
+                          type="number"
                           variant="filled"
+                          color={trackError ? "error" : "primary"}
+                          onChange={(e) => {
+                            setAlbumData({
+                              ...albumData,
+                              no_of_tracks: parseInt(e.target.value),
+                            });
+                          }}
                         />
+                        {trackError && <ErrorMessage />}
                       </Box>
                       <Box
                         component="form"
@@ -149,13 +270,23 @@ const page = () => {
                           },
                         }}
                       >
-                       
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DemoContainer components={[" DatePicker"]}>
-                            <DatePicker  label="Release Date" />
+                            <DatePicker
+                              label="Release Date"
+                              onChange={(value) => {
+                                const date = value
+                                  .format("YYYY-MM-DD")
+                                  .toString();
+                                setAlbumData({
+                                  ...albumData,
+                                  release_date: date,
+                                });
+                              }}
+                            />
                           </DemoContainer>
                         </LocalizationProvider>
-                        
+                        {dateError && <ErrorMessage />}
                       </Box>
 
                       <Box
@@ -169,10 +300,14 @@ const page = () => {
                         }}
                       >
                         <Autocomplete
+                          multiple
                           disablePortal
-                          id="combo-box-demo"
+                          id="album_genres"
                           options={genres}
                           style={{ boxSizing: "initial", width: "82%" }}
+                          onChange={(e, value) => {
+                            setAlbumData({ ...albumData, album_genre: value });
+                          }}
                           renderInput={(params) => (
                             <TextField
                               variant="filled"
@@ -181,6 +316,7 @@ const page = () => {
                             />
                           )}
                         />
+                        {genreError && <ErrorMessage />}
                       </Box>
                       <Box
                         component="form"
@@ -193,7 +329,7 @@ const page = () => {
                         }}
                       >
                         <TextField
-                          id="filled-basic"
+                          id="additional_tags"
                           label="Additional Tags (Optional)"
                           variant="filled"
                         />
@@ -209,23 +345,36 @@ const page = () => {
                         }}
                       >
                         <TextField
-                          id="filled-multiline-static"
+                          id="description"
                           label="Description"
                           multiline
                           rows={4}
                           defaultValue="Description of your Album"
                           variant="filled"
+                          onChange={(e) => {
+                            setAlbumData({
+                              ...albumData,
+                              description: e.target.value,
+                            });
+                          }}
                         />
                       </Box>
                       <div style={{ marginTop: "30px", marginLeft: "20px" }}>
                         <FormControl>
                           <FormLabel id="demo-radio-buttons-group-label">
-                            privacy
+                            Privacy
                           </FormLabel>
                           <RadioGroup
                             aria-labelledby="demo-radio-buttons-group-label"
                             defaultValue="Public"
                             name="radio-buttons-group"
+                            row
+                            onChange={(e) => {
+                              setAlbumData({
+                                ...albumData,
+                                privacy: e.target.value,
+                              });
+                            }}
                           >
                             <FormControlLabel
                               value="Public"
@@ -249,334 +398,6 @@ const page = () => {
                   </Box>
                 </CustomTabPanel>
               </div>
-
-              {/*<CustomTabPanel value={value} index={1}>
-        <Box sx={{ width: "100%", display: "flex" }}>
-          <Box
-            sx={{
-              display: "flex",
-              marginLeft: "20px",
-              width: "400px",
-
-              marginBottom: "30px",
-            }}
-          >
-            <TextField
-              fullWidth
-              label="Contains music"
-              id="fullWidth"
-              style={{ boxSizing: "initial" }}
-            />
-          </Box>
-          <Box sx={{ display: "flex", width: "400px", marginLeft: "200px" }}>
-            <TextField
-              fullWidth
-              label="ISRC"
-              id="fullWidth"
-              style={{ boxSizing: "initial" }}
-            />
-            <HelpOutlineIcon />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            backgroundColor: "white",
-
-            width: "100%",
-            height: "auto",
-            borderRadius: "10px",
-            padding: "50px",
-            justifyContent: "space-evenly",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-
-              width: "300px",
-              marginBottom: "20px",
-            }}
-          >
-            <TextField
-              fullWidth
-              label="Contains music"
-              id="fullWidth"
-              style={{ boxSizing: "initial" }}
-            />
-          </Box>
-
-          <Box sx={{ display: "flex", width: "300px", marginLeft: "20px" }}>
-            <TextField
-              fullWidth
-              label="ISRC"
-              id="fullWidth"
-              style={{ boxSizing: "initial" }}
-            />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              marginLeft: "20px",
-              width: "300px",
-              marginBottom: "20px",
-            }}
-          >
-            <TextField
-              fullWidth
-              label="Contains music"
-              id="fullWidth"
-              style={{ boxSizing: "initial" }}
-            />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            marginTop: "40px",
-
-            display: "flex",
-            backgroundColor: "white",
-            flexDirection: "column",
-
-            width: "100%",
-            height: "auto",
-            borderRadius: "10px",
-          }}
-        >
-          <div style={{ marginLeft: "10px" }}>
-            <h2>Release date</h2>
-           <LocalizationProvider dateAdapter={AdapterDayjs}>
-           <DatePicker />
-           </LocalizationProvider>
-            <p>
-              Setting your release date to at least 1-week in the future
-              increases your chances of getting added to playlists.
-            </p>
-
-            <p>
-              If it's important that your album goes live in all stores on the
-              same day, click here for info.
-            </p>
-          </div>
-        </Box>
-
-        <Box
-          sx={{
-            marginTop: "40px",
-
-            display: "flex",
-            backgroundColor: "white",
-            flexDirection: "column",
-
-            width: "100%",
-            height: "auto",
-            borderRadius: "10px",
-          }}
-        >
-          <h2 style={{ marginLeft: "10px" }}>Album title</h2>
-          <Box
-            sx={{
-              marginLeft: "10px",
-              display: "flex",
-              width: "800px",
-              maxWidth: "80%",
-              marginBottom: "30px",
-            }}
-          >
-            <TextField
-              fullWidth
-              label=" Album Title"
-              id="fullWidth"
-              style={{ boxSizing: "initial" }}
-            />
-          </Box>
-        </Box>
-        <Box sx={{ display: "flex" }}>
-          <Box
-            sx={{
-              marginTop: "40px",
-
-              display: "flex",
-              backgroundColor: "white",
-              flexDirection: "column",
-
-              width: "50%",
-              height: "auto",
-              borderRadius: "10px",
-            }}
-          >
-            <h2 style={{ marginLeft: "10px" }}>Record label</h2>
-            <Box
-              sx={{
-                display: "flex",
-                marginLeft: "20px",
-                width: "300px",
-                maxWidth: "50%",
-                marginBottom: "20px",
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Contains music"
-                id="fullWidth"
-                style={{ boxSizing: "initial" }}
-              />
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              marginTop: "40px",
-              marginLeft: "20px",
-              display: "flex",
-              backgroundColor: "white",
-              flexDirection: "column",
-
-              width: "50%",
-              height: "auto",
-              borderRadius: "10px",
-            }}
-          >
-            <h2 style={{ marginLeft: "10px" }}>Language</h2>
-            <Box
-              sx={{
-                display: "flex",
-                marginLeft: "10px",
-                width: "400px",
-                maxWidth: "50%",
-                marginBottom: "30px",
-              }}
-            >
-              <Autocomplete
-                disablePortal
-                id="combo-box-demo"
-                options={Language}
-                style={{ boxSizing: "initial", width: "90%" }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Language" />
-                )}
-              />
-            </Box>
-          </Box>
-        </Box>
-        <Box sx={{ display: "flex" }}>
-          <Box
-            sx={{
-              marginTop: "40px",
-
-              display: "flex",
-              backgroundColor: "white",
-              flexDirection: "column",
-
-              width: "100%",
-              height: "auto",
-              borderRadius: "10px",
-            }}
-          >
-            <h2 style={{ marginLeft: "10px" }}>Primary Genre</h2>
-            <Box
-              sx={{
-                marginLeft: "10px",
-                display: "flex",
-                width: "800px",
-                maxWidth: "80%",
-                marginBottom: "30px",
-              }}
-            >
-              <TextField
-                fullWidth
-                label=" Language"
-                id="fullWidth"
-                style={{ boxSizing: "initial" }}
-              />
-            </Box>
-            <Box
-              sx={{
-                marginLeft: "10px",
-                display: "flex",
-                width: "800px",
-                maxWidth: "80%",
-                marginBottom: "30px",
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Electronic subgenre "
-                id="fullWidth"
-                style={{ boxSizing: "initial" }}
-              />
-            </Box>
-          </Box>
-        </Box>
-        <Box>
-          <Box
-            sx={{
-              marginTop: "40px",
-
-              display: "flex",
-              backgroundColor: "white",
-              flexDirection: "column",
-              padding: "10px",
-              width: "100%",
-              height: "auto",
-              borderRadius: "20px",
-            }}
-          >
-            <h2 style={{ marginLeft: "10px" }}>Add Lyrics</h2>
-            <Box
-              sx={{
-                display: "flex",
-                width: "90%",
-                maxWidth: "100%",
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Add Lyrics"
-                id="fullWidth"
-                multiline
-                rows={10}
-                style={{ boxSizing: "initial", width: "100%" }}
-              />
-            </Box>
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            marginTop: "40px",
-
-            display: "flex",
-            backgroundColor: "white",
-            flexDirection: "column",
-
-            width: "100%",
-            height: "auto",
-            borderRadius: "10px",
-          }}
-        >
-          <h2 style={{ marginLeft: "10px" }}>Important checkboxes (mandatory)</h2>
-          <div style={{marginLeft:'20px'}}>
-          <FormGroup>
-            <FormControlLabel
-              required
-              control={<Checkbox />}
-              label="I recorded this music, and am authorized to sell it in stores worldwide & collect all royalties."
-            />
-             <FormControlLabel
-              required
-              control={<Checkbox />}
-              label="I'm not using any other artist's name in my name, song titles, or album title, without their approval."
-            />
-             <FormControlLabel
-              required
-              control={<Checkbox />}
-              label="I have read and agree to the terms of the HearWeGo Distribution Agreement"
-            />
-          </FormGroup>
-
-          </div>
-         
-        </Box>
-      </CustomTabPanel>*/}
               <div
                 style={{
                   display: "flex",
@@ -593,14 +414,14 @@ const page = () => {
                   >
                     Cansel
                   </Button>
-                  <Button
+                  <LoadingButton
+                    loading={uploading}
+                    startIcon={<SaveIcon />}
                     variant="contained"
-                    onClick={() => {
-                      Router.push("add3");
-                    }}
+                    onClick={handleAddAlbumData}
                   >
                     Save
-                  </Button>
+                  </LoadingButton>
                 </Stack>
               </div>
             </div>
@@ -638,4 +459,4 @@ function a11yProps(index: number) {
   };
 }
 
-export default page;
+export default AddAlbumData;

@@ -127,15 +127,18 @@ export interface Song {
 }
 
 export interface Album {
-  albumName?: string;
-  artist?: string[];
-  albumCoverArt?: string;
-  albumTracks?: number;
-  albumLength?: number;
-  impressions?: string;
-  listners?: string;
-  genres?: string[];
+  album_title?: string;
+  artist?: { artist_id: string; artist_name: string }[];
+  album_img?: string;
+  no_of_tracks?: number;
+  album_length?: number;
+  no_of_impressions?: string;
+  no_of_plays?: string;
+  album_genre?: string[];
   privacy?: string;
-  releaseDate?: string;
-  albumStatus?: string;
+  release_date?: string;
+  album_status?: string;
+  additional_tags?: string[];
+  description?: string;
+  song?: string[];
 }

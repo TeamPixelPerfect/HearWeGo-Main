@@ -32,10 +32,11 @@ import {
   FaGlobeAsia,
 } from "react-icons/fa";
 import { MdDelete, MdHeadset } from "react-icons/md";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MainSongCard } from "../../songs/page";
+import { getAlbum, getSong } from "@/app/services/SongServices";
 
 interface Props {
   params: { id: string };
@@ -57,7 +58,7 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
         <CardMedia
           component="img"
           sx={{ width: "100%", borderRadius: 1 }}
-          image={albumData.albumCoverArt}
+          image={albumData.album_img}
           alt="Live from space album cover"
         />
         <Box
@@ -79,10 +80,10 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
 
       <SongPreviewDetails>
         <Typography component="div" sx={{ fontSize: 28, fontWeight: 600 }}>
-          {albumData.albumName}
+          {albumData.album_title}
         </Typography>
         <Typography variant="h6" component="div" sx={{ fontSize: 16 }}>
-          {albumData?.artists?.join(',')}
+          {albumData?.artist?.map((artist) => artist.artist_name).join(",")}
         </Typography>
 
         <Stack
@@ -90,7 +91,7 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
           spacing={1}
           sx={{ marginBottom: "1em", fontSize: 12 }}
         >
-          {albumData?.genres?.map((genre) => {
+          {albumData?.album_genre?.map((genre) => {
             return <Chip label={genre} color="primary" sx={{ fontSize: 12 }} />;
           })}
         </Stack>
@@ -106,17 +107,17 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
         <Alert
           variant="filled"
           severity={
-            albumData?.albumStatus === "Released"
+            albumData?.album_status === "Released"
               ? "success"
-              : albumData?.albumStatus === "To Release"
+              : albumData?.album_status === "To Release"
               ? "warning"
-              : albumData?.albumStatus === "Draft"
+              : albumData?.album_status === "Draft"
               ? "info"
               : "info"
           }
           sx={{ width: "200px" }}
         >
-          {albumData.albumStatus}
+          {albumData.album_status}
         </Alert>
       </SongPreviewDetails>
 
@@ -187,77 +188,24 @@ const AlbumDetails = ({ params: { id } }: Props) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const [albumDetails, setAlbumDetails] = useState<Album>({
-    albumName: "L.P.",
-    artists: ["The Rembrandts"],
-    albumCoverArt:
-      "https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg",
-    albumLength: 67.15,
-    albumTracks: 15,
-    impressions: "12.7M",
-    listners: "7.0M",
-    genres: ["pop", "rock", "classic"],
-    privacy: "public",
-    releaseDate: "2024-03-01",
-    albumStatus: "To Release",
-  });
-  const [albumSongs, setAlbumSongs] = useState<Song[]>([
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-    {
-      songName: "I'll be there for you",
-      albumName: "L.P.",
-      duration: 3.08,
-      songUrl:
-        "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-      coverArt:
-        "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-      impressions: "10.5M",
-      listeners: "3.4M",
-    },
-  ]);
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [albumDetails, setAlbumDetails] = useState<Album>({});
+  const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
+
+  useEffect(() => {
+    if (id) {
+      getAlbum(artist?.token, id).then((album) => {
+        console.log("Album:::", album[0]);
+        setAlbumDetails(album[0]);
+        album[0].song.forEach((song_id) => {
+          getSong(artist?.token, song_id).then((song) => {
+            setAlbumSongs((prev) => [...prev, song]);
+          });
+        });
+      });
+    }
+  }, []);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>

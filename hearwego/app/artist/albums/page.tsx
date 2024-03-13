@@ -35,13 +35,14 @@ import { IoAddOutline, IoClose } from "react-icons/io5";
 import { MdAlbum, MdDelete } from "react-icons/md";
 
 const MainAlbumCard = ({
+  albumId,
   albumName,
   albumCoverArt,
   albumTracks,
   albumLength,
   impressions,
   listners,
-}: Album) => {
+}: any) => {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -52,7 +53,7 @@ const MainAlbumCard = ({
   return (
     <AlbumCard
       onClick={() => {
-        router.push("/artist/albums/a001");
+        router.push("/artist/albums/"+albumId);
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "50%" }}>
@@ -187,12 +188,13 @@ const ArtistAlbums = () => {
               albums.map((album) => {
                 return (
                   <MainAlbumCard
-                    albumName={album.albumName}
-                    albumCoverArt={album.albumCoverArt}
-                    albumTracks={album.albumTracks}
-                    albumLength={album.albumLength}
-                    impressions={album.impressions}
-                    listners={album.listners}
+                    albumId={album.album_id}
+                    albumName={album.album_title}
+                    albumCoverArt={album.album_img}
+                    albumTracks={album.no_of_tracks}
+                    albumLength={album.album_length}
+                    impressions={album.no_of_impressions}
+                    listners={album.no_of_plays}
                   />
                 );
               })

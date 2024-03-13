@@ -40,9 +40,10 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import SaveIcon from "@mui/icons-material/Save";
 import { Song } from "@/app/constants/models";
 import { createFilterOptions } from "@mui/material";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { addSong } from "@/app/services/SongServices";
 import { getAllArtists } from "@/app/services/ArtistServices";
+import { setSong } from "@/lib/features/song.slice";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -156,6 +157,8 @@ const AddSongData = () => {
 
   const [uploading, setUploading] = useState(false);
 
+  const dispatch = useAppDispatch();
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -262,6 +265,7 @@ const AddSongData = () => {
     addSong(artist ? artist.token : "", songData).then((res) => {
       console.log("Response:::", res);
       setUploading(false);
+      dispatch(setSong({ song_track: "" }));
       Router.push("/artist/songs/addSongPreview/"+res.song_id);
     });
   };

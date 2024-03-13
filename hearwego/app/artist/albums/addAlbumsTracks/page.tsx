@@ -24,12 +24,47 @@ import { useTheme } from "@emotion/react";
 import { Song } from "@/app/constants/models";
 import useAudio from "@/app/Hooks/useAudio";
 import { getSong, getSongsForArtist } from "@/app/services/SongServices";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import LoadingButton from "@mui/lab/LoadingButton";
+import SaveIcon from "@mui/icons-material/Save";
+import { setAlbum } from "@/lib/features/album.slice";
+import { useRouter } from "next/navigation";
 
 export default function AddAlbumTracks() {
   const theme = useTheme();
+  const router = useRouter();
 
+  const dispatch = useAppDispatch();
+
+  const [imageFile, setImageFile] = React.useState(null);
   const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
+
+  const [songTracks, setSongTracks] = useState<Song[]>([]);
+
+  const [imageErr, setImageErr] = useState(false);
+  const [albumSongsErr, setAlbumSongsErr] = useState(false);
+
+  const [uploading, setUploading] = useState(false);
+
+  const handleAddTrackToAlbum = () => {
+    let errors = [false, false];
+
+    if (!imageFile) {
+      setImageErr(true);
+      errors[0] = true;
+    }
+
+    if (songTracks.length === 0) {
+      setAlbumSongsErr(true);
+      errors[1] = true;
+    }
+
+    if (errors.includes(true)) {
+      return;
+    }
+    dispatch(setAlbum({ song_tracks: songTracks, album_img: imageFile ? imageFile : ""}));
+    router.push("/artist/albums/addAlbumData");
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -50,9 +85,27 @@ export default function AddAlbumTracks() {
 
             <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
               <Box
-                sx={{ width: "30%", display: "flex", justifyContent: "center" }}
+                sx={{ width: "30%"}}
               >
-                <DropAlbumImage />
+                <DropFile
+                  fileTypes="Album Cover Image"
+                  fileExtensions="JPEG,PNG,WEBP,SVG"
+                  isCircular={false}
+                  width="250px"
+                  height={"250px"}
+                  file={imageFile}
+                  setFile={setImageFile}
+                  aspectX={1}
+                  aspectY={1}
+                  shape="rect"
+                />
+                <Typography
+                  variant="subtitle1"
+                  color="error"
+                  sx={{ width: "100%", textAlign: "center", padding: "1em" }}
+                >
+                  {imageErr ? "Please upload an image to continue!" : ""}
+                </Typography>
               </Box>
 
               <Box sx={{ width: "70%" }}>
@@ -89,8 +142,16 @@ export default function AddAlbumTracks() {
                       key={index}
                       songData={song}
                       setAlbumSongs={setAlbumSongs}
+                      setSongTracks={setSongTracks}
                     />
                   ))}
+                  <Typography
+                    variant="subtitle1"
+                    color="error"
+                    sx={{ width: "100%", textAlign: "center", padding: "1em" }}
+                  >
+                    {albumSongsErr ? "Please add songs to continue!" : ""}
+                  </Typography>
                 </Box>
 
                 <Box sx={{ width: "100%", marginTop: "1em" }}>
@@ -109,7 +170,17 @@ export default function AddAlbumTracks() {
                 >
                   <Stack direction="row" spacing={2}>
                     <Button variant="outlined">Reset</Button>
-                    <Button variant="contained">Save</Button>
+                    <LoadingButton
+                      loading={uploading}
+                      startIcon={<SaveIcon />}
+                      variant="contained"
+                      onClick={() => {
+                        // Router.push("add2");
+                        handleAddTrackToAlbum();
+                      }}
+                    >
+                      Save
+                    </LoadingButton>
                   </Stack>
                 </Box>
               </Box>
@@ -121,37 +192,29 @@ export default function AddAlbumTracks() {
   );
 }
 
-function DropAlbumImage() {
-  const [imageFile, setImageFile] = React.useState(null);
-  return (
-    <DropFile
-      fileTypes="Album Cover Image"
-      fileExtensions="JPEG,PNG,WEBP,SVG"
-      isCircular={false}
-      width="250px"
-      height={"250px"}
-      file={imageFile}
-      setFile={setImageFile}
-      aspectX={1}
-      aspectY={1}
-      shape="rect"
-    />
-  );
-}
-
 interface SongCardProps {
   songData: any;
   setAlbumSongs?: any;
+  setSongTracks?: any;
 }
 
-function SongCard({ songData, setAlbumSongs }: SongCardProps) {
+function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
   const [song, setSong] = useState<Song>();
   const token = useAppSelector((state) => state.artist.user?.token);
 
   useEffect(() => {
     getSong(token ? token : "", songData?.value ? songData.value : "").then(
       (song) => {
-        console.log("Song:::", song);
+        setSongTracks((prev: any) => {
+          if (prev) {
+            if (prev.length > 0) {
+              const newSongs = prev.filter((s: any) => s.song_id !== song.song_id);
+              return [...newSongs, song];5
+            }
+            return [song];
+          }
+          return [song];
+         });
         setSong(song);
       }
     );
