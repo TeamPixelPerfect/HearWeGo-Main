@@ -11,7 +11,6 @@ import { url } from "inspector";
 import CardActions from "@mui/material";
 import { FaFilePdf } from "react-icons/fa";
 
-
 interface RenderedTicketprops {
   Event_img: string;
   Ref_No: string;
@@ -1428,33 +1427,38 @@ const SuccessfullPDF: React.FC = () => {
         </Box>
       </Box>
 
-  <Box sx={{
-  //   width:'20%',
-  //    margin:'20px',
-  //  height:'20%',
-    
-  }}>
-      <Button sx={{
-        width:'15%',
-        height:'5%',
-        //backgroundColor:'#A5B4FC',
-        color:'white',
-        fontSize:'20px',
-        fontWeight:'bold',
-        padding:'10px',
-        borderRadius:'5px',
-        margin:'60px',
-      
-      }}
-        //href="/main/events/MoreInterestEvents"
-        variant="contained"
-        size="small"
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          // backgroundColor:'red',
+          margin: "40px",
+        }}
       >
-        PDF 
-        <FaFilePdf style={{
-          margin:'10px',
-        }}></FaFilePdf>
-      </Button>
+        <Button
+          sx={{
+            width: "15%",
+            height: "5%",
+            //backgroundColor:'#A5B4FC',
+            color: "white",
+            fontSize: "20px",
+            fontWeight: "bold",
+
+            borderRadius: "5px",
+          }}
+          //href="/main/events/MoreInterestEvents"
+          variant="contained"
+          size="small"
+        >
+          PDF
+          <FaFilePdf
+            style={{
+              margin: "10px",
+            }}
+          ></FaFilePdf>
+        </Button>
       </Box>
     </Box>
   );
