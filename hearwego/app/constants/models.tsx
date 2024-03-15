@@ -142,3 +142,41 @@ export interface Album {
   description?: string;
   song?: string[];
 }
+
+export interface Event{
+  event_id?: string;
+      event_img?: string;
+      event_name?: string;
+      event_type?: string;
+      age_from?: number;
+      age_to?: number;
+      no_of_sessions?: number;
+      sessions?: [
+        {
+          session_id: string,
+          session_name: string,
+          session_date: string,
+          session_time: string,
+          duration: string,
+          venue: string,
+          artists: [
+            {
+              artist_id: string,
+              artist_name: string
+            }
+          ],
+          session_special_notice: string
+        }
+      ];
+      sponsor?: string[];
+      teams?: [
+        {
+          team_type: string,
+          team_name: string,
+          contact_name: string,
+          contact: string,
+          email: string
+        }
+      ];
+      description?: string;
+}
