@@ -27,13 +27,21 @@ const Home = () => {
   return (
     <>
       <Header app={app} />
-      <HomeBanner imgs={app?.banner_imgs}>
+      <HomeBanner
+        imgs={[
+          "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        ]}
+      >
         <HomeTaglineContainer>
           <HomeTagline>Music For Living,</HomeTagline>
           <HomeTagline2>Live For Music.</HomeTagline2>
         </HomeTaglineContainer>
         <HomeBannerButtonContainer>
-          <HomeBannerButton onClick={() => {Router.push('/auth/artistSignUp')}}>
+          <HomeBannerButton
+            onClick={() => {
+              Router.push("/auth/artistSignUp");
+            }}
+          >
             <span>Join as Artist</span>
           </HomeBannerButton>
           <HomeBannerButton
@@ -70,7 +78,13 @@ const Home = () => {
                       }}
                     ></div>
                     {matches && (
-                      <HomeBannerButton sx={{ backgroundColor: "#6B21A8", order: 2, marginLeft:0 }}>
+                      <HomeBannerButton
+                        sx={{
+                          backgroundColor: "#6B21A8",
+                          order: 2,
+                          marginLeft: 0,
+                        }}
+                      >
                         <span>Explore</span>
                       </HomeBannerButton>
                     )}
@@ -94,7 +108,13 @@ const Home = () => {
                       )}
                     </div>
                     {matches && (
-                      <HomeBannerButton sx={{ backgroundColor: "#6B21A8", order:2, marginLeft:0 }}>
+                      <HomeBannerButton
+                        sx={{
+                          backgroundColor: "#6B21A8",
+                          order: 2,
+                          marginLeft: 0,
+                        }}
+                      >
                         <span>Explore</span>
                       </HomeBannerButton>
                     )}

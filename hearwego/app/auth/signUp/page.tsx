@@ -10,6 +10,8 @@ import {
   SelectChangeEvent,
   Stack,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,10 +28,14 @@ import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import Logo from "@/app/components/Logo";
 
 const SignUp = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+
+  const theme = useTheme();
+  const matches = useMediaQuery("(max-width:960px)");
 
   const [userDetails, setUserDetails] = React.useState({
     name: "",
@@ -74,34 +80,64 @@ const SignUp = () => {
 
   // Handle Sign up process
   const handleSignUp = () => {
+    const errors = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ];
     if (userDetails.name === "") {
       setNameError(true);
-    } else if (userDetails.email === "") {
-      setEmailError(true);
-    } else if (userDetails.password === "") {
-      setPasswordError(true);
-    } else if (userDetails.confirmPassword === "") {
-      setConfirmPasswordError(true);
-    } else if (userDetails.country === "") {
-      setCountryError(true);
-    } else if (userDetails.mobileNumber === "") {
-      setMobileNumberError(true);
-    } else if (userDetails.password !== userDetails.confirmPassword) {
-      setPasswordMismatchError(true);
-    } else if (userDetails.gender === "") {
-      setGenderError(true);
-    } else if (userDetails.birthDate === "") {
-      setBirthDateError(true);
-    } else {
-      console.log(userDetails);
-      handleRegister(userDetails).then((res) => {
-        if (res) {
-          dispatch(logInUser(res?.user));
-          sessionStorage.setItem("hwg-user", JSON.stringify(res));
-          router.replace("/");
-        }
-      });
+      errors[0] = true;
     }
+    if (userDetails.email === "") {
+      setEmailError(true);
+      errors[1] = true;
+    }
+    if (userDetails.password === "") {
+      setPasswordError(true);
+      errors[2] = true;
+    }
+    if (userDetails.confirmPassword === "") {
+      setConfirmPasswordError(true);
+      errors[3] = true;
+    }
+    if (userDetails.country === "") {
+      setCountryError(true);
+      errors[4] = true;
+    }
+    if (userDetails.mobileNumber === "") {
+      setMobileNumberError(true);
+      errors[5] = true;
+    }
+    if (userDetails.password !== userDetails.confirmPassword) {
+      setPasswordMismatchError(true);
+      errors[6] = true;
+    }
+    if (userDetails.gender === "") {
+      setGenderError(true);
+      errors[7] = true;
+    }
+    if (userDetails.birthDate === "") {
+      setBirthDateError(true);
+      errors[8] = true;
+    }
+
+    if (errors.includes(true)) return;
+
+    console.log(userDetails);
+    handleRegister(userDetails).then((res) => {
+      if (res) {
+        dispatch(logInUser(res?.user));
+        sessionStorage.setItem("hwg-user", JSON.stringify(res));
+        router.replace("/");
+      }
+    });
   };
 
   return (
@@ -116,27 +152,54 @@ const SignUp = () => {
           }}
         />
       </Stack> */}
-      <Box>
+      <Box
+        sx={{
+          display: "flex",
+          width: "100%",
+          height: matches ? "1250px" : "100%",
+          maxHeight: matches ? "1250px" : "1000px",
+          flexDirection: matches ? "column" : "row",
+        }}
+      >
+        <Box
+          sx={{
+            width: matches ? "100%" : "50%",
+            minHeight: matches ? "20%" : "100%",
+            backgroundColor: "#000",
+            backgroundImage: `url("https://plus.unsplash.com/premium_photo-1682096467444-8861e1dc3bc2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        ></Box>
+
         <Box
           id="artist-sign-in"
           sx={{
             flex: "0 0 auto",
-            width: "100%",
-            height: "550px",
+            width: matches ? "100%" : "50%",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
+            marginLeft: "2em",
+            padding: "80px 0",
             // background: "magenta"
           }}
         >
+          <Logo
+            img_url={
+              theme.palette.mode === "dark"
+                ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo(white).png"
+                : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
+            }
+          />
           <Typography
             variant="h4"
             sx={{
-              color: "#fff",
+              mt: "8px",
               fontWeight: "600",
-              textAlign: "center",
-              marginBottom: "20px",
+              marginBottom: "30px",
               paddingTop: "0px",
             }}
           >
@@ -153,7 +216,8 @@ const SignUp = () => {
             onChange={(e) => {
               setUserDetails({ ...userDetails, name: e.target.value });
             }}
-            inputRef={(input) => input && nameError && input.focus()}
+            helperText={nameError ? "Name is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="email"
@@ -166,7 +230,8 @@ const SignUp = () => {
             onChange={(e) => {
               setUserDetails({ ...userDetails, email: e.target.value });
             }}
-            inputRef={(input) => input && emailError && input.focus()}
+            helperText={emailError ? "Email is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="password"
@@ -179,7 +244,8 @@ const SignUp = () => {
             onChange={(e) => {
               setUserDetails({ ...userDetails, password: e.target.value });
             }}
-            inputRef={(input) => input && passwordError && input.focus()}
+            helperText={passwordError ? "Password is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="confirm-password"
@@ -195,11 +261,14 @@ const SignUp = () => {
                 confirmPassword: e.target.value,
               });
             }}
-            inputRef={(input) =>
-              input &&
-              (confirmPasswordError || passwordMismatchError) &&
-              input.focus()
+            helperText={
+              confirmPasswordError
+                ? "Confirm Password is required"
+                : passwordMismatchError
+                ? "Passwords do not match"
+                : ""
             }
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -216,8 +285,23 @@ const SignUp = () => {
               label="Birth Date*"
               value={selectedDay}
               onChange={handleBirthDateChange}
-              inputRef={(input) => input && birthDateError && input.focus()}
             />
+            <Box>
+              {birthDateError ? (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "red",
+                    marginLeft: "12px",
+                    fontSize: "12px",
+                  }}
+                >
+                  Birth Date is required
+                </Typography>
+              ) : (
+                ""
+              )}
+            </Box>
           </LocalizationProvider>
 
           <AuthTextField
@@ -234,7 +318,8 @@ const SignUp = () => {
                 gender: e.target.value,
               });
             }}
-            inputRef={(input) => input && genderError && input.focus()}
+            helperText={genderError ? "Gender is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           >
             <MenuItem value="Male">Male</MenuItem>
             <MenuItem value="Female">Female</MenuItem>
@@ -244,14 +329,15 @@ const SignUp = () => {
           <Stack
             direction="row"
             sx={{
-              width: "40%",
+              // width: "40%",
               alignItems: "center",
               justifyContent: "center",
+              // background: "magenta"
             }}
           >
-            <FormControl sx={{ m: 1, minWidth: 80 }}>
+            <FormControl sx={{ width: "30%", mr: 1 }}>
               <InputLabel id="demo-simple-select-autowidth-label">
-                Country
+                Code
               </InputLabel>
               <Select
                 labelId="demo-simple-select-autowidth-label"
@@ -263,7 +349,7 @@ const SignUp = () => {
                 color={countryError ? "error" : "primary"}
                 sx={{
                   background: "rgba(255,255,255,0.1)",
-                  borderRadius: "10px",
+                  // borderRadius: "10px",
                   margin: "0",
                 }}
                 defaultValue={selectedCountry}
@@ -298,7 +384,7 @@ const SignUp = () => {
               variant="outlined"
               type="number"
               color={mobileNumberError ? "error" : "primary"}
-              style={{ boxSizing: "initial", width: "100%" }}
+              style={{ boxSizing: "initial" }}
               defaultValue={userDetails.mobileNumber}
               onChange={(e) => {
                 setUserDetails({
@@ -306,11 +392,12 @@ const SignUp = () => {
                   mobileNumber: e.target.value,
                 });
               }}
-              inputRef={(input) => input && mobileNumberError && input.focus()}
+              helperText={mobileNumberError ? "Mobile Number is required" : ""}
+              FormHelperTextProps={{ style: { color: "red" } }}
             />
           </Stack>
 
-          <Stack spacing={1} direction="row" sx={{ marginTop: "10px" }}>
+          <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             {/* <Button
               size="large"
               variant="contained"
@@ -344,7 +431,7 @@ const SignUp = () => {
 
           <Typography
             variant="body1"
-            sx={{ color: "#fff", marginTop: "10px", paddingBottom: "20px" }}
+            sx={{ marginTop: "40px", paddingBottom: "20px" }}
           >
             Already have an account?{" "}
             <Link href="/auth/signIn" style={{ color: "#C084FC" }}>

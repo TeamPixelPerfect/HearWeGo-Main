@@ -17,6 +17,8 @@ import {
   Typography,
   TextField,
   InputAdornment,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -49,9 +51,13 @@ import { GiPartyPopper } from "react-icons/gi";
 import { TypeSpecimenOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { countCommas, countNonEmptyItems } from "@/app/constants/functions";
+import Logo from "@/app/components/Logo";
 
 const ArtistSignUp = () => {
   const router = useRouter();
+  const theme = useTheme();
+
+  const matches = useMediaQuery("(max-width:960px)");
 
   // Sign up stage
   const [step, setStep] = useState<number>(0);
@@ -257,37 +263,43 @@ const ArtistSignUp = () => {
   };
 
   const handleStageSix = () => {
+    const errors = [false, false, false, false, false, false];
+
     if (artistDetails.email === "") {
       setEmailError(true);
-      return;
+      errors[0] = true;
     }
     if (artistDetails.password === "") {
       setPasswordError(true);
-      return;
+      errors[1] = true;
     }
     if (artistDetails.confirmPassword === "") {
       setConfirmPasswordError(true);
-      return;
+      errors[2] = true;
     }
     if (artistDetails.mobileNumber === "") {
       setMobileNumberError(true);
-      return;
+      errors[3] = true;
     }
     if (selectedCountry === "") {
       setArtistDetails({ ...artistDetails, country: selectedCountry });
       setCountryError(true);
-      return;
+      errors[4] = true;
     }
     if (artistDetails.password !== artistDetails.confirmPassword) {
       setPasswordMismatchError(true);
-      return;
+      errors[5] = true;
     }
+
+    if (errors.includes(true)) return;
+
     setEmailError(false);
     setPasswordError(false);
     setConfirmPasswordError(false);
     setMobileNumberError(false);
     setCountryError(false);
     setPasswordMismatchError(false);
+
     incrementStep(1);
   };
 
@@ -316,20 +328,27 @@ const ArtistSignUp = () => {
   };
 
   const handleCustomizeStage = () => {
+    const errors = [false, false];
+
     if (artistDetails.artistBio === "") {
       setBioError(true);
-      return;
+      errors[0] = true;
     }
     if (!profilePicture) {
       setProfilePicError(true);
-      return;
+      errors[1] = true;
     }
+
     setArtistDetails({
       ...artistDetails,
       artistBio: artistDetails.profilePicture,
     });
+
+    if (errors.includes(true)) return;
+
     setBioError(false);
     setProfilePicError(false);
+
     incrementStep(1);
   };
 
@@ -348,12 +367,12 @@ const ArtistSignUp = () => {
     if (commaCount === countNonEmptyItems(aliasList)) {
       aliasList.forEach((alias) => {
         console.log(alias);
-        if(!artistDetails.otherAliases.includes(alias)) {
+        if (!artistDetails.otherAliases.includes(alias)) {
           setArtistDetails({
             ...artistDetails,
             otherAliases: [...artistDetails.otherAliases, alias],
           });
-        };
+        }
       });
     }
   };
@@ -417,8 +436,11 @@ const ArtistSignUp = () => {
         sx={{
           width: "100%",
           height: "100%",
+          maxHeight: "1250px",
           display: "flex",
+          alignItems: "center",
           flexWrap: "nowrap",
+          padding: "80px 0",
           transform: `translateX(-${step * 100}%)`,
           transition: "transform 0.5s ease-in-out",
         }}
@@ -428,7 +450,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -436,10 +458,23 @@ const ArtistSignUp = () => {
             // background: "magenta",
           }}
         >
-          <Typography variant="h4" sx={{ color: "#fff", fontWeight: "700" }}>
+          <Logo
+            img_url={
+              theme.palette.mode === "dark"
+                ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo(white).png"
+                : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
+            }
+          />
+          <Typography
+            variant="h4"
+            sx={{ marginTop: "50px", fontWeight: "700" }}
+          >
             Welcome
           </Typography>
-          <Typography variant="h5" sx={{ color: "#A5B4FC" }}>
+          <Typography
+            variant="h5"
+            sx={{ color: "#A5B4FC", textAlign: "center" }}
+          >
             You’re going to join HearWeGo as an Artist!
           </Typography>
           <Button
@@ -456,7 +491,7 @@ const ArtistSignUp = () => {
           >
             Get Started
           </Button>
-          <Typography variant="body1" sx={{ color: "#fff", marginTop: "40px" }}>
+          <Typography variant="body1" sx={{ marginTop: "40px" }}>
             Already have an account?{" "}
             <Link href="/auth/artistSignIn" style={{ color: "#C084FC" }}>
               Sign in
@@ -468,7 +503,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -478,7 +513,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -498,7 +532,8 @@ const ArtistSignUp = () => {
                 artistName: e.target.value,
               });
             }}
-            inputRef={(input) => input && artistNameError && input.focus()}
+            helperText={artistNameError ? "Artist name is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
             style={{ boxSizing: "initial" }}
           />
           <AuthTextField
@@ -515,7 +550,7 @@ const ArtistSignUp = () => {
             label="Other Alias(es)"
             variant="outlined"
             onChange={(e) => {
-              handleAddAlias(e.target.value)
+              handleAddAlias(e.target.value);
             }}
             style={{ boxSizing: "initial" }}
           />
@@ -573,7 +608,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -596,7 +630,12 @@ const ArtistSignUp = () => {
             <AuthCheckBox
               id="solo"
               style={
-                checkType("solo") && { background: "rgba(255,255,255,0.4" }
+                checkType("solo") && {
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
+                }
               }
               onClick={() => handleArtistTypeSelect("solo")}
             >
@@ -609,19 +648,23 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                Solo
-              </Typography>
-              <FaPerson style={{ fontSize: "40px", color: "#fff" }} />
+              <Typography variant="subtitle1">Solo</Typography>
+              <FaPerson style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="duo"
-              style={checkType("duo") && { background: "rgba(255,255,255,0.4" }}
+              style={
+                checkType("duo") && {
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
+                }
+              }
               onClick={() => handleArtistTypeSelect("duo")}
             >
               <Stack
@@ -633,20 +676,22 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                Duo
-              </Typography>
-              <MdOutlineGroup style={{ fontSize: "40px", color: "#fff" }} />
+              <Typography variant="subtitle1">Duo</Typography>
+              <MdOutlineGroup style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="group"
               style={
-                checkType("group") && { background: "rgba(255,255,255,0.4" }
+                checkType("group") && {
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
+                }
               }
               onClick={() => handleArtistTypeSelect("group")}
             >
@@ -661,15 +706,12 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                Group
-              </Typography>
-              <MdGroups style={{ fontSize: "40px", color: "#fff" }} />
+              <Typography variant="subtitle1">Group</Typography>
+              <MdGroups style={{ fontSize: "40px" }} />
             </AuthCheckBox>
           </Box>
 
@@ -714,7 +756,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -724,7 +766,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               // marginBottom: "10px",
@@ -733,7 +774,7 @@ const ArtistSignUp = () => {
             What is your music genre?
           </Typography>
 
-          <Typography variant="subtitle1" sx={{ color: "#fff", marginTop: 0 }}>
+          <Typography variant="subtitle1" sx={{ marginTop: 0 }}>
             Choose up to 3*
           </Typography>
 
@@ -755,16 +796,17 @@ const ArtistSignUp = () => {
                     key={genre}
                     style={
                       checkGenre(genre) && {
-                        background: "rgba(255,255,255,0.4",
+                        background:
+                          theme.palette.mode === "dark"
+                            ? "rgba(255,255,255,0.4)"
+                            : "rgba(0,0,0,0.4)",
                       }
                     }
                     onClick={() => {
                       handleGenreSelect(genre);
                     }}
                   >
-                    <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                      {genre}
-                    </Typography>
+                    <Typography variant="subtitle1">{genre}</Typography>
                   </AuthGenreBox>
                 );
               })}
@@ -821,7 +863,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -845,7 +886,10 @@ const ArtistSignUp = () => {
               id="performer"
               style={
                 checkProfession("performer") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
                 }
               }
               onClick={() => handleProfessionSelect("performer")}
@@ -861,24 +905,23 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Performer
               </Typography>
-              <IoMdMicrophone style={{ fontSize: "40px", color: "#fff" }} />
+              <IoMdMicrophone style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="producer"
               style={
                 checkProfession("producer") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
                 }
               }
               onClick={() => handleProfessionSelect("producer")}
@@ -894,24 +937,23 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Producer
               </Typography>
-              <FaCompactDisc style={{ fontSize: "40px", color: "#fff" }} />
+              <FaCompactDisc style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="songwriter"
               style={
                 checkProfession("songwriter") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
                 }
               }
               onClick={() => handleProfessionSelect("songwriter")}
@@ -927,24 +969,23 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Songwriter
               </Typography>
-              <FaPenNib style={{ fontSize: "40px", color: "#fff" }} />
+              <FaPenNib style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="instrumentalist"
               style={
                 checkProfession("instrumentalist") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
                 }
               }
               onClick={() => handleProfessionSelect("instrumentalist")}
@@ -960,18 +1001,14 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Instrumentalist
               </Typography>
-              <GiGuitar style={{ fontSize: "40px", color: "#fff" }} />
+              <GiGuitar style={{ fontSize: "40px" }} />
             </AuthCheckBox>
           </Box>
 
@@ -1026,7 +1063,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -1045,7 +1081,8 @@ const ArtistSignUp = () => {
             onChange={(e) => {
               setArtistDetails({ ...artistDetails, email: e.target.value });
             }}
-            inputRef={(input) => input && emailError && input.focus()}
+            helperText={emailError ? "Email is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="password"
@@ -1058,7 +1095,8 @@ const ArtistSignUp = () => {
             onChange={(e) => {
               setArtistDetails({ ...artistDetails, password: e.target.value });
             }}
-            inputRef={(input) => input && passwordError && input.focus()}
+            helperText={passwordError ? "Password is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="confirm-password"
@@ -1074,11 +1112,14 @@ const ArtistSignUp = () => {
                 confirmPassword: e.target.value,
               });
             }}
-            inputRef={(input) =>
-              input &&
-              (confirmPasswordError || passwordMismatchError) &&
-              input.focus()
+            helperText={
+              confirmPasswordError
+                ? "Please confirm your password"
+                : passwordMismatchError
+                ? "Passwords do not match"
+                : ""
             }
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <Stack
@@ -1155,7 +1196,8 @@ const ArtistSignUp = () => {
                   mobileNumber: e.target.value,
                 });
               }}
-              inputRef={(input) => input && mobileNumberError && input.focus()}
+              helperText={mobileNumberError ? "Mobile number is required" : ""}
+              FormHelperTextProps={{ style: { color: "red" } }}
             />
           </Stack>
 
@@ -1206,7 +1248,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               // marginBottom: "0px",
@@ -1229,7 +1270,7 @@ const ArtistSignUp = () => {
             fileTypes="NIC,Passport,Driving License,"
             fileExtensions="PDF,PNG,JPEG"
             isCircular={false}
-            width="50%"
+            width={matches ? "80%" : "50%"}
             height="300px"
             file={verDoc}
             setFile={setVerDoc}
@@ -1238,7 +1279,10 @@ const ArtistSignUp = () => {
             shape="rect"
           />
 
-          <Typography color="error" sx={{ marginTop: "1em" }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ marginTop: "1em", fontSize: "12px", color: "red" }}
+          >
             {verificationDocumentError &&
               "Verification documents are required!"}
           </Typography>
@@ -1280,7 +1324,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1290,7 +1334,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1304,7 +1347,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1327,13 +1369,10 @@ const ArtistSignUp = () => {
               sx={{ fontSize: "4rem", color: "#6366F1", marginRight: "10px" }}
             />
             <Stack>
-              <Typography
-                variant="h5"
-                sx={{ color: "#fff", fontWeight: "600" }}
-              >
+              <Typography variant="h5" sx={{ fontWeight: "600" }}>
                 Successfully Submitted Request!
               </Typography>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
+              <Typography variant="subtitle1">
                 Current Status:{" "}
                 <span style={{ fontWeight: "300" }}>
                   <em>Pending</em>
@@ -1379,7 +1418,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1389,7 +1428,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1403,7 +1441,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1426,13 +1463,10 @@ const ArtistSignUp = () => {
               sx={{ fontSize: "4rem", color: "#6366F1", marginRight: "10px" }}
             />
             <Stack>
-              <Typography
-                variant="h5"
-                sx={{ color: "#fff", fontWeight: "600" }}
-              >
+              <Typography variant="h5" sx={{ fontWeight: "600" }}>
                 Successfully Submitted Request!
               </Typography>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
+              <Typography variant="subtitle1">
                 Current Status:{" "}
                 <span style={{ fontWeight: "300" }}>
                   <em>Verified</em>
@@ -1478,7 +1512,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1488,7 +1522,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "5px",
@@ -1502,7 +1535,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "14px",
             }}
           >
@@ -1522,7 +1554,7 @@ const ArtistSignUp = () => {
             />
           </Box>
 
-          <Typography color="error">
+          <Typography sx={{ marginTop: "1em", color: "red", fontSize: "12px" }}>
             {otpError && "Please enter the 4-digit OTP code!"}
           </Typography>
 
@@ -1563,7 +1595,7 @@ const ArtistSignUp = () => {
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1573,7 +1605,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "5px",
@@ -1594,7 +1625,7 @@ const ArtistSignUp = () => {
           >
             <Stack
               spacing={2}
-              direction="row"
+              direction={matches ? "column" : "row"}
               sx={{
                 justifyContent: "center",
                 alignItems: "center",
@@ -1633,7 +1664,7 @@ const ArtistSignUp = () => {
             </Stack>
             <Stack
               spacing={1}
-              direction="row"
+              direction={matches ? "column" : "row"}
               sx={{
                 display: "flex",
                 justifyContent: "center",
@@ -1645,7 +1676,7 @@ const ArtistSignUp = () => {
                 fileTypes="Cover Photo"
                 fileExtensions="PNG,JPEG,WEBP"
                 isCircular={false}
-                width="32.5%"
+                width={matches ? "100%" : "32.5%"}
                 height="170px"
                 file={coverPhoto1}
                 setFile={setCoverPhoto1}
@@ -1657,7 +1688,7 @@ const ArtistSignUp = () => {
                 fileTypes="Cover Photo"
                 fileExtensions="PNG,JPEG,WEBP"
                 isCircular={false}
-                width="32.5%"
+                width={matches ? "100%" : "32.5%"}
                 height="170px"
                 file={coverPhoto2}
                 setFile={setCoverPhoto2}
@@ -1669,7 +1700,7 @@ const ArtistSignUp = () => {
                 fileTypes="Cover Photo"
                 fileExtensions="PNG,JPEG,WEBP"
                 isCircular={false}
-                width="32.5%"
+                width={matches ? "100%" : "32.5%"}
                 height="170px"
                 file={coverPhoto3}
                 setFile={setCoverPhoto3}
@@ -1680,10 +1711,10 @@ const ArtistSignUp = () => {
             </Stack>
           </Box>
 
-          <Typography color="error" sx={{ marginTop: "1em" }}>
+          <Typography sx={{ marginTop: "1em", color: "red", fontSize: "12px" }}>
             {bioError && "Artists bio is required!"}
           </Typography>
-          <Typography color="error">
+          <Typography sx={{ marginTop: "8px", color: "red", fontSize: "12px" }}>
             {profilePicError && "Please upload a profile picture!"}
           </Typography>
 
@@ -1734,7 +1765,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1748,7 +1778,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1759,7 +1788,7 @@ const ArtistSignUp = () => {
 
           <AuthSocialInputBox sx={{ marginTop: "30px" }}>
             <AuthSocialIcon>
-              <FacebookIcon sx={{ color: "#fff" }} />
+              <FacebookIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="fb-url"
@@ -1771,7 +1800,7 @@ const ArtistSignUp = () => {
 
           <AuthSocialInputBox>
             <AuthSocialIcon>
-              <InstagramIcon sx={{ color: "#fff" }} />
+              <InstagramIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="insta-url"
@@ -1783,7 +1812,7 @@ const ArtistSignUp = () => {
 
           <AuthSocialInputBox>
             <AuthSocialIcon>
-              <XIcon sx={{ color: "#fff" }} />
+              <XIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="twitter-url"
@@ -1795,7 +1824,7 @@ const ArtistSignUp = () => {
 
           <AuthSocialInputBox sx={{ marginBottom: "30px" }}>
             <AuthSocialIcon>
-              <PublicIcon sx={{ color: "#fff" }} />
+              <PublicIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="website-url"
@@ -1866,7 +1895,6 @@ const ArtistSignUp = () => {
           <Typography
             variant="h5"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1880,7 +1908,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -2037,13 +2064,9 @@ const ArtistSignUp = () => {
               width: "70%",
             }}
           >
-            <GiPartyPopper
-              style={{
-                fontSize: "100px",
-                color: "#6366F1",
-                marginRight: "30px",
-              }}
-            />
+            <Box sx={{ mr: "8px" }}>
+              <img width="180px" src="/imgs/happy.png" alt="happy" />
+            </Box>
             <Stack
               sx={{
                 display: "flex",
@@ -2051,13 +2074,10 @@ const ArtistSignUp = () => {
                 alignItems: "flex-start",
               }}
             >
-              <Typography
-                variant="h4"
-                sx={{ color: "#fff", fontWeight: "600" }}
-              >
+              <Typography variant="h4" sx={{ fontWeight: "600" }}>
                 Congratulations!
               </Typography>
-              <Typography variant="h6" sx={{ color: "#fff" }}>
+              <Typography variant="h6">
                 Now You Can Enjoy Our Exclusive Artist Services
               </Typography>
               <Button
