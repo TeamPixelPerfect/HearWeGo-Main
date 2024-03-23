@@ -92,12 +92,12 @@ export default function PersistentDrawerLeft({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => router.push("/login")}>
+            <ListItemButton onClick={() => router.push("/auth/signIn")}>
               <ListItemText primary="Login" />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => router.push("/register")}>
+            <ListItemButton onClick={() => router.push("/auth/signUp")}>
               <ListItemText primary="Register" />
             </ListItemButton>
           </ListItem>

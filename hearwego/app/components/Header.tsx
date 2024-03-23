@@ -132,7 +132,7 @@ const Header = ({ app }: Props) => {
     <HeaderContainer pathName={pathName}>
       <Box>
         {!matches ? (
-          <PersistentDrawerLeft
+          <PersistentDrawerLeft 
             open={open}
             setOpen={setOpen}
             menuItems={app.site_main_menu}

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import react, { useContext } from "react";
+import react, { useContext, useState } from "react";
 import {
   HeaderBox,
   SearchArea,
@@ -27,6 +27,7 @@ import { ColorModeContext } from "../styles/CustomeTheme";
 import { FaBars } from "react-icons/fa";
 import { useMediaQuery } from "@mui/material";
 import { useAppSelector } from "@/lib/hooks";
+import ADPersistentDrawerLeft from "./ADMobileDrawer";
 
 const ArtistDashboardHeader = () => {
   const theme = useTheme();
@@ -35,16 +36,25 @@ const ArtistDashboardHeader = () => {
   const artist = useAppSelector((state) => state.artist.user);
 
   const matches = useMediaQuery("(max-width:960px)");
+  const [open, setOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
   return (
     <HeaderBox>
+      {matches ? (
+        <ADPersistentDrawerLeft open={open} setOpen={setOpen} />
+      ) : null}
+
       {matches ? (
         <HitPredictorIco>
           <Box sx={{ "& > :not(style)": { m: 1 } }}>
             <HitPredictorBtn
               color="primary"
               aria-label="add"
-              onClick={() => console.log("clicked")}
+              onClick={handleDrawerOpen}
             >
               <FaBars />
             </HitPredictorBtn>
@@ -104,12 +114,12 @@ const ArtistDashboardHeader = () => {
 
       <ProfileArea>
         <ProfileDetailArea elevation={0}>
-          <Avatar
-            src={artist?.user.profilePicture}
-          />
+          <Avatar src={artist?.user.profilePicture} />
           <ArtistDetail>
             <ArtistName>{artist?.user.artistName}</ArtistName>
-            <ArtistGenre>{artist?.user.musicGenres[0]} | {artist?.user.artistType}</ArtistGenre>
+            <ArtistGenre>
+              {artist?.user.musicGenres[0]} | {artist?.user.artistType}
+            </ArtistGenre>
           </ArtistDetail>
         </ProfileDetailArea>
       </ProfileArea>

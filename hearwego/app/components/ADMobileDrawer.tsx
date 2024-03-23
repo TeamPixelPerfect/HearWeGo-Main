@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useContext } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -21,6 +22,12 @@ import MailIcon from "@mui/icons-material/Mail";
 import { menuItem } from "../constants/models";
 import { useRouter } from "next/navigation";
 import CellTowerIcon from "@mui/icons-material/CellTower";
+import { sideMenuOpts } from "../constants/lists";
+import { useMediaQuery } from "@mui/material";
+import { ColorModeContext } from "../styles/CustomeTheme";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import Logo from "./Logo";
 
 const drawerWidth = 240;
 
@@ -36,16 +43,14 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 interface Props {
   open: boolean;
   setOpen: (open: boolean) => void;
-  menuItems: menuItem[];
 }
 
-export default function PersistentDrawerLeft({
-  open,
-  setOpen,
-  menuItems,
-}: Props) {
+export default function ADPersistentDrawerLeft({ open, setOpen }: Props) {
   const theme = useTheme();
   const router = useRouter();
+
+  const colorMode = useContext(ColorModeContext);
+  const matches = useMediaQuery("(max-width:960px)");
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -59,10 +64,10 @@ export default function PersistentDrawerLeft({
     <Box sx={{ display: "flex" }}>
       <Drawer
         sx={{
-          width: drawerWidth,
+          width: 0,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
+            width: matches ? drawerWidth : 0,
             boxSizing: "border-box",
           },
         }}
@@ -71,6 +76,17 @@ export default function PersistentDrawerLeft({
         open={open}
       >
         <DrawerHeader>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              p: "2em 0"
+            }}
+          >
+            <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
+          </Box>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "ltr" ? (
               <ChevronLeftIcon />
@@ -81,26 +97,22 @@ export default function PersistentDrawerLeft({
         </DrawerHeader>
         <Divider />
         <List>
-          {menuItems?.map((item, index) => (
-            <ListItem key={item._id} disablePadding>
-              <ListItemButton onClick={() => router.push(item.url)}>
-                <ListItemText primary={item.name} />
-              </ListItemButton>
-            </ListItem>
+          {sideMenuOpts?.map((item, index) => (
+            <>
+              {item.items.map((_item) => {
+                return (
+                  <ListItem key={item.groupLabel} disablePadding>
+                    <ListItemButton onClick={() => router.push(_item.link)}>
+                      <ListItemIcon>
+                        <_item.icon />
+                      </ListItemIcon>
+                      <ListItemText primary={_item.label} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
+            </>
           ))}
-        </List>
-        <Divider />
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => router.push("/login")}>
-              <ListItemText primary="Login" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => router.push("/register")}>
-              <ListItemText primary="Register" />
-            </ListItemButton>
-          </ListItem>
         </List>
         <Divider />
         <List>
@@ -110,6 +122,20 @@ export default function PersistentDrawerLeft({
                 <CellTowerIcon />
               </ListItemIcon>
               <ListItemText primary="Hit Predictor" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={colorMode.toggleColorMode}>
+              <ListItemIcon>
+                {theme.palette.mode === "dark" ? (
+                  <Brightness7Icon />
+                ) : (
+                  <Brightness4Icon />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary={theme.palette.mode === "dark" ? "Light" : "Dark"}
+              />
             </ListItemButton>
           </ListItem>
         </List>

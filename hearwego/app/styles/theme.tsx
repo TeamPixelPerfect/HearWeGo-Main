@@ -32,32 +32,6 @@ const getDesignTokens = (mode: PaletteMode) => ({
   },
 });
 
-// export const getDesignTokens = (mode: PaletteMode) => ({
-//     palette: {
-//       mode,
-//       ...(mode === 'light'
-//         ? {
-//             // palette values for light mode
-//             primary: '#7e22ce',
-//             text: {
-//               primary: '#787878',
-//               secondary: '#4B4B4B',
-//             },
-//           }
-//         : {
-//             // palette values for dark mode
-//             primary: '#7e22ce',
-//             background: {
-//               default: '#171616',
-//             },
-//             text: {
-//               primary: '#fff',
-//               secondary: '#787878',
-//             },
-//           }),
-//     },
-// });
-
 export const hearWeGoTheme = createTheme({
   palette: {
     mode: "light",
@@ -92,7 +66,7 @@ export const hearWeGoDarkTheme = createTheme({
     },
     background: {
       default: "#0F172A",
-      paper: "0F172A",
+      paper: "#0F172A",
     },
     text: {
       primary: "#fff",
