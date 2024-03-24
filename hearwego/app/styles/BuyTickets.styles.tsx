@@ -584,6 +584,13 @@ export const TicketCover: React.FC<TicketCoverProps> = ({
 };
 
 export function FillDetails() {
+  const [firstNameError, setFirstNameError] = useState(false);
+  const [lastNameError, setLastNameError] = useState(false);
+  const [nicError, setNicError] = useState(false);
+  const [contactError, setContactError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [termsError, setTermsError] = useState(false);
+
   return (
     <Box
       sx={{
@@ -600,12 +607,15 @@ export function FillDetails() {
         <Box sx={{ display: "flex", flexDirection: "column", width: "35%" }}>
           <Typography>First Name</Typography>
           <TextField
+            id="firstName"
+            error={firstNameError}
             style={{
               width: "100%",
               boxSizing: "initial",
             }}
             placeholder="Enter your first name (Ex: Kamal)"
             variant="filled"
+            helperText={firstNameError ? "First Name is required" : ""}
           />
         </Box>
         <Box
@@ -618,7 +628,7 @@ export function FillDetails() {
         >
           <Typography>Last Name</Typography>
           <TextField
-            id="filled-textarea"
+            id="lastName"
             style={{
               width: "100%",
               marginBottom: "20px",
@@ -633,7 +643,7 @@ export function FillDetails() {
       <Box sx={{ display: "flex", flexDirection: "column", width: "35%" }}>
         <Typography>NIC/Passport</Typography>
         <TextField
-          id="filled-textarea"
+          id="Nic"
           style={{
             width: "100%",
             marginBottom: "20px",
@@ -648,7 +658,7 @@ export function FillDetails() {
         <Stack direction="row" spacing={12}>
           <Box sx={{ width: "20%" }}>
             <Autocomplete
-              id="country-select-demo"
+              id="countrySelect"
               sx={{}}
               options={countries}
               autoHighlight
@@ -680,7 +690,7 @@ export function FillDetails() {
             />
           </Box>
           <TextField
-            id="filled-textarea"
+            id="contactNumber"
             style={{
               width: "100%",
               marginBottom: "20px",
@@ -694,7 +704,7 @@ export function FillDetails() {
       <Box>
         <Typography>Email</Typography>
         <TextField
-          id="filled-textarea"
+          id="email"
           style={{
             width: "35%",
             marginBottom: "20px",
@@ -705,6 +715,7 @@ export function FillDetails() {
         />
       </Box>
       <FormControlLabel
+        id="terms"
         control={<Checkbox />}
         label="Agree with the terms & conditions"
       />
@@ -930,7 +941,13 @@ export const SuccessfulDetails: React.FC = () => {
           padding: "30px 30px 20px 30px",
         }}
       >
-        <Box sx={{display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography variant="h4" gutterBottom>
             Your Tickets
           </Typography>
@@ -940,9 +957,8 @@ export const SuccessfulDetails: React.FC = () => {
               height: "5%",
               color: "white",
               fontSize: "20px",
-              fontWeight: "bold",           
+              fontWeight: "bold",
               borderRadius: "5px",
-             
             }}
             variant="contained"
             size="small"
@@ -1282,12 +1298,8 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   justifyContent: "left",
-                  //backgroundColor: "red",
-                  //margin: "10px 0px 0px 10px",
                   fontSize: "20px",
-                  // fontWeight: "bold",
                   color: "white",
-                  // padding: "0px 0px 0px 20px",
                   flexDirection: "column",
                 }}
               >
@@ -1296,11 +1308,7 @@ const SuccessfullPDF: React.FC = () => {
                   sx={{
                     width: "50%",
                     height: "100%",
-                    //backgroundColor: "yellow",
-                    //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    //justifyContent: "right",
-                    //padding: "10px",
                     fontSize: "12px",
                     padding: "0px 0px 0px 0px",
                   }}
@@ -1313,13 +1321,9 @@ const SuccessfullPDF: React.FC = () => {
                 sx={{
                   width: "50%",
                   height: "100%",
-                  // backgroundColor: "yellow",
-                  //margin: "10px 0px 0px 10px",
                   display: "flex",
                   justifyContent: "right",
-                  //padding: "10px",
                   fontSize: "16px",
-                  //padding: "0px 0px 0px 40px",
                 }}
               >
                 LKR 2500.00
@@ -1328,12 +1332,9 @@ const SuccessfullPDF: React.FC = () => {
             <Box
               sx={{
                 width: "100%",
-                // height: "100%",
                 display: "flex",
                 flexDirection: "row",
-                //backgroundColor: "green",
                 padding: "5px",
-                // margin: "10px",
               }}
             >
               <Box
@@ -1342,12 +1343,8 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   justifyContent: "left",
-                  //backgroundColor: "red",
-                  //margin: "10px 0px 0px 10px",
                   fontSize: "20px",
-                  // fontWeight: "bold",
                   color: "white",
-                  // padding: "0px 0px 0px 20px",
                   flexDirection: "column",
                 }}
               >
@@ -1356,11 +1353,7 @@ const SuccessfullPDF: React.FC = () => {
                   sx={{
                     width: "50%",
                     height: "100%",
-                    //backgroundColor: "yellow",
-                    //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    //justifyContent: "right",
-                    //padding: "10px",
                     fontSize: "12px",
                     padding: "0px 0px 0px 0px",
                   }}
@@ -1373,13 +1366,9 @@ const SuccessfullPDF: React.FC = () => {
                 sx={{
                   width: "50%",
                   height: "100%",
-                  // backgroundColor: "yellow",
-                  //margin: "10px 0px 0px 10px",
                   display: "flex",
                   justifyContent: "right",
-                  //padding: "10px",
                   fontSize: "16px",
-                  //padding: "0px 0px 0px 40px",
                 }}
               >
                 LKR 2000.00
@@ -1388,12 +1377,9 @@ const SuccessfullPDF: React.FC = () => {
             <Box
               sx={{
                 width: "100%",
-                // height: "100%",
                 display: "flex",
                 flexDirection: "row",
-                // backgroundColor: "green",
                 padding: "5px",
-                // margin: "10px",
               }}
             >
               <Box
@@ -1402,12 +1388,8 @@ const SuccessfullPDF: React.FC = () => {
                   height: "100%",
                   display: "flex",
                   justifyContent: "left",
-                  //backgroundColor: "red",
-                  //margin: "10px 0px 0px 10px",
                   fontSize: "20px",
-                  // fontWeight: "bold",
                   color: "white",
-                  // padding: "0px 0px 0px 20px",
                   flexDirection: "column",
                 }}
               >
@@ -1416,11 +1398,7 @@ const SuccessfullPDF: React.FC = () => {
                   sx={{
                     width: "50%",
                     height: "100%",
-                    //backgroundColor: "yellow",
-                    //margin: "10px 0px 0px 10px",
                     display: "flex",
-                    //justifyContent: "right",
-                    //padding: "10px",
                     fontSize: "12px",
                     padding: "0px 0px 0px 0px",
                   }}
@@ -1433,13 +1411,9 @@ const SuccessfullPDF: React.FC = () => {
                 sx={{
                   width: "50%",
                   height: "100%",
-                  //backgroundColor: "yellow",
-                  //margin: "10px 0px 0px 10px",
                   display: "flex",
                   justifyContent: "right",
-                  //padding: "10px",
                   fontSize: "16px",
-                  //padding: "0px 0px 0px 40px",
                 }}
               >
                 LKR 1000.00
@@ -1449,33 +1423,28 @@ const SuccessfullPDF: React.FC = () => {
         </Box>
       </Box>
 
-  <Box sx={{
-  //   width:'20%',
-  //    margin:'20px',
-  //  height:'20%',
-    
-  }}>
-      <Button sx={{
-        width:'15%',
-        height:'5%',
-        //backgroundColor:'#A5B4FC',
-        color:'white',
-        fontSize:'20px',
-        fontWeight:'bold',
-        padding:'10px',
-        borderRadius:'5px',
-        margin:'60px',
-      
-      }}
-        //href="/main/events/MoreInterestEvents"
-        variant="contained"
-        size="small"
-      >
-        PDF 
-        <FaFilePdf style={{
-          margin:'10px',
-        }}></FaFilePdf>
-      </Button>
+      <Box sx={{}}>
+        <Button
+          sx={{
+            width: "15%",
+            height: "5%",
+            color: "white",
+            fontSize: "20px",
+            fontWeight: "bold",
+            padding: "10px",
+            borderRadius: "5px",
+            margin: "60px",
+          }}
+          variant="contained"
+          size="small"
+        >
+          PDF
+          <FaFilePdf
+            style={{
+              margin: "10px",
+            }}
+          ></FaFilePdf>
+        </Button>
       </Box>
     </Box>
   );
