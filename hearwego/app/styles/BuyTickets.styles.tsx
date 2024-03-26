@@ -11,7 +11,7 @@ import { url } from "inspector";
 import CardActions from "@mui/material";
 import { FaFilePdf } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+import "react-phone-input-2/lib/bootstrap.css";
 
 interface RenderedTicketprops {
   Event_img: string;
@@ -186,7 +186,11 @@ export function FillDetails(this: any) {
           <Typography>First Name</Typography>
           <TextField
             id="firstName"
-            error={firstNameError}
+            error={
+              typeof firstNameError === "string" && firstNameError.length > 0
+                ? true
+                : false
+            }
             style={{
               width: "100%",
               boxSizing: "initial",
@@ -234,17 +238,7 @@ export function FillDetails(this: any) {
       <Box sx={{ display: "flex", flexDirection: "column", width: "30%" }}>
         <Typography>Contact Number</Typography>
         <Stack direction="row" spacing={12}>
-          <PhoneInput country={"us"} />
-          {/* <TextField
-            id="contactNumber"
-            style={{
-              width: "100%",
-              marginBottom: "20px",
-              boxSizing: "initial",
-            }}
-            placeholder="Enter your contact number"
-            variant="filled"
-          /> */}
+          <PhoneInput country={""} />
         </Stack>
       </Box>
       <Box>
