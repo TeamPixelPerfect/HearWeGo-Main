@@ -6,11 +6,12 @@ interface Props {
   albumName: string;
   albumImg: string;
   year: string;
+  album_id: string;
 }
 
-export default function SingleAlbum({ albumName, year, albumImg }: Props) {
+export default function SingleAlbum({ albumName, year, albumImg, album_id }: Props) {
   return (
-    <Link href="/main/artists/SingleArtistPage/SingleAlbum">
+    <Link href={"/main/artists/Albums/" + album_id}>
     <Box
 
       sx={{

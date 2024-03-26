@@ -56,7 +56,11 @@ import {
   isNumeric,
 } from "@/app/constants/functions";
 import Logo from "@/app/components/Logo";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { getArtist, updateArtist } from "@/app/services/ArtistServices";
+import { logInArtist } from "@/lib/features/artist.slice";
+import { handleArtistLogin } from "@/app/services/AuthServices";
+import { current } from "@reduxjs/toolkit";
 
 interface Props {
   params: { id: string };
@@ -68,6 +72,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
 
   const matches = useMediaQuery("(max-width:960px)");
   const artist = useAppSelector((state) => state.artist.user);
+
+  const dispatch = useAppDispatch();
 
   // Sign up stage
   const [step, setStep] = useState<number>(0);
@@ -120,21 +126,25 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     musicGenres: [""],
     artistProfession: [""],
     mobileNumber: "",
-    country: "",
+    gender: "",
+    country: "LK",
     birthDate: "",
     verificationDocuments: [""],
-    artistCovers: [""],
-    artistBio: "",
     email: "",
     password: "",
     confirmPassword: "",
+    mobileVerified: false,
+  });
+
+  // Artist Profile Customization Details
+  const [artistCustomization, setArtistCustomization] = useState({
+    artistBio: "",
     profilePicture: "",
-    socialMediaLinks: {
-      facebook: "",
-      twitter: "",
-      instagram: "",
-    },
-    webUrl: "",
+    artistCovers: ["", "", ""],
+  });
+
+  // Artist Bank Details
+  const [artistBankDetails, setArtistBankDetails] = useState({
     bankDetails: {
       accountName: "",
       accountNumber: "",
@@ -142,7 +152,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
       bankBranch: "",
       country: "",
     },
-    mobileVerified: false,
+  });
+
+  // Artist Social Media Details
+  const [artistSocialMediaDetails, setArtistSocialMediaDetails] = useState({
+    socialMediaLinks: {
+      facebook: "",
+      twitter: "",
+      instagram: "",
+    },
+    webUrl: "",
   });
 
   // Error Handling for Inputs
@@ -160,7 +179,10 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     useState(false);
   const [otpError, setOtpError] = useState(false);
   const [bioError, setBioError] = useState(false);
+  const [coverPhotoError, setCoverPhotoError] = useState(false);
   const [profilePicError, setProfilePicError] = useState(false);
+
+  const [uploading, setUploading] = useState(false);
 
   // Increment Sign up stage (Next button)
   const incrementStep = (step: number) => {
@@ -334,13 +356,17 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     }
     setArtistDetails({ ...artistDetails, mobileVerified: true });
     setOtpError(false);
+
     incrementStep(1);
   };
 
   const handleCustomizeStage = () => {
-    const errors = [false, false];
+    setBioError(false);
+    setProfilePicError(false);
+    setCoverPhotoError(false);
+    const errors = [false, false, false];
 
-    if (artistDetails.artistBio === "") {
+    if (artistCustomization.artistBio === "") {
       setBioError(true);
       errors[0] = true;
     }
@@ -348,18 +374,54 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
       setProfilePicError(true);
       errors[1] = true;
     }
-
-    setArtistDetails({
-      ...artistDetails,
-      artistBio: artistDetails.profilePicture,
-    });
+    if (!coverPhoto1) {
+      setCoverPhotoError(true);
+      errors[2] = true;
+    }
 
     if (errors.includes(true)) return;
 
+    setArtistCustomization({
+      ...artistCustomization,
+      profilePicture: profilePicture,
+      artistCovers: [coverPhoto1, coverPhoto2, coverPhoto3],
+    });
+
     setBioError(false);
     setProfilePicError(false);
+    setCoverPhotoError(false);
 
-    incrementStep(1);
+    setUploading(true);
+    console.log("Artist:::", artist.user._id);
+    updateArtist(artist?.token, artist?.user._id, {
+      ...artistCustomization,
+      profilePicture: profilePicture,
+      artistCovers: [coverPhoto1, coverPhoto2, coverPhoto3],
+    }).then((res) => {
+      if (res) {
+        const newData = { user: res, token: artist?.token };
+        dispatch(logInArtist(newData));
+        sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
+        incrementStep(1);
+      }
+      setUploading(false);
+    });
+  };
+
+  // handle social details stage
+  const handleSocialDetailsStage = () => {
+    updateArtist(
+      artist?.token,
+      artist?.user._id,
+      artistSocialMediaDetails
+    ).then((res) => {
+      if (res) {
+        const newData = { user: res.user, token: artist?.token };
+        dispatch(logInArtist(newData));
+        sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
+        incrementStep(1);
+      }
+    });
   };
 
   // handle add other alias
@@ -434,20 +496,25 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     if (isNumeric(id)) {
       setStep(parseInt(id));
     }
+
+    const _artist = sessionStorage.getItem("hwg-artist");
+    if (_artist) {
+      const currentUser = JSON.parse(_artist);
+      console.log("Current User:::", currentUser.user);
+      getArtist(currentUser.user._id).then((res) => {
+        if (res) {
+          const newData = { user: res.user, token: currentUser.token };
+          dispatch(logInArtist(newData));
+          sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
+          console.log("Successful");
+        }
+      });
+    }
+    console.log("Artist:::", artist);
   }, []);
 
   return (
     <AuthContainer>
-      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
-        <CloseIcon
-          sx={{
-            color: "rgba(255,255,255,0.4)",
-            fontSize: "2rem",
-            cursor: "pointer",
-            alignSelf: "flex-end",
-          }}
-        />
-      </Stack> */}
       <Box
         sx={{
           width: "100%",
@@ -461,6 +528,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
           transition: "transform 0.5s ease-in-out",
         }}
       >
+        {/* Welcome Screen */}
         <Box
           id="as-step-1"
           sx={{
@@ -514,6 +582,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Link>
           </Typography>
         </Box>
+
+        {/* Artist Name */}
         <Box
           id="as-step-2"
           sx={{
@@ -609,6 +679,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Type */}
         <Box
           id="as-step-3"
           sx={{
@@ -767,6 +839,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Genre */}
         <Box
           id="as-step-4"
           sx={{
@@ -864,6 +938,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Profession */}
         <Box
           id="as-step-5"
           sx={{
@@ -1064,6 +1140,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Details */}
         <Box
           id="as-step-6"
           sx={{
@@ -1249,6 +1327,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Identity Verification */}
         <Box
           id="as-step-7"
           sx={{
@@ -1335,6 +1415,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Request Pending */}
         <Box
           id="as-step-8"
           sx={{
@@ -1431,6 +1513,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Request Appproved */}
         <Box
           id="as-step-9"
           sx={{
@@ -1525,6 +1609,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Mobile Number Verification */}
         <Box
           id="as-step-10"
           sx={{
@@ -1608,6 +1694,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Customize Profile */}
         <Box
           id="as-step-11"
           sx={{
@@ -1659,8 +1747,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 rows={6}
                 style={{ boxSizing: "initial" }}
                 onChange={(e) => {
-                  setArtistDetails({
-                    ...artistDetails,
+                  setArtistCustomization({
+                    ...artistCustomization,
                     artistBio: e.target.value,
                   });
                 }}
@@ -1735,6 +1823,9 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
           <Typography sx={{ marginTop: "8px", color: "red", fontSize: "12px" }}>
             {profilePicError && "Please upload a profile picture!"}
           </Typography>
+          <Typography sx={{ marginTop: "8px", color: "red", fontSize: "12px" }}>
+            {coverPhotoError && "Please upload at least one cover photo!"}
+          </Typography>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
@@ -1768,6 +1859,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Social Media Details */}
         <Box
           id="as-step-12"
           sx={{
@@ -1813,6 +1906,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               label="Facebook Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.socialMediaLinks.facebook}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  socialMediaLinks: {
+                    ...artistSocialMediaDetails.socialMediaLinks,
+                    facebook: e.target.value,
+                  },
+                });
+              }}
             />
           </AuthSocialInputBox>
 
@@ -1825,6 +1928,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               label="Instagram Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.socialMediaLinks.instagram}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  socialMediaLinks: {
+                    ...artistSocialMediaDetails.socialMediaLinks,
+                    instagram: e.target.value,
+                  },
+                });
+              }}
             />
           </AuthSocialInputBox>
 
@@ -1837,6 +1950,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               label="X(Twitter) Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.socialMediaLinks.twitter}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  socialMediaLinks: {
+                    ...artistSocialMediaDetails.socialMediaLinks,
+                    twitter: e.target.value,
+                  },
+                });
+              }}
             />
           </AuthSocialInputBox>
 
@@ -1849,6 +1972,13 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               label="Website URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.webUrl}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  webUrl: e.target.value,
+                });
+              }}
             />
           </AuthSocialInputBox>
 
@@ -1892,12 +2022,14 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleSocialDetailsStage}
             >
               Next
             </Button>
           </Stack>
         </Box>
+
+        {/* Payment Details */}
         <Box
           id="as-step-13"
           sx={{
@@ -1939,6 +2071,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             label="Bank Account Name"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.accountName}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  accountName: e.target.value,
+                },
+              });
+            }}
           />
 
           <AuthTextField
@@ -1946,6 +2088,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             label="Bank Account Number"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.accountNumber}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  accountNumber: e.target.value,
+                },
+              });
+            }}
           />
 
           <AuthTextField
@@ -1953,6 +2105,16 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             label="Bank"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.bankName}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  bankName: e.target.value,
+                },
+              });
+            }}
           />
 
           <AuthTextField
@@ -1960,29 +2122,37 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             label="Bank Branch"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.bankBranch}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  bankBranch: e.target.value,
+                },
+              });
+            }}
           />
 
           <FormControl
             sx={{ m: 1, minWidth: 80, marginBottom: "30px", width: "40%" }}
           >
             <InputLabel id="demo-simple-select-autowidth-label">
-              <ReactCountryFlag
-                countryCode={selectedCountry}
-                svg
-                style={{
-                  width: "1.5em",
-                  height: "1.5em",
-                  marginRight: "8px",
-                }}
-                title={selectedCountry}
-              />
-              {selectedCountry}
+              Country
             </InputLabel>
             <Select
               labelId="demo-simple-select-autowidth-label"
               id="country"
-              value={artistDetails.country}
-              onChange={handleCountryChange}
+              value={artistBankDetails.bankDetails.country}
+              onChange={(e) => {
+                setArtistBankDetails({
+                  ...artistBankDetails,
+                  bankDetails: {
+                    ...artistBankDetails.bankDetails,
+                    country: e.target.value,
+                  },
+                });
+              }}
               // autoWidth
               label="Country"
               sx={{
@@ -2061,6 +2231,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             </Button>
           </Stack>
         </Box>
+
         <Box
           id="as-step-14"
           sx={{

@@ -34,6 +34,7 @@ interface ArtistCardProps {
   name: string;
   Genre: string;
   img_url: string;
+  id?: string;
 }
 
 interface tableRow {
@@ -118,7 +119,8 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
 export const ArtistCard: React.FC<ArtistCardProps> = ({
   name,
   Genre,
-  img_url,
+  img_url, 
+  id
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   return (
@@ -137,7 +139,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
       onMouseEnter={() => setIsHovered(true)} // Set isHovered to true when mouse enters
       onMouseLeave={() => setIsHovered(false)} // Set isHovered to false when mouse leaves
     >
-      <Link href="/main/artists/SingleArtistPage">
+      <Link href={"/main/artists/" + id}>
         <CardActionArea
           style={{
             backgroundImage: `url(${img_url})`,

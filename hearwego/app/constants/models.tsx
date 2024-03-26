@@ -68,6 +68,7 @@ export interface BankDetails {
 
 export interface Artist {
   user: {
+    _id?: string;
     artist_id?: string;
     email: String;
     password: String;

@@ -188,12 +188,14 @@ export default function Artist() {
           name="Michale Jackson"
           Genre="Pop"
           img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+          id="ar1"
         />
 
         <ArtistCard
           name="Freddie Mercury"
           Genre="Rock"
           img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
+          id="ar2"
         />
 
         <ArtistCard
@@ -373,12 +375,14 @@ export default function Artist() {
           name="Michale Jackson"
           Genre="Pop"
           img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+          id="ar1"
         />
 
         <ArtistCard
           name="Freddie Mercury"
           Genre="Rock"
           img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
+          id="ar2"
         />
 
         <ArtistCard

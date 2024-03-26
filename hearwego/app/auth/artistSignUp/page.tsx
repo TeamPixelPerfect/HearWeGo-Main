@@ -135,12 +135,14 @@ const ArtistSignUp = () => {
     mobileVerified: false,
   });
 
+  // Artist Profile Customization Details
   const [artistCustomization, setArtistCustomization] = useState({
     artistBio: "",
     profilePicture: "",
     artistCovers: ["", "", ""],
   });
 
+  // Artist Bank Details
   const [artistBankDetails, setArtistBankDetails] = useState({
     bankDetails: {
       accountName: "",
@@ -151,6 +153,7 @@ const ArtistSignUp = () => {
     },
   });
 
+  // Artist Social Media Details
   const [artistSocialMediaDetails, setArtistSocialMediaDetails] = useState({
     socialMediaLinks: {
       facebook: "",
@@ -500,16 +503,6 @@ const ArtistSignUp = () => {
 
   return (
     <AuthContainer>
-      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
-        <CloseIcon
-          sx={{
-            color: "rgba(255,255,255,0.4)",
-            fontSize: "2rem",
-            cursor: "pointer",
-            alignSelf: "flex-end",
-          }}
-        />
-      </Stack> */}
       <Box
         sx={{
           width: "100%",
