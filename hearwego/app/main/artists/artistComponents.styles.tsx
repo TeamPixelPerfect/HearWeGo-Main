@@ -31,9 +31,9 @@ interface CustomSelectProps {
 }
 
 interface ArtistCardProps {
-  name: string;
-  Genre: string;
-  img_url: string;
+  name: String;
+  Genre: String;
+  img_url: String;
   id?: string;
 }
 

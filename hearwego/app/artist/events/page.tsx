@@ -156,7 +156,6 @@ function EventTabs() {
   );
 }
 
-
 function EventArea() {
   const artist = useAppSelector((state) => state.artist.user);
 
