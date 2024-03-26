@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 
 export const EventMainBox = styled(Box)(({ theme }) => ({
     width: '100%',
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: "transparent",
     height: 'auto',
     borderRadius: 30, 
     // padding: '1em',

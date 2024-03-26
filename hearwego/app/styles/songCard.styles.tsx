@@ -8,7 +8,7 @@ export const SongCard = styled(Card)(({ theme }) => ({
   // justifyContent: "space-between",
   padding: "8px 16px",
   height: "80px",
-  marginBottom: "8px",
+  marginBottom: "12px",
 
   "& h6": {
     fontSize: "16px",

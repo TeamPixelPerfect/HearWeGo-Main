@@ -3,10 +3,11 @@ import { base_url } from "../constants/keys";
 export const getSongs = async (
   token: string,
   page?: number,
-  limit?: number
+  limit?: number,
+  sort?: string,
 ) => {
   const res = await fetch(
-    `${base_url}/DiscographyManager/songs?page=${page}&limit=${limit}`,
+    `${base_url}/DiscographyManager/songs?page=${page}&limit=${limit}&`,
     {
       method: "GET",
       headers: {
@@ -23,6 +24,7 @@ export const getSongs = async (
     throw new Error(error.message);
   }
 };
+
 
 export const getSongsForArtist = async (
   token: string,

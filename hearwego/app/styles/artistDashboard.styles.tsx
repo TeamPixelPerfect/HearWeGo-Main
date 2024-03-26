@@ -98,6 +98,7 @@ export const ADHomeCoverBox = styled(Box, {
 })<{imgUrl : string}>(({ theme, imgUrl }) => ({
   width: "100%",
   height: "100%",
+  maxWidth: "100%",
   background: `url(${imgUrl}) no-repeat`,
   backgroundPosition: "center",
   backgroundSize: "cover",
@@ -178,8 +179,8 @@ export const ADHomeSocialIcons = styled(Box)(({ theme }) => ({
 export const FeaturedSongCard = styled(Card)(({ theme }) => ({
   width: "100%",
   minHeight: "300px",
-  margin: "12px 0",
-  boxShadow: "0 2px 4px 0 rgba(138, 148, 159, 0.2)",
+  margin: "16px 0",
+  boxShadow: "3px 3px 8px rgba(0, 0, 0, 0.2)",
 
   "& h5": {
     fontSize: "20px",
@@ -193,8 +194,8 @@ export const FeaturedSongCard = styled(Card)(({ theme }) => ({
 export const FeaturedAlbumCard = styled(Card)(({ theme }) => ({
   width: "96%",
   minHeight: "300px",
-  margin: "12px auto",
-  boxShadow: "0 2px 4px 0 rgba(138, 148, 159, 0.2)",
+  margin: "16px auto",
+  boxShadow: "3px 3px 8px rgba(0, 0, 0, 0.2)",
 
   "& h5": {
     fontSize: "20px",

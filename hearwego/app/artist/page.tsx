@@ -9,7 +9,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ADArtistInfo,
   ADArtistPageUrl,
@@ -41,6 +41,12 @@ import { MdAlbum } from "react-icons/md";
 import { GiSoundWaves } from "react-icons/gi";
 import CustomTabPanel from "../components/CustomeTabPanel";
 import { useAppSelector } from "@/lib/hooks";
+import { Album, Song } from "../constants/models";
+import {
+  getAlbumForArtists,
+  getSongsForArtist,
+} from "../services/SongServices";
+import { Home } from "@mui/icons-material";
 
 interface HomeSongCardProps {
   songName: string;
@@ -81,11 +87,11 @@ const HomeSongCard = ({
         <Typography variant="body2">{duration}</Typography>
       </SongCardItem>
 
-     <Box sx={{width:"5%"}}>
-     <SongCardPlayButton onClick={toggle}>
-        {playing ? <IoIosPause /> : <IoIosPlay />}
-      </SongCardPlayButton>
-     </Box>
+      <Box sx={{ width: "5%" }}>
+        <SongCardPlayButton onClick={toggle}>
+          {playing ? <IoIosPause /> : <IoIosPlay />}
+        </SongCardPlayButton>
+      </Box>
     </SongCard>
   );
 };
@@ -122,16 +128,34 @@ const ADHomePage = () => {
 
   const [tabValue, setTabValue] = React.useState(0);
 
-  const artist = useAppSelector((state) => state.artist.user)
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [popularSongs, setPopularSongs] = useState<Song[]>();
+  const [recentSongs, setRecentSongs] = useState<Song[]>();
+  const [upcomingSongs, setUpcomingSongs] = useState<Song[]>();
+
+  const [albums, setAlbums] = useState<Album[]>();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
+  useEffect(() => {
+    getSongsForArtist(artist?.token, artist?.user.artist_id).then((songs) => {
+      console.log(songs);
+      setPopularSongs(songs.data);
+    });
+
+    getAlbumForArtists(artist?.token, artist?.user.artist_id).then((albums) => {
+      console.log(albums);
+      setAlbums(albums.data);
+    });
+  }, []);
+
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
       <Grid item xs={12} md={12} sx={{ height: "50vh", margin: "0" }}>
-        <ADHomeCoverBox imgUrl={coverPic}>
+        <ADHomeCoverBox imgUrl={artist?.user.artistCovers[0]}>
           <ADHomeNameArea>
             <Box sx={{ display: "flex", alignItems: "flex-end" }}>
               <ADHomeProfilePicture imgUrl={artist?.user.profilePicture} />
@@ -186,40 +210,55 @@ const ADHomePage = () => {
             </Tabs>
           </ADHomeTabBox>
           <CustomTabPanel value={tabValue} index={0} fullWidth={false}>
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
+            {popularSongs?.length > 0 ? (
+              popularSongs.map((song) => (
+                <HomeSongCard
+                  songName={song.song_title}
+                  albumName={song.album_title}
+                  duration={song.song_length}
+                  songUrl={song.song_track}
+                  coverArt={song.song_img}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No songs available yet!</em>
+              </Typography>
+            )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1} fullWidth={false}>
-            <Typography>Recent Songs</Typography>
+            {recentSongs?.length > 0 ? (
+              recentSongs.map((song) => (
+                <HomeSongCard
+                  songName={song.song_title}
+                  albumName={song.album_title}
+                  duration={song.song_length}
+                  songUrl={song.song_track}
+                  coverArt={song.song_img}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No songs available yet!</em>
+              </Typography>
+            )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2} fullWidth={false}>
-            <Typography>Upcoming Songs</Typography>
+            {upcomingSongs?.length > 0 ? (
+              upcomingSongs.map((song) => (
+                <HomeSongCard
+                  songName={song.song_title}
+                  albumName={song.album_title}
+                  duration={song.song_length}
+                  songUrl={song.song_track}
+                  coverArt={song.song_img}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No songs available yet!</em>
+              </Typography>
+            )}
           </CustomTabPanel>
         </FeaturedSongCard>
       </Grid>
@@ -228,19 +267,22 @@ const ADHomePage = () => {
           <Typography variant="h5" sx={{ fontWeight: "600", mb: 2 }}>
             Featured Albums
           </Typography>
+
           <Box sx={{ m: 3 }}>
-            <HomeAlbumCard
-              albumCoverArt="https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg"
-              albumName="L.P."
-              albumTracks={15}
-              albumLength={67.15}
-            />
-            <HomeAlbumCard
-              albumCoverArt="https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg"
-              albumName="L.P."
-              albumTracks={15}
-              albumLength={67.15}
-            />
+            {albums?.length > 0 ? (
+              albums.map((album) => (
+                <HomeAlbumCard
+                  albumCoverArt={album.album_img}
+                  albumName={album.album_title}
+                  albumTracks={album.album_tracks}
+                  albumLength={album.album_length}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No albums available yet!</em>
+              </Typography>
+            )}
           </Box>
         </FeaturedAlbumCard>
       </Grid>
