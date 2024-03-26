@@ -188,7 +188,7 @@ export default function Artist() {
           name="Michale Jackson"
           Genre="Pop"
           img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-          id="ar1"
+          id="ar11"
         />
 
         <ArtistCard
