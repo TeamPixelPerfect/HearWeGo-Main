@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface menuItem {
   _id: string;
   name: string;
