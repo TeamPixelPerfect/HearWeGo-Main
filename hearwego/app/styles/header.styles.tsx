@@ -4,6 +4,9 @@ import { serviceItem } from "../constants/models";
 const tranparentPaths = [
   "/",
   "/auth/artistSignUp",
+  "/auth/artistSignUp/7",
+  "/auth/artistSignUp/8",
+  "/auth/artistSignUp/9",
   "/auth/artistSignIn",
   "/auth/signIn",
   "/auth/signUp",

@@ -11,6 +11,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { logInArtist } from "@/lib/features/artist.slice";
+import { handleArtistLogin } from "../services/AuthServices";
+import { getArtist } from "../services/ArtistServices";
 
 export default function Layout({
   children,
@@ -25,10 +27,26 @@ export default function Layout({
   useEffect(() => {
     if (!artist) {
       const _artist = sessionStorage.getItem("hwg-artist");
-      if (_artist)
-        dispatch(logInArtist(JSON.parse(_artist)));
+      if (_artist) {
+        const currentUser = JSON.parse(_artist);
+        getArtist(currentUser.user._id).then((res) => {
+          if (res) {
+            dispatch(logInArtist(res));
+            sessionStorage.setItem("hwg-artist", JSON.stringify(res));
+          }
+        });
+      }
       router.replace("/auth/artistSignUp");
     } else {
+      console.log("isAdminApproved:::", artist.user.isAdminApproved);
+      if (!artist.user.isAdminApproved) {
+        window.location.replace("/auth/artistSignUp/7");
+        return;
+      }
+      if (!artist.user.isMobileVerified) {
+        window.location.replace("/auth/artistSignUp/8");
+        return;
+      }
       let path = location.pathname.split("/");
       path.shift();
       path.shift();

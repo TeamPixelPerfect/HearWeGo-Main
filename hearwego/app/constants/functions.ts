@@ -17,3 +17,7 @@ export function countNonEmptyItems(arr: string[]): number {
   }
   return count;
 }
+
+export function isNumeric(str: string): boolean {
+  return !isNaN(parseFloat(str));
+}

@@ -19,10 +19,6 @@ import {
   InputAdornment,
   useTheme,
   useMediaQuery,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -61,12 +57,12 @@ import {
 } from "@/app/constants/functions";
 import Logo from "@/app/components/Logo";
 import { useAppSelector } from "@/lib/hooks";
-import ErrorIcon from "@mui/icons-material/Error";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/bootstrap.css";
-import { handleArtistRegister } from "@/app/services/AuthServices";
 
-const ArtistSignUp = () => {
+interface Props {
+  params: { id: string };
+}
+
+const ArtistSignUp = ({ params: { id } }: Props) => {
   const router = useRouter();
   const theme = useTheme();
 
@@ -124,24 +120,21 @@ const ArtistSignUp = () => {
     musicGenres: [""],
     artistProfession: [""],
     mobileNumber: "",
-    gender: "",
-    country: "LK",
+    country: "",
     birthDate: "",
     verificationDocuments: [""],
     artistCovers: [""],
+    artistBio: "",
     email: "",
     password: "",
     confirmPassword: "",
-    mobileVerified: false,
-  });
-
-  const [artistCustomization, setArtistCustomization] = useState({
-    artistBio: "",
     profilePicture: "",
-    artistCovers: ["", "", ""],
-  });
-
-  const [artistBankDetails, setArtistBankDetails] = useState({
+    socialMediaLinks: {
+      facebook: "",
+      twitter: "",
+      instagram: "",
+    },
+    webUrl: "",
     bankDetails: {
       accountName: "",
       accountNumber: "",
@@ -149,15 +142,7 @@ const ArtistSignUp = () => {
       bankBranch: "",
       country: "",
     },
-  });
-
-  const [artistSocialMediaDetails, setArtistSocialMediaDetails] = useState({
-    socialMediaLinks: {
-      facebook: "",
-      twitter: "",
-      instagram: "",
-    },
-    webUrl: "",
+    mobileVerified: false,
   });
 
   // Error Handling for Inputs
@@ -176,9 +161,6 @@ const ArtistSignUp = () => {
   const [otpError, setOtpError] = useState(false);
   const [bioError, setBioError] = useState(false);
   const [profilePicError, setProfilePicError] = useState(false);
-  const [coverPhotoError, setCoverPhotoError] = useState(false);
-  const [birthDateError, setBirthDateError] = useState(false);
-  const [genderError, setGenderError] = useState(false);
 
   // Increment Sign up stage (Next button)
   const incrementStep = (step: number) => {
@@ -331,31 +313,6 @@ const ArtistSignUp = () => {
     incrementStep(1);
   };
 
-  const handleStageSixPartTwo = () => {
-    const errors = [false, false, false];
-
-    if (artistDetails.birthDate === "") {
-      setBirthDateError(true);
-      errors[0] = true;
-    }
-
-    if (!selectedCountry) {
-      setCountryError(true);
-      errors[1] = true;
-    }
-
-    if (!artistDetails.gender) {
-      setGenderError(true);
-      errors[2] = true;
-    }
-
-    if (errors.includes(true)) return;
-
-    setArtistDetails({ ...artistDetails, country: selectedCountry });
-
-    incrementStep(1);
-  };
-
   const handleStageSeven = () => {
     if (!verDoc) {
       setVerificationDocumentError(true);
@@ -363,15 +320,7 @@ const ArtistSignUp = () => {
     }
     setArtistDetails({ ...artistDetails, verificationDocuments: verDoc });
     setVerificationDocumentError(false);
-
-    console.log("Artist Details:::", artistDetails);
-
-    handleArtistRegister(artistDetails).then((res) => {
-      if (res) {
-        console.log("Artist Registered Successfully! " + res);
-        incrementStep(1);
-      }
-    });
+    incrementStep(1);
   };
 
   const handleOtpStage = () => {
@@ -389,9 +338,9 @@ const ArtistSignUp = () => {
   };
 
   const handleCustomizeStage = () => {
-    const errors = [false, false, false];
+    const errors = [false, false];
 
-    if (artistCustomization.artistBio === "") {
+    if (artistDetails.artistBio === "") {
       setBioError(true);
       errors[0] = true;
     }
@@ -399,26 +348,16 @@ const ArtistSignUp = () => {
       setProfilePicError(true);
       errors[1] = true;
     }
-    if (!coverPhoto1 || !coverPhoto2 || !coverPhoto3) {
-      setCoverPhotoError(true);
-      errors[2] = true;
-    }
 
-    setArtistCustomization({
-      ...artistCustomization,
-      profilePicture: profilePicture,
-    });
-
-    setArtistCustomization({
-      ...artistCustomization,
-      artistCovers: [coverPhoto1, coverPhoto2, coverPhoto3],
+    setArtistDetails({
+      ...artistDetails,
+      artistBio: artistDetails.profilePicture,
     });
 
     if (errors.includes(true)) return;
 
     setBioError(false);
     setProfilePicError(false);
-    setCoverPhotoError(false);
 
     incrementStep(1);
   };
@@ -492,9 +431,8 @@ const ArtistSignUp = () => {
   };
 
   useEffect(() => {
-    const index = window.location.pathname.split("/")[-1];
-    if (isNumeric(index)) {
-      setStep(parseInt(index));
+    if (isNumeric(id)) {
+      setStep(parseInt(id));
     }
   }, []);
 
@@ -523,7 +461,6 @@ const ArtistSignUp = () => {
           transition: "transform 0.5s ease-in-out",
         }}
       >
-        {/* Welcome Screen */}
         <Box
           id="as-step-1"
           sx={{
@@ -577,8 +514,6 @@ const ArtistSignUp = () => {
             </Link>
           </Typography>
         </Box>
-
-        {/* Artist Name */}
         <Box
           id="as-step-2"
           sx={{
@@ -674,8 +609,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Artist Type */}
         <Box
           id="as-step-3"
           sx={{
@@ -834,8 +767,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Music Genre */}
         <Box
           id="as-step-4"
           sx={{
@@ -933,8 +864,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Artist Profession */}
         <Box
           id="as-step-5"
           sx={{
@@ -1135,8 +1064,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Artist Details */}
         <Box
           id="as-step-6"
           sx={{
@@ -1214,18 +1141,79 @@ const ArtistSignUp = () => {
           <Stack
             direction="row"
             sx={{
+              width: "40%",
               alignItems: "center",
               justifyContent: "center",
-              mt: "8px",
             }}
           >
-            <PhoneInput
-              enableSearch={true}
-              country={"lk"}
-              value={artistDetails?.mobileNumber}
-              onChange={(phone) => {
-                setArtistDetails({ ...artistDetails, mobileNumber: phone });
+            <FormControl sx={{ m: 1, minWidth: 80 }}>
+              <InputLabel id="demo-simple-select-autowidth-label">
+                <ReactCountryFlag
+                  countryCode={selectedCountry}
+                  svg
+                  style={{
+                    width: "1.5em",
+                    height: "1.5em",
+                    marginRight: "8px",
+                  }}
+                  title={selectedCountry}
+                />
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-autowidth-label"
+                id="country"
+                value={artistDetails.country}
+                onChange={handleCountryChange}
+                // autoWidth
+                label="Country"
+                color={countryError ? "error" : "primary"}
+                sx={{
+                  background: "rgba(255,255,255,0.1)",
+                  borderRadius: "10px",
+                  margin: "0",
+                }}
+                defaultValue={selectedCountry}
+                inputRef={(input) => input && countryError && input.focus()}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {countries.map((country) => {
+                  return (
+                    <MenuItem value={country}>
+                      <ReactCountryFlag
+                        key={country}
+                        countryCode={country}
+                        svg
+                        style={{
+                          width: "1.5em",
+                          height: "1.5em",
+                          marginRight: "8px",
+                        }}
+                        title={country}
+                      />
+                      {country}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <AuthTextField
+              id="phone"
+              label="Mobile Number*"
+              variant="outlined"
+              type="number"
+              color={mobileNumberError ? "error" : "primary"}
+              style={{ boxSizing: "initial", width: "100%" }}
+              defaultValue={artistDetails.mobileNumber}
+              onChange={(e) => {
+                setArtistDetails({
+                  ...artistDetails,
+                  mobileNumber: e.target.value,
+                });
               }}
+              helperText={mobileNumberError ? "Mobile number is required" : ""}
+              FormHelperTextProps={{ style: { color: "red" } }}
             />
           </Stack>
 
@@ -1261,164 +1249,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Additional Artist Details */}
-        <Box
-          id="as-step-15"
-          sx={{
-            flex: "0 0 auto",
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "700",
-              textAlign: "center",
-              marginBottom: "20px",
-            }}
-          >
-            We just need a few more details
-          </Typography>
-          <AuthTextField
-            id="birth-date"
-            label="Birthdate*"
-            variant="outlined"
-            type="date"
-            color={emailError ? "error" : "primary"}
-            style={{ boxSizing: "initial" }}
-            defaultValue={
-              artistDetails?.birthDate ? artistDetails.birthDate : 0
-            }
-            onChange={(e) => {
-              setArtistDetails({ ...artistDetails, birthDate: e.target.value });
-            }}
-            helperText={birthDateError ? "Birthdate is required" : ""}
-            FormHelperTextProps={{ style: { color: "red" } }}
-          />
-          <FormControl
-            sx={{ m: 1, minWidth: 80, marginBottom: "30px", width: "40%" }}
-          >
-            <InputLabel id="demo-simple-select-autowidth-label">
-              <ReactCountryFlag
-                countryCode={selectedCountry}
-                svg
-                style={{
-                  width: "1.5em",
-                  height: "1.5em",
-                  marginRight: "8px",
-                }}
-                title={selectedCountry}
-              />
-              {selectedCountry}
-            </InputLabel>
-            <Select
-              labelId="country-label"
-              id="country"
-              value={artistDetails.country}
-              onChange={handleCountryChange}
-              // autoWidth
-              label="Country"
-              sx={{
-                background: "rgba(255,255,255,0.1)",
-                borderRadius: "10px",
-                margin: "0",
-              }}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {countries.map((country) => {
-                return (
-                  <MenuItem value={country}>
-                    <ReactCountryFlag
-                      key={country}
-                      countryCode={country}
-                      svg
-                      style={{
-                        width: "1.5em",
-                        height: "1.5em",
-                        marginRight: "8px",
-                      }}
-                      title={country}
-                    />
-                    {country}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-          <Typography color="error" sx={{ fontSize: "12px" }}>
-            {countryError && "Country is required!"}
-          </Typography>
-
-          <FormControl>
-            <FormLabel id="gender-label">Gender</FormLabel>
-            <RadioGroup
-              aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue="female"
-              name="radio-buttons-group"
-              onChange={(e) => {
-                setArtistDetails({ ...artistDetails, gender: e.target.value });
-              }}
-              sx={{ display: "flex", flexDirection: "row" }}
-            >
-              <FormControlLabel
-                value="female"
-                control={<Radio />}
-                label="Female"
-              />
-              <FormControlLabel value="male" control={<Radio />} label="Male" />
-              <FormControlLabel
-                value="other"
-                control={<Radio />}
-                label="Other"
-              />
-            </RadioGroup>
-          </FormControl>
-          <Typography color="error" sx={{ fontSize: "12px" }}>
-            {genderError && "Gender is required!"}
-          </Typography>
-
-          <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
-            <Button
-              size="large"
-              variant="contained"
-              color="secondary"
-              startIcon={<ArrowCircleLeftIcon />}
-              sx={{
-                marginTop: "30px",
-                textTransform: "capitalize",
-                padding: "8px 32px",
-                background: "#787878",
-              }}
-              onClick={() => decrementStep(1)}
-            >
-              Back
-            </Button>
-            <Button
-              size="large"
-              variant="contained"
-              color="secondary"
-              endIcon={<ArrowCircleRightIcon />}
-              sx={{
-                marginTop: "30px",
-                textTransform: "capitalize",
-                padding: "8px 32px",
-              }}
-              onClick={handleStageSixPartTwo}
-            >
-              Next
-            </Button>
-          </Stack>
-        </Box>
-
-        {/* Identity Verification */}
         <Box
           id="as-step-7"
           sx={{
@@ -1505,8 +1335,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Request Pending */}
         <Box
           id="as-step-8"
           sx={{
@@ -1553,7 +1381,7 @@ const ArtistSignUp = () => {
               width: "70%",
             }}
           >
-            <ErrorIcon
+            <CheckCircleIcon
               sx={{ fontSize: "4rem", color: "#6366F1", marginRight: "10px" }}
             />
             <Stack>
@@ -1575,6 +1403,7 @@ const ArtistSignUp = () => {
               variant="contained"
               color="secondary"
               startIcon={<ArrowCircleLeftIcon />}
+              disabled={true}
               sx={{
                 marginTop: "30px",
                 textTransform: "capitalize",
@@ -1602,8 +1431,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Request Appproved */}
         <Box
           id="as-step-9"
           sx={{
@@ -1667,7 +1494,7 @@ const ArtistSignUp = () => {
           </Box>
 
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
-            <Button
+            {/* <Button
               size="large"
               variant="contained"
               color="secondary"
@@ -1681,7 +1508,7 @@ const ArtistSignUp = () => {
               onClick={() => decrementStep(1)}
             >
               Back
-            </Button>
+            </Button> */}
             <Button
               size="large"
               variant="contained"
@@ -1698,8 +1525,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Mobile Number Verification */}
         <Box
           id="as-step-10"
           sx={{
@@ -1783,8 +1608,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Customize Profile */}
         <Box
           id="as-step-11"
           sx={{
@@ -1836,8 +1659,8 @@ const ArtistSignUp = () => {
                 rows={6}
                 style={{ boxSizing: "initial" }}
                 onChange={(e) => {
-                  setArtistCustomization({
-                    ...artistCustomization,
+                  setArtistDetails({
+                    ...artistDetails,
                     artistBio: e.target.value,
                   });
                 }}
@@ -1945,8 +1768,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Social Media Details */}
         <Box
           id="as-step-12"
           sx={{
@@ -1992,16 +1813,6 @@ const ArtistSignUp = () => {
               label="Facebook Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
-              value={artistSocialMediaDetails.socialMediaLinks.facebook}
-              onChange={(e) => {
-                setArtistSocialMediaDetails({
-                  ...artistSocialMediaDetails,
-                  socialMediaLinks: {
-                    ...artistSocialMediaDetails.socialMediaLinks,
-                    facebook: e.target.value,
-                  },
-                });
-              }}
             />
           </AuthSocialInputBox>
 
@@ -2014,16 +1825,6 @@ const ArtistSignUp = () => {
               label="Instagram Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
-              value={artistSocialMediaDetails.socialMediaLinks.instagram}
-              onChange={(e) => {
-                setArtistSocialMediaDetails({
-                  ...artistSocialMediaDetails,
-                  socialMediaLinks: {
-                    ...artistSocialMediaDetails.socialMediaLinks,
-                    instagram: e.target.value,
-                  },
-                });
-              }}
             />
           </AuthSocialInputBox>
 
@@ -2036,16 +1837,6 @@ const ArtistSignUp = () => {
               label="X(Twitter) Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
-              value={artistSocialMediaDetails.socialMediaLinks.twitter}
-              onChange={(e) => {
-                setArtistSocialMediaDetails({
-                  ...artistSocialMediaDetails,
-                  socialMediaLinks: {
-                    ...artistSocialMediaDetails.socialMediaLinks,
-                    twitter: e.target.value,
-                  },
-                });
-              }}
             />
           </AuthSocialInputBox>
 
@@ -2058,13 +1849,6 @@ const ArtistSignUp = () => {
               label="Website URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
-              value={artistSocialMediaDetails.webUrl}
-              onChange={(e) => {
-                setArtistSocialMediaDetails({
-                  ...artistSocialMediaDetails,
-                  webUrl: e.target.value,
-                });
-              }}
             />
           </AuthSocialInputBox>
 
@@ -2114,8 +1898,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Payment Details */}
         <Box
           id="as-step-13"
           sx={{
@@ -2157,16 +1939,6 @@ const ArtistSignUp = () => {
             label="Bank Account Name"
             variant="outlined"
             style={{ boxSizing: "initial" }}
-            value={artistBankDetails.bankDetails.accountName}
-            onChange={(e) => {
-              setArtistBankDetails({
-                ...artistBankDetails,
-                bankDetails: {
-                  ...artistBankDetails.bankDetails,
-                  accountName: e.target.value,
-                },
-              });
-            }}
           />
 
           <AuthTextField
@@ -2174,16 +1946,6 @@ const ArtistSignUp = () => {
             label="Bank Account Number"
             variant="outlined"
             style={{ boxSizing: "initial" }}
-            value={artistBankDetails.bankDetails.accountNumber}
-            onChange={(e) => {
-              setArtistBankDetails({
-                ...artistBankDetails,
-                bankDetails: {
-                  ...artistBankDetails.bankDetails,
-                  accountNumber: e.target.value,
-                },
-              });
-            }}
           />
 
           <AuthTextField
@@ -2191,16 +1953,6 @@ const ArtistSignUp = () => {
             label="Bank"
             variant="outlined"
             style={{ boxSizing: "initial" }}
-            value={artistBankDetails.bankDetails.bankName}
-            onChange={(e) => {
-              setArtistBankDetails({
-                ...artistBankDetails,
-                bankDetails: {
-                  ...artistBankDetails.bankDetails,
-                  bankName: e.target.value,
-                },
-              });
-            }}
           />
 
           <AuthTextField
@@ -2208,37 +1960,29 @@ const ArtistSignUp = () => {
             label="Bank Branch"
             variant="outlined"
             style={{ boxSizing: "initial" }}
-            value={artistBankDetails.bankDetails.bankBranch}
-            onChange={(e) => {
-              setArtistBankDetails({
-                ...artistBankDetails,
-                bankDetails: {
-                  ...artistBankDetails.bankDetails,
-                  bankBranch: e.target.value,
-                },
-              });
-            }}
           />
 
           <FormControl
             sx={{ m: 1, minWidth: 80, marginBottom: "30px", width: "40%" }}
           >
             <InputLabel id="demo-simple-select-autowidth-label">
-              Country
+              <ReactCountryFlag
+                countryCode={selectedCountry}
+                svg
+                style={{
+                  width: "1.5em",
+                  height: "1.5em",
+                  marginRight: "8px",
+                }}
+                title={selectedCountry}
+              />
+              {selectedCountry}
             </InputLabel>
             <Select
               labelId="demo-simple-select-autowidth-label"
               id="country"
-              value={artistBankDetails.bankDetails.country}
-              onChange={(e) => {
-                setArtistBankDetails({
-                  ...artistBankDetails,
-                  bankDetails: {
-                    ...artistBankDetails.bankDetails,
-                    country: e.target.value,
-                  },
-                });
-              }}
+              value={artistDetails.country}
+              onChange={handleCountryChange}
               // autoWidth
               label="Country"
               sx={{
@@ -2317,8 +2061,6 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
-
-        {/* Greeting  */}
         <Box
           id="as-step-14"
           sx={{
