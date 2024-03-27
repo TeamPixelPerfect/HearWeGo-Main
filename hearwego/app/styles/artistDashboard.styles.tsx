@@ -7,14 +7,14 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
   width: "100%",
   background: theme.palette.mode === "light" ? "#EEF2FF" : "#0F172A",
   ".ad-left": {
-    width: "16%", 
+    width: "18%", 
     minWidth: "60px",
     height: "100vh",
   },
   ".ad-right": {
-    width: "84%",
+    width: "82%",
     maxWidth: "100%",
-    minWidth: "300px",
+    minWidth: "350px",
     padding: "1em 1em 1em 0",
     marginLeft: "1em",
   },
@@ -37,7 +37,7 @@ export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   padding: "0.5em 0",
-  background: "#F3E8FF",
+  background: theme.palette.background.paper,
   minHeight: "100%",
   minWidth: "60px",
   width: "inherit",
@@ -45,14 +45,13 @@ export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
   position: "fixed",
   zIndex: "10",
   borderRadius: "0 30px 0 0",
-  boxShadow: "1px 1px 3px rgba(0,0,0,0.2)",
+  boxShadow: "2px 3px 5px rgba(0,0,0,0.3)",
   transition: "width 1s",
   // transform: "translateX(-100%)",
   a: {
     textDecoration: "none",
     display: "flex",
     div: {
-      color: "#4B4B4B",
       fontWeight: "500",
       fontSize: "14px",
     },
@@ -80,7 +79,7 @@ export const ADNavItemGroupBox = styled("div")(({ theme }) => ({
 export const ADNavItemBox = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  padding: "2px 16px 2px 0",
+  padding: "4px 16px",
   marginBottom: "0.2em",
   width: "100%",
   cursor: "Pointer",
@@ -99,13 +98,19 @@ export const ADHomeCoverBox = styled(Box, {
   width: "100%",
   height: "100%",
   maxWidth: "100%",
-  background: `url(${imgUrl}) no-repeat`,
+  backgroundColor: "#787878",
+  backgroundImage: `url(${imgUrl})`,
   backgroundPosition: "center",
   backgroundSize: "cover",
+  backgroundRepeat: "no-repeat",
   display: "flex",
   flexDirecrion: "column",
   // justifyContent: "flex-end",
   alignItems: "flex-end",
+  // borderWidth: "10px",
+  // borderStyle: "solid",
+  // borderColor: theme.palette.background.default,
+  borderRadius: "10px"
 }));
 
 export const ADHomeNameArea = styled(Box)(({ theme }) => ({
@@ -117,13 +122,23 @@ export const ADHomeNameArea = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "flex-end",
   justifyContent: "space-between",
+  borderRadius: "10px",
+  "@media (max-width:960px)": {
+    flexDirection: "column",
+    maxHeight: "350px",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  }
 }));
 
 export const ADHomeName = styled(Box)(({ theme }) => ({
   color: "#fff",
   fontSize: "32px",
-  fontWeight: "500",
+  fontWeight: "700",
   // marginBottom: "0.5em",
+  "@media (max-width:960px)": {
+    // textAlign: "center",
+  }
 }));
 
 export const ADArtistInfo = styled(Box)(({ theme }) => ({
@@ -134,7 +149,7 @@ export const ADArtistInfo = styled(Box)(({ theme }) => ({
 }));
 
 export const ADArtistPageUrl = styled(Box)(({ theme }) => ({
-  background: theme.palette.secondary.main,
+  background: "#4338ca",
   color: "#fff",
   width: "fit-content",
   padding: "8px 16px",
@@ -157,16 +172,18 @@ export const ADHomeProfilePicture = styled(Box, {
   width: "200px",
   height: "200px",
   borderRadius: "50%",
-  background: `url('${imgUrl}') no-repeat`,
+  backgroundColor: "#787878",
+  backgroundImage: `url('${imgUrl}')`,
+  backgroundRepeat: "no-repeat",
   backgroundPosition: "center",
   backgroundSize: "cover",
-  borderWidth: "2px",
+  borderWidth: "5px",
   borderStyle: "solid",
   borderColor: theme.palette.background.default
 }));
 
 export const ADHomeSocialIcons = styled(Box)(({ theme }) => ({
-  color: theme.palette.secondary.main,
+  color: "#fff",
   display: "flex",
   marginBottom: "0.5em",
   fontSize: "32px",

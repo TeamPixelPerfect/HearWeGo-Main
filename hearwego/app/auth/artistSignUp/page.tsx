@@ -511,7 +511,7 @@ const ArtistSignUp = () => {
           display: "flex",
           alignItems: "center",
           flexWrap: "nowrap",
-          padding: "80px 0",
+          padding: "40px 0",
           transform: `translateX(-${step * 100}%)`,
           transition: "transform 0.5s ease-in-out",
         }}
@@ -586,6 +586,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -683,6 +684,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -707,10 +709,7 @@ const ArtistSignUp = () => {
               id="solo"
               style={
                 checkType("solo") && {
-                  background:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.4)"
-                      : "rgba(0,0,0,0.4)",
+                  background: "#a5b4fc",
                 }
               }
               onClick={() => handleArtistTypeSelect("solo")}
@@ -723,22 +722,20 @@ const ArtistSignUp = () => {
               >
                 <CheckCircleIcon
                   style={{
+                    color: "#4338ca",
                     fontSize: "25px",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
               <Typography variant="subtitle1">Solo</Typography>
-              <FaPerson style={{ fontSize: "40px" }} />
+              <FaPerson style={{ color: "#4338ca", fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="duo"
               style={
                 checkType("duo") && {
-                  background:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.4)"
-                      : "rgba(0,0,0,0.4)",
+                  background: "#a5b4fc",
                 }
               }
               onClick={() => handleArtistTypeSelect("duo")}
@@ -751,22 +748,20 @@ const ArtistSignUp = () => {
               >
                 <CheckCircleIcon
                   style={{
+                    color: "#4338ca",
                     fontSize: "25px",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
               <Typography variant="subtitle1">Duo</Typography>
-              <MdOutlineGroup style={{ fontSize: "40px" }} />
+              <MdOutlineGroup style={{ color: "#4338ca", fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="group"
               style={
                 checkType("group") && {
-                  background:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.4)"
-                      : "rgba(0,0,0,0.4)",
+                  background: "#a5b4fc",
                 }
               }
               onClick={() => handleArtistTypeSelect("group")}
@@ -781,13 +776,14 @@ const ArtistSignUp = () => {
               >
                 <CheckCircleIcon
                   style={{
+                    color: "#4338ca",
                     fontSize: "25px",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
               <Typography variant="subtitle1">Group</Typography>
-              <MdGroups style={{ fontSize: "40px" }} />
+              <MdGroups style={{ color: "#4338ca", fontSize: "40px" }} />
             </AuthCheckBox>
           </Box>
 
@@ -843,6 +839,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -874,10 +871,7 @@ const ArtistSignUp = () => {
                     key={genre}
                     style={
                       checkGenre(genre) && {
-                        background:
-                          theme.palette.mode === "dark"
-                            ? "rgba(255,255,255,0.4)"
-                            : "rgba(0,0,0,0.4)",
+                        background: "#a5b4fc",
                       }
                     }
                     onClick={() => {
@@ -942,6 +936,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -966,10 +961,7 @@ const ArtistSignUp = () => {
               id="performer"
               style={
                 checkProfession("performer") && {
-                  background:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.4)"
-                      : "rgba(0,0,0,0.4)",
+                  background:"#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("performer")}
@@ -998,10 +990,7 @@ const ArtistSignUp = () => {
               id="producer"
               style={
                 checkProfession("producer") && {
-                  background:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.4)"
-                      : "rgba(0,0,0,0.4)",
+                  background:"#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("producer")}
@@ -1030,10 +1019,7 @@ const ArtistSignUp = () => {
               id="songwriter"
               style={
                 checkProfession("songwriter") && {
-                  background:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.4)"
-                      : "rgba(0,0,0,0.4)",
+                  background:"#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("songwriter")}
@@ -1144,6 +1130,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1270,6 +1257,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1426,6 +1414,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1514,6 +1503,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1611,6 +1601,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1707,6 +1698,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1792,6 +1784,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -1954,6 +1947,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",
@@ -2123,6 +2117,7 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
               fontWeight: "700",
               textAlign: "center",

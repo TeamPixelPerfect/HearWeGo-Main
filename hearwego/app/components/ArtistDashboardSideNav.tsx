@@ -8,7 +8,7 @@ import {
 } from "../styles/artistDashboard.styles";
 import Logo from "../components/Logo";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { Box, IconButton, useMediaQuery } from "@mui/material";
+import { Box, IconButton, useMediaQuery, useTheme } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
@@ -28,6 +28,7 @@ const ArtistDashboardSideNav = () => {
   const handleClose = () => setOpen(false);
 
   const matches = useMediaQuery("(max-width:960px)");
+  const theme = useTheme();
 
   useEffect(() => {
     console.log("Artist:::", artist);
@@ -38,15 +39,21 @@ const ArtistDashboardSideNav = () => {
 
   return (
     <ArtistDashboardSideNavContainer>
-      <Box sx={{ marginBottom: "1em" }}></Box>
+      <Box sx={{ marginBottom: "3em" }}></Box>
       <Box
-        sx={{ cursor: "pointer" }}
+        sx={{ cursor: "pointer", marginBottom: "1em" }}
         onClick={() => {
           Router.push("/artist");
         }}
       >
         {!matches ? (
-          <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
+          <Logo
+            img_url={
+              theme.palette.mode === "light"
+                ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
+                : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo(white).png"
+            }
+          />
         ) : (
           <IconButton color="primary" sx={{ fontSize: "40px" }}>
             <IoIosArrowDroprightCircle />
@@ -71,10 +78,17 @@ const ArtistDashboardSideNav = () => {
           })}
         </Box>
         <ADNavItemGroupBox>
-          <ADNavItemBox>
-            <Link href="/artist">
-              <SettingsIcon sx={{ color: "#3730A3", marginRight: "10px" }} />
-              {!matches && <div style={{ color: "#3730A3" }}>Settings</div>}
+          <ADNavItemBox sx={{ marginBottom: "2em" }}>
+            <Link
+              href="/artist"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <SettingsIcon color="secondary" sx={{ marginRight: "10px" }} />
+              {!matches && (
+                <Box style={{ color: theme.palette.secondary.main }}>
+                  Settings
+                </Box>
+              )}
             </Link>
           </ADNavItemBox>
         </ADNavItemGroupBox>

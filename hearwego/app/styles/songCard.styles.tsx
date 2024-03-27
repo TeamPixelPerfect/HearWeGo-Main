@@ -70,7 +70,7 @@ export const AlbumCard = styled(Card)(({ theme }) => ({
   // justifyContent: "space-between",
   padding: 0,
   height: "100px",
-  marginBottom: "8px",
+  marginBottom: "12px",
 
   "& h6": {
     fontSize: "16px",
