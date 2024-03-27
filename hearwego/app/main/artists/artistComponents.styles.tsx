@@ -147,6 +147,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
             backgroundPosition: "center",
             height: "100%",
             width: "100%",
+            textTransform:"capitalize"
           }}
         >
           <Box

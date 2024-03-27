@@ -69,6 +69,10 @@ export interface BankDetails {
 }
 
 export interface Artist {
+  artistName: String;
+  musicGenres: any;
+  artistCovers: any;
+  artist_id: string | undefined;
   user: {
     _id?: string;
     artist_id?: string;
