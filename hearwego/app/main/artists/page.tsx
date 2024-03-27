@@ -82,7 +82,7 @@ export default function Artist({ params: {} }: props) {
         setAllArtistData(res.data);
       }
     });
-  }, [page,per_page]);
+  }, [page, per_page]);
 
   const handleGenreChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGenre(event.target.value as string);
@@ -214,7 +214,7 @@ export default function Artist({ params: {} }: props) {
                 ? artists.artistCovers[0]
                 : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
             }
-            id={}
+            id={artists.artist_id}
           />
         ))}
       </Stack>
@@ -379,35 +379,18 @@ export default function Artist({ params: {} }: props) {
         spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
-        <ArtistCard
-          name="Michale Jackson"
-          Genre="Pop"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-          id="ar1"
-        />
-
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-          id="ar2"
-        />
-
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
+        {allArtistData.map((artists) => (
+          <ArtistCard
+            name={artists.artistName}
+            Genre={artists.musicGenres.join(", ")}
+            img_url={
+              artists.artistCovers.length > 0
+                ? artists.artistCovers[0]
+                : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+            }
+            id={"ar11"}
+          />
+        ))}
       </Stack>
     </Maindiv>
   );
