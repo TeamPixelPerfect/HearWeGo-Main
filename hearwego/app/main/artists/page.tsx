@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { Box } from "@mui/material";
 import { Stack } from "@mui/material";
@@ -20,9 +20,10 @@ import {
   TableRow,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Artist } from "@/app/constants/models";
+import { Album, Artist, Song } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { useAppSelector } from "@/lib/hooks";
+import { getSongsForArtist } from "@/app/services/SongServices";
 
 export const genreOptions = [
   { value: "pop", label: "Pop" },
@@ -60,9 +61,9 @@ export const typeOptions = [
 ];
 
 interface props {
-  params: {};
+  params: { id: string };
 }
-export default function Artist({ params: {} }: props) {
+export default function Artist({ params: { id } }: props) {
   const [genre, setGenre] = React.useState("");
   const [profession, setProfession] = React.useState("");
   const [gender, setGender] = React.useState("");
@@ -75,14 +76,21 @@ export default function Artist({ params: {} }: props) {
   const [page, setPage] = useState(1);
   const [per_page, setLimit] = useState(5);
 
+  const [allArtistSongs, setAllArtistSongs] = useState<Song[]>([]);
+
   useEffect(() => {
     getAllArtists(page, per_page).then((res) => {
-      if (res) {
-        console.log(res);
-        setAllArtistData(res.data);
-      }
+      console.log(res);
+      setAllArtistData(res.data);
     });
-  }, [page, per_page]);
+  }, [page]);
+
+  useEffect(() => {
+    getSongsForArtist(artist?.token, id).then((Songs) => {
+      console.log(Songs);
+      setAllArtistSongs(Songs.data);
+    });
+  }, []);
 
   const handleGenreChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGenre(event.target.value as string);
@@ -246,106 +254,36 @@ export default function Artist({ params: {} }: props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100000000}
-              popularity={""}
-              country_img={""}
-              LinkPage={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100000000}
-              popularity={""}
-              country_img={""}
-              LinkPage={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100000000}
-              popularity={""}
-              country_img={""}
-              LinkPage={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100000000}
-              popularity={""}
-              country_img={""}
-              LinkPage={""}
-            />
+            {allArtistData.map((artists) => (
+              <TrendingRow
+                Rank={{
+                  rank: 1,
+                  rank_img:
+                    "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+                }}
+                Artist={{
+                  name: artists.artistName,
+                  img_url:
+                    artists.artistCovers.length > 0
+                      ? artists.artistCovers[0]
+                      : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg",
+                }}
+                Latest_song={{
+                  song_name: artist?.token ? allArtistSongs[0].song_title : "",
+                  song_img:
+                    "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+                }}
+                Latest_album={{
+                  album_name: "Scream",
+                  album_img:
+                    "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+                }}
+                Fans={100000000}
+                popularity={""}
+                country_img={""}
+                LinkPage={""}
+              />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -379,18 +317,21 @@ export default function Artist({ params: {} }: props) {
         spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
-        {allArtistData.map((artists) => (
-          <ArtistCard
-            name={artists.artistName}
-            Genre={artists.musicGenres.join(", ")}
-            img_url={
-              artists.artistCovers.length > 0
-                ? artists.artistCovers[0]
-                : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-            }
-            id={"ar11"}
-          />
-        ))}
+        {allArtistData
+          .slice()
+          .reverse()
+          .map((artists) => (
+            <ArtistCard
+              name={artists.artistName}
+              Genre={artists.musicGenres.join(", ")}
+              img_url={
+                artists.artistCovers.length > 0
+                  ? artists.artistCovers[0]
+                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+              }
+              id={artists.artist_id}
+            />
+          ))}
       </Stack>
     </Maindiv>
   );
