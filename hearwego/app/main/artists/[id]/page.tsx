@@ -228,9 +228,9 @@ export default function SingleArtistPage({ params: { id } }: Props) {
             Albums
           </Box>
 
-          <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+          <Grid container spacing={5} sx={{ margin: "1em auto", width: "95%" }}>
             {albumByArtist.map((albums, index) => (
-              <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
+              <Grid item xs={2} md={2} style={{ paddingLeft: 3}}>
                 <SingleAlbum
                   album_id={albums.album_id}
                   albumName={albums.album_title}

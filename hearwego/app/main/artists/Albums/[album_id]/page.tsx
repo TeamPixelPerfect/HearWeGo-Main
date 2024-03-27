@@ -88,7 +88,7 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
     <Maindiv>
       {albumData ? (
         <>
-          <CoverCardMedia image="https://www.cnn.com/interactive/2023/12/style/thriller-dance-video-40-year-anniversary/media/images/4xGHmgXB.jpeg">
+          <CoverCardMedia image={albumData?.album_img}>
             <div
               style={{
                 background: "black",
@@ -101,13 +101,17 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
             <AllMiddleBox>
               <Stack direction="row" width="100%" spacing={"1px"}>
                 <ProfilePicAvatar
-                  src={
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6nb_Cit59ogQsc692zoACe-QkVCDG_8NNAFvXWTIfFgatco6C-4-TcPLyl5nDcGWUkw&usqp=CAU"
-                  }
+                  src={albumData?.album_img}
                 ></ProfilePicAvatar>
 
                 <ArtistDetailBox>
-                  <ArtistNameBox>{albumData?.album_title}</ArtistNameBox>
+                  <ArtistNameBox sx={{
+                    fontSize: "30px",
+                    fontWeight: "bold",
+                    color: "white",
+                    textTransform:'capitalize'
+                  
+                  }}>{albumData?.album_title}</ArtistNameBox>
                   <GenreBox>{albumData?.release_date?.trimStart().slice(0, 4)}</GenreBox>
                   <SocialMediaBox>
                     <Button>
