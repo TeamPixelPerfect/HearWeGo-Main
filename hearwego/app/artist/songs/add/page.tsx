@@ -58,8 +58,8 @@ const AddSong = () => {
                 <Typography
                   variant="h4"
                   sx={{
-                    fontSize: "20px",
-                    fontWeight: "500",
+                    fontSize: "24px",
+                    fontWeight: "700",
                     color: theme.palette.secondary.main,
                     padding: "1em",
                   }}

@@ -10,7 +10,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setApp } from "@/lib/features/app.slice";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersistentDrawerLeft from "./MobileDrawer";
@@ -62,6 +62,8 @@ const Header = ({ app }: Props) => {
 
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+
+  const router = useRouter();
 
   const user = useAppSelector((state) => state.user.user);
 
@@ -129,6 +131,7 @@ const Header = ({ app }: Props) => {
               variant="contained"
               startIcon={<CellTowerIcon />}
               style={{ textTransform: "capitalize" }}
+              onClick={() => {router.push("main/predictor")}}
             >
               Hit Predictor
             </Button>

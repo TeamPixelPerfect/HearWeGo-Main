@@ -195,7 +195,7 @@ const ADHomePage = () => {
                 }
               >
                 <ADHomeName>{artist?.user.artistName}</ADHomeName>
-                <ADArtistInfo>{artist?.user.artistBio}</ADArtistInfo>
+                <ADArtistInfo>{artist?.user.artistBio.split(".")[0]}</ADArtistInfo>
 
                 <ADArtistPageUrl>
                   <Link href="">http://www.hearwego.com/wq23s</Link>

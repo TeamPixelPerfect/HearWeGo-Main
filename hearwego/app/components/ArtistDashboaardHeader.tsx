@@ -29,10 +29,13 @@ import { Stack, useMediaQuery } from "@mui/material";
 import { useAppSelector } from "@/lib/hooks";
 import ADPersistentDrawerLeft from "./ADMobileDrawer";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { useRouter } from "next/navigation";
 
 const ArtistDashboardHeader = () => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+
+  const router = useRouter();
 
   const artist = useAppSelector((state) => state.artist.user);
 
@@ -107,7 +110,7 @@ const ArtistDashboardHeader = () => {
 
       <HitPredictorIco>
         <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <HitPredictorBtn color="secondary" aria-label="add">
+          <HitPredictorBtn color="secondary" aria-label="add" onClick={() => {router.push('/main/predictor')}}>
             <CellTowerIcon />
           </HitPredictorBtn>
         </Box>

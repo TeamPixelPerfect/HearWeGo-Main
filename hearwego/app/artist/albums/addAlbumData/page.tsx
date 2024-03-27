@@ -170,8 +170,8 @@ const AddAlbumData = () => {
                 variant="h4"
                 color="secondary"
                 sx={{
-                  fontSize: "20px",
-                  fontWeight: "500",
+                  fontSize: "24px",
+                  fontWeight: "700",
                   padding: "1em",
                 }}
               >
