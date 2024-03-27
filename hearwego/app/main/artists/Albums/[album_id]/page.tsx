@@ -108,7 +108,7 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
 
                 <ArtistDetailBox>
                   <ArtistNameBox>{albumData?.album_title}</ArtistNameBox>
-                  <GenreBox>1983</GenreBox>
+                  <GenreBox>{albumData?.release_date?.trimStart().slice(0, 4)}</GenreBox>
                   <SocialMediaBox>
                     <Button>
                       <FacebookRoundedIcon
@@ -136,12 +136,12 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
                       display: "flex",
                       padding: "30px 0px",
                     }}
-                  >
-                    Thriller is the sixth studio album by the American singer
+                  >{albumData?.description}
+                    {/* Thriller is the sixth studio album by the American singer
                     and songwriter Michael Jackson, released on November 29,
                     1982, by Epic Records. It was produced by Quincy Jones, who
                     had previously worked with Jackson on his 1979 album Off the
-                    Wall and who would later produce his 1987 album Bad.
+                    Wall and who would later produce his 1987 album Bad. */}
                   </Box>
                 </ArtistDetailBox>
 

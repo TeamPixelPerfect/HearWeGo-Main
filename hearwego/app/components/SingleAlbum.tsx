@@ -45,33 +45,39 @@ export default function SingleAlbum({ albumName, year, albumImg, album_id }: Pro
             width: "100%",
             height: "100%",
             borderRadius: "14px",
-            opacity: "0.6",
+            opacity: "0.7",
             // position:'fixed'
           }}
         >
           <Box
             style={{
               position: "relative",
-              padding: "10%",
+              padding: "2%",
               justifyContent: "space-between",
+              //backgroundColor: "yellow",
+              borderRadius: "14px",
+              
             }}
           >
             <Box
               sx={{
-                //backgroundColor: "blue",
+                backgroundColor: "black",
                 color: "white",
                 width: "100%",
-                fontSize: "24px",
+                fontSize: "28px",
                 fontWeight: "bold",
                 position: "relative",
                 display: "flex",
+                textTransform: "capitalize",
+                textAlign:'left',
+                
               }}
             >
               {albumName}
             </Box>
             <Box
               sx={{
-                //backgroundColor: "blue",
+                backgroundColor: "black",
                 color: "white",
                 width: "40%",
                 fontSize: "20px",

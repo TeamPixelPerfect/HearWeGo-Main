@@ -35,46 +35,9 @@ import {
 } from "../../../styles/SingleArtistPage.styles";
 import { urPK } from "@mui/x-date-pickers";
 import { getArtist, getArtistV2 } from "@/app/services/ArtistServices";
-import { Artist } from "@/app/constants/models";
-
-const albumNames = [
-  {
-    album_id: "al1",
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    album_id: "al2",
-    name: "Off the Wall",
-    year: "1979",
-    img: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Off_the_wall.jpg/220px-Off_the_wall.jpg",
-  },
-  {
-    album_id: "al3",
-    name: "Bad",
-    year: "1987",
-    img: "https://upload.wikimedia.org/wikipedia/en/5/51/Michael_Jackson_-_Bad.png",
-  },
-  {
-    album_id: "al4",
-    name: "Ben",
-    year: "1972",
-    img: "https://upload.wikimedia.org/wikipedia/en/1/17/BenMichaelJackson.jpg",
-  },
-  {
-    album_id: "al5",
-    name: "Invincible",
-    year: "2001",
-    img: "https://upload.wikimedia.org/wikipedia/en/9/98/Mjinvincible.jpg",
-  },
-  {
-    album_id: "al6",
-    name: "Manila",
-    year: "1996",
-    img: "https://i.scdn.co/image/ab67616d0000b273655f0aa6bcd03fb68905c38e",
-  },
-];
+import { Album, Artist } from "@/app/constants/models";
+import { getAlbumForArtists } from "@/app/services/SongServices";
+import { useAppSelector } from "@/lib/hooks";
 
 const songNames = [
   {
@@ -124,6 +87,8 @@ interface Props {
 
 export default function SingleArtistPage({ params: { id } }: Props) {
   const [artistData, setArtistData] = React.useState<Artist>();
+  const [albumByArtist, setAlbumByArtist] = React.useState<Album[]>([]);
+  const artist = useAppSelector((state) => state.artist.user);
 
   React.useEffect(() => {
     console.log(id);
@@ -135,11 +100,24 @@ export default function SingleArtistPage({ params: { id } }: Props) {
     });
   }, []);
 
+  React.useEffect(() => {
+    getAlbumForArtists(artist?.token, id).then((res) => {
+      console.log("Albums:::", res);
+      setAlbumByArtist(res.data);
+    });
+  }, []);
+
   return (
     <Maindiv>
       {artistData ? (
         <>
-          <CoverCardMedia image={artistData.user.artistCovers.length > 0 ? artistData.user.artistCovers[0] : "https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp"}>
+          <CoverCardMedia
+            image={
+              artistData.user.artistCovers.length > 0
+                ? artistData.user.artistCovers[0]
+                : "https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp"
+            }
+          >
             <div
               style={{
                 background: "black",
@@ -152,9 +130,8 @@ export default function SingleArtistPage({ params: { id } }: Props) {
             <AllMiddleBox>
               <Stack direction="row" width="100%" spacing={"1px"}>
                 <ProfilePicAvatar
-                  src={
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/170px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-                  }
+                  src={artistData.user.profilePicture}
+                  
                 ></ProfilePicAvatar>
 
                 <ArtistDetailBox>
@@ -162,9 +139,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                     {artistData.user.artistName}
                     <FlagBox></FlagBox>
                   </ArtistNameBox>
-                  <GenreBox>
-                    {artistData.user.musicGenres.join(", ")}
-                  </GenreBox>
+                  <GenreBox>{artistData.user.musicGenres.join(", ")}</GenreBox>
                   <SocialMediaBox>
                     <Button>
                       <FacebookRoundedIcon
@@ -193,10 +168,11 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                       padding: "30px 0px",
                     }}
                   >
-                    Michael Joseph Jackson was an American singer,
+                    {artistData.user.artistBio}
+                    {/* Michael Joseph Jackson was an American singer,
                     songwriter,dancer, and philanthropist. Known as the "King of
                     Pop", he is regarded as one of the most significant cultural
-                    figures ofthe 20th century.
+                    figures ofthe 20th century. */}
                   </Box>
                 </ArtistDetailBox>
 
@@ -253,13 +229,13 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           </Box>
 
           <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-            {albumNames.map(({ album_id, name, year, img }) => (
+            {albumByArtist.map((albums, index) => (
               <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
                 <SingleAlbum
-                  album_id={album_id}
-                  albumName={name}
-                  year={year}
-                  albumImg={img}
+                  album_id={albums.album_id}
+                  albumName={albums.album_title}
+                  year={albums.release_date?.trimStart().slice(0, 4)}
+                  albumImg={albums.album_img}
                 ></SingleAlbum>
               </Grid>
             ))}
