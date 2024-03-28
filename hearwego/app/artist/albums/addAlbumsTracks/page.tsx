@@ -1,6 +1,6 @@
 "use client";
 
-import { Box } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import Card from "@mui/material/Card";
 
 import CardContent from "@mui/material/CardContent";
@@ -35,6 +35,8 @@ export default function AddAlbumTracks() {
   // Initialize necessary hooks and state variables
   const theme = useTheme();
   const router = useRouter();
+
+  const matches = useMediaQuery("(max-width:960px)");
 
   const dispatch = useAppDispatch();
 
@@ -95,7 +97,7 @@ export default function AddAlbumTracks() {
               Add New Album
             </Typography>
 
-            <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
+            <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap", flexDirection: matches?"column":"row", alignItems:matches?"center":"flex-start" }}>
               {/* Box for uploading album cover image */}
               <Box sx={{ width: "30%" }}>
                 <DropFile
@@ -120,7 +122,7 @@ export default function AddAlbumTracks() {
               </Box>
 
               {/* Box for adding songs to the album */}
-              <Box sx={{ width: "70%" }}>
+              <Box sx={{ width:matches?"90%": "70%" }}>
                 <Typography
                   component="div"
                   sx={{ marginBottom: "1em", fontSize: 14 }}
@@ -171,7 +173,7 @@ export default function AddAlbumTracks() {
                 </Box>
 
                 <Box sx={{ width: "100%", marginTop: "1em" }}>
-                  <Button variant="contained" startIcon={<AddCircleIcon />}>
+                  <Button  variant="contained" startIcon={<AddCircleIcon />}>
                     Add New Song
                   </Button>
                 </Box>
@@ -329,7 +331,7 @@ function ClickPlay({ song_track }: { song_track: string }) {
         <IconButton sx={{ color: "primary.main" }}>
           <PlayCircleIcon
             sx={{ color: "primary.main", fontSize: 36 }}
-            //   sx={{ width: "30%", height: "auto" }}
+           
             onClick={toggle}
           />
         </IconButton>
@@ -385,19 +387,11 @@ function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
           sx={{ width: "100%" }}
           variant="filled"
           {...params}
-          label="Enter Song Title"
+          label="Enter song title"
         />
       )}
     />
   );
 }
 
-// Dummy data for song selection
-const songSet = [
-  { label: "I'll be there for you", year: 1994 },
-  { label: "The Godfather", year: 1972 },
-  { label: "The Godfather: Part II", year: 1974 },
-  { label: "The Dark Knight", year: 2008 },
-  { label: "12 Angry Men", year: 1957 },
-  { label: "Schindler's List", year: 1993 },
-];
+

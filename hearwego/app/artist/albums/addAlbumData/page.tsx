@@ -171,7 +171,7 @@ const AddAlbumData = () => {
   }, []);
 
   return (
-    <Box sx={{ minWidth: 275 }}>
+    <Box sx={{ minWidth: 375 }}>
       <Card variant="outlined">
         <React.Fragment>
           <CardContent>
