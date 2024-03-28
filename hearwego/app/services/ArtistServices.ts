@@ -1,5 +1,6 @@
 import { base_url } from "../constants/keys";
 
+
 // Get all artists
 export const getAllArtists = async () => {
   const res = await fetch(`${base_url}/users/artists`, {
@@ -32,7 +33,7 @@ export const getArtist = async (id: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 // get artist by artist_id
 export const getArtistV2 = async (id: string) => {
@@ -49,7 +50,7 @@ export const getArtistV2 = async (id: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 // update artist details
 export const updateArtist = async (token: string, id: string, data: any) => {
@@ -68,4 +69,4 @@ export const updateArtist = async (token: string, id: string, data: any) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};

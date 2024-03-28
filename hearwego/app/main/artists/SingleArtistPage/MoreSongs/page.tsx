@@ -1,11 +1,11 @@
+//Songs Mor Page
+
 "use client";
 import React from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
-import Grid from "@mui/material/Grid";
 import SingleSongRow from "@/app/components/SingleSongRow";
 import { Stack } from "@mui/material";
 import {
@@ -28,19 +28,22 @@ const songNames = [
   },
   {
     index: 9,
-    songImg: "https://i1.sndcdn.com/artworks-1OHOA4uZkbc36Prf-ht3dkw-t500x500.jpg",
+    songImg:
+      "https://i1.sndcdn.com/artworks-1OHOA4uZkbc36Prf-ht3dkw-t500x500.jpg",
     songName: "Smooth Criminal",
     noOfFollowers: "1,034,450,090",
   },
   {
     index: 10,
-    songImg: "https://upload.wikimedia.org/wikipedia/en/3/3e/Earth_Song_cover.jpg",
+    songImg:
+      "https://upload.wikimedia.org/wikipedia/en/3/3e/Earth_Song_cover.jpg",
     songName: "Earth Song",
     noOfFollowers: "4,234,989,000",
   },
   {
     index: 11,
-    songImg: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGwiHncfzBj2eBDZJ2huqgU27ESCyRXgf4wA&usqp=CAU",
+    songImg:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGwiHncfzBj2eBDZJ2huqgU27ESCyRXgf4wA&usqp=CAU",
     songName: "You Are Not Alone",
     noOfFollowers: "3,234,490,600",
   },
@@ -55,6 +58,7 @@ const songNames = [
 export default function MoreSongs() {
   return (
     <Maindiv>
+      {/* This Search bar is used to search the songs */}
       <Box
         style={{
           display: "flex",
@@ -84,6 +88,7 @@ export default function MoreSongs() {
         Songs
       </Box>
 
+      {/* This is the grid for songs */}
       <Stack>
         {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
           <SingleSongRow
