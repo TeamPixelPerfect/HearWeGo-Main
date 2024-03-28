@@ -38,18 +38,22 @@ import { useRouter } from "next/navigation";
 import { MainSongCard } from "../../songs/page";
 import { getAlbum, getSong } from "@/app/services/SongServices";
 
+// Defining interface for props
 interface Props {
   params: { id: string };
 }
 
+// Defining interface for album preview props
 interface AlbumPreviewProps {
   albumData: Album;
 }
 
+// Album preview component
 function AlbumPreview({ albumData }: AlbumPreviewProps) {
   const artist = useAppSelector((state) => state.artist.user?.user);
 
   return (
+    // Displaying album details
     <Paper
       elevation={3}
       sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}
@@ -121,6 +125,7 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
         </Alert>
       </SongPreviewDetails>
 
+      {/* Share options */}
       <SongPreviewShare>
         <Box
           sx={{
@@ -184,16 +189,19 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
   );
 }
 
+// Album details component
 const AlbumDetails = ({ params: { id } }: Props) => {
   const theme = useTheme();
   const router = useRouter();
 
   const artist = useAppSelector((state) => state.artist.user);
 
+  // State for album details and songs
   const [albumDetails, setAlbumDetails] = useState<Album>({});
   const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
 
   useEffect(() => {
+    // Fetching album details and songs
     if (id) {
       getAlbum(artist?.token, id).then((album) => {
         console.log("Album:::", album[0]);
@@ -208,8 +216,15 @@ const AlbumDetails = ({ params: { id } }: Props) => {
   }, []);
 
   return (
+    // Displaying album details and songs
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh", background: theme.palette.background.default }}>
+      <Card
+        sx={{
+          width: "100%",
+          minHeight: "100vh",
+          background: theme.palette.background.default,
+        }}
+      >
         <Box
           sx={{
             width: "100%",

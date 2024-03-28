@@ -15,7 +15,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { CardMedia, Stack } from "@mui/material";
-import { Router } from "next/router";
 
 // Function to create data for the table
 function createData1(name1: string, calories1: number) {
