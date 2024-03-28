@@ -1,6 +1,7 @@
+//Single Artist Page
+
 "use client";
 import * as React from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -17,7 +18,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleAlbum from "@/app/components/SingleAlbum";
 import CardActions from "@mui/material/CardActions";
-import Link from "next/link";
 import SingleSongRow from "@/app/components/SingleSongRow";
 
 import {
@@ -33,98 +33,23 @@ import {
   FlagBox,
   SearchPaper,
 } from "../../../styles/SingleArtistPage.styles";
-import { urPK } from "@mui/x-date-pickers";
 import { getArtist, getArtistV2 } from "@/app/services/ArtistServices";
-import { Artist } from "@/app/constants/models";
-
-const albumNames = [
-  {
-    album_id: "al1",
-    name: "Thriller",
-    year: "1982",
-    img: "https://static.tvtropes.org/pmwiki/pub/images/thriller_e1448027599226_7.jpg",
-  },
-  {
-    album_id: "al2",
-    name: "Off the Wall",
-    year: "1979",
-    img: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Off_the_wall.jpg/220px-Off_the_wall.jpg",
-  },
-  {
-    album_id: "al3",
-    name: "Bad",
-    year: "1987",
-    img: "https://upload.wikimedia.org/wikipedia/en/5/51/Michael_Jackson_-_Bad.png",
-  },
-  {
-    album_id: "al4",
-    name: "Ben",
-    year: "1972",
-    img: "https://upload.wikimedia.org/wikipedia/en/1/17/BenMichaelJackson.jpg",
-  },
-  {
-    album_id: "al5",
-    name: "Invincible",
-    year: "2001",
-    img: "https://upload.wikimedia.org/wikipedia/en/9/98/Mjinvincible.jpg",
-  },
-  {
-    album_id: "al6",
-    name: "Manila",
-    year: "1996",
-    img: "https://i.scdn.co/image/ab67616d0000b273655f0aa6bcd03fb68905c38e",
-  },
-];
-
-const songNames = [
-  {
-    index: 1,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
-  },
-  {
-    index: 2,
-    songImg: "https://miro.medium.com/v2/resize:fit:500/0*U2KdecQg1CLUbMZc.jpg",
-    songName: "Beat It",
-    noOfFollowers: "2,234,450,800",
-  },
-  {
-    index: 3,
-    songImg:
-      "https://i1.sndcdn.com/artworks-1OHOA4uZkbc36Prf-ht3dkw-t500x500.jpg",
-    songName: "Smooth Criminal",
-    noOfFollowers: "1,034,450,090",
-  },
-  {
-    index: 4,
-    songImg:
-      "https://upload.wikimedia.org/wikipedia/en/3/3e/Earth_Song_cover.jpg",
-    songName: "Earth Song",
-    noOfFollowers: "4,234,989,000",
-  },
-  {
-    index: 5,
-    songImg:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGwiHncfzBj2eBDZJ2huqgU27ESCyRXgf4wA&usqp=CAU",
-    songName: "You Are Not Alone",
-    noOfFollowers: "3,234,490,600",
-  },
-  {
-    index: 6,
-    songImg: "https://i.ytimg.com/vi/B87SGx0OADY/maxresdefault.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
-  },
-];
+import { Album, Artist, Song } from "@/app/constants/models";
+import { getAlbumForArtists } from "@/app/services/SongServices";
+import { useAppSelector } from "@/lib/hooks";
+import { getSongsForArtist } from "@/app/services/SongServices";
 
 interface Props {
   params: { id: string };
 }
 
 export default function SingleArtistPage({ params: { id } }: Props) {
-  const [artistData, setArtistData] = React.useState<Artist>();
+  const [artistData, setArtistData] = React.useState<Artist>(); // This is the state for artist data
+  const [albumByArtist, setAlbumByArtist] = React.useState<Album[]>([]); // This is the state for album by artist
+  const artist = useAppSelector((state) => state.artist.user);
+  const [songByArtist, setSongByArtist] = React.useState<Song[]>([]); // This is the state for song by artist
 
+  // This is the useEffect for get artist
   React.useEffect(() => {
     console.log(id);
     getArtistV2(id).then((res) => {
@@ -135,11 +60,34 @@ export default function SingleArtistPage({ params: { id } }: Props) {
     });
   }, []);
 
+  // This is the useEffect for get album by artist
+  React.useEffect(() => {
+    getAlbumForArtists(artist?.token, id).then((res) => {
+      console.log("Albums:::", res);
+      setAlbumByArtist(res.data);
+    });
+  }, []);
+
+  // This is the useEffect for get song by artist
+  React.useEffect(() => {
+    getSongsForArtist(artist?.token, id).then((res) => {
+      console.log("Songs:::", res);
+      setSongByArtist(res.data);
+    });
+  }, []);
+
   return (
     <Maindiv>
       {artistData ? (
         <>
-          <CoverCardMedia image={artistData.user.artistCovers.length > 0 ? artistData.user.artistCovers[0] : "https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp"}>
+          {/* This is CardMedia component for backcover img */}
+          <CoverCardMedia
+            image={
+              artistData.user.artistCovers.length > 0
+                ? artistData.user.artistCovers[0]
+                : "https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp"
+            }
+          >
             <div
               style={{
                 background: "black",
@@ -151,20 +99,19 @@ export default function SingleArtistPage({ params: { id } }: Props) {
 
             <AllMiddleBox>
               <Stack direction="row" width="100%" spacing={"1px"}>
+                {/* This is the profilepictureavtar for artist profile pic*/}
+
                 <ProfilePicAvatar
-                  src={
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/170px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-                  }
+                  src={artistData.user.profilePicture}
                 ></ProfilePicAvatar>
 
+                {/* This is the artistdetailbox for artist details*/}
                 <ArtistDetailBox>
                   <ArtistNameBox>
                     {artistData.user.artistName}
                     <FlagBox></FlagBox>
                   </ArtistNameBox>
-                  <GenreBox>
-                    {artistData.user.musicGenres.join(", ")}
-                  </GenreBox>
+                  <GenreBox>{artistData.user.musicGenres.join(", ")}</GenreBox>
                   <SocialMediaBox>
                     <Button>
                       <FacebookRoundedIcon
@@ -193,13 +140,11 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                       padding: "30px 0px",
                     }}
                   >
-                    Michael Joseph Jackson was an American singer,
-                    songwriter,dancer, and philanthropist. Known as the "King of
-                    Pop", he is regarded as one of the most significant cultural
-                    figures ofthe 20th century.
+                    {artistData.user.artistBio}
                   </Box>
                 </ArtistDetailBox>
 
+                {/* This is the optionbox for artist options*/}
                 <OptionBox>
                   <Stack direction="row" width="100%" spacing={"1px"}>
                     <Button>
@@ -223,6 +168,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
             </AllMiddleBox>
           </CoverCardMedia>
 
+          {/* This is the searchpaper for searchbar*/}
           <Box
             style={{
               display: "flex",
@@ -241,6 +187,8 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                 
             </SearchPaper>
           </Box>
+
+          {/* This is the box for album caption*/}
           <Box
             style={{
               padding: "10px 0px 0px 20px",
@@ -252,29 +200,32 @@ export default function SingleArtistPage({ params: { id } }: Props) {
             Albums
           </Box>
 
-          <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-            {albumNames.map(({ album_id, name, year, img }) => (
-              <Grid item xs={4} md={2} style={{ paddingLeft: 0 }}>
+          {/* This is the grid for show albums*/}
+          <Grid container spacing={5} sx={{ margin: "1em auto", width: "95%" }}>
+            {albumByArtist.map((albums, index) => (
+              <Grid item xs={2} md={2} style={{ paddingLeft: 3 }}>
+                {/* This is the singlealbum component for show single album*/}
                 <SingleAlbum
-                  album_id={album_id}
-                  albumName={name}
-                  year={year}
-                  albumImg={img}
+                  album_id={albums.album_id}
+                  albumName={albums.album_title}
+                  year={albums.release_date?.trimStart().slice(0, 4)}
+                  albumImg={albums.album_img}
                 ></SingleAlbum>
               </Grid>
             ))}
           </Grid>
 
+          {/* This is the cardaction for discover more button*/}
           <CardActions style={{ justifyContent: "right", padding: "10px" }}>
             <Button
-              href="/main/artists/SingleArtistPage/MoreAlbums"
+              href={"/main/artists/SingleArtistPage/" + id}
               //variant="contained"
               size="small"
             >
               Discover More
             </Button>
           </CardActions>
-
+          {/* This is the box for song caption*/}
           <Box
             style={{
               padding: "0px 0px 0px 20px",
@@ -286,17 +237,19 @@ export default function SingleArtistPage({ params: { id } }: Props) {
             Songs
           </Box>
 
+          {/* This is the stack for show songs*/}
           <Stack>
-            {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
+            {songByArtist.map((songs, index) => (
               <SingleSongRow
-                index={index}
-                songImg={songImg}
-                songName={songName}
-                noOfFollowers={noOfFollowers}
+                song_id={songs.song_id}
+                songImg={songs.song_img}
+                songName={songs.song_title}
+                noOfFollowers={songs.no_of_impressions}
               ></SingleSongRow>
             ))}
           </Stack>
 
+          {/* This is the cardaction for discover more button*/}
           <CardActions style={{ justifyContent: "right", padding: "10px" }}>
             <Button
               href="/main/artists/SingleArtistPage/MoreSongs"
