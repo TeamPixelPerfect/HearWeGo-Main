@@ -124,7 +124,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   height: "100%",
 }));
 
-//created the artist card component
+//created the artist card component where the details of the artist are displayed
 export const ArtistCard: React.FC<ArtistCardProps> = ({
   name,
   Genre,
@@ -133,6 +133,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   return (
+    
     <Card
       sx={{
         position: "relative",
@@ -181,6 +182,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
   );
 };
 
+//A single row in the trending table
 export const TrendingRow: React.FC<tableRow> = ({
   LinkPage,
   Rank,

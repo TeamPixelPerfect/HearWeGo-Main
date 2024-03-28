@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -41,6 +41,7 @@ const tickets = [
   },
 ];
 
+
 function EventCreateShow(n: number) {
   const [ticketData, setTicketData] = useState(tickets);
 
@@ -56,7 +57,7 @@ function EventCreateShow(n: number) {
   } else if (n == 2) {
     return <PaymentDetails />;
   } else if (n == 3) {
-    return <SuccessfulDetails /> ;
+    return <SuccessfulDetails />;
   } else {
     return null;
   }
@@ -171,6 +172,7 @@ const ColorlibStepIconRoot = styled("div")<{
   }),
 }));
 
+//where the icons are defined and assigned to the steps
 function ColorlibStepIcon(props: StepIconProps) {
   const { active, completed, className } = props;
 
@@ -277,7 +279,7 @@ export default function Page() {
         }}
       >
         {allStepsCompleted() ? (
-          <React.Fragment>
+          <>
             <Typography sx={{ mt: 2, mb: 1 }}>
               All steps completed - you&apos;re finished
             </Typography>
@@ -285,9 +287,9 @@ export default function Page() {
               <Box sx={{ flex: "1 1 auto" }} />
               <Button onClick={handleReset}>Reset</Button>
             </Box>
-          </React.Fragment>
+          </>
         ) : (
-          <React.Fragment>
+          <>
             <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
               <div>{EventCreateShow(activeStep)}</div>
             </Typography>
@@ -310,7 +312,7 @@ export default function Page() {
                 {/* {completedSteps() === totalSteps() - 1 ? "Finish" : "Next"} */}
               </Button>
             </Box>
-          </React.Fragment>
+          </>
         )}
       </Box>
     </Maindiv>

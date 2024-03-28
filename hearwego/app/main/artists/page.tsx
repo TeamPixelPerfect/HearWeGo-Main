@@ -124,6 +124,7 @@ export default function Artist({ params: { id } }: props) {
     setValue(newValue);
   };
   return (
+    //This is the Maindiv that contains all the components
     <Maindiv>
       <Box
         sx={{
@@ -143,6 +144,7 @@ export default function Artist({ params: { id } }: props) {
             marginTop: "30px",
           }}
         >
+          {/* This is the SearchPaper that contains the search bar */}
           <SearchPaper>
             <InputBase
               sx={{ ml: 1, flex: 1 }}
@@ -154,6 +156,7 @@ export default function Artist({ params: { id } }: props) {
             </IconButton>
           </SearchPaper>
         </Box>
+        {/* This is the Stack that contains the CustomSelect components */}
         <Stack direction="row" spacing={5}>
           <CustomSelect
             labelId="genre-select-label"
@@ -213,6 +216,7 @@ export default function Artist({ params: { id } }: props) {
         spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
+        {/* Map all the artists to the ArtistCard component */}
         {allArtistData.map((artists) => (
           <ArtistCard
             name={artists.artistName}
@@ -317,6 +321,7 @@ export default function Artist({ params: { id } }: props) {
         spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
+        {/* Map all the artists to the ArtistCard component on the reverse order */}
         {allArtistData
           .slice()
           .reverse()

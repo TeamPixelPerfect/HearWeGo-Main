@@ -26,6 +26,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Stack from "@mui/material/Stack";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useTheme } from "@mui/material";
+
 export default function SinglePRCampaign() {
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
@@ -74,8 +75,20 @@ export default function SinglePRCampaign() {
                   color: "black",
                 }}
               >
-                <Typography sx={{ paddingLeft: "10px" , color: theme.palette.text.primary}}>Progress</Typography>
-                <Typography sx={{ paddingRight: "10px", color: theme.palette.text.primary}}>
+                <Typography
+                  sx={{
+                    paddingLeft: "10px",
+                    color: theme.palette.text.primary,
+                  }}
+                >
+                  Progress
+                </Typography>
+                <Typography
+                  sx={{
+                    paddingRight: "10px",
+                    color: theme.palette.text.primary,
+                  }}
+                >
                   60% Completed
                 </Typography>
               </Box>
@@ -203,6 +216,7 @@ export default function SinglePRCampaign() {
   );
 }
 
+//Linear Progress with label
 function LinearProgressWithLabel(
   props: LinearProgressProps & { value: number }
 ) {
@@ -219,7 +233,7 @@ function LinearProgressWithLabel(
     </Box>
   );
 }
-
+//a single task component for a Campaign
 export function SingleTask() {
   const [isChecked, setIsChecked] = React.useState(false);
 
@@ -250,7 +264,9 @@ export function SingleTask() {
         <Icon sx={{ color: theme.palette.text.primary, marginRight: "15px" }}>
           <ListAltIcon />
         </Icon>
-        <Typography sx={{ color: theme.palette.text.primary }}>Organize a Meeting</Typography>
+        <Typography sx={{ color: theme.palette.text.primary }}>
+          Organize a Meeting
+        </Typography>
       </Box>
       <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
     </Box>
