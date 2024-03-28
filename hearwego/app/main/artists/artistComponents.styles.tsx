@@ -124,7 +124,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   height: "100%",
 }));
 
-//created the artist card component
+//created the artist card component where the details of the artist are displayed
 export const ArtistCard: React.FC<ArtistCardProps> = ({
   name,
   Genre,
@@ -133,6 +133,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   return (
+    //created the card component for the artist
     <Card
       sx={{
         position: "relative",
@@ -140,15 +141,17 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
         height: "230px",
         marginBottom: 0,
         borderRadius: "30px",
-        transition: "transform 0.2s ease-in-out", 
+        transition: "transform 0.2s ease-in-out",
         transform: isHovered ? "scale(1.10)" : "scale(1)",
         marginRight: "20px",
         marginTop: "20px",
       }}
-      onMouseEnter={() => setIsHovered(true)} 
-      onMouseLeave={() => setIsHovered(false)} 
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
+      {/*created the link component for the artist card*/}
       <Link href={"/main/artists/" + id}>
+        {/*created the card action area for the artist card*/}
         <CardActionArea
           style={{
             backgroundImage: `url(${img_url})`,
@@ -159,6 +162,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
             textTransform: "capitalize",
           }}
         >
+          {/*created the card actions for the artist card*/}
           <Box
             sx={{
               marginTop: "70%",
@@ -181,6 +185,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
   );
 };
 
+//A single row in the trending table
 export const TrendingRow: React.FC<tableRow> = ({
   LinkPage,
   Rank,
@@ -194,6 +199,7 @@ export const TrendingRow: React.FC<tableRow> = ({
   return (
     <TableRow>
       <TableCell align="center">
+        {/*created the stack component for the trending row*/}
         <Stack
           direction={"row"}
           spacing={4}
@@ -225,7 +231,7 @@ export const TrendingRow: React.FC<tableRow> = ({
                 backgroundPosition: "center",
                 width: "25px",
                 height: "25px",
-                alignItems:"left"
+                alignItems: "left",
               }}
             ></div>
             <div>{Artist.name}</div>
