@@ -21,7 +21,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CancelIcon from "@mui/icons-material/Cancel";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
@@ -47,8 +46,6 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import PublicIcon from "@mui/icons-material/Public";
-import { GiPartyPopper } from "react-icons/gi";
-import { TypeSpecimenOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import {
   countCommas,
@@ -59,8 +56,6 @@ import Logo from "@/app/components/Logo";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getArtist, updateArtist } from "@/app/services/ArtistServices";
 import { logInArtist } from "@/lib/features/artist.slice";
-import { handleArtistLogin } from "@/app/services/AuthServices";
-import { current } from "@reduxjs/toolkit";
 
 interface Props {
   params: { id: string };

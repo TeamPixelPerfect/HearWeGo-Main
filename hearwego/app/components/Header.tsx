@@ -1,11 +1,10 @@
 "use client";
-import React, { use, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { AppItem } from "../constants/models";
 import Logo from "../components/Logo";
 import Navigation from "../components/Navigation";
-import { base_url } from "../constants/keys";
-import { IconButton, Button, Stack, PaletteMode } from "@mui/material";
+import { IconButton, Button } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -19,33 +18,6 @@ import { ColorModeContext } from "../styles/CustomeTheme";
 import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useSelector } from "react-redux";
-
-import { styled } from "@mui/material/styles";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-
-import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
-
-import {
-  FilledInput,
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from "@mui/material";
-import DropFile from "@/app/components/DropFile";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import { BorderColor, Visibility, VisibilityOff } from "@mui/icons-material";
-import { countries } from "country-flag-icons";
-import ReactCountryFlag from "react-country-flag";
-import { AuthTextField } from "@/app/styles/auth.styles";
 import UserProfilePopup from "./UserProfilePopup";
 
 interface Props {
@@ -105,6 +77,8 @@ const Header = ({ app }: Props) => {
                 <Brightness4Icon />
               )}
             </IconButton>
+
+            {/*User profile*/}
             {user ? (
               <React.Fragment>
                 <IconButton
@@ -131,7 +105,7 @@ const Header = ({ app }: Props) => {
               variant="contained"
               startIcon={<CellTowerIcon />}
               style={{ textTransform: "capitalize" }}
-              onClick={() => {router.push("main/predictor")}}
+              onClick={() => {router.push("/main/predictor")}}
             >
               Hit Predictor
             </Button>

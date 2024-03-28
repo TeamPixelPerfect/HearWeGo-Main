@@ -78,12 +78,7 @@ const MainAlbumCard = ({
         <GiSoundWaves />
         <Typography variant="body2">{albumLength}</Typography>
       </SongCardItem>
-      {/* 
-      <Box sx={{ width: "10%", display: "flex", justifyContent: "flex-end" }}>
-        <SongCardPlayButton onClick={toggle}>
-          {playing ? <IoIosPause /> : <IoIosPlay />}
-        </SongCardPlayButton>
-      </Box> */}
+    
       <IconButton onClick={handleOpen}>
         {open ? <IoClose /> : <IoMdMore />}
       </IconButton>

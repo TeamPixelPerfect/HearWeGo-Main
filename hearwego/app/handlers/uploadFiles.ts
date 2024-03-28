@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
-import { Content } from "next/font/google";
 
+// Function to upload image to S3 bucket
 export const uploadImage = async (fileName: string, buffer: string) => {
   const S3_BUCKET = "hwgbucket";
   const REGION = "ap-south-1";
@@ -43,6 +43,8 @@ export const uploadImage = async (fileName: string, buffer: string) => {
     }
 };
 
+
+// Function to upload song to S3 bucket
 export const uploadSong = async (file: File) => {
   const S3_BUCKET = "hwgbucket";
   const REGION = "ap-south-1";

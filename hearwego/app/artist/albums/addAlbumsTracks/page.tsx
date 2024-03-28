@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
+
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -30,7 +30,9 @@ import SaveIcon from "@mui/icons-material/Save";
 import { setAlbum } from "@/lib/features/album.slice";
 import { useRouter } from "next/navigation";
 
+// Main functional component for adding album tracks
 export default function AddAlbumTracks() {
+  // Initialize necessary hooks and state variables
   const theme = useTheme();
   const router = useRouter();
 
@@ -46,9 +48,11 @@ export default function AddAlbumTracks() {
 
   const [uploading, setUploading] = useState(false);
 
+  // Function to handle adding track to album
   const handleAddTrackToAlbum = () => {
     let errors = [false, false];
 
+    // Check for errors in image file and album songs
     if (!imageFile) {
       setImageErr(true);
       errors[0] = true;
@@ -59,10 +63,18 @@ export default function AddAlbumTracks() {
       errors[1] = true;
     }
 
+    // If there are errors, return without saving
     if (errors.includes(true)) {
       return;
     }
-    dispatch(setAlbum({ song_tracks: songTracks, album_img: imageFile ? imageFile : ""}));
+
+    // Dispatch action to set album and redirect to next step
+    dispatch(
+      setAlbum({
+        song_tracks: songTracks,
+        album_img: imageFile ? imageFile : "",
+      })
+    );
     router.push("/artist/albums/addAlbumData");
   };
 
@@ -84,9 +96,8 @@ export default function AddAlbumTracks() {
             </Typography>
 
             <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
-              <Box
-                sx={{ width: "30%"}}
-              >
+              {/* Box for uploading album cover image */}
+              <Box sx={{ width: "30%" }}>
                 <DropFile
                   fileTypes="Album Cover Image"
                   fileExtensions="JPEG,PNG,WEBP,SVG"
@@ -108,6 +119,7 @@ export default function AddAlbumTracks() {
                 </Typography>
               </Box>
 
+              {/* Box for adding songs to the album */}
               <Box sx={{ width: "70%" }}>
                 <Typography
                   component="div"
@@ -118,6 +130,8 @@ export default function AddAlbumTracks() {
 
                 <Box sx={{ width: "100%", display: "flex" }}>
                   <Box sx={{ width: "95%" }}>
+
+                     {/* Component for selecting songs */}
                     <SongSelectBox setAlbumSongs={setAlbumSongs} />
                   </Box>
                   <Box
@@ -137,6 +151,8 @@ export default function AddAlbumTracks() {
                 </Box>
 
                 <Box sx={{ width: "100%", marginTop: "1em" }}>
+                  
+                   {/* Display selected album songs */}
                   {albumSongs.map((song, index) => (
                     <SongCard
                       key={index}
@@ -170,6 +186,8 @@ export default function AddAlbumTracks() {
                 >
                   <Stack direction="row" spacing={2}>
                     <Button variant="outlined">Reset</Button>
+                   
+                    {/* Button to save album tracks */}
                     <LoadingButton
                       loading={uploading}
                       startIcon={<SaveIcon />}
@@ -192,12 +210,14 @@ export default function AddAlbumTracks() {
   );
 }
 
+// Interface for props of SongCard component
 interface SongCardProps {
   songData: any;
   setAlbumSongs?: any;
   setSongTracks?: any;
 }
 
+// Component for displaying individual song card
 function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
   const [song, setSong] = useState<Song>();
   const token = useAppSelector((state) => state.artist.user?.token);
@@ -208,13 +228,16 @@ function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
         setSongTracks((prev: any) => {
           if (prev) {
             if (prev.length > 0) {
-              const newSongs = prev.filter((s: any) => s.song_id !== song.song_id);
-              return [...newSongs, song];5
+              const newSongs = prev.filter(
+                (s: any) => s.song_id !== song.song_id
+              );
+              return [...newSongs, song];
+              5;
             }
             return [song];
           }
           return [song];
-         });
+        });
         setSong(song);
       }
     );
@@ -294,7 +317,10 @@ function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
   );
 }
 
+// Component for handling play/pause button
 function ClickPlay({ song_track }: { song_track: string }) {
+
+  // Custom hook to manage audio playback
   const { playing, toggle } = useAudio({ url: song_track });
 
   return (
@@ -311,26 +337,29 @@ function ClickPlay({ song_track }: { song_track: string }) {
         <IconButton sx={{ color: "primary.main" }}>
           <PauseCircleIcon
             sx={{ color: "primary.main", fontSize: 36 }}
-            //   sx={{ width: "30%", height: "auto" }}
+            
             onClick={toggle}
           />
         </IconButton>
-        // <PauseCircleIcon
-        //   sx={{ width: "30%", height: "auto" }}
-        //   onClick={togglePlay}
-        // />
+       
       )}
     </>
   );
 }
 
+// Component for selecting songs
 function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
+
+  // Initialize state variables
   const [songs, setSongs] = useState<Song[]>([]);
   const artist = useAppSelector((state) => state.artist.user);
 
+  // Fetch songs for the artist when component mounts
   useEffect(() => {
     if (artist?.user.artist_id && artist.token) {
       getSongsForArtist(artist.token, artist.user.artist_id).then((songs) => {
+       
+        // Map fetched songs to required format
         const data = songs.data.map((song: any) => ({
           label: song.song_title,
           value: song.song_id,
@@ -347,6 +376,8 @@ function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
       options={songs}
       sx={{ width: "90%" }}
       onChange={(event, newValue) => {
+
+        // Update selected songs
         setAlbumSongs((prev: any) => [...prev, newValue]);
       }}
       renderInput={(params) => (
@@ -361,6 +392,7 @@ function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
   );
 }
 
+// Dummy data for song selection
 const songSet = [
   { label: "I'll be there for you", year: 1994 },
   { label: "The Godfather", year: 1972 },

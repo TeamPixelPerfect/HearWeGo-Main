@@ -1,31 +1,23 @@
 "use client";
 import React, { use, useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { AppItem } from "../constants/models";
-import Logo from "../components/Logo";
-import Navigation from "../components/Navigation";
-import { base_url } from "../constants/keys";
-import { IconButton, Button, Stack, PaletteMode, Dialog, styled } from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import CellTowerIcon from "@mui/icons-material/CellTower";
+
+import {
+  IconButton,
+  Button,
+  Stack,
+  PaletteMode,
+  Dialog,
+  styled,
+} from "@mui/material";
+
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { setApp } from "@/lib/features/app.slice";
-import { usePathname } from "next/navigation";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import MenuIcon from "@mui/icons-material/Menu";
-import PersistentDrawerLeft from "./MobileDrawer";
-import { HeaderContainer } from "../styles/header.styles";
-import { ColorModeContext } from "../styles/CustomeTheme";
-import { useTheme } from "@mui/material/styles";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useSelector } from "react-redux";
+
 import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
+
 import DialogActions from "@mui/material/DialogActions";
 
 import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
 
 import {
   FilledInput,
@@ -38,14 +30,13 @@ import {
   TextField,
 } from "@mui/material";
 import DropFile from "@/app/components/DropFile";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import { BorderColor, Visibility, VisibilityOff } from "@mui/icons-material";
+
 import { countries } from "country-flag-icons";
 import ReactCountryFlag from "react-country-flag";
-import { AuthTextField } from "@/app/styles/auth.styles";
-import PhoneInput from "react-phone-input-2";
+
 import "react-phone-input-2/lib/bootstrap.css";
 
+// Styled dialog component
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -55,6 +46,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+// Props interface for UserProfilePopup component
 interface Props {
   open: boolean;
   open1: boolean;
@@ -64,6 +56,7 @@ interface Props {
   setOpen2: (open: boolean) => void;
 }
 
+// UserProfilePopup component definition
 const UserProfilePopup = ({
   open,
   open1,
@@ -75,13 +68,19 @@ const UserProfilePopup = ({
   const [profilePicture, setProfilePicture] = useState<any>(null);
   const [selectedCountry, setSelectedCountry] = useState("LK");
   const [countryError, setCountryError] = React.useState(false);
-
   const [mobileNumberError, setMobileNumberError] = React.useState(false);
 
+  // Accessing user from the redux store
+  const user = useAppSelector((state) => state.user.user);
+
+  const dispatch = useAppDispatch();
+
+  // Close dialog function
   const handleClose = () => {
     setOpen(false);
   };
 
+  // Functions to handle opening and closing of dialogs
   const handleClickOpen1 = () => {
     setOpen1(true);
   };
@@ -101,11 +100,13 @@ const UserProfilePopup = ({
     setUserDetails({ ...userDetails, country: event.target.value });
   };
 
+  // State for user details
   const [userDetails, setUserDetails] = React.useState({
     country: "",
     mobileNumber: "",
   });
 
+  // State for password visibility
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -116,18 +117,26 @@ const UserProfilePopup = ({
     event.preventDefault();
   };
 
+  // Get profile photo and country
+  useEffect(() => {
+    setProfilePicture(user?.profilePicture);
+    setSelectedCountry(user?.country ? user.country : "");
+  }, [user]);
 
+  // Return JSX for UserProfilePopup component
   return (
     <BootstrapDialog
       onClose={handleClose}
       aria-labelledby="customized-dialog-title"
       open={open}
     >
-      <Box sx={{ backgroundColor: "#3B1956", padding: "20px" }}>
+      <Box sx={{ padding: "20px" }}>
         <DialogTitle
-          sx={{ m: 0, color: "white", p: 2 }}
-          id="customized-dialog-title"
-        ></DialogTitle>
+          sx={{ mb: 2, p: 2, fontWeight: 700, fontSize: "32px" }}
+          id="user-greeting"
+        >
+          Hello, {user?.name.split(" ")[0]}!
+        </DialogTitle>
         <IconButton
           aria-label="close"
           onClick={handleClose}
@@ -135,12 +144,13 @@ const UserProfilePopup = ({
             position: "absolute",
             right: 8,
             top: 8,
-            color: "white",
           }}
         >
           <CloseIcon />
         </IconButton>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+
+        {/* Profile picture section */}
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
           <DropFile
             fileTypes="Profile Picture"
             fileExtensions="PNG,JPEG,WEBP"
@@ -154,7 +164,7 @@ const UserProfilePopup = ({
             shape="round"
           />
         </Box>
-
+        {/* Form for user Details*/}
         <Box
           component="form"
           sx={{
@@ -165,17 +175,10 @@ const UserProfilePopup = ({
         >
           <div>
             <TextField
-              id="filled-helperText"
+              id="user-name"
               label="User Name"
-              defaultValue="Default Value"
+              defaultValue={user?.name}
               variant="filled"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <BorderColorIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </div>
         </Box>
@@ -189,25 +192,20 @@ const UserProfilePopup = ({
         >
           <div>
             <TextField
-              id="filled-helperText"
+              id="user-email"
               label="E-mail"
-              defaultValue="Default Value"
+              defaultValue={user?.email}
               variant="filled"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <BorderColorIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </div>
         </Box>
 
+        {/*Change Password*/}
         <Box
           sx={{
             display: "flex",
             margin: "20px",
+            marginTop: 5,
             justifyContent: "space-evenly",
           }}
         >
@@ -221,7 +219,7 @@ const UserProfilePopup = ({
               aria-labelledby="customized-dialog-title"
               open={open1}
             >
-              <Box sx={{ backgroundColor: "#3B1956", padding: "30px" }}>
+              <Box sx={{ padding: "30px" }}>
                 <DialogTitle sx={{ m: 0, p: 3 }} id="customized-dialog-title">
                   Change Password
                 </DialogTitle>
@@ -291,6 +289,7 @@ const UserProfilePopup = ({
             </BootstrapDialog>
           </React.Fragment>
 
+          {/*Change mobile Number*/}
           <React.Fragment>
             <Button variant="contained" onClick={handleClickOpen2}>
               Change mobile NO
@@ -309,7 +308,6 @@ const UserProfilePopup = ({
               >
                 <Box
                   sx={{
-                    backgroundColor: "#3B1956",
                     padding: "20px",
                   }}
                 >
@@ -329,9 +327,11 @@ const UserProfilePopup = ({
                   >
                     <div>
                       <TextField
-                        id="filled-helperText"
+                        id="old-mobile-number"
                         label="Old Mobile Number"
-                        defaultValue="* ** ** ** 564"
+                        defaultValue={
+                          "*** ** ***" + user?.mobileNumber.substring(9, 12)
+                        }
                         variant="filled"
                       />
                     </div>
@@ -405,7 +405,7 @@ const UserProfilePopup = ({
                       }
                     />
                   </Stack>
-                 
+
                   <IconButton
                     aria-label="close"
                     onClick={handleClose2}
