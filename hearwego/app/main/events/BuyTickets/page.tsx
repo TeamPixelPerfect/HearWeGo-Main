@@ -41,7 +41,7 @@ const tickets = [
   },
 ];
 
-
+//function to show the components based on the step
 function EventCreateShow(n: number) {
   const [ticketData, setTicketData] = useState(tickets);
 
@@ -63,6 +63,7 @@ function EventCreateShow(n: number) {
   }
 }
 
+//styled components for the stepper
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 10,

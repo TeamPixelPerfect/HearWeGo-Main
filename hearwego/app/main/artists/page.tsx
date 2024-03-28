@@ -64,20 +64,25 @@ interface props {
   params: { id: string };
 }
 export default function Artist({ params: { id } }: props) {
+  //State variables for the filters
   const [genre, setGenre] = React.useState("");
   const [profession, setProfession] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [country, setCountry] = React.useState("");
   const [type, setType] = React.useState("");
 
+  //Redux state variables
   const artist = useAppSelector((state) => state.artist.user);
 
+  //State variables for the artist data
   const [allArtistData, setAllArtistData] = useState<Artist[]>([]);
   const [page, setPage] = useState(1);
   const [per_page, setLimit] = useState(5);
 
+  //State variables for the artist songs
   const [allArtistSongs, setAllArtistSongs] = useState<Song[]>([]);
 
+  //Get all the artists
   useEffect(() => {
     getAllArtists(page, per_page).then((res) => {
       console.log(res);
@@ -85,37 +90,40 @@ export default function Artist({ params: { id } }: props) {
     });
   }, [page]);
 
+  //Get all the songs for the artist
   useEffect(() => {
     getSongsForArtist(artist?.token, id).then((Songs) => {
       console.log(Songs);
       setAllArtistSongs(Songs.data);
     });
   }, []);
-
+  //Handle the change of the genre filter
   const handleGenreChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGenre(event.target.value as string);
   };
-
+  //Handle the change of the profession filter
   const handleProfessionChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     setProfession(event.target.value as string);
   };
-
+  //Handle the change of the Gender filter
   const handleGenderChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGender(event.target.value as string);
   };
-
+  //Handle the change of the Country filter
   const handleCountryChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     setCountry(event.target.value as string);
   };
 
+  //Handle the change of the Type filter
   const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setType(event.target.value as string);
   };
 
+  //State variable for the value of the scroll
   const [value, setValue] = React.useState(0);
   const handleScrollChange = (
     event: React.SyntheticEvent,
@@ -205,12 +213,14 @@ export default function Artist({ params: { id } }: props) {
           />
         </Stack>
       </Box>
+      {/* This is the Typography that contains the text "Featured Artists" */}
       <Typography
         variant="h6"
         sx={{ marginTop: "20px", color: "text.primary" }}
       >
         Featured Artists
       </Typography>
+      {/* This is the Stack that contains the ArtistCard components */}
       <Stack
         direction="row"
         spacing={2}
@@ -230,6 +240,7 @@ export default function Artist({ params: { id } }: props) {
           />
         ))}
       </Stack>
+      {/* This is the Typography that contains the text "Trending Artists" */}
       <Typography
         variant="h6"
         sx={{ marginTop: "20px", color: "text.primary" }}
@@ -240,6 +251,7 @@ export default function Artist({ params: { id } }: props) {
         component={Paper}
         style={{ borderRadius: "30px", marginTop: "20px" }}
       >
+        {/* This is the Table that contains the TrendingRow components */}
         <Table
           sx={{
             width: "100%",
@@ -258,6 +270,7 @@ export default function Artist({ params: { id } }: props) {
             </TableRow>
           </TableHead>
           <TableBody>
+            {/* Map all the artists to the TrendingRow component */}
             {allArtistData.map((artists) => (
               <TrendingRow
                 Rank={{
@@ -299,6 +312,7 @@ export default function Artist({ params: { id } }: props) {
           display: "flex",
         }}
       >
+        {/* Link to the TrendingArtistsSeeMore page */}
         <Link href="/main/artists/TrendingArtistsSeeMore/">
           <Typography
             variant="body1"
