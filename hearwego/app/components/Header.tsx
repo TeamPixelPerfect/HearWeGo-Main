@@ -1,16 +1,15 @@
 "use client";
-import React, { use, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { AppItem } from "../constants/models";
 import Logo from "../components/Logo";
 import Navigation from "../components/Navigation";
-import { base_url } from "../constants/keys";
-import { IconButton, Button, Stack, PaletteMode } from "@mui/material";
+import { IconButton, Button } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CellTowerIcon from "@mui/icons-material/CellTower";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setApp } from "@/lib/features/app.slice";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersistentDrawerLeft from "./MobileDrawer";
@@ -19,6 +18,7 @@ import { ColorModeContext } from "../styles/CustomeTheme";
 import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import UserProfilePopup from "./UserProfilePopup";
 
 interface Props {
   app: AppItem;
@@ -35,9 +35,20 @@ const Header = ({ app }: Props) => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
 
+  const router = useRouter();
+
+  const user = useAppSelector((state) => state.user.user);
+
   useEffect(() => {
     dispatch(setApp(app));
   }, []);
+
+  const [open1, setOpen1] = React.useState(false);
+  const [open2, setOpen2] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
   return (
     <HeaderContainer pathName={pathName}>
@@ -56,7 +67,7 @@ const Header = ({ app }: Props) => {
         {matches ? (
           <Box>
             <IconButton
-              sx={{ ml: 1 }}
+              sx={{ ml: 1, mr: 2 }}
               onClick={colorMode.toggleColorMode}
               color="inherit"
             >
@@ -66,19 +77,35 @@ const Header = ({ app }: Props) => {
                 <Brightness4Icon />
               )}
             </IconButton>
-            <IconButton
-              aria-label="user-profile"
-              size="large"
-              style={{ margin: "0 16px" }}
-            >
-              <AccountCircleIcon sx={{ color: "#fff" }} fontSize="large" />
-            </IconButton>
+
+            {/*User profile*/}
+            {user ? (
+              <React.Fragment>
+                <IconButton
+                  onClick={handleClickOpen}
+                  aria-label="user-profile"
+                  size="large"
+                  style={{ marginRight: "16px" }}
+                >
+                  <AccountCircleIcon sx={{ color: "#fff" }} fontSize="large" />
+                </IconButton>
+                <UserProfilePopup
+                  open={open}
+                  open1={open1}
+                  open2={open2}
+                  setOpen={setOpen}
+                  setOpen1={setOpen1}
+                  setOpen2={setOpen2}
+                />
+              </React.Fragment>
+            ) : null}
             <Button
               component="label"
               color="secondary"
               variant="contained"
               startIcon={<CellTowerIcon />}
               style={{ textTransform: "capitalize" }}
+              onClick={() => {router.push("/main/predictor")}}
             >
               Hit Predictor
             </Button>
