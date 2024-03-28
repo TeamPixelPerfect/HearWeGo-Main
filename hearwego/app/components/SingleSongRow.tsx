@@ -6,14 +6,16 @@ import React, { useState } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface Props {
-  index: number;
+  //index: number;
   songImg: string;
   songName: string;
   noOfFollowers: string;
+  song_id: string;
 }
 
 export default function SingleAlbum({
-  index,
+  //index,
+  song_id,
   songImg,
   songName,
   noOfFollowers,
@@ -32,6 +34,8 @@ export default function SingleAlbum({
         //height: "10%",
         backgroundColor: "primary.light",
         //display: "flex",
+        border: "1px solid black",
+        borderRadius: "10px",
       }}
     >
       <Stack direction="row" width="100%">
@@ -46,7 +50,7 @@ export default function SingleAlbum({
             color: "primary.default",
           }}
         >
-          {index}
+          *
         </Box>
         <Box
           sx={{
@@ -81,7 +85,6 @@ export default function SingleAlbum({
                 fontFamily: "Roboto",
                 fontWeight: "bold",
                 color: "primary.default",
-
                 textAlign: "center",
                 //backgroundColor:'yellow'
               }}
@@ -100,7 +103,7 @@ export default function SingleAlbum({
                 //backgroundColor:'red'
               }}
             >
-              {noOfFollowers}
+              {noOfFollowers ? noOfFollowers : "0"}
             </Box>
           </Stack>
         </Box>
@@ -152,7 +155,6 @@ export default function SingleAlbum({
             position: "relative",
             display: "flex",
             right: "5%",
-         
           }}
         >
           <MoreVertIcon />

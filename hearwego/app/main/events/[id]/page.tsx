@@ -1,6 +1,7 @@
+
+
 "use client";
 import * as React from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -14,9 +15,6 @@ import { BsPersonStanding } from "react-icons/bs";
 import SpatialTrackingIcon from "@mui/icons-material/SpatialTracking";
 import SingleEventComponent from "@/app/components/SingleEvent";
 import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-
-import CardMedia from "@mui/material/CardMedia";
 
 interface Props {
   params: { id: string };
@@ -104,9 +102,9 @@ const recommendEvents = [
 
 ]
 export default function SingleEvent({ params: { id } }: Props) {
-  console.log("Event_id::", id);
   return (
     <Maindiv>
+      {/* This is the CoverEventCardMedia component for backcover img */}
       <CoverEventCardMedia image="https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png">
         <div
           style={{
@@ -116,12 +114,14 @@ export default function SingleEvent({ params: { id } }: Props) {
             opacity: "0.7",
           }}
         ></div>
-
+      
+      {/* This is the EventBox component for event details */}
         <EventBox>
           <EventNameBox>Beats</EventNameBox>
           <ArtistNameBox>Kaizer Kaize</ArtistNameBox>
         </EventBox>
 
+        {/* This is the OptionBox component for event options */}
         <OptionBox>
           <Stack direction="row" width="100%" spacing={"1px"}>
             <Button>
@@ -163,7 +163,8 @@ export default function SingleEvent({ params: { id } }: Props) {
         }}
       >
         <MiddleEventImageBox></MiddleEventImageBox>
-
+      
+      {/* This is the LeftBox component for event details */}
         <LeftBox>
           <Box
             sx={{
@@ -272,6 +273,8 @@ export default function SingleEvent({ params: { id } }: Props) {
               alignItems: "center",
             }}
           >
+
+           {/* This is the Box component for event description */}
             <Box
               sx={{
                 width: "100%",
@@ -344,7 +347,8 @@ export default function SingleEvent({ params: { id } }: Props) {
           </Button>
         </CardActions>
       </Box>
-
+ 
+      {/* This is the grid for recommend events */}
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
         {recommendEvents.map(
           ({ name, img, date, day, time, artist, event_id }) => (
