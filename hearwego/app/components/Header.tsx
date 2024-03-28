@@ -105,6 +105,8 @@ const Header = ({ app }: Props) => {
                 <Brightness4Icon />
               )}
             </IconButton>
+
+            {/*User profile*/}
             {user ? (
               <React.Fragment>
                 <IconButton
