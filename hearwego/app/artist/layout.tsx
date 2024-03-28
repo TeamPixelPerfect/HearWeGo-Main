@@ -1,8 +1,5 @@
 "use client";
 
-import Header from "../components/Header";
-import { AppItem } from "../constants/models";
-import { base_url } from "../constants/keys";
 import ArtistDashboardSideNav from "../components/ArtistDashboardSideNav";
 import { ArtistDashboardLayout } from "../styles/artistDashboard.styles";
 import ArtistDashboardHeader from "../components/ArtistDashboaardHeader";
@@ -11,7 +8,6 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { logInArtist } from "@/lib/features/artist.slice";
-import { handleArtistLogin } from "../services/AuthServices";
 import { getArtist } from "../services/ArtistServices";
 
 export default function Layout({
