@@ -1,5 +1,6 @@
 import { base_url } from "../constants/keys";
 
+// get all songs service
 export const getSongs = async (
   token: string,
   page?: number,
@@ -25,7 +26,7 @@ export const getSongs = async (
   }
 };
 
-
+// get songs for a artist
 export const getSongsForArtist = async (
   token: string,
   artistId: string,
@@ -51,6 +52,7 @@ export const getSongsForArtist = async (
   }
 };
 
+// get a single song by id
 export const getSong = async (token: string, songId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs/${songId}`, {
     method: "GET",
@@ -68,6 +70,7 @@ export const getSong = async (token: string, songId: string) => {
   }
 };
 
+// add a new song
 export const addSong = async (token: string, data: any) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs`, {
     method: "POST",
@@ -86,6 +89,7 @@ export const addSong = async (token: string, data: any) => {
   }
 };
 
+// update a song
 export const updateSong = async (token: string, songId: string, data: any) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs/${songId}`, {
     method: "PATCH",
@@ -104,6 +108,7 @@ export const updateSong = async (token: string, songId: string, data: any) => {
   }
 };
 
+// delete a song
 export const deletSong = async (token: string, songId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs/${songId}`, {
     method: "DELETE",
@@ -121,6 +126,7 @@ export const deletSong = async (token: string, songId: string) => {
   }
 };
 
+// get all albums
 export const getAlbums = async (token: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/albums`, {
     method: "GET",
@@ -138,6 +144,7 @@ export const getAlbums = async (token: string) => {
   }
 };
 
+// get albums for a artist
 export const getAlbumForArtists = async (
   token: string,
   artistId: string,
@@ -162,6 +169,7 @@ export const getAlbumForArtists = async (
   }
 };
 
+// get a single album by id
 export const getAlbum = async (token: string, albumId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/albums/${albumId}`, {
     method: "GET",
@@ -179,6 +187,7 @@ export const getAlbum = async (token: string, albumId: string) => {
   }
 };
 
+// add a new album
 export const addAlbum = async (token: string, data: any) => {
   const res = await fetch(`${base_url}/DiscographyManager/albums`, {
     method: "POST",
@@ -197,6 +206,7 @@ export const addAlbum = async (token: string, data: any) => {
   }
 };
 
+// update an album
 export const updateAlbum = async (
   token: string,
   albumId: string,
@@ -219,6 +229,7 @@ export const updateAlbum = async (
   }
 };
 
+// delete an album
 export const deletAlbum = async (token: string, albumId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/albums/${albumId}`, {
     method: "DELETE",

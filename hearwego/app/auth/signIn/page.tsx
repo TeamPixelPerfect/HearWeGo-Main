@@ -9,7 +9,6 @@ import {
   useTheme,
 } from "@mui/material";
 import React from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -26,14 +25,17 @@ const SignIn = () => {
 
   const matches = useMediaQuery("(max-width:960px)");
 
+  // State to store user details
   const [userDetails, setUserDetails] = React.useState({
     email: "",
     password: "",
   });
 
+  // State to store error status of email and password fields
   const [emailError, setEmailError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
 
+  // Function to handle sign in
   const handleSignIn = () => {
     const errors = [false, false];
 
@@ -59,16 +61,6 @@ const SignIn = () => {
 
   return (
     <AuthContainer>
-      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
-        <CloseIcon
-          sx={{
-            color: "rgba(255,255,255,0.4)",
-            fontSize: "2rem",
-            cursor: "pointer",
-            alignSelf: "flex-end",
-          }}
-        />
-      </Stack> */}
       <Box
         sx={{
           display: "flex",
@@ -104,6 +96,7 @@ const SignIn = () => {
             // background: "magenta"
           }}
         >
+          {/* Logo */}
           <Logo
             img_url={
               theme.palette.mode === "dark"
@@ -111,6 +104,8 @@ const SignIn = () => {
                 : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
             }
           />
+
+          {/* Sign in text */}
           <Typography
             variant="h4"
             sx={{
@@ -121,6 +116,8 @@ const SignIn = () => {
           >
             Sign into HearWeGo
           </Typography>
+
+          {/* Email */}
           <AuthTextField
             id="email"
             label="Email*"
@@ -134,8 +131,9 @@ const SignIn = () => {
             }}
             helperText={emailError ? "Email is required" : ""}
             FormHelperTextProps={{ style: { color: "red" } }}
-            // inputRef={(input) => input && emailError && input.focus()}
           />
+
+          {/* Password */}
           <AuthTextField
             id="password"
             label="Password*"
@@ -151,22 +149,8 @@ const SignIn = () => {
             FormHelperTextProps={{ style: { color: "red" } }}
           />
 
+          {/* Sign in button */}
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
-            {/* <Button
-              size="large"
-              variant="contained"
-              color="secondary"
-              startIcon={<ArrowCircleLeftIcon />}
-              sx={{
-                marginTop: "30px",
-                textTransform: "capitalize",
-                padding: "8px 32px",
-                background: "#787878",
-              }}
-              onClick={() => decrementStep(1)}
-            >
-              Back
-            </Button> */}
             <Button
               size="large"
               variant="contained"
@@ -183,6 +167,7 @@ const SignIn = () => {
             </Button>
           </Stack>
 
+          {/* Sign up link */}
           <Typography variant="body1" sx={{ marginTop: "40px" }}>
             Don't have an account?{" "}
             <Link href="/auth/signUp" style={{ color: "#C084FC" }}>

@@ -1,5 +1,6 @@
 import { base_url } from "../constants/keys";
 
+// user signup service
 export const handleRegister = async (data: any) => {
   const res = await fetch(`${base_url}/auth/signup`, {
     method: "POST",
@@ -17,6 +18,7 @@ export const handleRegister = async (data: any) => {
   }
 };
 
+// user login service
 export const handleLogin = async (data: any) => {
   const res = await fetch(`${base_url}/auth/login`, {
     method: "POST",
@@ -34,6 +36,7 @@ export const handleLogin = async (data: any) => {
   }
 };
 
+// artist signup service
 export const handleArtistRegister = async (data: any) => {
   const res = await fetch(`${base_url}/auth/artist/signup`, {
     method: "POST",
@@ -51,6 +54,7 @@ export const handleArtistRegister = async (data: any) => {
   }
 };
 
+// artist login service
 export const handleArtistLogin = async (data: any) => {
   const res = await fetch(`${base_url}/auth/artist/login`, {
     method: "POST",

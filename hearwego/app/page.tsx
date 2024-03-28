@@ -57,6 +57,7 @@ const Home = () => {
           </HomeBannerButton>
         </HomeBannerButtonContainer>
       </HomeBanner>
+      
       <HomeServicesContainer>
         {app.service_items
           ? app.service_items.map((item: serviceItem, index: number) => {
@@ -124,6 +125,7 @@ const Home = () => {
             })
           : "Loading..."}
       </HomeServicesContainer>
+      
       <Footer />
     </>
   );

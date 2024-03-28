@@ -43,6 +43,7 @@ const DropSong = ({
   const [blob, setBlob] = useState<Blob>();
   const visualizerRef = useRef<HTMLCanvasElement>(null);
 
+  // Function to handle the file selection
   const handleSelectFile = (acceptedFiles: File[]) => {
     setFile(acceptedFiles[0]);
     var blob = new Blob([acceptedFiles[0]], { type: "audio/mp3" });
@@ -87,6 +88,7 @@ const DropSong = ({
                 objectFit: "cover",
               }}
             >
+              {/* Visualize the uploaded song */}
               {blob ? (
                 <Box>
                   <AudioVisualizer

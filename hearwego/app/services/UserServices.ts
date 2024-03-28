@@ -1,5 +1,6 @@
 import { base_url } from "../constants/keys";
 
+// get user service
 export const getUser = async (id: string) => {
     const res = await fetch(`${base_url}/users/${id}`, {
       method: "GET",
