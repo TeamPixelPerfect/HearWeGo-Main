@@ -15,7 +15,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import VideoLabelIcon from "@mui/icons-material/VideoLabel";
 import { DateField } from "@mui/x-date-pickers/DateField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import StepConnector, {
@@ -433,12 +433,15 @@ function SelectEventType() {
   );
 }
 
+let sessionCount = 0;
+
 function EventDetails() {
   const [numberOfSessions, setNumberOfSessions] = useState(0);
 
   const handleNumberOfSessionsChange = (event) => {
     const value = parseInt(event.target.value);
     setNumberOfSessions(isNaN(value) ? 0 : value);
+    sessionCount = value;
   };
 
   const generateDivs = () => {
@@ -451,6 +454,12 @@ function EventDetails() {
       );
     }
     return divs;
+  };
+
+  const [isAgeEnabled, setIsAgeEnabled] = useState(false);
+
+  const handleCheckboxChange = (event) => {
+    setIsAgeEnabled(event.target.checked);
   };
 
   const [imgFile, setImgFile] = React.useState(null);
@@ -513,6 +522,7 @@ function EventDetails() {
                     }}
                     variant="filled"
                     sx={{ width: "48%" }}
+                    disabled={!isAgeEnabled}
                   />
 
                   <TextField
@@ -524,10 +534,19 @@ function EventDetails() {
                     }}
                     variant="filled"
                     sx={{ width: "48%" }}
+                    disabled={!isAgeEnabled}
                   />
                 </Box>
 
-                <FormControlLabel control={<Checkbox />} label="Age Limits" />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isAgeEnabled}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label="Age Limits"
+                />
               </Stack>
 
               <TextField
@@ -554,32 +573,44 @@ function EventDetails() {
         </Typography>
         {generateDivs()}
       </Paper>
-    
+
       <SponsorField />
       <TeamField />
     </>
   );
 }
 
-function SessionArea() {
-  return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Sessions
-      </Typography>
-      <SessionForm />
-    </Paper>
-  );
-}
+// function SessionArea() {
+//   return (
+//     <Paper
+//       sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+//       elevation={3}
+//     >
+//       <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+//         Sessions
+//       </Typography>
+//       <SessionForm />
+//     </Paper>
+//   );
+// }
 
 function TicketDetails() {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
 
   const handleSwitchChange = (event) => {
     setIsChecked(event.target.checked);
+  };
+
+  const generateDivs = () => {
+    const divs = [];
+    for (let i = 0; i < sessionCount; i++) {
+      divs.push(
+        <div key={i}>
+          <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
+        </div>
+      );
+    }
+    return divs;
   };
 
   return (
@@ -594,7 +625,15 @@ function TicketDetails() {
           />
         </FormGroup>
       </InputRow>
-      <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
+      <Paper
+        sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+        elevation={3}
+      >
+        <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+          Tickets Details
+        </Typography>
+        {generateDivs()}
+      </Paper>
     </div>
   );
 }
@@ -634,7 +673,10 @@ function SessionForm() {
     dayjs("2022-04-17T15:30")
   );
   return (
-    <Paper sx={{ width: "100%", padding: "2em", marginBottom: "1em" }} elevation={3}>
+    <Paper
+      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+      elevation={3}
+    >
       <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
         Session 01
       </Typography>
@@ -782,8 +824,6 @@ function TeamField() {
       <Box sx={{ width: "100%" }}>
         <TeamTable />
       </Box>
-
-      <TeamModal />
     </Paper>
   );
 }
@@ -872,17 +912,56 @@ const teamColumns: GridColDef[] = [
   { field: "teamEmail", headerName: "E-mail", width: 250 },
 ];
 
-const teamRows = [
-  {
-    id: 1,
-    teamType: "Organizing",
-    teamName: "Test",
-    teamContact: "077-9999999",
-    teamEmail: "test@gmail.com",
-  },
-];
+let teamRows = [];
 
 function TeamTable() {
+  const [teamType, setTeamType] = useState("");
+  const [teamName, setTeamName] = useState("");
+  const [teamContact, setTeamContact] = useState("");
+  const [teamEmail, setTeamEmail] = useState("");
+
+  const handleTeamTypeChange = (event) => {
+    setTeamType(event.target.value);
+  };
+
+  const handleTeamNameChange = (event) => {
+    setTeamName(event.target.value);
+  };
+
+  const handleTeamContactChange = (event) => {
+    setTeamContact(event.target.value);
+  };
+
+  const handleTeamEmailChange = (event) => {
+    setTeamEmail(event.target.value);
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const addNewTeam = () => {
+    const newId = teamRows.length + 1;
+    const newTeam = {
+      id: newId,
+      teamType: teamType,
+      teamName: teamName,
+      teamContact: teamContact,
+      teamEmail: teamEmail,
+    };
+
+    const newTeamRows = [...teamRows, newTeam];
+
+    teamRows = newTeamRows;
+
+    refreshTable();
+    handleClose();
+  };
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
@@ -896,6 +975,75 @@ function TeamTable() {
         pageSizeOptions={[5, 10]}
         checkboxSelection
       />
+
+      <div>
+        <Button onClick={handleOpen}>Add New Team</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={teamModalStyle}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1em" }}
+            >
+              Team Details
+            </Typography>
+
+            <TextField
+              id="team_type"
+              label="Team Type"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTeamTypeChange}
+            />
+
+            <TextField
+              id="team_name"
+              label="Team Name"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTeamNameChange}
+            />
+
+            <TextField
+              id="team_contact"
+              label="Contact No."
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTeamContactChange}
+            />
+
+            <TextField
+              id="team_email"
+              label="Email"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTeamEmailChange}
+            />
+
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="contained" onClick={addNewTeam}>
+                Add
+              </Button>
+            </Stack>
+          </Box>
+
+          {/* <Stack direction="row" spacing={2}>
+          <Button variant="outlined">Close</Button>
+          <Button variant="contained" startIcon={<AddIcon />}>
+            Add
+          </Button>
+        </Stack> */}
+        </Modal>
+      </div>
     </div>
   );
 }
@@ -913,8 +1061,6 @@ function SponsorField() {
       <Box sx={{ width: "100%" }}>
         <SponsorTable />
       </Box>
-
-      <SponsorModal />
     </Paper>
   );
 }
@@ -931,11 +1077,13 @@ const sponsorModalStyle = {
   p: 4,
 };
 
+let sponsorRows = [];
+
 function SponsorModal() {
-  const [sponsorType, setSponsorType] = useState('');
-  const [sponsorName, setSponsorName] = useState('');
-  const [sponsorContact, setSponsorContact] = useState('');
-  const [sponsorEmail, setSponsorEmail] = useState('');
+  const [sponsorType, setSponsorType] = useState("");
+  const [sponsorName, setSponsorName] = useState("");
+  const [sponsorContact, setSponsorContact] = useState("");
+  const [sponsorEmail, setSponsorEmail] = useState("");
 
   const handleSponsorTypeChange = (event) => {
     setSponsorType(event.target.value);
@@ -957,15 +1105,22 @@ function SponsorModal() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const addNewSponsor = ()=> {
-    sponsorRows.push({
-      id: sponsorRows.length+1,
-  sponsorType: sponsorType, 
-  sponsorName: sponsorName, 
-  sponsorContact: sponsorContact,
-  sponsorEmail: sponsorEmail, 
-    })
-  }
+  const addNewSponsor = () => {
+    const newId = sponsorRows.length + 1;
+    const newSponsor = {
+      id: newId,
+      sponsorType: sponsorType,
+      sponsorName: sponsorName,
+      sponsorContact: sponsorContact,
+      sponsorEmail: sponsorEmail,
+    };
+
+    const newSponsorRows = [...sponsorRows, newSponsor];
+
+    sponsorRows = newSponsorRows;
+
+    handleClose();
+  };
 
   return (
     <div>
@@ -1017,11 +1172,14 @@ function SponsorModal() {
             sx={{ width: "100%", marginBottom: 2 }}
             onChange={handleSponsorEmailChange}
           />
-        <Stack direction='row' spacing={2}>
-        <Button variant="outlined" onClick={handleClose}>Close</Button>
-        <Button variant="contained" onClick={addNewSponsor}>Add</Button>
-        </Stack>
-        
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" onClick={handleClose}>
+              Close
+            </Button>
+            <Button variant="contained" onClick={addNewSponsor}>
+              Add
+            </Button>
+          </Stack>
         </Box>
 
         {/* <Stack direction="row" spacing={2}>
@@ -1043,20 +1201,59 @@ const sponsorColumns: GridColDef[] = [
   { field: "sponsorEmail", headerName: "E-mail", width: 250 },
 ];
 
-var sponsorRows = [
-  {
-    id: 1,
-    sponsorType: "Main",
-    sponsorName: "Pepsi",
-    sponsorContact: "077-9999999",
-    sponsorEmail: "pepsi@gmail.com",
-  },
-];
-
 function SponsorTable() {
+  const [sponsorType, setSponsorType] = useState("");
+  const [sponsorName, setSponsorName] = useState("");
+  const [sponsorContact, setSponsorContact] = useState("");
+  const [sponsorEmail, setSponsorEmail] = useState("");
+
+  const handleSponsorTypeChange = (event) => {
+    setSponsorType(event.target.value);
+  };
+
+  const handleSponsorNameChange = (event) => {
+    setSponsorName(event.target.value);
+  };
+
+  const handleSponsorContactChange = (event) => {
+    setSponsorContact(event.target.value);
+  };
+
+  const handleSponsorEmailChange = (event) => {
+    setSponsorEmail(event.target.value);
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const addNewSponsor = () => {
+    const newId = sponsorRows.length + 1;
+    const newSponsor = {
+      id: newId,
+      sponsorType: sponsorType,
+      sponsorName: sponsorName,
+      sponsorContact: sponsorContact,
+      sponsorEmail: sponsorEmail,
+    };
+
+    const newSponsorRows = [...sponsorRows, newSponsor];
+
+    sponsorRows = newSponsorRows;
+
+    refreshTable();
+    handleClose();
+  };
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
+        key={refreshKey}
         rows={sponsorRows}
         columns={sponsorColumns}
         initialState={{
@@ -1067,6 +1264,74 @@ function SponsorTable() {
         pageSizeOptions={[5, 10]}
         checkboxSelection
       />
+
+      <div>
+        <Button onClick={handleOpen}>Add New Sponsor</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={sponsorModalStyle}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1em" }}
+            >
+              Sponsor Details
+            </Typography>
+
+            <TextField
+              id="sponsor_type"
+              label="Sponsor Type"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleSponsorTypeChange}
+            />
+
+            <TextField
+              id="sponsor_name"
+              label="Sponsor Name"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleSponsorNameChange}
+            />
+
+            <TextField
+              id="sponsor_contact"
+              label="Contact No."
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleSponsorContactChange}
+            />
+
+            <TextField
+              id="sponsor_email"
+              label="Email"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleSponsorEmailChange}
+            />
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="contained" onClick={addNewSponsor}>
+                Add
+              </Button>
+            </Stack>
+          </Box>
+
+          {/* <Stack direction="row" spacing={2}>
+          <Button variant="outlined">Close</Button>
+          <Button variant="contained" startIcon={<AddIcon />}>
+            Add
+          </Button>
+        </Stack> */}
+        </Modal>
+      </div>
     </div>
   );
 }
@@ -1255,13 +1520,6 @@ function TicketSwitchDisplay(switchStatus: number) {
 function ManualTicketForm() {
   return (
     <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Tickets Details
-      </Typography>
-      <Paper
         sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
         elevation={3}
       >
@@ -1303,20 +1561,13 @@ function ManualTicketForm() {
           />
         </Box>
       </Paper>
-    </Paper>
   );
 }
 
 function AutoTicketForm() {
   const [imgFile, setImgFile] = React.useState(null);
   return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Tickets Details
-      </Typography>
+    
       <Paper
         sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
         elevation={3}
@@ -1369,7 +1620,7 @@ function AutoTicketForm() {
           />
         </Box>
       </Paper>
-    </Paper>
+
   );
 }
 
@@ -1737,10 +1988,6 @@ const EventsDisplay = (
       <Box sx={{ width: "100%" }}>
         <CreateEvent />
       </Box>
-      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-        Word of the Day
-      </Typography>
-      <Typography variant="h5" component="div"></Typography>
     </CardContent>
   </React.Fragment>
 );

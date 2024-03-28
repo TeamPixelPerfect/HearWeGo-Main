@@ -68,6 +68,7 @@ export interface BankDetails {
 
 export interface Artist {
   user: {
+    artist_id?: string;
     email: String;
     password: String;
     artistName: String;
@@ -95,12 +96,12 @@ export interface Artist {
 }
 
 export interface Song {
-  song_id: string;
-  song_title: string;
-  album_title: string;
-  song_length: number;
+  song_id?: string;
+  song_title?: string;
+  album_title?: string;
+  song_length?: number;
   song_track: string;
-  song_img: string;
+  song_img?: string;
   no_of_impressions?: number;
   no_of_plays?: number;
   no_of_shares?: number;
@@ -109,33 +110,37 @@ export interface Song {
   electronic_sub_genre?: string[];
   isrc?: string;
   release_date?: string;
-  songStatus?: string;
+  song_status?: string;
   privacy_status?: string;
-  langauge?: string;
+  language?: string[] ;
   record_label?: string;
-  song_writers?: string[],
-  composer?: string[],
-  lyrics?: string,
-  artists?: string[]
-  platform_links?: [
-    {platform_name: string, link: string,}
-  ],
-  publisher?: string[],
-  contain_music?: string,
+  song_writers?: { artist_id: string; artist_name: string }[];
+  composer?: { artist_id: string; artist_name: string }[];
+  lyrics?: string;
+  artist?: { artist_id: string; artist_name: string }[];
+  platform_links?: { platform_name: string; link: string }[];
+  publisher?: string[];
+  contain_music?: string;
+  additional_tags?: string[];
+  description?: string;
+  added_by?: string;
 }
 
 export interface Album {
-  albumName?: string;
-  artists?: string[];
-  albumCoverArt?: string;
-  albumTracks?: number;
-  albumLength?: number;
-  impressions?: string;
-  listners?: string;
-  genres?: string[];
+  album_title?: string;
+  artist?: { artist_id: string; artist_name: string }[];
+  album_img?: string;
+  no_of_tracks?: number;
+  album_length?: number;
+  no_of_impressions?: string;
+  no_of_plays?: string;
+  album_genre?: string[];
   privacy?: string;
-  releaseDate?: string;
-  albumStatus?: string;
+  release_date?: string;
+  album_status?: string;
+  additional_tags?: string[];
+  description?: string;
+  song?: string[];
 }
 
 export interface Event{

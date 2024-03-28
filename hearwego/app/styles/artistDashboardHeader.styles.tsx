@@ -78,6 +78,7 @@ export const ArtistName = styled("div")(({ theme }) => ({
     marginLeft: '10px',
     fontFamily: "Dancing Script",
     fontWeight: 700,
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
+    textTransform: "capitalize",
   }));
 

@@ -7,7 +7,7 @@ import ImageCropper from "./ImageCropper";
 import Modal from "@mui/material/Modal";
 import { CropperModal } from "../styles/imageCropper.styles";
 
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 interface Props {
   fileTypes: string;
@@ -17,9 +17,9 @@ interface Props {
   height: string;
   file: any;
   setFile: (file: any) => void;
-  aspectX: number,
-  aspectY: number,
-  shape: 'rect'|'round'
+  aspectX: number;
+  aspectY: number;
+  shape: "rect" | "round";
 }
 
 const DropFile = ({
@@ -32,9 +32,10 @@ const DropFile = ({
   setFile,
   aspectX,
   aspectY,
-  shape
+  shape,
 }: Props) => {
   const [open, setOpen] = useState(false);
+  const [fileName, setFileName] = useState("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -42,6 +43,7 @@ const DropFile = ({
 
   const handleSelectFile = (acceptedFiles: File[]) => {
     // console.log(acceptedFiles[0]);
+    setFileName(acceptedFiles[0].name);
     setFile(URL.createObjectURL(acceptedFiles[0]));
     handleOpen();
   };
@@ -56,6 +58,7 @@ const DropFile = ({
       >
         {file ? (
           <ImageCropper
+            name={fileName}
             image={file}
             setImage={setFile}
             handleClose={handleClose}
@@ -67,7 +70,10 @@ const DropFile = ({
           <Box>No image file selected</Box>
         )}
       </CropperModal>
-      <Dropzone onDrop={(acceptedFiles) => handleSelectFile(acceptedFiles)}>
+      <Dropzone
+        accept={{ "image/*": [] }}
+        onDrop={(acceptedFiles) => handleSelectFile(acceptedFiles)}
+      >
         {({ getRootProps, getInputProps }) => (
           <section
             style={{
@@ -133,8 +139,8 @@ const DropFile = ({
                     variant="body1"
                     sx={{
                       textAlign: "center",
-                      padding: "20px 0",
-                      fontSize: isCircular ? "10px" : "12px",
+                      padding: "10px 0",
+                      fontSize: isCircular ? "8px" : "12px",
                     }}
                   >
                     <em>Supports {fileExtensions}</em>

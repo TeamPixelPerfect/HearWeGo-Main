@@ -7,7 +7,7 @@ interface Props {
 }
 
 const Logo = ({img_url}: Props) => {
-  const matches = useMediaQuery('(min-width:1000px)');
+  const matches = useMediaQuery('(min-width:1200px)');
 
   return (
     <Box sx={{padding: 0}}>

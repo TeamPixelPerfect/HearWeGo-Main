@@ -4,7 +4,11 @@ import { Box } from "@mui/material";
 
 export const SongPreviewSong = styled(Box)(({ theme }) => ({
     width: '20%',
-    position: "relative"
+    position: "relative",
+    "@media (max-width:540px)": {
+      width: "100%",
+    }
+
   }));
 
 export const SongPreviewDetails = styled(Box)(({ theme }) => ({
@@ -18,5 +22,8 @@ export const SongPreviewDetails = styled(Box)(({ theme }) => ({
     display: 'flex',
     // backgroundColor: 'yellow',
     flexDirection: 'column',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    "@media (max-width:540px)": {
+      width: "100%",
+    }
   }));

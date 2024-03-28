@@ -17,6 +17,12 @@ const nextConfig = {
     AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
     AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
   },
+  swcMinify: true,
+  fastRefresh: true,
+  concurrentFeatures: true,
+  productionBrowserSourceMaps: false, 
+  optimizeFonts: false,
+  minify: false,
 };
 
 export default nextConfig;

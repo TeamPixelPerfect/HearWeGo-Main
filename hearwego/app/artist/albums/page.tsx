@@ -3,7 +3,7 @@
 import useAudio from "@/app/Hooks/useAudio";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { Album } from "@/app/constants/models";
-import { getAlbums } from "@/app/services/SongServices";
+import { getAlbumForArtists, getAlbums } from "@/app/services/SongServices";
 import { ADHomeTabBox, ADTabBox } from "@/app/styles/artistDashboard.styles";
 import { EventMainBox } from "@/app/styles/artistDashboardEventsPage.styles";
 import {
@@ -35,13 +35,14 @@ import { IoAddOutline, IoClose } from "react-icons/io5";
 import { MdAlbum, MdDelete } from "react-icons/md";
 
 const MainAlbumCard = ({
+  albumId,
   albumName,
   albumCoverArt,
   albumTracks,
   albumLength,
   impressions,
   listners,
-}: Album) => {
+}: any) => {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -52,7 +53,7 @@ const MainAlbumCard = ({
   return (
     <AlbumCard
       onClick={() => {
-        router.push("/artist/albums/a001");
+        router.push("/artist/albums/"+albumId);
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "50%" }}>
@@ -134,17 +135,17 @@ const ArtistAlbums = () => {
   };
 
   useEffect(() => {
-    if (artist?.token) {
-      getAlbums(artist?.token).then((albums) => {
+    if (artist?.token && artist?.user?.artist_id) {
+      getAlbumForArtists(artist?.token, artist?.user?.artist_id).then((albums) => {
         console.log("Albums:::", albums);
-        setAlbums(albums);
+        setAlbums(albums.data);
       });
     }
   }, []);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh" }}>
+      <Card sx={{ width: "100%", minHeight: "100vh",background: theme.palette.background.default }}>
         <Box
           sx={{
             width: "100%",
@@ -183,16 +184,17 @@ const ArtistAlbums = () => {
             <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            {albums ? (
+            {albums.length > 0 ? (
               albums.map((album) => {
                 return (
                   <MainAlbumCard
-                    albumName={album.albumName}
-                    albumCoverArt={album.albumCoverArt}
-                    albumTracks={album.albumTracks}
-                    albumLength={album.albumLength}
-                    impressions={album.impressions}
-                    listners={album.listners}
+                    albumId={album.album_id}
+                    albumName={album.album_title}
+                    albumCoverArt={album.album_img}
+                    albumTracks={album.no_of_tracks}
+                    albumLength={album.album_length}
+                    impressions={album.no_of_impressions}
+                    listners={album.no_of_plays}
                   />
                 );
               })

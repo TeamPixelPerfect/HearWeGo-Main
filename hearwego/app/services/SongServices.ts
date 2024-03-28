@@ -1,13 +1,45 @@
 import { base_url } from "../constants/keys";
 
-export const getSongs = async (token: string) => {
-  const res = await fetch(`${base_url}/DiscographyManager/songs`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+export const getSongs = async (
+  token: string,
+  page?: number,
+  limit?: number
+) => {
+  const res = await fetch(
+    `${base_url}/DiscographyManager/songs?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const songs = await res.json();
+    return songs;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getSongsForArtist = async (
+  token: string,
+  artistId: string,
+  page?: number,
+  limit?: number
+) => {
+  const res = await fetch(
+    `${base_url}/DiscographyManager/songs/artist/${artistId}?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (res.ok) {
     const songs = await res.json();
     return songs;
@@ -98,6 +130,30 @@ export const getAlbums = async (token: string) => {
   if (res.ok) {
     const songs = await res.json();
     return songs;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getAlbumForArtists = async (
+  token: string,
+  artistId: string,
+  page?: number,
+  limit?: number
+) => {
+  const res = await fetch(
+    `${base_url}/DiscographyManager/albums/artist/${artistId}?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const albums = await res.json();
+    return albums;
   } else {
     const error = await res.json();
     throw new Error(error.message);

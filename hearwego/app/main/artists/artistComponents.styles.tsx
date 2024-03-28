@@ -3,7 +3,13 @@ import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import { Box, CardActionArea, CardActions } from "@mui/material";
+import {
+  Box,
+  CardActionArea,
+  CardActions,
+  FormControl,
+  Link,
+} from "@mui/material";
 import { Stack } from "@mui/material";
 import { InputLabel, Select, MenuItem } from "@mui/material";
 import Card from "@mui/material/Card";
@@ -31,6 +37,7 @@ interface ArtistCardProps {
 }
 
 interface tableRow {
+  LinkPage: string;
   Rank: {
     rank: number;
     rank_img: string;
@@ -61,28 +68,30 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 }) => {
   return (
     <div>
-      <InputLabel id={labelId}>{label}</InputLabel>
-      <Select
-        labelId={labelId}
-        id={id}
-        value={value}
-        onChange={(event: React.ChangeEvent<{ value: string }>) =>
-          onChange(event)
-        }
-        label={label}
-        sx={{
-          width: "100px",
-          backgroundColor: "secondary.main",
-          color: "background.default",
-          height: "40px",
-        }}
-      >
-        {options.map((option, index) => (
-          <MenuItem key={index} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </Select>
+      <FormControl sx={{ m: 1, color: "white" }} size="small">
+        <InputLabel id={labelId}>{label}</InputLabel>
+        <Select
+          labelId={labelId}
+          id={id}
+          value={value}
+          onChange={(event: React.ChangeEvent<{ value: string }>) =>
+            onChange(event)
+          }
+          label={label}
+          sx={{
+            width: "150px",
+            backgroundColor: "primary.light",
+            color: "primary.default",
+            height: "40px",
+          }}
+        >
+          {options.map((option, index) => (
+            <MenuItem key={index} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </div>
   );
 };
@@ -128,35 +137,38 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
       onMouseEnter={() => setIsHovered(true)} // Set isHovered to true when mouse enters
       onMouseLeave={() => setIsHovered(false)} // Set isHovered to false when mouse leaves
     >
-      <CardActionArea
-        style={{
-          backgroundImage: `url(${img_url})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        <Box
-          sx={{
-            margin: "0px",
-            padding: "16px",
-            backgroundColor: "rgba(0, 0, 0, 0.82)",
-            color: "background.paper",
-            textAlign: "right",
+      <Link href="/main/artists/SingleArtistPage">
+        <CardActionArea
+          style={{
+            backgroundImage: `url(${img_url})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            height: "100%",
+            width: "100%",
           }}
         >
-          <Typography gutterBottom variant="h6" component="div">
-            {name}
-          </Typography>
-          <Typography variant="body1">{Genre}</Typography>
-        </Box>
-      </CardActionArea>
+          <Box
+            sx={{
+              marginTop: "70%",
+              padding: "16px",
+              backgroundColor: "rgba(0, 0, 0, 0.82)",
+              color: "background.paper",
+              textAlign: "right",
+            }}
+          >
+            <Typography gutterBottom variant="h6" component="div">
+              {name}
+            </Typography>
+            <Typography variant="body1">{Genre}</Typography>
+          </Box>
+        </CardActionArea>
+      </Link>
     </Card>
   );
 };
 
 export const TrendingRow: React.FC<tableRow> = ({
+  LinkPage,
   Rank,
   Artist,
   Latest_song,
@@ -186,22 +198,24 @@ export const TrendingRow: React.FC<tableRow> = ({
         </Stack>
       </TableCell>
       <TableCell align="center">
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ justifyContent: "center", alignItems: "center" }}
-        >
-          <div
-            style={{
-              backgroundImage: `url(${Artist.img_url})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              width: "25px",
-              height: "25px",
-            }}
-          ></div>
-          <div>{Artist.name}</div>
-        </Stack>
+        <Link href={LinkPage}>
+          <Stack
+            direction={"row"}
+            spacing={2}
+            sx={{ justifyContent: "center", alignItems: "center" }}
+          >
+            <div
+              style={{
+                backgroundImage: `url(${Artist.img_url})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                width: "25px",
+                height: "25px",
+              }}
+            ></div>
+            <div>{Artist.name}</div>
+          </Stack>
+        </Link>
       </TableCell>
       <TableCell align="center">
         <Stack

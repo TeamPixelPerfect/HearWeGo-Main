@@ -15,6 +15,7 @@ import { handleImageUpload } from "../services/FileServices";
 import { uploadImage } from "../handlers/uploadFiles";
 
 interface Props {
+  name: string;
   image: string;
   setImage: (image: string | null) => void;
   handleClose: () => void;
@@ -24,6 +25,7 @@ interface Props {
 }
 
 const ImageCropper = ({
+  name,
   image,
   setImage,
   handleClose,
@@ -58,7 +60,8 @@ const ImageCropper = ({
       );
       setCroppedImage(croppedImage);
       setImage(croppedImage);
-      uploadImage("test", croppedImage as string);
+      const location = await uploadImage(name, croppedImage as string); 
+      setImage(location);
       handleClose();
     } catch (e) {
       console.error(e);

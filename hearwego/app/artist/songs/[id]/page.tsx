@@ -18,11 +18,12 @@ import {
   Paper,
   Stack,
   Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    FaChevronLeft,
+  FaChevronLeft,
   FaChevronRight,
   FaEdit,
   FaFacebook,
@@ -45,6 +46,7 @@ import {
   SongDetailTitleEven,
 } from "@/app/styles/artistSongDetails.styles";
 import Link from "next/link";
+import { getSong } from "@/app/services/SongServices";
 
 interface Props {
   params: { id: string };
@@ -91,16 +93,24 @@ function ClickPlay({ songUrl }: ClickPlayProps) {
 function SongPreview({ songData }: SongPreviewProps) {
   const artist = useAppSelector((state) => state.artist.user?.user);
 
+  const matches = useMediaQuery("(min-width:540px)");
+
   return (
     <Paper
       elevation={3}
-      sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexWrap: "wrap",
+        flexDirection: matches ? "row" : "column",
+      }}
     >
       <SongPreviewSong>
         <CardMedia
           component="img"
           sx={{ width: "100%", borderRadius: 1 }}
           image={songData.song_img}
+          height="100%"
           alt="Live from space album cover"
         />
         <Box
@@ -132,7 +142,8 @@ function SongPreview({ songData }: SongPreviewProps) {
           {songData.song_title}
         </Typography>
         <Typography variant="h6" component="div" sx={{ fontSize: 16 }}>
-          {songData?.artists?.join(',')} - {songData.album_title}
+          {songData?.artist?.map((artist) => artist.artist_name).join(",")} -{" "}
+          {songData.album_title ? songData.album_title : "Single"}
         </Typography>
 
         <Stack
@@ -141,7 +152,14 @@ function SongPreview({ songData }: SongPreviewProps) {
           sx={{ marginBottom: "1em", fontSize: 12 }}
         >
           {songData?.primary_genre?.map((genre) => {
-            return <Chip key={genre} label={genre} color="primary" sx={{ fontSize: 12 }} />;
+            return (
+              <Chip
+                key={genre}
+                label={genre}
+                color="primary"
+                sx={{ fontSize: 12 }}
+              />
+            );
           })}
         </Stack>
         <Stack
@@ -149,33 +167,44 @@ function SongPreview({ songData }: SongPreviewProps) {
           spacing={1}
           sx={{ marginBottom: "1em", fontSize: 12 }}
         >
-          {songData?.song_genre?.map((genre) => {
-            return <Chip key={genre} label={genre} color="primary" sx={{ fontSize: 12 }} />;
+          {songData?.electronic_sub_genre?.map((genre) => {
+            return (
+              <Chip
+                key={genre}
+                label={genre}
+                color="secondary"
+                sx={{ fontSize: 12 }}
+              />
+            );
           })}
         </Stack>
 
         <Chip
           icon={
-            songData?.privacy_status === "private" ? <LockIcon /> : <FaGlobeAsia />
+            songData?.privacy_status === "private" ? (
+              <LockIcon />
+            ) : (
+              <FaGlobeAsia />
+            )
           }
           sx={{ marginBottom: "1em" }}
-          label={songData?.privacy_status === "private" ? "Private" : "Public"}
+          label={songData?.privacy_status}
         />
 
         <Alert
           variant="filled"
           severity={
-            songData?.songStatus === "Released"
+            songData?.song_status === "Released"
               ? "success"
-              : songData?.songStatus === "To Release"
+              : songData?.song_status === "To Release"
               ? "warning"
-              : songData?.songStatus === "Draft"
+              : songData?.song_status === "Draft"
               ? "info"
               : "info"
           }
-          sx={{ width: "200px" }}
+          sx={{ width: "200px", marginBottom: "1em" }}
         >
-          {songData.songStatus}
+          {songData.song_status}
         </Alert>
       </SongPreviewDetails>
 
@@ -228,7 +257,17 @@ function SongPreview({ songData }: SongPreviewProps) {
             alignItems: "center",
           }}
         >
-          <Stack direction="row" spacing={1} sx={{ color: "#fff" }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              color: "#fff",
+              fontSize: "12px",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%"
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center" }}>
               https://www.hearwego.com/wq23s
             </Box>
@@ -244,47 +283,24 @@ function SongPreview({ songData }: SongPreviewProps) {
 
 const SongDetails = ({ params: { id } }: Props) => {
   const theme = useTheme();
+  const artist = useAppSelector((state) => state.artist.user);
 
-  const [songDetails, setSongDetails] = useState<Song>({
-    song_id: "s001",
-    song_title: "I'll be there for you",
-    artists: ["The Rembrandts"],
-    album_title: "L.P.",
-    song_length: 3.08,
-    song_track:
-      "https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3",
-    song_img:
-      "https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg",
-    no_of_impressions: 10,
-    no_of_plays: 4,
-    song_genre: ["pop", "rock"],
-    isrc: "USEE10001295",
-    release_date: "2024-03-01",
-    songStatus: "Released",
-    privacy_status: "private",
-    langauge: "English",
-    record_label: "Elektra",
-    song_writers: ["David Crane", "Marta Kauffman", "Allee Willis"],
-    composer: ["Gavin Mackillop", "David Crane"],
-    lyrics: `
-    So no one told you life was gonna be this way
-    Your job's a joke, you're broke
-    Your love life's DOA
-    It's like you're always stuck in second gear
-    When it hasn't been your day, your week, your month
-    Or even your year, but
+  const [songDetails, setSongDetails] = useState<Song | null>(null);
 
-    I'll be there for you
-    (When the rain starts to pour)
-    I'll be there for you
-    (Like I've been there before)
-    I'll be there for you
-    ('Cause you're there for me too)`,
-  });
+  useEffect(() => {
+    if (artist) {
+      getSong(artist.token, id).then((song) => {
+        console.log("Song:::", song);
+        setSongDetails(song);
+      });
+    }
+  }, []);
+
+  if (!songDetails) return <div>Loading...</div>;
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh" }}>
+      <Card sx={{ width: "100%", minHeight: "100vh", background: theme.palette.background.default }}>
         <Box
           sx={{
             width: "100%",
@@ -294,9 +310,13 @@ const SongDetails = ({ params: { id } }: Props) => {
             padding: "1em 2em 1em 2em",
           }}
         >
-          <Box sx={{display:"flex", alignItems:"center"}}>
-            <Link href="/artist/songs" color="secondary" style={{marginRight: "1em"}}>
-                <FaChevronLeft />
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Link
+              href="/artist/songs"
+              color="secondary"
+              style={{ marginRight: "1em" }}
+            >
+              <FaChevronLeft />
             </Link>
             <Typography
               variant="h4"
@@ -321,67 +341,68 @@ const SongDetails = ({ params: { id } }: Props) => {
         </Box>
         <SongPreview songData={songDetails} />
         <SongDetailTable container>
-          <SongDetailTitle item xs={3} md={2}>
+          <SongDetailTitle item xs={4} md={2}>
             Release Date
           </SongDetailTitle>
-          <SongDetailData item xs={9} md={10}>
+          <SongDetailData item xs={8} md={10}>
             {songDetails?.release_date}
           </SongDetailData>
 
-          <SongDetailTitleEven item xs={3} md={2}>
+          <SongDetailTitleEven item xs={4} md={2}>
             Language
           </SongDetailTitleEven>
-          <SongDetailDataEven item xs={9} md={10}>
-            {songDetails?.langauge}
+          <SongDetailDataEven item xs={8} md={10}>
+            {songDetails.language &&
+              songDetails?.language.map((lang) => <Box>{lang}</Box>)}
           </SongDetailDataEven>
 
-          <SongDetailTitle item xs={3} md={2}>
+          <SongDetailTitle item xs={4} md={2}>
             Length
           </SongDetailTitle>
-          <SongDetailData item xs={9} md={10}>
+          <SongDetailData item xs={8} md={10}>
             {songDetails?.song_length}
           </SongDetailData>
 
-          <SongDetailTitleEven item xs={3} md={2}>
+          <SongDetailTitleEven item xs={4} md={2}>
             Label
           </SongDetailTitleEven>
-          <SongDetailDataEven item xs={9} md={10}>
+          <SongDetailDataEven item xs={8} md={10}>
             {songDetails?.record_label}
           </SongDetailDataEven>
 
-          <SongDetailTitle item xs={3} md={2}>
+          <SongDetailTitle item xs={4} md={2}>
             Songwriter(s)
           </SongDetailTitle>
-          <SongDetailData item xs={9} md={10}>
+          <SongDetailData item xs={8} md={10}>
             {songDetails?.song_writers?.map((writer) => {
-              return <Box>{writer}</Box>;
+              return <Box>{writer.artist_name}</Box>;
             })}
           </SongDetailData>
 
-          <SongDetailTitleEven item xs={3} md={2}>
+          <SongDetailTitleEven item xs={4} md={2}>
             Producer(s)
           </SongDetailTitleEven>
-          <SongDetailDataEven item xs={9} md={10}>
+          <SongDetailDataEven item xs={8} md={10}>
             {songDetails?.composer?.map((producer) => {
-              return <Box>{producer}</Box>;
+              return <Box>{producer.artist_name}</Box>;
             })}
           </SongDetailDataEven>
 
-          <SongDetailTitleEven item xs={3} md={2}>
+          <SongDetailTitle item xs={4} md={2}>
             Publisher(s)
-          </SongDetailTitleEven>
-          <SongDetailDataEven item xs={9} md={10}>
+          </SongDetailTitle>
+          <SongDetailData item xs={8} md={10}>
             {songDetails?.publisher?.map((publisher) => {
               return <Box>{publisher}</Box>;
             })}
-          </SongDetailDataEven>
-
-          <SongDetailTitle item xs={3} md={2}>
-            Lyrics
-          </SongDetailTitle>
-          <SongDetailData item xs={9} md={10}>
-            <Box sx={{ whiteSpace: "pre-wrap" }}>{songDetails?.lyrics}</Box>
           </SongDetailData>
+
+          <SongDetailTitleEven item xs={4} md={2}>
+            Lyrics
+          </SongDetailTitleEven>
+          <SongDetailDataEven item xs={8} md={10}>
+            <Box sx={{ whiteSpace: "pre-wrap" }}>{songDetails?.lyrics}</Box>
+          </SongDetailDataEven>
         </SongDetailTable>
       </Card>
     </Grid>

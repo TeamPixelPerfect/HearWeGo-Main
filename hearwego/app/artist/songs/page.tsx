@@ -36,7 +36,7 @@ import { FaHeadphonesSimple } from "react-icons/fa6";
 import { bool } from "aws-sdk/clients/signer";
 import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
-import { getSongs } from "@/app/services/SongServices";
+import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
 
 interface HomeSongCardProps {
@@ -45,7 +45,7 @@ interface HomeSongCardProps {
 
 export const MainSongCard = ({ songData }: HomeSongCardProps) => {
   const router = useRouter();
-  const { playing, toggle } = useAudio({ url: songData.song_track });
+  const { playing, toggle } = useAudio({ url: songData.song_track? songData.song_track: "" });
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -59,7 +59,7 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
-        <SongCardCoverArt imgUrl={songData.song_img} />
+        <SongCardCoverArt imgUrl={songData.song_img ? songData.song_img: ""} />
         <Typography variant="h6">{songData.song_title}</Typography>
       </Box>
       <SongCardItem width="20%">
@@ -117,6 +117,7 @@ const ArtistSongs = () => {
   const [draftSongs, setDraftSongs] = useState<Song[]>([]);
 
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -130,32 +131,32 @@ const ArtistSongs = () => {
   };
 
   useEffect(() => {
-    if (artist?.token) {
+    if (artist?.token && artist?.user?.artist_id) {
       // fetch popular songs
-      getSongs(artist?.token).then((songs) => {
+      getSongsForArtist(artist?.token, artist?.user?.artist_id, page, limit).then((songs) => {
         console.log("Songs:::", songs);
-        setPopularSongs(songs);
+        setPopularSongs(songs.data);
       });
 
       // fetch recent songs
-      getSongs(artist?.token).then((songs) => {
+      getSongsForArtist(artist?.token, artist?.user?.artist_id, page, limit).then((songs) => {
         console.log("Songs:::", songs);
-        setRecentSongs(songs);
+        setRecentSongs(songs.data);
       });
 
       // fetch upcoming songs
-      getSongs(artist?.token).then((songs) => {
+      getSongsForArtist(artist?.token, artist?.user?.artist_id, page, limit).then((songs) => {
         console.log("Songs:::", songs);
-        setUpcomingSongs(songs);
+        setUpcomingSongs(songs.data);
       });
 
       // fetch draft songs
     }
-  }, []);
+  }, [page]);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh" }}>
+      <Card sx={{ width: "100%", minHeight: "100vh", background: theme.palette.background.default }}>
         <Box
           sx={{
             width: "100%",

@@ -184,7 +184,7 @@ export default function Context() {
                       borderColor: "divider",
                       borderBottom: "2px solid",
                       textTransform: "uppercase",
-                      fontWeight: 600
+                      fontWeight: 600,
                     }}
                   >
                     Create Post
@@ -206,8 +206,8 @@ export default function Context() {
                       }}
                     >
                       Damidu Thathsara<br></br>
-                      <Box sx={{fontSize:"12px"}}>
-                      2021-09-20<br></br> 12:30:00
+                      <Box sx={{ fontSize: "12px" }}>
+                        2021-09-20<br></br> 12:30:00
                       </Box>
                     </Typography>
                   </ArtistDetail>
@@ -254,10 +254,10 @@ export default function Context() {
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
-                      alignItems:"center"
+                      alignItems: "center",
                     }}
                   >
-                   <Box
+                    <Box
                       sx={{
                         width: "50%",
                         textAlign: "center",
@@ -358,8 +358,7 @@ export default function Context() {
                         </DemoContainer>
                       </LocalizationProvider>
                     </Box>
-                   </Box>
-      
+                  </Box>
 
                   <Stack
                     direction="row"
@@ -388,7 +387,7 @@ export default function Context() {
             value="1"
             style={{
               width: "100%",
-              padding: "1em 0"
+              padding: "1em 0",
             }}
           >
             <Box
