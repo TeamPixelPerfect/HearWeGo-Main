@@ -14,7 +14,6 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
 import ReactCountryFlag from "react-country-flag";
@@ -37,6 +36,7 @@ const SignUp = () => {
   const theme = useTheme();
   const matches = useMediaQuery("(max-width:960px)");
 
+  // State to store user details
   const [userDetails, setUserDetails] = React.useState({
     name: "",
     email: "",
@@ -51,6 +51,7 @@ const SignUp = () => {
   const [selectedCountry, setSelectedCountry] = useState("LK");
   const [selectedDay, setSelectedDay] = React.useState<Dayjs | null>();
 
+  // Error states
   const [nameError, setNameError] = React.useState(false);
   const [emailError, setEmailError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
@@ -142,16 +143,6 @@ const SignUp = () => {
 
   return (
     <AuthContainer>
-      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
-        <CloseIcon
-          sx={{
-            color: "rgba(255,255,255,0.4)",
-            fontSize: "2rem",
-            cursor: "pointer",
-            alignSelf: "flex-end",
-          }}
-        />
-      </Stack> */}
       <Box
         sx={{
           display: "flex",
@@ -187,6 +178,7 @@ const SignUp = () => {
             // background: "magenta"
           }}
         >
+          {/* hearwego logo */}
           <Logo
             img_url={
               theme.palette.mode === "dark"
@@ -194,6 +186,8 @@ const SignUp = () => {
                 : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
             }
           />
+
+          {/* Sign up heading */}
           <Typography
             variant="h4"
             sx={{
@@ -205,6 +199,10 @@ const SignUp = () => {
           >
             Join with HearWeGo
           </Typography>
+
+          {/* Sign up form */}
+
+          {/* Name */}
           <AuthTextField
             id="name"
             label="Username*"
@@ -219,6 +217,8 @@ const SignUp = () => {
             helperText={nameError ? "Name is required" : ""}
             FormHelperTextProps={{ style: { color: "red" } }}
           />
+
+          {/* Email */}
           <AuthTextField
             id="email"
             label="Email*"
@@ -233,6 +233,8 @@ const SignUp = () => {
             helperText={emailError ? "Email is required" : ""}
             FormHelperTextProps={{ style: { color: "red" } }}
           />
+
+          {/* Password */}
           <AuthTextField
             id="password"
             label="Password*"
@@ -247,6 +249,8 @@ const SignUp = () => {
             helperText={passwordError ? "Password is required" : ""}
             FormHelperTextProps={{ style: { color: "red" } }}
           />
+
+          {/* Confirm Password */}
           <AuthTextField
             id="confirm-password"
             label="Confirm Password*"
@@ -271,6 +275,7 @@ const SignUp = () => {
             FormHelperTextProps={{ style: { color: "red" } }}
           />
 
+          {/* Birth Date */}
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               sx={{
@@ -304,6 +309,7 @@ const SignUp = () => {
             </Box>
           </LocalizationProvider>
 
+          {/* gender */}
           <AuthTextField
             id="gender"
             label="Gender*"
@@ -326,13 +332,13 @@ const SignUp = () => {
             <MenuItem value="Other">Other</MenuItem>
           </AuthTextField>
 
+
+          {/* Country and Mobile Number */}
           <Stack
             direction="row"
             sx={{
-              // width: "40%",
               alignItems: "center",
               justifyContent: "center",
-              // background: "magenta"
             }}
           >
             <FormControl sx={{ width: "30%", mr: 1 }}>
@@ -378,6 +384,8 @@ const SignUp = () => {
                 })}
               </Select>
             </FormControl>
+
+            {/* Mobile Number */}
             <AuthTextField
               id="phone"
               label="Mobile Number*"
@@ -397,22 +405,8 @@ const SignUp = () => {
             />
           </Stack>
 
+          {/* Sign up button */}
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
-            {/* <Button
-              size="large"
-              variant="contained"
-              color="secondary"
-              startIcon={<ArrowCircleLeftIcon />}
-              sx={{
-                marginTop: "30px",
-                textTransform: "capitalize",
-                padding: "8px 32px",
-                background: "#787878",
-              }}
-              onClick={() => decrementStep(1)}
-            >
-              Back
-            </Button> */}
             <Button
               size="large"
               variant="contained"
@@ -429,6 +423,7 @@ const SignUp = () => {
             </Button>
           </Stack>
 
+          {/* Sign in link */}
           <Typography
             variant="body1"
             sx={{ marginTop: "40px", paddingBottom: "20px" }}
@@ -438,6 +433,7 @@ const SignUp = () => {
               Sign In
             </Link>
           </Typography>
+          
         </Box>
       </Box>
     </AuthContainer>

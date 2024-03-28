@@ -1,8 +1,6 @@
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import AlbumIcon from "@mui/icons-material/Album";
-import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import AutoGraphIcon from "@mui/icons-material/AutoGraph";
-import SsidChartIcon from "@mui/icons-material/SsidChart";
 import GroupsIcon from "@mui/icons-material/Groups";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
@@ -10,6 +8,7 @@ import EventIcon from "@mui/icons-material/Event";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import PublicIcon from "@mui/icons-material/Public";
 
+// Artist Side Menu Options
 export const sideMenuOpts = [
     {
       groupLabel: "Discography",

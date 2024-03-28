@@ -44,6 +44,7 @@ const ImageCropper = ({
   });
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
+  // Function to handle the crop completion
   const onCropComplete = (
     croppedArea: PixelCropArea,
     croppedAreaPixels: PixelCropArea
@@ -51,6 +52,7 @@ const ImageCropper = ({
     setCroppedAreaPixels(croppedAreaPixels);
   };
 
+  // Function to show the cropped image
   const showCroppedImage = async () => {
     try {
       const croppedImage = await getCroppedImg(
@@ -60,7 +62,10 @@ const ImageCropper = ({
       );
       setCroppedImage(croppedImage);
       setImage(croppedImage);
+
+      // upload the cropped image to the server
       const location = await uploadImage(name, croppedImage as string); 
+      
       setImage(location);
       handleClose();
     } catch (e) {

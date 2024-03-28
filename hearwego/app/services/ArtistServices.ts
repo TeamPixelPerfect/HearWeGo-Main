@@ -1,5 +1,6 @@
 import { base_url } from "../constants/keys";
 
+// Get all artists
 export const getAllArtists = async () => {
   const res = await fetch(`${base_url}/users/artists`, {
     method: "GET",
@@ -16,6 +17,7 @@ export const getAllArtists = async () => {
   }
 };
 
+// get artist by id
 export const getArtist = async (id: string) => {
   const res = await fetch(`${base_url}/users/artists/${id}`, {
     method: "GET",
@@ -32,6 +34,7 @@ export const getArtist = async (id: string) => {
   }
 }
 
+// get artist by artist_id
 export const getArtistV2 = async (id: string) => {
   const res = await fetch(`${base_url}/users/artists/v2/${id}`, {
     method: "GET",
@@ -48,6 +51,7 @@ export const getArtistV2 = async (id: string) => {
   }
 }
 
+// update artist details
 export const updateArtist = async (token: string, id: string, data: any) => {
   const res = await fetch(`${base_url}/users/artists/${id}`, {
     method: "PATCH",

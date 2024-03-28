@@ -51,8 +51,6 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import PublicIcon from "@mui/icons-material/Public";
-import { GiPartyPopper } from "react-icons/gi";
-import { TypeSpecimenOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import {
   countCommas,
