@@ -15,23 +15,37 @@ import {
 } from "./styles/home.styles";
 import { serviceItem } from "./constants/models";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const app = useAppSelector((state) => state.app);
   const matches = useMediaQuery("(max-width:960px)");
+
+  const Router = useRouter();
+
   return (
     <>
       <Header app={app} />
-      <HomeBanner imgs={app?.banner_imgs}>
+      <HomeBanner
+        imgs={[
+          "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        ]}
+      >
         <HomeTaglineContainer>
           <HomeTagline>Music For Living,</HomeTagline>
           <HomeTagline2>Live For Music.</HomeTagline2>
         </HomeTaglineContainer>
         <HomeBannerButtonContainer>
-          <HomeBannerButton>
+          <HomeBannerButton
+            onClick={() => {
+              Router.push("/auth/artistSignUp");
+            }}
+          >
             <span>Join as Artist</span>
           </HomeBannerButton>
           <HomeBannerButton
+            onClick={() => Router.push("/auth/signUp")}
             style={{
               background: "transparent",
               border: "3px",
@@ -43,6 +57,7 @@ const Home = () => {
           </HomeBannerButton>
         </HomeBannerButtonContainer>
       </HomeBanner>
+      
       <HomeServicesContainer>
         {app.service_items
           ? app.service_items.map((item: serviceItem, index: number) => {
@@ -64,7 +79,13 @@ const Home = () => {
                       }}
                     ></div>
                     {matches && (
-                      <HomeBannerButton sx={{ backgroundColor: "#6B21A8", order: 2, marginLeft:0 }}>
+                      <HomeBannerButton
+                        sx={{
+                          backgroundColor: "#6B21A8",
+                          order: 2,
+                          marginLeft: 0,
+                        }}
+                      >
                         <span>Explore</span>
                       </HomeBannerButton>
                     )}
@@ -88,7 +109,13 @@ const Home = () => {
                       )}
                     </div>
                     {matches && (
-                      <HomeBannerButton sx={{ backgroundColor: "#6B21A8", order:2, marginLeft:0 }}>
+                      <HomeBannerButton
+                        sx={{
+                          backgroundColor: "#6B21A8",
+                          order: 2,
+                          marginLeft: 0,
+                        }}
+                      >
                         <span>Explore</span>
                       </HomeBannerButton>
                     )}
@@ -98,6 +125,8 @@ const Home = () => {
             })
           : "Loading..."}
       </HomeServicesContainer>
+      
+      <Footer />
     </>
   );
 };
