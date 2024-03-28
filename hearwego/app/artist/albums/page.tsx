@@ -1,11 +1,8 @@
 "use client";
-
-import useAudio from "@/app/Hooks/useAudio";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { Album } from "@/app/constants/models";
 import { getAlbumForArtists, getAlbums } from "@/app/services/SongServices";
 import { ADHomeTabBox, ADTabBox } from "@/app/styles/artistDashboard.styles";
-import { EventMainBox } from "@/app/styles/artistDashboardEventsPage.styles";
 import {
   AlbumCard,
   AlbumCardCoverArt,
@@ -34,6 +31,8 @@ import { IoMdMore } from "react-icons/io";
 import { IoAddOutline, IoClose } from "react-icons/io5";
 import { MdAlbum, MdDelete } from "react-icons/md";
 
+
+// Component for displaying an individual album card
 const MainAlbumCard = ({
   albumId,
   albumName,
@@ -45,15 +44,18 @@ const MainAlbumCard = ({
 }: any) => {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
-
+  
+   // Function to toggle the open state
   const handleOpen = () => {
     setOpen((val) => !val);
   };
 
   return (
+
+    // Album card with album details and action buttons
     <AlbumCard
       onClick={() => {
-        router.push("/artist/albums/"+albumId);
+        router.push("/artist/albums/" + albumId);
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "50%" }}>
@@ -76,12 +78,7 @@ const MainAlbumCard = ({
         <GiSoundWaves />
         <Typography variant="body2">{albumLength}</Typography>
       </SongCardItem>
-      {/* 
-      <Box sx={{ width: "10%", display: "flex", justifyContent: "flex-end" }}>
-        <SongCardPlayButton onClick={toggle}>
-          {playing ? <IoIosPause /> : <IoIosPlay />}
-        </SongCardPlayButton>
-      </Box> */}
+    
       <IconButton onClick={handleOpen}>
         {open ? <IoClose /> : <IoMdMore />}
       </IconButton>
@@ -102,6 +99,7 @@ const MainAlbumCard = ({
   );
 };
 
+// Component for displaying artist albums
 const ArtistAlbums = () => {
   const theme = useTheme();
   const router = useRouter();
@@ -109,24 +107,16 @@ const ArtistAlbums = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [tabValue, setTabValue] = useState(0);
 
-  const [albums, setAlbums] = useState<Album[]>([
-    {
-      albumName: "L.P.",
-      albumCoverArt:
-        "https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg",
-      albumLength: 67.15,
-      albumTracks: 15,
-      impressions: "12.7M",
-      listners: "7.0M",
-    },
-  ]);
+  const [albums, setAlbums] = useState<Album[]>([]);
 
+  // Function to handle tab change
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
   const [page, setPage] = useState(1);
 
+  // Function to handle page change
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
@@ -134,18 +124,31 @@ const ArtistAlbums = () => {
     setPage(value);
   };
 
+
+  // Effect hook to fetch albums data
   useEffect(() => {
     if (artist?.token && artist?.user?.artist_id) {
-      getAlbumForArtists(artist?.token, artist?.user?.artist_id).then((albums) => {
-        console.log("Albums:::", albums);
-        setAlbums(albums.data);
-      });
+      getAlbumForArtists(artist?.token, artist?.user?.artist_id).then(
+        (albums) => {
+          console.log("Albums:::", albums);
+          setAlbums(albums.data);
+        }
+      );
     }
   }, []);
 
   return (
+    // Grid container for layout
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh",background: theme.palette.background.default }}>
+
+      {/* Card for displaying albums */}
+      <Card
+        sx={{
+          width: "100%",
+          minHeight: "100vh",
+          background: theme.palette.background.default,
+        }}
+      >
         <Box
           sx={{
             width: "100%",
@@ -158,8 +161,8 @@ const ArtistAlbums = () => {
           <Typography
             variant="h4"
             sx={{
-              fontSize: "20px",
-              fontWeight: "500",
+              fontSize: "24px",
+              fontWeight: "700",
               color: theme.palette.secondary.main,
             }}
           >
@@ -184,6 +187,7 @@ const ArtistAlbums = () => {
             <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
+             {/* Display albums or message if no albums available */}
             {albums.length > 0 ? (
               albums.map((album) => {
                 return (

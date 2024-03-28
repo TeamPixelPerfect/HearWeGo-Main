@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Roboto, Dancing_Script } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import "./globals.css";
-import Header from "./components/Header";
 import StoreProvider from "./StoreProvider";
 import Wrapper from "./components/Wrapper";
 import { AppItem } from "./constants/models";

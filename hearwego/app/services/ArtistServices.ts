@@ -1,15 +1,14 @@
 import { base_url } from "../constants/keys";
 
-export const getAllArtists = async (page?: number, per_page?: number) => {
-  const res = await fetch(
-    `${base_url}/users/artists?page=${page}&limit=${per_page}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+
+// Get all artists
+export const getAllArtists = async () => {
+  const res = await fetch(`${base_url}/users/artists`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   if (res.ok) {
     const artists = await res.json();
     return artists;
@@ -19,6 +18,7 @@ export const getAllArtists = async (page?: number, per_page?: number) => {
   }
 };
 
+// get artist by id
 export const getArtist = async (id: string) => {
   const res = await fetch(`${base_url}/users/artists/${id}`, {
     method: "GET",
@@ -35,6 +35,7 @@ export const getArtist = async (id: string) => {
   }
 };
 
+// get artist by artist_id
 export const getArtistV2 = async (id: string) => {
   const res = await fetch(`${base_url}/users/artists/v2/${id}`, {
     method: "GET",
@@ -51,6 +52,7 @@ export const getArtistV2 = async (id: string) => {
   }
 };
 
+// update artist details
 export const updateArtist = async (token: string, id: string, data: any) => {
   const res = await fetch(`${base_url}/users/artists/${id}`, {
     method: "PATCH",

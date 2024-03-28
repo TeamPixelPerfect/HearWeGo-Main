@@ -5,6 +5,7 @@ interface Props {
   url: string;
 }
 
+// Custom hook for playing audio
 const useAudio = ({ url }: Props) => {
   const [audio] = useState(new Audio(url));
   const [playing, setPlaying] = useState(false);

@@ -21,7 +21,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CancelIcon from "@mui/icons-material/Cancel";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
@@ -47,8 +46,6 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import PublicIcon from "@mui/icons-material/Public";
-import { GiPartyPopper } from "react-icons/gi";
-import { TypeSpecimenOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import {
   countCommas,
@@ -59,8 +56,6 @@ import Logo from "@/app/components/Logo";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getArtist, updateArtist } from "@/app/services/ArtistServices";
 import { logInArtist } from "@/lib/features/artist.slice";
-import { handleArtistLogin } from "@/app/services/AuthServices";
-import { current } from "@reduxjs/toolkit";
 
 interface Props {
   params: { id: string };
@@ -183,6 +178,13 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
   const [profilePicError, setProfilePicError] = useState(false);
 
   const [uploading, setUploading] = useState(false);
+
+  // bank details errors
+  const [accountNameError, setAccountNameError] = useState(false);
+  const [accountNumberError, setAccountNumberError] = useState(false);
+  const [bankNameError, setBankNameError] = useState(false);
+  const [bankBranchError, setBankBranchError] = useState(false);
+  const [bankCountryError, setBankCountryError] = useState(false);
 
   // Increment Sign up stage (Next button)
   const incrementStep = (step: number) => {
@@ -416,12 +418,61 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
       artistSocialMediaDetails
     ).then((res) => {
       if (res) {
-        const newData = { user: res.user, token: artist?.token };
+        const newData = { user: res, token: artist?.token };
         dispatch(logInArtist(newData));
         sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
         incrementStep(1);
       }
     });
+  };
+
+  // handle payment details stage
+  const handlePaymentDetailsStage = () => {
+    const erros = [false, false, false, false, false];
+
+    if (artistBankDetails.bankDetails.accountName === "") {
+      setAccountNameError(true);
+      erros[0] = true;
+    }
+
+    if (artistBankDetails.bankDetails.accountNumber === "") {
+      setAccountNumberError(true);
+      erros[1] = true;
+    }
+
+    if (artistBankDetails.bankDetails.bankName === "") {
+      setBankNameError(true);
+      erros[2] = true;
+    }
+
+    if (artistBankDetails.bankDetails.bankBranch === "") {
+      setBankBranchError(true);
+      erros[3] = true;
+    }
+
+    if (artistBankDetails.bankDetails.country === "") {
+      setBankCountryError(true);
+      erros[4] = true;
+    }
+
+    if (erros.includes(true)) return;
+
+    setAccountNameError(false);
+    setAccountNumberError(false);
+    setBankNameError(false);
+    setBankBranchError(false);
+    setBankCountryError(false);
+
+    updateArtist(artist?.token, artist?.user._id, artistBankDetails).then(
+      (res) => {
+        if (res) {
+          const newData = { user: res, token: artist?.token };
+          dispatch(logInArtist(newData));
+          sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
+          incrementStep(1);
+        }
+      }
+    );
   };
 
   // handle add other alias
@@ -1881,7 +1932,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               marginBottom: "10px",
             }}
           >
-            We need some details to boost your promoting and<br></br> marketing
+            We need some details to boost your<br></br> promoting and marketing
           </Typography>
 
           <Typography
@@ -2081,6 +2132,10 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 },
               });
             }}
+            helperText={
+              accountNameError ? "Account holder name is required" : ""
+            }
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <AuthTextField
@@ -2098,6 +2153,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 },
               });
             }}
+            helperText={accountNumberError ? "Account number is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <AuthTextField
@@ -2115,6 +2172,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 },
               });
             }}
+            helperText={bankNameError ? "Bank name is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <AuthTextField
@@ -2132,6 +2191,8 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 },
               });
             }}
+            helperText={bankBranchError ? "Bank branch is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <FormControl
@@ -2184,6 +2245,9 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               })}
             </Select>
           </FormControl>
+          <Typography sx={{ marginTop: "8px", color: "red", fontSize: "12px" }}>
+            {bankCountryError && "Country is required!"}
+          </Typography>
 
           <Stack spacing={1} direction="row">
             <Button
@@ -2225,7 +2289,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handlePaymentDetailsStage}
             >
               Next
             </Button>
@@ -2251,6 +2315,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
               alignItems: "center",
               margin: "100px 0 70px 0",
               width: "70%",
+              flexDirection: matches ? "column" : "row",
             }}
           >
             <Box sx={{ mr: "8px" }}>
@@ -2259,8 +2324,10 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
             <Stack
               sx={{
                 display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "flex-start",
+                justifyContent: matches ? "center" : "flex-start",
+                alignItems: matches ? "center" : "flex-start",
+                // background: "yellow",
+                textAlign: "center",
               }}
             >
               <Typography variant="h4" sx={{ fontWeight: "600" }}>

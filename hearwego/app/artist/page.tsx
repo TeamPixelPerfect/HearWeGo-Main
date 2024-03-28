@@ -8,8 +8,9 @@ import {
   Tab,
   Tabs,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ADArtistInfo,
   ADArtistPageUrl,
@@ -41,6 +42,12 @@ import { MdAlbum } from "react-icons/md";
 import { GiSoundWaves } from "react-icons/gi";
 import CustomTabPanel from "../components/CustomeTabPanel";
 import { useAppSelector } from "@/lib/hooks";
+import { Album, Song } from "../constants/models";
+import {
+  getAlbumForArtists,
+  getSongsForArtist,
+} from "../services/SongServices";
+import { Home } from "@mui/icons-material";
 
 interface HomeSongCardProps {
   songName: string;
@@ -65,27 +72,34 @@ const HomeSongCard = ({
   coverArt,
 }: HomeSongCardProps) => {
   const { playing, toggle } = useAudio({ url: songUrl });
+  const matches = useMediaQuery("(max-width:960px)");
 
   return (
     <SongCard>
-      <Box sx={{ display: "flex", alignItems: "center", width: "45%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: matches ? "60%" : "45%",
+        }}
+      >
         <SongCardCoverArt imgUrl={coverArt} />
         <Typography variant="h6">{songName}</Typography>
       </Box>
-      <SongCardItem width="40%">
+      <SongCardItem width={matches ? "30%" : "40%"}>
         <MdAlbum />
         <Typography variant="body1">{albumName}</Typography>
       </SongCardItem>
-      <SongCardItem width="10%">
+      {!matches && <SongCardItem width="10%">
         <GiSoundWaves />
         <Typography variant="body2">{duration}</Typography>
-      </SongCardItem>
+      </SongCardItem>}
 
-     <Box sx={{width:"5%"}}>
-     <SongCardPlayButton onClick={toggle}>
-        {playing ? <IoIosPause /> : <IoIosPlay />}
-      </SongCardPlayButton>
-     </Box>
+      <Box sx={{ width:matches? "10%" :"5%" }}>
+        <SongCardPlayButton onClick={toggle}>
+          {playing ? <IoIosPause /> : <IoIosPlay />}
+        </SongCardPlayButton>
+      </Box>
     </SongCard>
   );
 };
@@ -111,6 +125,8 @@ const HomeAlbumCard = ({
 };
 
 const ADHomePage = () => {
+  const matches = useMediaQuery("(max-width:960px)");
+
   const [profilePic, setProfilePic] = useState<string>(
     // "https://placehold.co/600x600/png"
     "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
@@ -122,22 +138,65 @@ const ADHomePage = () => {
 
   const [tabValue, setTabValue] = React.useState(0);
 
-  const artist = useAppSelector((state) => state.artist.user)
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [popularSongs, setPopularSongs] = useState<Song[]>();
+  const [recentSongs, setRecentSongs] = useState<Song[]>();
+  const [upcomingSongs, setUpcomingSongs] = useState<Song[]>();
+
+  const [albums, setAlbums] = useState<Album[]>();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
+  useEffect(() => {
+    getSongsForArtist(artist?.token, artist?.user.artist_id).then((songs) => {
+      console.log(songs);
+      setPopularSongs(songs.data);
+    });
+
+    getAlbumForArtists(artist?.token, artist?.user.artist_id).then((albums) => {
+      console.log(albums);
+      setAlbums(albums.data);
+    });
+  }, []);
+
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Grid item xs={12} md={12} sx={{ height: "50vh", margin: "0" }}>
-        <ADHomeCoverBox imgUrl={coverPic}>
+      <Grid
+        item
+        xs={12}
+        md={12}
+        sx={{ height: matches ? "600px" : "400px", margin: "0" }}
+      >
+        <ADHomeCoverBox imgUrl={artist?.user.artistCovers[0]}>
           <ADHomeNameArea>
-            <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: matches ? "center" : "flex-end",
+                flexDirection: matches ? "column" : "row",
+                justifyContent: matches ? "flex-end" : "center",
+                mb: matches ? "2em" : 0,
+              }}
+            >
               <ADHomeProfilePicture imgUrl={artist?.user.profilePicture} />
-              <Box sx={{ ml: 1 }}>
+              <Box
+                sx={
+                  !matches
+                    ? { ml: 3 }
+                    : {
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }
+                }
+              >
                 <ADHomeName>{artist?.user.artistName}</ADHomeName>
-                <ADArtistInfo>{artist?.user.artistBio}</ADArtistInfo>
+                {artist.user.artistBio && <ADArtistInfo>{artist?.user.artistBio.split(".")[0]}</ADArtistInfo>}
+
                 <ADArtistPageUrl>
                   <Link href="">http://www.hearwego.com/wq23s</Link>
                   <FaCopy />
@@ -149,8 +208,8 @@ const ADHomePage = () => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-                alignItems: "flex-end",
-                mr: 2,
+                alignItems: matches ? "center" : "flex-end",
+                mr: matches ? 0 : 2,
               }}
             >
               <ADHomeSocialIcons>
@@ -158,7 +217,14 @@ const ADHomePage = () => {
                 <AiFillInstagram />
                 <FaSquareXTwitter />
               </ADHomeSocialIcons>
-              <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: matches ? "center" : "flex-start",
+                  justifyContent: matches ? "center" : "flex-start",
+                }}
+              >
                 <Typography
                   variant="h4"
                   sx={{ color: "#fff", fontWeight: "600", mb: 0 }}
@@ -175,72 +241,95 @@ const ADHomePage = () => {
       </Grid>
       <Grid item xs={12} md={8} sx={{ margin: 0 }}>
         <FeaturedSongCard>
-          <Typography variant="h5" sx={{ fontWeight: "600", mb: 0 }}>
+          <Typography variant="h5" sx={{ fontWeight: "700", mb: 0 }}>
             Featured Songs
           </Typography>
           <ADHomeTabBox>
-            <Tabs value={tabValue} onChange={handleChange}>
+            <Tabs
+              textColor="secondary"
+              indicatorColor="secondary"
+              value={tabValue}
+              onChange={handleChange}
+            >
               <Tab label="Popular" />
               <Tab label="Recent" />
               <Tab label="Upcoming" />
             </Tabs>
           </ADHomeTabBox>
           <CustomTabPanel value={tabValue} index={0} fullWidth={false}>
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
-            <HomeSongCard
-              songName="I'll be there for you"
-              albumName="L.P."
-              duration={3.08}
-              songUrl="https://hwgbucket.s3.ap-south-1.amazonaws.com/songs/Numba+Daka+Ma+(Female+version)+-+Hashmi+Sathnara+%5BSONG.LK%5D.mp3"
-              coverArt="https://i.pinimg.com/originals/0e/f4/51/0ef451a1c010f30e4d82f48f97c02637.jpg"
-            />
+            {popularSongs?.length > 0 ? (
+              popularSongs.map((song) => (
+                <HomeSongCard
+                  songName={song.song_title}
+                  albumName={song.album_title}
+                  duration={song.song_length}
+                  songUrl={song.song_track}
+                  coverArt={song.song_img}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No songs available yet!</em>
+              </Typography>
+            )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1} fullWidth={false}>
-            <Typography>Recent Songs</Typography>
+            {recentSongs?.length > 0 ? (
+              recentSongs.map((song) => (
+                <HomeSongCard
+                  songName={song.song_title}
+                  albumName={song.album_title}
+                  duration={song.song_length}
+                  songUrl={song.song_track}
+                  coverArt={song.song_img}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No songs available yet!</em>
+              </Typography>
+            )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2} fullWidth={false}>
-            <Typography>Upcoming Songs</Typography>
+            {upcomingSongs?.length > 0 ? (
+              upcomingSongs.map((song) => (
+                <HomeSongCard
+                  songName={song.song_title}
+                  albumName={song.album_title}
+                  duration={song.song_length}
+                  songUrl={song.song_track}
+                  coverArt={song.song_img}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No songs available yet!</em>
+              </Typography>
+            )}
           </CustomTabPanel>
         </FeaturedSongCard>
       </Grid>
       <Grid item xs={12} md={4} sx={{ margin: 0 }}>
         <FeaturedAlbumCard>
-          <Typography variant="h5" sx={{ fontWeight: "600", mb: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: "700", mb: 2 }}>
             Featured Albums
           </Typography>
+
           <Box sx={{ m: 3 }}>
-            <HomeAlbumCard
-              albumCoverArt="https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg"
-              albumName="L.P."
-              albumTracks={15}
-              albumLength={67.15}
-            />
-            <HomeAlbumCard
-              albumCoverArt="https://i.discogs.com/UvK4JbCFNk0ewmfYkSUjscACrZgJyMdSLRwJrI6al2o/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0Njk4/MTMwLTE1Nzk5MTA2/ODgtMjg5OC5qcGVn.jpeg"
-              albumName="L.P."
-              albumTracks={15}
-              albumLength={67.15}
-            />
+            {albums?.length > 0 ? (
+              albums.map((album) => (
+                <HomeAlbumCard
+                  albumCoverArt={album.album_img}
+                  albumName={album.album_title}
+                  albumTracks={album.album_tracks}
+                  albumLength={album.album_length}
+                />
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No albums available yet!</em>
+              </Typography>
+            )}
           </Box>
         </FeaturedAlbumCard>
       </Grid>

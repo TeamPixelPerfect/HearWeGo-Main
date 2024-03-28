@@ -2,25 +2,21 @@ import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { menuItem } from "../constants/models";
 import { useRouter } from "next/navigation";
 import CellTowerIcon from "@mui/icons-material/CellTower";
+import Logo from "./Logo";
+import { useAppSelector } from "@/lib/hooks";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const drawerWidth = 240;
 
@@ -47,6 +43,8 @@ export default function PersistentDrawerLeft({
   const theme = useTheme();
   const router = useRouter();
 
+  const user = useAppSelector((state) => state.user);
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -71,6 +69,23 @@ export default function PersistentDrawerLeft({
         open={open}
       >
         <DrawerHeader>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              p: "2em 0",
+            }}
+          >
+            <Logo
+              img_url={
+                theme.palette.mode === "light"
+                  ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
+                  : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo(white).png"
+              }
+            />
+          </Box>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "ltr" ? (
               <ChevronLeftIcon />
@@ -91,16 +106,30 @@ export default function PersistentDrawerLeft({
         </List>
         <Divider />
         <List>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => router.push("/auth/signIn")}>
-              <ListItemText primary="Login" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => router.push("/auth/signUp")}>
-              <ListItemText primary="Register" />
-            </ListItemButton>
-          </ListItem>
+          {!user ? (
+            <>
+              {" "}
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => router.push("/auth/signIn")}>
+                  <ListItemText primary="Login" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => router.push("/auth/signUp")}>
+                  <ListItemText primary="Register" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          ) : (
+            <ListItem disablePadding>
+              <ListItemButton onClick={() => router.push("/")}>
+                <ListItemIcon>
+                  <AccountCircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Profile" />
+              </ListItemButton>
+            </ListItem>
+          )}
         </List>
         <Divider />
         <List>

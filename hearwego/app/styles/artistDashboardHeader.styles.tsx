@@ -36,27 +36,30 @@ export const HitPredictorBtn = styled(Fab)(({ theme }) => ({
 export const ProfileArea = styled("div")(({ theme }) => ({
   height: "100%",
   width: "20%",
+  minWidth: "200px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  "@media (max-width: 960px)": {
+    minWidth:"fit-content"
+  }
 }));
 
 export const ProfileDetailArea = styled(Card)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "space-between",
   padding: '8px',
   width: "100%",
-  height: "70%",
-  backgroundColor: "#F3E8FF",
+  height: "100%",
   borderRadius: "12px",
-  boxShadow: "0 2px 4px 0 rgba(138, 148, 159, 0.2)",
-  "& > *:nth-child(1)": {
-    marginRight: 2,
-  },
-  "& > *:nth-child(2)": {
-    flex: "auto",
-  },
+  boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2)",
+  // "& > *:nth-child(1)": {
+  //   marginRight: 2,
+  // },
+  // "& > *:nth-child(2)": {
+  //   flex: "auto",
+  // },
 }));
 
 export const ArtistDetail = styled("div")(({ theme }) => ({
@@ -66,9 +69,8 @@ export const ArtistDetail = styled("div")(({ theme }) => ({
   }));
 
 export const ArtistName = styled("div")(({ theme }) => ({
-    width: "100%",
-    fontSize: '1em',
-    marginLeft: '10px',
+    fontSize: '16px',
+    marginRight: '1em',
     fontWeight: 700
   }));
 
