@@ -6,10 +6,14 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import { Button, Stack, Typography } from "@mui/material";
 
+
+// Functional component for the page
 const page = () => {
   return (
     <div>
       <h1 style={{ marginLeft: "20px", color: "#4338CA" }}>Tickets</h1>
+
+      {/* Main content */}
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Card sx={{ border: "solid", borderRadius: "20px" ,width:'1200px'}}>
@@ -33,6 +37,8 @@ const page = () => {
                     }}
                   ></Box>
                 </Box>
+
+                 {/* Ticket Details Text */}
                 <Box
                   sx={{
                     display: "flex",
@@ -138,6 +144,7 @@ const page = () => {
           </Card>
         </Box>
       </Box>
+      {/* Button section */}
       <div
         style={{
           display: "flex",
