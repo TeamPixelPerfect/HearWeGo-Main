@@ -1,10 +1,7 @@
 "use client";
 import React, { use, useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { AppItem } from "../constants/models";
-import Logo from "../components/Logo";
-import Navigation from "../components/Navigation";
-import { base_url } from "../constants/keys";
+
 import {
   IconButton,
   Button,
@@ -13,26 +10,14 @@ import {
   Dialog,
   styled,
 } from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import CellTowerIcon from "@mui/icons-material/CellTower";
+
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { setApp } from "@/lib/features/app.slice";
-import { usePathname } from "next/navigation";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import MenuIcon from "@mui/icons-material/Menu";
-import PersistentDrawerLeft from "./MobileDrawer";
-import { HeaderContainer } from "../styles/header.styles";
-import { ColorModeContext } from "../styles/CustomeTheme";
-import { useTheme } from "@mui/material/styles";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useSelector } from "react-redux";
+
 import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
+
 import DialogActions from "@mui/material/DialogActions";
 
 import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
 
 import {
   FilledInput,
@@ -45,12 +30,10 @@ import {
   TextField,
 } from "@mui/material";
 import DropFile from "@/app/components/DropFile";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import { BorderColor, Visibility, VisibilityOff } from "@mui/icons-material";
+
 import { countries } from "country-flag-icons";
 import ReactCountryFlag from "react-country-flag";
-import { AuthTextField } from "@/app/styles/auth.styles";
-import PhoneInput from "react-phone-input-2";
+
 import "react-phone-input-2/lib/bootstrap.css";
 
 // Styled dialog component
@@ -137,8 +120,8 @@ const UserProfilePopup = ({
   // Get profile photo and country
   useEffect(() => {
     setProfilePicture(user?.profilePicture);
-    setSelectedCountry(user?.country? user.country: "");
-  }, [user])
+    setSelectedCountry(user?.country ? user.country : "");
+  }, [user]);
 
   // Return JSX for UserProfilePopup component
   return (
@@ -196,13 +179,6 @@ const UserProfilePopup = ({
               label="User Name"
               defaultValue={user?.name}
               variant="filled"
-              // InputProps={{
-              //   endAdornment: (
-              //     <InputAdornment position="end">
-              //       <BorderColorIcon />
-              //     </InputAdornment>
-              //   ),
-              // }}
             />
           </div>
         </Box>
@@ -220,17 +196,11 @@ const UserProfilePopup = ({
               label="E-mail"
               defaultValue={user?.email}
               variant="filled"
-              // InputProps={{
-              //   endAdornment: (
-              //     <InputAdornment position="end">
-              //       <BorderColorIcon />
-              //     </InputAdornment>
-              //   ),
-              // }}
             />
           </div>
         </Box>
 
+        {/*Change Password*/}
         <Box
           sx={{
             display: "flex",
@@ -319,6 +289,7 @@ const UserProfilePopup = ({
             </BootstrapDialog>
           </React.Fragment>
 
+          {/*Change mobile Number*/}
           <React.Fragment>
             <Button variant="contained" onClick={handleClickOpen2}>
               Change mobile NO
@@ -358,7 +329,9 @@ const UserProfilePopup = ({
                       <TextField
                         id="old-mobile-number"
                         label="Old Mobile Number"
-                        defaultValue={"*** ** ***" + user?.mobileNumber.substring(9,12)}
+                        defaultValue={
+                          "*** ** ***" + user?.mobileNumber.substring(9, 12)
+                        }
                         variant="filled"
                       />
                     </div>

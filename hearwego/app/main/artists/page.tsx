@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { Box } from "@mui/material";
 import { Stack } from "@mui/material";
@@ -20,6 +20,10 @@ import {
   TableRow,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { Album, Artist, Song } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { useAppSelector } from "@/lib/hooks";
+import { getSongsForArtist } from "@/app/services/SongServices";
 
 export const genreOptions = [
   { value: "pop", label: "Pop" },
@@ -56,37 +60,70 @@ export const typeOptions = [
   { value: "band", label: "Band" },
 ];
 
-export default function Artist() {
+interface props {
+  params: { id: string };
+}
+export default function Artist({ params: { id } }: props) {
+  //State variables for the filters
   const [genre, setGenre] = React.useState("");
   const [profession, setProfession] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [country, setCountry] = React.useState("");
   const [type, setType] = React.useState("");
 
+  //Redux state variables
+  const artist = useAppSelector((state) => state.artist.user);
+
+  //State variables for the artist data
+  const [allArtistData, setAllArtistData] = useState<Artist[]>([]);
+  const [page, setPage] = useState(1);
+  const [per_page, setLimit] = useState(5);
+
+  //State variables for the artist songs
+  const [allArtistSongs, setAllArtistSongs] = useState<Song[]>([]);
+
+  //Get all the artists
+  useEffect(() => {
+    getAllArtists(page, per_page).then((res) => {
+      console.log(res);
+      setAllArtistData(res.data);
+    });
+  }, [page]);
+
+  //Get all the songs for the artist
+  useEffect(() => {
+    getSongsForArtist(artist?.token, id).then((Songs) => {
+      console.log(Songs);
+      setAllArtistSongs(Songs.data);
+    });
+  }, []);
+  //Handle the change of the genre filter
   const handleGenreChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGenre(event.target.value as string);
   };
-
+  //Handle the change of the profession filter
   const handleProfessionChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     setProfession(event.target.value as string);
   };
-
+  //Handle the change of the Gender filter
   const handleGenderChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGender(event.target.value as string);
   };
-
+  //Handle the change of the Country filter
   const handleCountryChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     setCountry(event.target.value as string);
   };
 
+  //Handle the change of the Type filter
   const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setType(event.target.value as string);
   };
 
+  //State variable for the value of the scroll
   const [value, setValue] = React.useState(0);
   const handleScrollChange = (
     event: React.SyntheticEvent,
@@ -95,6 +132,7 @@ export default function Artist() {
     setValue(newValue);
   };
   return (
+    //This is the Maindiv that contains all the components
     <Maindiv>
       <Box
         sx={{
@@ -114,6 +152,7 @@ export default function Artist() {
             marginTop: "30px",
           }}
         >
+          {/* This is the SearchPaper that contains the search bar */}
           <SearchPaper>
             <InputBase
               sx={{ ml: 1, flex: 1 }}
@@ -125,6 +164,7 @@ export default function Artist() {
             </IconButton>
           </SearchPaper>
         </Box>
+        {/* This is the Stack that contains the CustomSelect components */}
         <Stack direction="row" spacing={5}>
           <CustomSelect
             labelId="genre-select-label"
@@ -173,47 +213,34 @@ export default function Artist() {
           />
         </Stack>
       </Box>
+      {/* This is the Typography that contains the text "Featured Artists" */}
       <Typography
         variant="h6"
         sx={{ marginTop: "20px", color: "text.primary" }}
       >
         Featured Artists
       </Typography>
+      {/* This is the Stack that contains the ArtistCard components */}
       <Stack
         direction="row"
         spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
-        <ArtistCard
-          name="Michale Jackson"
-          Genre="Pop"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-          id="ar1"
-        />
-
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-          id="ar2"
-        />
-
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
+        {/* Map all the artists to the ArtistCard component */}
+        {allArtistData.map((artists) => (
+          <ArtistCard
+            name={artists.artistName}
+            Genre={artists.musicGenres.join(", ")}
+            img_url={
+              artists.artistCovers.length > 0
+                ? artists.artistCovers[0]
+                : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+            }
+            id={artists.artist_id}
+          />
+        ))}
       </Stack>
+      {/* This is the Typography that contains the text "Trending Artists" */}
       <Typography
         variant="h6"
         sx={{ marginTop: "20px", color: "text.primary" }}
@@ -224,6 +251,7 @@ export default function Artist() {
         component={Paper}
         style={{ borderRadius: "30px", marginTop: "20px" }}
       >
+        {/* This is the Table that contains the TrendingRow components */}
         <Table
           sx={{
             width: "100%",
@@ -242,102 +270,37 @@ export default function Artist() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
-            <TrendingRow
-              Rank={{
-                rank: 1,
-                rank_img:
-                  "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-              }}
-              Artist={{
-                name: "Michale Jackson",
-                img_url: "",
-              }}
-              Latest_song={{
-                song_name: "Leave Me Alone",
-                song_img:
-                  "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-              }}
-              Latest_album={{
-                album_name: "Scream",
-                album_img:
-                  "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-              }}
-              Fans={100_000_000}
-              popularity={""}
-              country_img={""}
-            />
+            {/* Map all the artists to the TrendingRow component */}
+            {allArtistData.map((artists) => (
+              <TrendingRow
+                Rank={{
+                  rank: 1,
+                  rank_img:
+                    "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+                }}
+                Artist={{
+                  name: artists.artistName,
+                  img_url:
+                    artists.artistCovers.length > 0
+                      ? artists.artistCovers[0]
+                      : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg",
+                }}
+                Latest_song={{
+                  song_name: artist?.token ? allArtistSongs[0].song_title : "",
+                  song_img:
+                    "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+                }}
+                Latest_album={{
+                  album_name: "Scream",
+                  album_img:
+                    "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+                }}
+                Fans={100000000}
+                popularity={""}
+                country_img={""}
+                LinkPage={""}
+              />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -349,6 +312,7 @@ export default function Artist() {
           display: "flex",
         }}
       >
+        {/* Link to the TrendingArtistsSeeMore page */}
         <Link href="/main/artists/TrendingArtistsSeeMore/">
           <Typography
             variant="body1"
@@ -371,35 +335,22 @@ export default function Artist() {
         spacing={2}
         sx={{ marginTop: "20px", marginBottom: "20px" }}
       >
-        <ArtistCard
-          name="Michale Jackson"
-          Genre="Pop"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-          id="ar1"
-        />
-
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-          id="ar2"
-        />
-
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Eminem"
-          Genre="Hip Hop"
-          img_url="https://i.scdn.co/image/ab6761610000e5eba00b11c129b27a88fc72f36b"
-        />
-        <ArtistCard
-          name="Freddie Mercury"
-          Genre="Rock"
-          img_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg/800px-Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg"
-        />
+        {/* Map all the artists to the ArtistCard component on the reverse order */}
+        {allArtistData
+          .slice()
+          .reverse()
+          .map((artists) => (
+            <ArtistCard
+              name={artists.artistName}
+              Genre={artists.musicGenres.join(", ")}
+              img_url={
+                artists.artistCovers.length > 0
+                  ? artists.artistCovers[0]
+                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+              }
+              id={artists.artist_id}
+            />
+          ))}
       </Stack>
     </Maindiv>
   );

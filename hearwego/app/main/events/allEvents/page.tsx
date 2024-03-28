@@ -104,7 +104,7 @@ const allEvents = [
 export default function MoreAlbums() {
   return (
     <Maindiv>
-      <Box
+       <Box
         style={{
           display: "flex",
           padding: "15px",

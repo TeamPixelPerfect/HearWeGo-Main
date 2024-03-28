@@ -1,6 +1,7 @@
+//Single Song page
+
 "use client";
 import * as React from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -11,7 +12,6 @@ import LanguageIcon from "@mui/icons-material/Language";
 import { BsSpotify } from "react-icons/bs";
 import { SiApplemusic } from "react-icons/si";
 import { SiYoutubemusic } from "react-icons/si";
-import { Container } from "@mui/material";
 
 import {
   Maindiv,
@@ -41,6 +41,7 @@ export default function SingleSongPage() {
   ];
   return (
     <Maindiv>
+      {/* This is CardMedia component for backcover img */}
       <CoverCardMedia image="https://www.billboard.com/wp-content/uploads/media/Michael-Jackson-1986-concert-billboard-1548.jpg">
         <div
           style={{
@@ -53,12 +54,14 @@ export default function SingleSongPage() {
 
         <AllMiddleBox>
           <Stack direction="row" width="100%" spacing={"1px"}>
+            {/* This is the profilepictureavtar for artist profile pic*/}
             <ProfilePicAvatar
               src={
                 "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg"
               }
             ></ProfilePicAvatar>
 
+            {/* This is the artistdetailbox for artist details*/}
             <ArtistDetailBox>
               <ArtistNameBox>Billie Jean</ArtistNameBox>
               <GenreBox>Michael Jackson</GenreBox>

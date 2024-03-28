@@ -1,14 +1,14 @@
 "use client";
-import { relative } from "path";
+
 import React, { useCallback, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+
 import Radio from "@mui/material/Radio";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
+
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
@@ -17,10 +17,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { Autocomplete } from "@mui/material";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import { styled } from "@mui/material/styles";
-import Tooltip from "@mui/material/Tooltip";
-import FormGroup from "@mui/material/FormGroup";
-import Checkbox from "@mui/material/Checkbox";
+
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -41,6 +38,8 @@ interface TabPanelProps {
   value: number;
 }
 
+//Array of available languages for albums.
+
 const genres = [
   "Pop",
   "Rock",
@@ -53,6 +52,8 @@ const genres = [
   "R&B (Rhythm and Blues)",
   "Metal",
 ];
+
+//Array of available languages for albums.
 const Language = [
   "Sinhala",
   "English",
@@ -63,6 +64,7 @@ const Language = [
   "Hindi",
 ];
 
+//Component for displaying error message.
 const ErrorMessage = () => {
   return (
     <div
@@ -79,12 +81,15 @@ const ErrorMessage = () => {
   );
 };
 
+//Component for adding album data.
 const AddAlbumData = () => {
   const Router = useRouter();
 
+  // Fetching user and album data from Redux store
   const artist = useAppSelector((state) => state.artist.user);
   const albumDraft = useAppSelector((state) => state.album);
 
+  // State variables for managing form data and errors
   const [imageFile, setImageFile] = useState("");
   const [value, setValue] = React.useState(0);
 
@@ -110,10 +115,12 @@ const AddAlbumData = () => {
 
   const [uploading, setUploading] = useState(false);
 
+  // Function to handle tab change
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
+  // Function to add album data
   const handleAddAlbumData = () => {
     const errors = [false, false, false, false, false];
     if (!albumData.album_title) {
@@ -138,6 +145,8 @@ const AddAlbumData = () => {
 
     console.log(albumData);
     setUploading(true);
+
+    // Add album API call
     addAlbum(artist?.token ? artist.token : "", albumData).then((res) => {
       console.log(res);
       setUploading(false);
@@ -145,6 +154,7 @@ const AddAlbumData = () => {
     });
   };
 
+  // Effect to set initial album data
   useEffect(() => {
     console.log(albumDraft);
     setImageFile(albumDraft.album_img);
@@ -161,7 +171,7 @@ const AddAlbumData = () => {
   }, []);
 
   return (
-    <Box sx={{ minWidth: 275 }}>
+    <Box sx={{ minWidth: 375 }}>
       <Card variant="outlined">
         <React.Fragment>
           <CardContent>
@@ -192,6 +202,7 @@ const AddAlbumData = () => {
                   <Box sx={{ width: "100%", display: "flex" }}>
                     <Box>
                       {" "}
+                      {/* Component for uploading album image */}
                       <DropFile
                         fileTypes="Image"
                         fileExtensions="JPG,PNG,JPEG"
@@ -207,6 +218,7 @@ const AddAlbumData = () => {
                       {!imageFile && <ErrorMessage />}
                     </Box>
                     <Box sx={{ width: "50%", marginLeft: "100px" }}>
+                      {/* Form section for number of tracks */}
                       <Box
                         component="form"
                         sx={{
@@ -260,6 +272,8 @@ const AddAlbumData = () => {
                         />
                         {trackError && <ErrorMessage />}
                       </Box>
+
+                      {/* Form section for selecting release date */}
                       <Box
                         component="form"
                         sx={{
@@ -288,7 +302,7 @@ const AddAlbumData = () => {
                         </LocalizationProvider>
                         {dateError && <ErrorMessage />}
                       </Box>
-
+                      {/* Form section for selecting album genres */}
                       <Box
                         component="form"
                         sx={{
@@ -305,6 +319,7 @@ const AddAlbumData = () => {
                           id="album_genres"
                           options={genres}
                           style={{ boxSizing: "initial", width: "82%" }}
+                          // Handler for updating selected album genres in state
                           onChange={(e, value) => {
                             setAlbumData({ ...albumData, album_genre: value });
                           }}
@@ -318,6 +333,8 @@ const AddAlbumData = () => {
                         />
                         {genreError && <ErrorMessage />}
                       </Box>
+
+                      {/* Form section for additional tags */}
                       <Box
                         component="form"
                         sx={{
@@ -334,6 +351,8 @@ const AddAlbumData = () => {
                           variant="filled"
                         />
                       </Box>
+
+                      {/* Form section for album description */}
                       <Box
                         component="form"
                         sx={{
@@ -351,6 +370,7 @@ const AddAlbumData = () => {
                           rows={4}
                           defaultValue="Description of your Album"
                           variant="filled"
+                          // Handler for updating album description in state
                           onChange={(e) => {
                             setAlbumData({
                               ...albumData,
@@ -359,6 +379,8 @@ const AddAlbumData = () => {
                           }}
                         />
                       </Box>
+
+                      {/* Form section for selecting privacy settings */}
                       <div style={{ marginTop: "30px", marginLeft: "20px" }}>
                         <FormControl>
                           <FormLabel id="demo-radio-buttons-group-label">
@@ -369,6 +391,7 @@ const AddAlbumData = () => {
                             defaultValue="Public"
                             name="radio-buttons-group"
                             row
+                            // Handler for updating privacy settings in state
                             onChange={(e) => {
                               setAlbumData({
                                 ...albumData,

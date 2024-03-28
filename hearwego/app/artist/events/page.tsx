@@ -42,6 +42,7 @@ import {
 } from "../../styles/artistDashboardEventsPage.styles";
 import { getEvents } from "@/app/services/EventServices";
 
+//event cards display
 export default function ArtistEvents() {
   const [eventDetails, setEventDetails] = useState([]);
 
@@ -68,6 +69,7 @@ export default function ArtistEvents() {
   );
 }
 
+
 const EventsDisplay = (
   <React.Fragment>
     <CardContent>
@@ -78,6 +80,7 @@ const EventsDisplay = (
   </React.Fragment>
 );
 
+//ebent tabs
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -104,6 +107,7 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
+//prop for tabs
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
@@ -111,9 +115,12 @@ function a11yProps(index: number) {
   };
 }
 
+
+//event tab bar
 function EventTabs() {
   const [value, setValue] = React.useState(0);
 
+  //handle the tab change
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -156,7 +163,7 @@ function EventTabs() {
   );
 }
 
-
+//event details
 function EventArea() {
   const artist = useAppSelector((state) => state.artist.user);
 
@@ -197,7 +204,8 @@ function EventArea() {
         </Button>
       </Box>
       <Box sx={{ width: "100%" }}>
-        <Grid container columnGap={5} rowGap={2} sx={{ width: "100%" }}>
+        <Grid container columnGap={7} rowGap={2} sx={{ width: "100%" }}>
+          {/* mapping event cards */}
           {upcomingEvents.map((events, index) => {
             return events.sessions?.map((event) => (
               <Grid item xs={4} md={2} spacing={10} style={{}}>
@@ -213,7 +221,7 @@ function EventArea() {
         </Grid>
       </Box>
 
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "center" , marginTop: "1em"}}>
         <Pagination count={10} color="primary" />
       </Box>
     </>
@@ -228,6 +236,7 @@ interface EventCardProps {
   no_of_interests?: number;
 }
 
+//single event card
 function EventCard({
   event_name,
   event_img,

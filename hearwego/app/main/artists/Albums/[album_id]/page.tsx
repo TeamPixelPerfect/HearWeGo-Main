@@ -1,6 +1,7 @@
+//Single Album Page
+
 "use client";
 import * as React from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -73,9 +74,10 @@ interface Props {
 }
 
 export default function SingleAlbumPage({ params: { album_id } }: Props) {
-  const [albumData, setAlbumData] = React.useState<Album>();
-  const [albumSongs, setAlbumSongs] = React.useState<Song[]>();
+  const [albumData, setAlbumData] = React.useState<Album>(); // This is the state for album data
+  const [albumSongs, setAlbumSongs] = React.useState<Song[]>(); // This is the state for album songs
 
+  // This is the useEffect for get album
   React.useEffect(() => {
     console.log(album_id);
     getAlbum("test", album_id).then((album) => {
@@ -88,7 +90,8 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
     <Maindiv>
       {albumData ? (
         <>
-          <CoverCardMedia image="https://www.cnn.com/interactive/2023/12/style/thriller-dance-video-40-year-anniversary/media/images/4xGHmgXB.jpeg">
+          {/* This is CardMedia component for backcover img */}
+          <CoverCardMedia image={albumData?.album_img}>
             <div
               style={{
                 background: "black",
@@ -100,15 +103,24 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
 
             <AllMiddleBox>
               <Stack direction="row" width="100%" spacing={"1px"}>
-                <ProfilePicAvatar
-                  src={
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6nb_Cit59ogQsc692zoACe-QkVCDG_8NNAFvXWTIfFgatco6C-4-TcPLyl5nDcGWUkw&usqp=CAU"
-                  }
-                ></ProfilePicAvatar>
+                {/* This is the profilepictureavtar for artist profile pic*/}
+                <ProfilePicAvatar src={albumData?.album_img}></ProfilePicAvatar>
 
+                {/* This is the album detail box */}
                 <ArtistDetailBox>
-                  <ArtistNameBox>{albumData?.album_title}</ArtistNameBox>
-                  <GenreBox>1983</GenreBox>
+                  <ArtistNameBox
+                    sx={{
+                      fontSize: "30px",
+                      fontWeight: "bold",
+                      color: "white",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {albumData?.album_title}
+                  </ArtistNameBox>
+                  <GenreBox>
+                    {albumData?.release_date?.trimStart().slice(0, 4)}
+                  </GenreBox>
                   <SocialMediaBox>
                     <Button>
                       <FacebookRoundedIcon
@@ -137,14 +149,11 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
                       padding: "30px 0px",
                     }}
                   >
-                    Thriller is the sixth studio album by the American singer
-                    and songwriter Michael Jackson, released on November 29,
-                    1982, by Epic Records. It was produced by Quincy Jones, who
-                    had previously worked with Jackson on his 1979 album Off the
-                    Wall and who would later produce his 1987 album Bad.
+                    {albumData?.description}
                   </Box>
                 </ArtistDetailBox>
 
+                {/* This is the optionbox for artist options*/}
                 <OptionBox>
                   <Stack direction="row" width="100%" spacing={"1px"}>
                     <Button>
@@ -176,7 +185,9 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
             Songs
           </Box>
 
+          {/* This is the stack for songs */}
           {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
+            // This is the single song row component
             <SingleSongRow
               index={index}
               songImg={songImg}
