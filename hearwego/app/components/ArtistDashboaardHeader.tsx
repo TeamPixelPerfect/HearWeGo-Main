@@ -25,13 +25,17 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../styles/CustomeTheme";
 import { FaBars } from "react-icons/fa";
-import { useMediaQuery } from "@mui/material";
+import { Stack, useMediaQuery } from "@mui/material";
 import { useAppSelector } from "@/lib/hooks";
 import ADPersistentDrawerLeft from "./ADMobileDrawer";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { useRouter } from "next/navigation";
 
 const ArtistDashboardHeader = () => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+
+  const router = useRouter();
 
   const artist = useAppSelector((state) => state.artist.user);
 
@@ -106,22 +110,29 @@ const ArtistDashboardHeader = () => {
 
       <HitPredictorIco>
         <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <HitPredictorBtn color="secondary" aria-label="add">
+          <HitPredictorBtn color="secondary" aria-label="add" onClick={() => {router.push('/main/predictor')}}>
             <CellTowerIcon />
           </HitPredictorBtn>
         </Box>
       </HitPredictorIco>
 
       <ProfileArea>
-        <ProfileDetailArea elevation={0}>
-          <Avatar src={artist?.user.profilePicture} />
-          <ArtistDetail>
+        {!matches && <ProfileDetailArea elevation={0}>
+          <IconButton>
+            <ArrowDropDownIcon sx={{ fontSize: "32px" }} />
+          </IconButton>
+          <Stack direction="row" sx={{ alignItems: "center" }}>
             <ArtistName>{artist?.user.artistName}</ArtistName>
-            <ArtistGenre>
+            <Avatar src={artist?.user.profilePicture} />
+          </Stack>
+          {/* <ArtistDetail> */}
+
+          {/* <ArtistGenre>
               {artist?.user.musicGenres[0]} | {artist?.user.artistType}
-            </ArtistGenre>
-          </ArtistDetail>
-        </ProfileDetailArea>
+            </ArtistGenre> */}
+          {/* </ArtistDetail> */}
+        </ProfileDetailArea>}
+        {matches &&  <Avatar src={artist?.user.profilePicture} />}
       </ProfileArea>
     </HeaderBox>
   );

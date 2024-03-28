@@ -31,8 +31,9 @@ export default function Layout({
         const currentUser = JSON.parse(_artist);
         getArtist(currentUser.user._id).then((res) => {
           if (res) {
-            dispatch(logInArtist(res));
-            sessionStorage.setItem("hwg-artist", JSON.stringify(res));
+            const newData = { ...currentUser, ...res.user };
+            dispatch(logInArtist(newData));
+            sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
           }
         });
       }

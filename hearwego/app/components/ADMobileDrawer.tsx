@@ -82,10 +82,16 @@ export default function ADPersistentDrawerLeft({ open, setOpen }: Props) {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              p: "2em 0"
+              p: "2em 0",
             }}
           >
-            <Logo img_url="https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png" />
+            <Logo
+              img_url={
+                theme.palette.mode === "light"
+                  ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
+                  : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo(white).png"
+              }
+            />
           </Box>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "ltr" ? (

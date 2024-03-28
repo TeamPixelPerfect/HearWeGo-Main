@@ -4,7 +4,13 @@ import {
   ADNavItemBox,
 } from "../styles/artistDashboard.styles";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
-import { SvgIconTypeMap, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  SvgIconTypeMap,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import Link from "next/link";
 
 interface Props {
@@ -18,6 +24,7 @@ interface Props {
 
 const ADNavItemGroup = ({ groupLabel, items }: Props) => {
   const matches = useMediaQuery("(max-width:960px)");
+  const theme = useTheme();
 
   return (
     <ADNavItemGroupBox>
@@ -25,13 +32,19 @@ const ADNavItemGroup = ({ groupLabel, items }: Props) => {
       {items.map((item) => (
         <ADNavItemBox>
           {!matches ? (
-            <Link href={item.link}>
-              <item.icon style={{ color: "#4B4B4B", marginRight: "10px" }} />
-              <div>{item.label}</div>
+            <Link
+              href={item.link}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <item.icon color="secondary" style={{ marginRight: "10px" }} />
+              <Box sx={{ color: theme.palette.text.primary }}>{item.label}</Box>
             </Link>
           ) : (
-            <Link href={item.link}>
-              <item.icon style={{ color: "#4B4B4B" }} />
+            <Link
+              href={item.link}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <item.icon color="secondary" style={{ color: "#fff" }} />
             </Link>
           )}
         </ADNavItemBox>

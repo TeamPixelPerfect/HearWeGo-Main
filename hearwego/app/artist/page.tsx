@@ -8,6 +8,7 @@ import {
   Tab,
   Tabs,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
@@ -71,23 +72,30 @@ const HomeSongCard = ({
   coverArt,
 }: HomeSongCardProps) => {
   const { playing, toggle } = useAudio({ url: songUrl });
+  const matches = useMediaQuery("(max-width:960px)");
 
   return (
     <SongCard>
-      <Box sx={{ display: "flex", alignItems: "center", width: "45%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: matches ? "60%" : "45%",
+        }}
+      >
         <SongCardCoverArt imgUrl={coverArt} />
         <Typography variant="h6">{songName}</Typography>
       </Box>
-      <SongCardItem width="40%">
+      <SongCardItem width={matches ? "30%" : "40%"}>
         <MdAlbum />
         <Typography variant="body1">{albumName}</Typography>
       </SongCardItem>
-      <SongCardItem width="10%">
+      {!matches && <SongCardItem width="10%">
         <GiSoundWaves />
         <Typography variant="body2">{duration}</Typography>
-      </SongCardItem>
+      </SongCardItem>}
 
-      <Box sx={{ width: "5%" }}>
+      <Box sx={{ width:matches? "10%" :"5%" }}>
         <SongCardPlayButton onClick={toggle}>
           {playing ? <IoIosPause /> : <IoIosPlay />}
         </SongCardPlayButton>
@@ -117,6 +125,8 @@ const HomeAlbumCard = ({
 };
 
 const ADHomePage = () => {
+  const matches = useMediaQuery("(max-width:960px)");
+
   const [profilePic, setProfilePic] = useState<string>(
     // "https://placehold.co/600x600/png"
     "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
@@ -154,14 +164,39 @@ const ADHomePage = () => {
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Grid item xs={12} md={12} sx={{ height: "50vh", margin: "0" }}>
+      <Grid
+        item
+        xs={12}
+        md={12}
+        sx={{ height: matches ? "600px" : "400px", margin: "0" }}
+      >
         <ADHomeCoverBox imgUrl={artist?.user.artistCovers[0]}>
           <ADHomeNameArea>
-            <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: matches ? "center" : "flex-end",
+                flexDirection: matches ? "column" : "row",
+                justifyContent: matches ? "flex-end" : "center",
+                mb: matches ? "2em" : 0,
+              }}
+            >
               <ADHomeProfilePicture imgUrl={artist?.user.profilePicture} />
-              <Box sx={{ ml: 1 }}>
+              <Box
+                sx={
+                  !matches
+                    ? { ml: 3 }
+                    : {
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }
+                }
+              >
                 <ADHomeName>{artist?.user.artistName}</ADHomeName>
-                <ADArtistInfo>{artist?.user.artistBio}</ADArtistInfo>
+                <ADArtistInfo>{artist?.user.artistBio.split(".")[0]}</ADArtistInfo>
+
                 <ADArtistPageUrl>
                   <Link href="">http://www.hearwego.com/wq23s</Link>
                   <FaCopy />
@@ -173,8 +208,8 @@ const ADHomePage = () => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-                alignItems: "flex-end",
-                mr: 2,
+                alignItems: matches ? "center" : "flex-end",
+                mr: matches ? 0 : 2,
               }}
             >
               <ADHomeSocialIcons>
@@ -182,7 +217,14 @@ const ADHomePage = () => {
                 <AiFillInstagram />
                 <FaSquareXTwitter />
               </ADHomeSocialIcons>
-              <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: matches ? "center" : "flex-start",
+                  justifyContent: matches ? "center" : "flex-start",
+                }}
+              >
                 <Typography
                   variant="h4"
                   sx={{ color: "#fff", fontWeight: "600", mb: 0 }}
@@ -199,11 +241,16 @@ const ADHomePage = () => {
       </Grid>
       <Grid item xs={12} md={8} sx={{ margin: 0 }}>
         <FeaturedSongCard>
-          <Typography variant="h5" sx={{ fontWeight: "600", mb: 0 }}>
+          <Typography variant="h5" sx={{ fontWeight: "700", mb: 0 }}>
             Featured Songs
           </Typography>
           <ADHomeTabBox>
-            <Tabs value={tabValue} onChange={handleChange}>
+            <Tabs
+              textColor="secondary"
+              indicatorColor="secondary"
+              value={tabValue}
+              onChange={handleChange}
+            >
               <Tab label="Popular" />
               <Tab label="Recent" />
               <Tab label="Upcoming" />
@@ -264,7 +311,7 @@ const ADHomePage = () => {
       </Grid>
       <Grid item xs={12} md={4} sx={{ margin: 0 }}>
         <FeaturedAlbumCard>
-          <Typography variant="h5" sx={{ fontWeight: "600", mb: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: "700", mb: 2 }}>
             Featured Albums
           </Typography>
 
