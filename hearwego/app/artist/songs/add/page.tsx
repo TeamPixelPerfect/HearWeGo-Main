@@ -23,17 +23,22 @@ const AddSong = () => {
   const Router = useRouter();
   const theme = useTheme();
 
+  //useSatate for the song file
   const [songFile, setSongFile] = useState<File|null>();
   const [uploading, setUploading] = useState(false);
+  //useState for errors in song upload
   const [error, setError] = useState(false);
 
+  //redux for saving the song file globally
   const dispatch = useAppDispatch();
+
 
   const onDrop = useCallback((acceptedFiles: any) => {
     console.log(acceptedFiles);
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
+  //function to check the availability of the song track and upload
   const handleAddSong = () => {
     if (!songFile) {
       setError(true);
@@ -74,6 +79,7 @@ const AddSong = () => {
                     alignItems: "center",
                   }}
                 >
+                  {/* song drag and drop */}
                   <DropSong
                     fileTypes="Music Track"
                     fileExtensions="MP3,AAC,M4A"
