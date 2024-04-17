@@ -606,7 +606,7 @@ function TicketDetails() {
     for (let i = 0; i < sessionCount; i++) {
       divs.push(
         <div key={i}>
-          <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
+          <div>{TicketSwitchDisplay(isChecked ? 0 : 1, i+1)}</div>
         </div>
       );
     }
@@ -1509,22 +1509,28 @@ function BudgetTable() {
   );
 }
 
-function TicketSwitchDisplay(switchStatus: number) {
+function TicketSwitchDisplay(switchStatus: number, sessionNo: number) {
   if (switchStatus == 0) {
-    return <AutoTicketForm />;
+    return 
+    <div>
+      {AutoTicketForm(sessionNo)};
+    </div>
   } else {
-    return <ManualTicketForm />;
+    return 
+    <>
+      {ManualTicketForm(sessionNo)};
+    </> 
   }
 }
 
-function ManualTicketForm() {
+function ManualTicketForm(sessionNo: number) {
   return (
     <Paper
         sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
         elevation={3}
       >
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-          Tickets for the Session on 2024-01-19 at 8.00 P.M
+          Tickets for the Session {sessionNo}
         </Typography>
 
         <Box
@@ -1564,7 +1570,7 @@ function ManualTicketForm() {
   );
 }
 
-function AutoTicketForm() {
+function AutoTicketForm(sessionNo: number) {
   const [imgFile, setImgFile] = React.useState(null);
   return (
     
@@ -1573,7 +1579,7 @@ function AutoTicketForm() {
         elevation={3}
       >
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-          Tickets for the Session on 2024-01-19 at 8.00 P.M
+          Tickets for the Session {sessionNo}
         </Typography>
 
         <Box
