@@ -6,8 +6,6 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "hwgbucket.s3.ap-south-1.amazonaws.com",
-        port: "",
-        pathname: "",
       },
     ],
   },
