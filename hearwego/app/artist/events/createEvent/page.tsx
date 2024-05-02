@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -36,10 +35,6 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import {
   Unstable_NumberInput as BaseNumberInput,
   NumberInputProps,
@@ -69,20 +64,10 @@ import AddIcon from "@mui/icons-material/Add";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-// import Typography from '@mui/material/Typography';
-import { CardActionArea } from "@mui/material";
+import { CardActionArea, IconButton } from "@mui/material";
 import { countries } from "country-flag-icons";
 
-import {
-  CreateEventMainBox,
-  EventFormBody,
-  InputRow,
-  SessionBox,
-  SessionInputRow,
-  SessionInput,
-  CalendarArea,
-  SessionInfo,
-} from "../../../styles/artistDashboardCretaeEvent.styles";
+import { InputRow } from "../../../styles/artistDashboardCretaeEvent.styles";
 
 import { IOSSwitch } from "../../../styles/switch.styles";
 
@@ -433,27 +418,19 @@ function SelectEventType() {
   );
 }
 
-let sessionCount = 0;
+let sessionCount = 1;
 
 function EventDetails() {
   const [numberOfSessions, setNumberOfSessions] = useState(0);
+
+  const [timeValue, setTimeValue] = React.useState<Dayjs | null>(
+    dayjs("2022-04-17T15:30")
+  );
 
   const handleNumberOfSessionsChange = (event) => {
     const value = parseInt(event.target.value);
     setNumberOfSessions(isNaN(value) ? 0 : value);
     sessionCount = value;
-  };
-
-  const generateDivs = () => {
-    const divs = [];
-    for (let i = 0; i < numberOfSessions; i++) {
-      divs.push(
-        <div key={i}>
-          <SessionForm />
-        </div>
-      );
-    }
-    return divs;
   };
 
   const [isAgeEnabled, setIsAgeEnabled] = useState(false);
@@ -556,6 +533,7 @@ function EventDetails() {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                defaultValue={sessionCount}
                 variant="filled"
                 sx={{ width: "66%" }}
                 onChange={handleNumberOfSessionsChange}
@@ -571,7 +549,140 @@ function EventDetails() {
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
           Sessions
         </Typography>
-        {generateDivs()}
+
+        {Array.from(Array(sessionCount)).map((_, index) => (
+          <Paper
+            sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+            elevation={3}
+          >
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{ marginBottom: "1em" }}
+            >
+              Session {index + 1}
+            </Typography>
+
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "65%" }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Grid
+                    container
+                    rowSpacing={2}
+                    columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                    marginBottom={2}
+                  >
+                    <Grid xs={6}>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={["DateField"]}>
+                          <DateField
+                            label="Date"
+                            defaultValue={dayjs("2022-04-17")}
+                            format="LL"
+                            variant="filled"
+                            sx={{ width: "100%" }}
+                            key={index}
+                          />
+                        </DemoContainer>
+                      </LocalizationProvider>
+                    </Grid>
+
+                    <Grid xs={6}>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={["TimeField"]}>
+                          <TimeField
+                            label="Time"
+                            value={timeValue}
+                            onChange={(newValue) => setTimeValue(newValue)}
+                            variant="filled"
+                            sx={{ width: "100%" }}
+                            key={index}
+                          />
+                        </DemoContainer>
+                      </LocalizationProvider>
+                    </Grid>
+
+                    <Grid xs={6}>
+                      <TextField
+                        id="duration"
+                        label="Duration"
+                        type="number"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        variant="filled"
+                        sx={{ width: "100%" }}
+                        key={index}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="start">
+                              Hours
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid xs={6}>
+                      <SelectCountry />
+                    </Grid>
+                  </Grid>
+                  <TextField
+                    id="event_venue"
+                    label="Venue"
+                    variant="filled"
+                    sx={{ width: "100%", marginBottom: 2 }}
+                  />
+                  <Autocomplete
+                    sx={{ maxWidth: "90%" }}
+                    multiple
+                    id="artists"
+                    options={sessionArtist}
+                    getOptionLabel={(option) => option.name}
+                    filterSelectedOptions
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Artits"
+                        // placeholder="Favorites"
+                        variant="filled"
+                        sx={{ maxWidth: "100%" }}
+                        style={{ boxSizing: "initial" }}
+                      />
+                    )}
+                  />
+                </Box>
+              </Box>
+
+              <Box sx={{ width: "35%" }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer
+                    components={["DateCalendar"]}
+                    sx={{ width: "100%" }}
+                  >
+                    <DemoItem>
+                      <DateCalendar
+                        defaultValue={dayjs("2022-04-17")}
+                        disabled
+                      />
+                    </DemoItem>
+                  </DemoContainer>
+                </LocalizationProvider>
+              </Box>
+            </Box>
+
+            <Box sx={{ width: "100%" }}>
+              <TextField
+                id="session-des"
+                label="Description"
+                multiline
+                rows={4}
+                variant="filled"
+                sx={{ width: "100%" }}
+              />
+            </Box>
+          </Paper>
+        ))}
       </Paper>
 
       <SponsorField />
@@ -579,20 +690,6 @@ function EventDetails() {
     </>
   );
 }
-
-// function SessionArea() {
-//   return (
-//     <Paper
-//       sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-//       elevation={3}
-//     >
-//       <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-//         Sessions
-//       </Typography>
-//       <SessionForm />
-//     </Paper>
-//   );
-// }
 
 function TicketDetails() {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
@@ -606,7 +703,7 @@ function TicketDetails() {
     for (let i = 0; i < sessionCount; i++) {
       divs.push(
         <div key={i}>
-          <div>{TicketSwitchDisplay(isChecked ? 0 : 1, i+1)}</div>
+          <div>{TicketSwitchDisplay(isChecked ? 0 : 1, i + 1)}</div>
         </div>
       );
     }
@@ -752,9 +849,7 @@ function SessionForm() {
               id="artists"
               options={sessionArtist}
               getOptionLabel={(option) => option.name}
-              // defaultValue={[top100Films[13]]}
               filterSelectedOptions
-              // style={{boxSizing: "initial"}}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -839,70 +934,6 @@ const teamModalStyle = {
   boxShadow: 24,
   p: 4,
 };
-
-function TeamModal() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  return (
-    <div>
-      <Button onClick={handleOpen}>Add New Team</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={teamModalStyle}>
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            sx={{ marginBottom: "1em" }}
-          >
-            Team Details
-          </Typography>
-
-          <TextField
-            id="team_type"
-            label="Team Type"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-          />
-
-          <TextField
-            id="team_name"
-            label="Team Name"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-          />
-
-          <TextField
-            id="team_contact"
-            label="Contact No."
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-          />
-
-          <TextField
-            id="team_email"
-            label="Email"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-          />
-        </Box>
-
-        {/* <Stack direction="row" spacing={2}>
-          <Button variant="outlined">Close</Button>
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Add
-          </Button>
-        </Stack> */}
-      </Modal>
-    </div>
-  );
-}
 
 const teamColumns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -1035,13 +1066,6 @@ function TeamTable() {
               </Button>
             </Stack>
           </Box>
-
-          {/* <Stack direction="row" spacing={2}>
-          <Button variant="outlined">Close</Button>
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Add
-          </Button>
-        </Stack> */}
         </Modal>
       </div>
     </div>
@@ -1079,120 +1103,6 @@ const sponsorModalStyle = {
 
 let sponsorRows = [];
 
-function SponsorModal() {
-  const [sponsorType, setSponsorType] = useState("");
-  const [sponsorName, setSponsorName] = useState("");
-  const [sponsorContact, setSponsorContact] = useState("");
-  const [sponsorEmail, setSponsorEmail] = useState("");
-
-  const handleSponsorTypeChange = (event) => {
-    setSponsorType(event.target.value);
-  };
-
-  const handleSponsorNameChange = (event) => {
-    setSponsorName(event.target.value);
-  };
-
-  const handleSponsorContactChange = (event) => {
-    setSponsorContact(event.target.value);
-  };
-
-  const handleSponsorEmailChange = (event) => {
-    setSponsorEmail(event.target.value);
-  };
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const addNewSponsor = () => {
-    const newId = sponsorRows.length + 1;
-    const newSponsor = {
-      id: newId,
-      sponsorType: sponsorType,
-      sponsorName: sponsorName,
-      sponsorContact: sponsorContact,
-      sponsorEmail: sponsorEmail,
-    };
-
-    const newSponsorRows = [...sponsorRows, newSponsor];
-
-    sponsorRows = newSponsorRows;
-
-    handleClose();
-  };
-
-  return (
-    <div>
-      <Button onClick={handleOpen}>Add New Sponsor</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={sponsorModalStyle}>
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            sx={{ marginBottom: "1em" }}
-          >
-            Sponsor Details
-          </Typography>
-
-          <TextField
-            id="sponsor_type"
-            label="Sponsor Type"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-            onChange={handleSponsorTypeChange}
-          />
-
-          <TextField
-            id="sponsor_name"
-            label="Sponsor Name"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-            onChange={handleSponsorNameChange}
-          />
-
-          <TextField
-            id="sponsor_contact"
-            label="Contact No."
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-            onChange={handleSponsorContactChange}
-          />
-
-          <TextField
-            id="sponsor_email"
-            label="Email"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-            onChange={handleSponsorEmailChange}
-          />
-          <Stack direction="row" spacing={2}>
-            <Button variant="outlined" onClick={handleClose}>
-              Close
-            </Button>
-            <Button variant="contained" onClick={addNewSponsor}>
-              Add
-            </Button>
-          </Stack>
-        </Box>
-
-        {/* <Stack direction="row" spacing={2}>
-          <Button variant="outlined">Close</Button>
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Add
-          </Button>
-        </Stack> */}
-      </Modal>
-    </div>
-  );
-}
-
 const sponsorColumns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
   { field: "sponsorType", headerName: "Sponsor Type", width: 150 },
@@ -1206,6 +1116,7 @@ function SponsorTable() {
   const [sponsorName, setSponsorName] = useState("");
   const [sponsorContact, setSponsorContact] = useState("");
   const [sponsorEmail, setSponsorEmail] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const handleSponsorTypeChange = (event) => {
     setSponsorType(event.target.value);
@@ -1221,6 +1132,20 @@ function SponsorTable() {
 
   const handleSponsorEmailChange = (event) => {
     setSponsorEmail(event.target.value);
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    setSelectedRows(selectionModel);
+    console.log("Selected Row IDs:", selectionModel);
+  };
+
+  const handleDelete = () => {
+    const updatedRows = sponsorRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    sponsorRows = updatedRows;
+    setSelectedRows([]);
+    refreshTable();
   };
 
   const [open, setOpen] = React.useState(false);
@@ -1263,10 +1188,17 @@ function SponsorTable() {
         }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
+        onRowSelectionModelChange={handleSelectionModelChange}
+        rowSelectionModel={selectedRows}
       />
 
       <div>
-        <Button onClick={handleOpen}>Add New Sponsor</Button>
+        <IconButton onClick={handleOpen} aria-label="add" color="primary">
+          <AddIcon />
+        </IconButton>
+        <IconButton onClick={handleDelete} aria-label="delete" color="secondary">
+          <DeleteIcon />
+        </IconButton>
         <Modal
           open={open}
           onClose={handleClose}
@@ -1323,13 +1255,6 @@ function SponsorTable() {
               </Button>
             </Stack>
           </Box>
-
-          {/* <Stack direction="row" spacing={2}>
-          <Button variant="outlined">Close</Button>
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Add
-          </Button>
-        </Stack> */}
         </Modal>
       </div>
     </div>
@@ -1346,130 +1271,7 @@ function BudgetDetails() {
       <InputRow>
         <BudgetTable />
       </InputRow>
-
-      <InputRow>
-        <BudgetModal />
-      </InputRow>
     </div>
-  );
-}
-
-const budgetModalStyle = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
-function BudgetModal() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  return (
-    <div>
-      <Button onClick={handleOpen}>Add New Budget</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={budgetModalStyle}>
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            sx={{ marginBottom: "1em" }}
-          >
-            Budget Details
-          </Typography>
-
-          <TextField
-            id="budget-title"
-            label="Title"
-            variant="filled"
-            sx={{ width: "100%", marginBottom: 2 }}
-          />
-
-          <BudgetSessionSelect />
-
-          <BudgetTypeSelect />
-
-          <TextField
-            id="budget-amount"
-            label="Amount"
-            type="number"
-            variant="filled"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            // placeholder="Sessions"
-            style={{ boxSizing: "initial" }}
-            sx={{ width: "100%" }}
-          />
-        </Box>
-      </Modal>
-    </div>
-  );
-}
-
-function BudgetTypeSelect() {
-  const [type, setType] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setType(event.target.value as string);
-  };
-
-  return (
-    <Box sx={{ width: "100%", marginBottom: "1em" }}>
-      <FormControl fullWidth>
-        <InputLabel id="budget_type">Type</InputLabel>
-        <Select
-          labelId="budget_type_select"
-          id="demo-simple-select"
-          value={type}
-          label="Type"
-          onChange={handleChange}
-          variant="filled"
-        >
-          <MenuItem value={"income"}>Income</MenuItem>
-          <MenuItem value={"expense"}>Expense</MenuItem>
-        </Select>
-      </FormControl>
-    </Box>
-  );
-}
-
-function BudgetSessionSelect() {
-  const [session, setSession] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setSession(event.target.value as string);
-  };
-
-  return (
-    <Box sx={{ width: "100%", marginBottom: "1em" }}>
-      <FormControl fullWidth>
-        <InputLabel id="budget_type">Session</InputLabel>
-        <Select
-          labelId="budget_type_select"
-          id="demo-simple-select"
-          value={session}
-          label="Session"
-          onChange={handleChange}
-          variant="filled"
-        >
-          <MenuItem value={"session01"}>Session 01</MenuItem>
-          <MenuItem value={"session02"}>Expense</MenuItem>
-        </Select>
-      </FormControl>
-    </Box>
   );
 }
 
@@ -1481,17 +1283,56 @@ const budgetColumns: GridColDef[] = [
   { field: "budgetAmount", headerName: "Amount", width: 250 },
 ];
 
-const budgetRows = [
-  {
-    id: 1,
-    budgetTitle: "Hall Rent",
-    budgetSession: "Session 01",
-    budgetType: "Expense",
-    budgetAmount: 10000,
-  },
-];
+let budgetRows = [];
 
 function BudgetTable() {
+  const [budgetTitle, setBudgetTitle] = useState("");
+  const [budgetSession, setBudgetSession] = useState("");
+  const [budgetType, setBudgetType] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState(0);
+
+  const handleBudgetTitleChange = (event) => {
+    setBudgetTitle(event.target.value);
+  };
+
+  const handleBudgetSessionChange = (event) => {
+    setBudgetSession(event.target.value);
+  };
+
+  const handleBudgetTypeChange = (event) => {
+    setBudgetType(event.target.value as string);
+  };
+
+  const handleBudgetAmountChange = (event) => {
+    setBudgetAmount(event.target.value);
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const addNewBudget = () => {
+    const newId = teamRows.length + 1;
+    const newBudget = {
+      id: newId,
+      budgetTitle: budgetTitle,
+      budgetSession: budgetSession,
+      budgetType: budgetType,
+      budgetAmount: budgetAmount,
+    };
+
+    const newBudgetRows = [...budgetRows, newBudget];
+
+    budgetRows = newBudgetRows;
+
+    refreshTable();
+    handleClose();
+  };
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
@@ -1505,160 +1346,215 @@ function BudgetTable() {
         pageSizeOptions={[5, 10]}
         checkboxSelection
       />
+
+      <div>
+        <Button onClick={handleOpen}>Add New Budget</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={teamModalStyle}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1em" }}
+            >
+              Budget Details
+            </Typography>
+
+            <TextField
+              id="budget_title"
+              label="Budget Title"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleBudgetTitleChange}
+            />
+
+            <Box sx={{ width: "100%", marginBottom: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel id="budget_session">Session</InputLabel>
+                <Select
+                  labelId="budget_type_select"
+                  id="demo-simple-select"
+                  value={budgetSession}
+                  label="Session"
+                  onChange={handleBudgetSessionChange}
+                  variant="filled"
+                >
+                  {Array.from(Array(sessionCount)).map((_, index) => (
+                    <MenuItem value={"session" + (index + 1)}>
+                      Session {index + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ width: "100%", marginBottom: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel id="budget_type">Type</InputLabel>
+                <Select
+                  labelId="budget_type_select"
+                  id="demo-simple-select"
+                  value={budgetType}
+                  label="Type"
+                  onChange={handleBudgetTypeChange}
+                  variant="filled"
+                >
+                  <MenuItem value={"Income"}>Income</MenuItem>
+                  <MenuItem value={"Expense"}>Expense</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <TextField
+              id="budget_amount"
+              label="Amount"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleBudgetAmountChange}
+              type="number"
+            />
+
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="contained" onClick={addNewBudget}>
+                Add
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
+      </div>
     </div>
   );
 }
 
 function TicketSwitchDisplay(switchStatus: number, sessionNo: number) {
+  const autoTicketForm = AutoTicketForm(sessionNo);
+  const manualTicketForm = ManualTicketForm(sessionNo);
   if (switchStatus == 0) {
-    return 
-    <div>
-      {AutoTicketForm(sessionNo)};
-    </div>
-  } else {
-    return 
-    <>
-      {ManualTicketForm(sessionNo)};
-    </> 
+    return <div>{autoTicketForm}</div>;
+  } else if (switchStatus == 1) {
+    return <div>{manualTicketForm}</div>;
   }
 }
 
 function ManualTicketForm(sessionNo: number) {
   return (
     <Paper
-        sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-        elevation={3}
+      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+      elevation={3}
+    >
+      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+        Tickets for the Session {sessionNo}
+      </Typography>
+
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "1em",
+        }}
       >
-        <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-          Tickets for the Session {sessionNo}
-        </Typography>
+        <TextField
+          id="ticket-location"
+          label="Where to Buy Tickets"
+          variant="filled"
+          sx={{ width: "100%" }}
+        />
+      </Box>
 
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1em",
-          }}
-        >
-          <TextField
-            id="ticket-location"
-            label="Where to Buy Tickets"
-            variant="filled"
-            sx={{ width: "100%" }}
-          />
-        </Box>
-
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1em",
-          }}
-        >
-          <TextField
-            id="ticket-des"
-            label="Description"
-            multiline
-            rows={4}
-            variant="filled"
-            sx={{ width: "100%" }}
-          />
-        </Box>
-      </Paper>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "1em",
+        }}
+      >
+        <TextField
+          id="ticket-des"
+          label="Description"
+          multiline
+          rows={4}
+          variant="filled"
+          sx={{ width: "100%" }}
+        />
+      </Box>
+    </Paper>
   );
 }
 
-function AutoTicketForm(sessionNo: number) {
-  const [imgFile, setImgFile] = React.useState(null);
-  return (
-    
-      <Paper
-        sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-        elevation={3}
-      >
-        <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-          Tickets for the Session {sessionNo}
-        </Typography>
-
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1em",
-          }}
-        >
-          <DropFile
-            fileTypes="Ticket Cover Image"
-            fileExtensions="JPEG,PNG,WEBP,SVG"
-            isCircular={false}
-            width="100%"
-            height="250px"
-            file={imgFile}
-            setFile={setImgFile}
-            aspectX={1}
-            aspectY={1}
-            shape="rect"
-          />
-        </Box>
-
-        <Box sx={{ width: "100%", marginBottom: "1em" }}>
-          <TicketCurrencySelect />
-        </Box>
-
-        <Box sx={{ width: "100%" }}>
-          <AutoTicketTable />
-        </Box>
-        <Box sx={{ width: "100%", marginBottom: "1em" }}>
-          <SponsorModal />
-        </Box>
-
-        <Box sx={{ width: "100%", marginBottom: "1em" }}>
-          <TextField
-            id="ticket-des"
-            label="Description"
-            multiline
-            rows={4}
-            variant="filled"
-            sx={{ width: "100%" }}
-          />
-        </Box>
-      </Paper>
-
-  );
-}
+const autoTicketModalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 const autoTicketColumns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
-  { field: "ticketType", headerName: "Ticket Type", width: 100 },
-  { field: "ticketPrice", headerName: "Price", width: 100 },
-  { field: "ticketCount", headerName: "Count", width: 100 },
-  { field: "seatNoFrom", headerName: "Seat No. From", width: 150 },
-  { field: "seatNoTo", headerName: "Seat No. To", width: 100 },
+  { field: "ticketType", headerName: "Ticket Type", width: 150 },
+  { field: "ticketPrice", headerName: "Price", width: 150 },
+  { field: "ticketCount", headerName: "Count", width: 250 },
 ];
 
-const autoTicketRows = [
-  {
-    id: 1,
-    ticketType: "Gold",
-    ticketPrice: 1000,
-    ticketCount: 100,
-    seatNoFrom: 0,
-    seatNoTo: 0,
-  },
-  {
-    id: 2,
-    ticketType: "Silver",
-    ticketPrice: 500,
-    ticketCount: 100,
-    seatNoFrom: 0,
-    seatNoTo: 0,
-  },
-];
+let autoTicketRows = [];
 
+//new
 function AutoTicketTable() {
+  const [ticketType, setTicketType] = useState("");
+  const [ticketPrice, setTicketPrice] = useState("");
+  const [ticketCount, setTicketCount] = useState(0);
+
+  const handleTicketTypeChange = (event) => {
+    setTicketType(event.target.value);
+  };
+
+  const handleTicketPriceChange = (event) => {
+    setTicketPrice(event.target.value);
+  };
+
+  const handleTicketCountChange = (event) => {
+    setTicketCount(event.target.value);
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const addNewTeam = () => {
+    const newId = teamRows.length + 1;
+    const newTicket = {
+      id: newId,
+      ticketType: ticketType,
+      ticketPrice: ticketPrice,
+      ticketCount: ticketCount,
+    };
+
+    const newAutoTicketRows = [...autoTicketRows, newTicket];
+
+    autoTicketRows = newAutoTicketRows;
+
+    refreshTable();
+    handleClose();
+  };
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
@@ -1672,7 +1568,118 @@ function AutoTicketTable() {
         pageSizeOptions={[5, 10]}
         checkboxSelection
       />
+
+      <div>
+        <Button onClick={handleOpen}>Add New Ticket</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={autoTicketModalStyle}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1em" }}
+            >
+              Ticket Details
+            </Typography>
+
+            <TextField
+              id="ticket_type"
+              label="Ticket Type"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTicketTypeChange}
+            />
+
+            <TextField
+              id="ticket_price"
+              label="Price"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTicketPriceChange}
+              type="number"
+            />
+
+            <TextField
+              id="ticket_count"
+              label="Count"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              onChange={handleTicketCountChange}
+              type="number"
+            />
+
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="contained" onClick={addNewTeam}>
+                Add
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
+      </div>
     </div>
+  );
+}
+
+function AutoTicketForm(sessionNo: number) {
+  const [imgFile, setImgFile] = React.useState(null);
+  return (
+    <Paper
+      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
+      elevation={3}
+    >
+      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+        Tickets for the Session {sessionNo}
+      </Typography>
+
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "1em",
+        }}
+      >
+        <DropFile
+          fileTypes="Ticket Cover Image"
+          fileExtensions="JPEG,PNG,WEBP,SVG"
+          isCircular={false}
+          width="100%"
+          height="250px"
+          file={imgFile}
+          setFile={setImgFile}
+          aspectX={1}
+          aspectY={1}
+          shape="rect"
+        />
+      </Box>
+
+      <Box sx={{ width: "100%", marginBottom: "1em" }}>
+        <TicketCurrencySelect />
+      </Box>
+
+      <Box sx={{ width: "100%", marginBottom: "1em" }}>
+        <AutoTicketTable />
+      </Box>
+
+      <Box sx={{ width: "100%", marginBottom: "1em" }}>
+        <TextField
+          id="ticket-des"
+          label="Description"
+          multiline
+          rows={4}
+          variant="filled"
+          sx={{ width: "100%" }}
+        />
+      </Box>
+    </Paper>
   );
 }
 
@@ -1703,7 +1710,7 @@ function TicketCurrencySelect() {
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Choose a country"
+          label="Choose a currency"
           variant="filled"
           inputProps={{
             ...params.inputProps,
