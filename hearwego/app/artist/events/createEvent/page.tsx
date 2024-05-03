@@ -10,9 +10,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Check from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import PublishIcon from "@mui/icons-material/Publish";
-import SettingsIcon from "@mui/icons-material/Settings";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import VideoLabelIcon from "@mui/icons-material/VideoLabel";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -22,6 +20,7 @@ import StepConnector, {
 } from "@mui/material/StepConnector";
 import { StepIconProps } from "@mui/material/StepIcon";
 import FeedIcon from "@mui/icons-material/Feed";
+import EditIcon from '@mui/icons-material/Edit';
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
@@ -29,38 +28,24 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import {
-  Unstable_NumberInput as BaseNumberInput,
-  NumberInputProps,
-  numberInputClasses,
-} from "@mui/base/Unstable_NumberInput";
 import Autocomplete from "@mui/material/Autocomplete";
 import { IoCheckmarkDoneCircle } from "react-icons/io5";
 import Chip from "@mui/material/Chip";
 import { TimeField } from "@mui/x-date-pickers/TimeField";
 import dayjs, { Dayjs } from "dayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Modal from "@mui/material/Modal";
-import AddIcon from "@mui/icons-material/Add";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -1136,7 +1121,42 @@ function SponsorTable() {
 
   const handleSelectionModelChange = (selectionModel) => {
     setSelectedRows(selectionModel);
-    console.log("Selected Row IDs:", selectionModel);
+  };
+
+  const updateRowData = () => {
+    // Check if a row is selected for update
+    if (selectedRows.length === 1) {
+      // Get the selected row ID
+      const selectedRowId = selectedRows[0];
+
+      // Find the index of the selected row in the sponsorRows array
+      const rowIndex = sponsorRows.findIndex((row) => row.id === selectedRowId);
+
+      if (rowIndex !== -1) {
+        // Update the row data with user inputs
+        const updatedRow = {
+          id: selectedRowId,
+          sponsorType: sponsorType,
+          sponsorName: sponsorName,
+          sponsorContact: sponsorContact,
+          sponsorEmail: sponsorEmail,
+        };
+
+        // Replace the old row with the updated row
+        const updatedRows = [...sponsorRows];
+        updatedRows[rowIndex] = updatedRow;
+
+        // Update sponsorRows with the updated rows
+        sponsorRows = updatedRows;
+
+        // Refresh the table
+        refreshTable();
+        handleClose(); // Close the modal or any other UI element used for input
+      }
+    } else {
+      // Inform the user to select a single row for update
+      console.log("Please select a single row to update.");
+    }
   };
 
   const handleDelete = () => {
@@ -1145,6 +1165,7 @@ function SponsorTable() {
     );
     sponsorRows = updatedRows;
     setSelectedRows([]);
+    console.log("Rows", sponsorRows);
     refreshTable();
   };
 
@@ -1193,11 +1214,22 @@ function SponsorTable() {
       />
 
       <div>
-        <IconButton onClick={handleOpen} aria-label="add" color="primary">
-          <AddIcon />
+        <IconButton onClick={handleOpen} aria-label="add" color="secondary">
+          <AddCircleIcon />
         </IconButton>
-        <IconButton onClick={handleDelete} aria-label="delete" color="secondary">
+        <IconButton
+          onClick={handleDelete}
+          aria-label="delete"
+          disabled={selectedRows.length == 0}
+        >
           <DeleteIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleOpen}
+          aria-label="update"
+          disabled={selectedRows.length != 1}
+        >
+          <EditIcon />
         </IconButton>
         <Modal
           open={open}
@@ -1252,6 +1284,10 @@ function SponsorTable() {
               </Button>
               <Button variant="contained" onClick={addNewSponsor}>
                 Add
+              </Button>
+
+              <Button variant="contained" onClick={updateRowData}>
+                Update
               </Button>
             </Stack>
           </Box>
