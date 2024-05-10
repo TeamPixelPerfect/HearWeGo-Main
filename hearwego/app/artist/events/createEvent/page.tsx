@@ -1369,6 +1369,7 @@ function SponsorTable() {
               id="sponsor_contact"
               label="Contact No."
               variant="filled"
+              type="number"
               sx={{ width: "100%", marginBottom: 2 }}
               value={sponsorContact}
               onChange={handleSponsorContactChange}
