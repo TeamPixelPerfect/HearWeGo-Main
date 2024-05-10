@@ -20,7 +20,7 @@ import StepConnector, {
 } from "@mui/material/StepConnector";
 import { StepIconProps } from "@mui/material/StepIcon";
 import FeedIcon from "@mui/icons-material/Feed";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
@@ -714,7 +714,12 @@ function TicketDetails() {
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
           Tickets Details
         </Typography>
-        {generateDivs()}
+
+        {Array.from(Array(sessionCount)).map((_, index) => (
+          <div>
+            <div>{TicketSwitchDisplay(isChecked ? 0 : 1, index + 1)}</div>
+          </div>
+        ))}
       </Paper>
     </div>
   );
@@ -1097,35 +1102,67 @@ const sponsorColumns: GridColDef[] = [
 ];
 
 function SponsorTable() {
+  const [sponsorTypeError, setSponsorTypeError] = useState(false);
+  const [sponsorNameError, setSponsorNameError] = useState(false);
+  const [sponsorContactError, setSponsorContactError] = useState(false);
+  const [sponsorEmailError, setSponsorEmailError] = useState(false);
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [sponsorType, setSponsorType] = useState("");
   const [sponsorName, setSponsorName] = useState("");
   const [sponsorContact, setSponsorContact] = useState("");
   const [sponsorEmail, setSponsorEmail] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   const handleSponsorTypeChange = (event) => {
     setSponsorType(event.target.value);
+    setSponsorTypeError(event.target.value.trim() === "");
   };
 
   const handleSponsorNameChange = (event) => {
     setSponsorName(event.target.value);
+    setSponsorNameError(event.target.value.trim() === "");
   };
 
   const handleSponsorContactChange = (event) => {
     setSponsorContact(event.target.value);
+    setSponsorContactError(event.target.value.trim() === "");
   };
 
   const handleSponsorEmailChange = (event) => {
     setSponsorEmail(event.target.value);
+    setSponsorEmailError(!validateEmail(event.target.value));
   };
 
   const handleSelectionModelChange = (selectionModel) => {
     setSelectedRows(selectionModel);
   };
 
+  const validateFields = () => {
+    return (
+      sponsorType.trim() !== "" &&
+      sponsorName.trim() !== "" &&
+      sponsorContact.trim() !== "" &&
+      sponsorEmail.trim() !== "" &&
+      validateEmail(sponsorEmail)
+    );
+  };
+
   const updateRowData = () => {
     // Check if a row is selected for update
-    if (selectedRows.length === 1) {
+    if (selectedRows.length === 1 && validateFields()) {
+      setSponsorTypeError(false);
+      setSponsorNameError(false);
+      setSponsorContactError(false);
+      setSponsorEmailError(false);
+
       // Get the selected row ID
       const selectedRowId = selectedRows[0];
 
@@ -1166,29 +1203,84 @@ function SponsorTable() {
     sponsorRows = updatedRows;
     setSelectedRows([]);
     console.log("Rows", sponsorRows);
+    setSponsorTypeError(false);
+    setSponsorNameError(false);
+    setSponsorContactError(false);
+    setSponsorEmailError(false);
+    setErrorMessage("");
     refreshTable();
   };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setSponsorTypeError(false);
+    setSponsorNameError(false);
+    setSponsorContactError(false);
+    setSponsorEmailError(false);
+    setErrorMessage("");
+    setOpen(false)
+  };
+
+  const handleOpenForAdd = () => {
+    setSponsorType("");
+    setSponsorName("");
+    setSponsorContact("");
+    setSponsorEmail("");
+    setSelectedRowData(null); // Clear selected row data
+    setOpen(true);
+  };
+
+  const handleOpenForUpdate = () => {
+    if (selectedRows.length === 1) {
+      const selectedRowId = selectedRows[0];
+      const selectedRow = sponsorRows.find((row) => row.id === selectedRowId);
+      if (selectedRow) {
+        setSponsorType(selectedRow.sponsorType);
+        setSponsorName(selectedRow.sponsorName);
+        setSponsorContact(selectedRow.sponsorContact);
+        setSponsorEmail(selectedRow.sponsorEmail);
+        setSelectedRowData(selectedRow);
+        setOpen(true);
+      }
+    } else {
+      console.log("Please select a single row to update.");
+    }
+  };
 
   const addNewSponsor = () => {
-    const newId = sponsorRows.length + 1;
-    const newSponsor = {
-      id: newId,
-      sponsorType: sponsorType,
-      sponsorName: sponsorName,
-      sponsorContact: sponsorContact,
-      sponsorEmail: sponsorEmail,
-    };
+    if (validateFields()) {
+      setErrorMessage("");
+      // Reset error states
+      setSponsorTypeError(false);
+      setSponsorNameError(false);
+      setSponsorContactError(false);
+      setSponsorEmailError(false);
 
-    const newSponsorRows = [...sponsorRows, newSponsor];
+      //----
+      const newId = sponsorRows.length + 1;
+      const newSponsor = {
+        id: newId,
+        sponsorType: sponsorType,
+        sponsorName: sponsorName,
+        sponsorContact: sponsorContact,
+        sponsorEmail: sponsorEmail,
+      };
 
-    sponsorRows = newSponsorRows;
+      const handleButtonClick = selectedRowData ? updateRowData : addNewSponsor;
 
-    refreshTable();
-    handleClose();
+      const newSponsorRows = [...sponsorRows, newSponsor];
+
+      sponsorRows = newSponsorRows;
+
+      refreshTable();
+      handleClose();
+    } else {
+      console.log("Please fill in all required fields with correct format.");
+      setErrorMessage(
+        "Please fill in all required fields with correct format."
+      );
+    }
   };
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -1214,7 +1306,11 @@ function SponsorTable() {
       />
 
       <div>
-        <IconButton onClick={handleOpen} aria-label="add" color="secondary">
+        <IconButton
+          onClick={handleOpenForAdd}
+          aria-label="add"
+          color="secondary"
+        >
           <AddCircleIcon />
         </IconButton>
         <IconButton
@@ -1225,7 +1321,7 @@ function SponsorTable() {
           <DeleteIcon />
         </IconButton>
         <IconButton
-          onClick={handleOpen}
+          onClick={handleOpenForUpdate}
           aria-label="update"
           disabled={selectedRows.length != 1}
         >
@@ -1244,7 +1340,7 @@ function SponsorTable() {
               component="h2"
               sx={{ marginBottom: "1em" }}
             >
-              Sponsor Details
+              {selectedRowData ? "Update Sponsor" : "Add Sponsor"}
             </Typography>
 
             <TextField
@@ -1252,7 +1348,10 @@ function SponsorTable() {
               label="Sponsor Type"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={sponsorType}
               onChange={handleSponsorTypeChange}
+              error={sponsorTypeError}
+              helperText={sponsorTypeError ? "Sponsor Type is required" : ""}
             />
 
             <TextField
@@ -1260,7 +1359,10 @@ function SponsorTable() {
               label="Sponsor Name"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={sponsorName}
               onChange={handleSponsorNameChange}
+              error={sponsorNameError}
+              helperText={sponsorNameError ? "Sponsor Name is required" : ""}
             />
 
             <TextField
@@ -1268,7 +1370,10 @@ function SponsorTable() {
               label="Contact No."
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={sponsorContact}
               onChange={handleSponsorContactChange}
+              error={sponsorContactError}
+              helperText={sponsorContactError ? "Contact No. is required" : ""}
             />
 
             <TextField
@@ -1276,18 +1381,35 @@ function SponsorTable() {
               label="Email"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={sponsorEmail}
               onChange={handleSponsorEmailChange}
+              error={sponsorEmailError}
+              helperText={sponsorEmailError ? "Invalid Email" : ""}
             />
+
+            {errorMessage && (
+              <div style={{ color: "red", marginBottom: "2em", fontSize: "14px", textDecoration: "italic" }}>
+                {errorMessage}
+              </div>
+            )}
+
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" onClick={handleClose}>
                 Close
               </Button>
-              <Button variant="contained" onClick={addNewSponsor}>
+              {/* <Button variant="contained" onClick={addNewSponsor}>
                 Add
               </Button>
 
               <Button variant="contained" onClick={updateRowData}>
                 Update
+              </Button> */}
+
+              <Button
+                variant="contained"
+                onClick={selectedRowData ? updateRowData : addNewSponsor}
+              >
+                {selectedRowData ? "Update" : "Add"}
               </Button>
             </Stack>
           </Box>
