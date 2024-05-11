@@ -936,56 +936,196 @@ const teamColumns: GridColDef[] = [
 let teamRows = [];
 
 function TeamTable() {
+  const [teamTypeError, setTeamTypeError] = useState(false);
+  const [teamNameError, setTeamNameError] = useState(false);
+  const [teamContactError, setTeamContactError] = useState(false);
+  const [teamEmailError, setTeamEmailError] = useState(false);
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [teamType, setTeamType] = useState("");
   const [teamName, setTeamName] = useState("");
   const [teamContact, setTeamContact] = useState("");
   const [teamEmail, setTeamEmail] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   const handleTeamTypeChange = (event) => {
     setTeamType(event.target.value);
+    setTeamTypeError(event.target.value.trim() === "");
   };
 
   const handleTeamNameChange = (event) => {
     setTeamName(event.target.value);
+    setTeamNameError(event.target.value.trim() === "");
   };
 
   const handleTeamContactChange = (event) => {
     setTeamContact(event.target.value);
+    setTeamContactError(event.target.value.trim() === "");
   };
 
   const handleTeamEmailChange = (event) => {
     setTeamEmail(event.target.value);
+    setTeamEmailError(!validateEmail(event.target.value));
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    setSelectedRows(selectionModel);
+  };
+
+  const validateFields = () => {
+    return (
+      teamType.trim() !== "" &&
+      teamName.trim() !== "" &&
+      teamContact.trim() !== "" &&
+      teamEmail.trim() !== "" &&
+      validateEmail(teamEmail)
+    );
+  };
+
+  const updateRowData = () => {
+    // Check if a row is selected for update
+    if (selectedRows.length === 1 && validateFields()) {
+      setTeamTypeError(false);
+      setTeamNameError(false);
+      setTeamContactError(false);
+      setTeamEmailError(false);
+
+      // Get the selected row ID
+      const selectedRowId = selectedRows[0];
+
+      // Find the index of the selected row in the sponsorRows array
+      const rowIndex = teamRows.findIndex((row) => row.id === selectedRowId);
+
+      if (rowIndex !== -1) {
+        // Update the row data with user inputs
+        const updatedRow = {
+          id: selectedRowId,
+          teamType: teamType,
+          teamName: teamName,
+          teamContact: teamContact,
+          teamEmail: teamEmail,
+        };
+
+        // Replace the old row with the updated row
+        const updatedRows = [...teamRows];
+        updatedRows[rowIndex] = updatedRow;
+
+        // Update sponsorRows with the updated rows
+        teamRows = updatedRows;
+
+        // Refresh the table
+        refreshTable();
+        handleClose(); // Close the modal or any other UI element used for input
+      }
+    } else {
+      // Inform the user to select a single row for update
+      console.log("Please select a single row to update.");
+    }
+  };
+
+  const handleDelete = () => {
+    const updatedRows = teamRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    teamRows = updatedRows;
+    setSelectedRows([]);
+    console.log("Rows", teamRows);
+    setTeamTypeError(false);
+    setTeamNameError(false);
+    setTeamContactError(false);
+    setTeamEmailError(false);
+    setErrorMessage("");
+    refreshTable();
   };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setTeamTypeError(false);
+    setTeamNameError(false);
+    setTeamContactError(false);
+    setTeamEmailError(false);
+    setErrorMessage("");
+    setOpen(false);
+  };
+
+  const handleOpenForAdd = () => {
+    setTeamType("");
+    setTeamName("");
+    setTeamContact("");
+    setTeamEmail("");
+    setSelectedRowData(null); // Clear selected row data
+    setOpen(true);
+  };
+
+  const handleOpenForUpdate = () => {
+    if (selectedRows.length === 1) {
+      const selectedRowId = selectedRows[0];
+      const selectedRow = teamRows.find((row) => row.id === selectedRowId);
+      if (selectedRow) {
+        setTeamType(selectedRow.teamType);
+        setTeamName(selectedRow.teamName);
+        setTeamContact(selectedRow.teamContact);
+        setTeamEmail(selectedRow.teamEmail);
+        setSelectedRowData(selectedRow);
+        setOpen(true);
+      }
+    } else {
+      console.log("Please select a single row to update.");
+    }
+  };
 
   const addNewTeam = () => {
-    const newId = teamRows.length + 1;
-    const newTeam = {
-      id: newId,
-      teamType: teamType,
-      teamName: teamName,
-      teamContact: teamContact,
-      teamEmail: teamEmail,
-    };
+    if (validateFields()) {
+      setErrorMessage("");
+      // Reset error states
+      setTeamTypeError(false);
+      setTeamNameError(false);
+      setTeamContactError(false);
+      setTeamEmailError(false);
 
-    const newTeamRows = [...teamRows, newTeam];
+      //----
+      const newId = teamRows.length + 1;
+      const newTeam = {
+        id: newId,
+        teamType: teamType,
+        teamName: teamName,
+        teamContact: teamContact,
+        teamEmail: teamEmail,
+      };
 
-    teamRows = newTeamRows;
+      const handleButtonClick = selectedRowData ? updateRowData : addNewTeam;
 
-    refreshTable();
-    handleClose();
+      const newTeamRows = [...teamRows, newTeam];
+
+      teamRows = newTeamRows;
+
+      refreshTable();
+      handleClose();
+    } else {
+      console.log("Please fill in all required fields with correct format.");
+      setErrorMessage(
+        "Please fill in all required fields with correct format."
+      );
+    }
   };
   const [refreshKey, setRefreshKey] = useState(0);
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
   };
+
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
+        key={refreshKey}
         rows={teamRows}
         columns={teamColumns}
         initialState={{
@@ -995,24 +1135,46 @@ function TeamTable() {
         }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
+        onRowSelectionModelChange={handleSelectionModelChange}
+        rowSelectionModel={selectedRows}
       />
 
       <div>
-        <Button onClick={handleOpen}>Add New Team</Button>
+        <IconButton
+          onClick={handleOpenForAdd}
+          aria-label="add"
+          color="secondary"
+        >
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleDelete}
+          aria-label="delete"
+          disabled={selectedRows.length == 0}
+        >
+          <DeleteIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleOpenForUpdate}
+          aria-label="update"
+          disabled={selectedRows.length != 1}
+        >
+          <EditIcon />
+        </IconButton>
         <Modal
           open={open}
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          <Box sx={teamModalStyle}>
+          <Box sx={sponsorModalStyle}>
             <Typography
               id="modal-modal-title"
               variant="h6"
               component="h2"
               sx={{ marginBottom: "1em" }}
             >
-              Team Details
+              {selectedRowData ? "Update Team" : "Add Team"}
             </Typography>
 
             <TextField
@@ -1020,7 +1182,10 @@ function TeamTable() {
               label="Team Type"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={teamType}
               onChange={handleTeamTypeChange}
+              error={teamTypeError}
+              helperText={teamTypeError ? "Team Type is required" : ""}
             />
 
             <TextField
@@ -1028,15 +1193,22 @@ function TeamTable() {
               label="Team Name"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={teamName}
               onChange={handleTeamNameChange}
+              error={teamNameError}
+              helperText={teamNameError ? "Team Name is required" : ""}
             />
 
             <TextField
               id="team_contact"
               label="Contact No."
               variant="filled"
+              type="number"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={teamContact}
               onChange={handleTeamContactChange}
+              error={teamContactError}
+              helperText={teamContactError ? "Contact No. is required" : ""}
             />
 
             <TextField
@@ -1044,15 +1216,34 @@ function TeamTable() {
               label="Email"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={teamEmail}
               onChange={handleTeamEmailChange}
+              error={teamEmailError}
+              helperText={teamEmailError ? "Invalid Email" : ""}
             />
+
+            {errorMessage && (
+              <div
+                style={{
+                  color: "red",
+                  marginBottom: "2em",
+                  fontSize: "14px",
+                  textDecoration: "italic",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
 
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" onClick={handleClose}>
                 Close
               </Button>
-              <Button variant="contained" onClick={addNewTeam}>
-                Add
+              <Button
+                variant="contained"
+                onClick={selectedRowData ? updateRowData : addNewTeam}
+              >
+                {selectedRowData ? "Update" : "Add"}
               </Button>
             </Stack>
           </Box>
