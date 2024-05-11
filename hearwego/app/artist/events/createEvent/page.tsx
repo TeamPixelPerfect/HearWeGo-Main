@@ -683,18 +683,6 @@ function TicketDetails() {
     setIsChecked(event.target.checked);
   };
 
-  const generateDivs = () => {
-    const divs = [];
-    for (let i = 0; i < sessionCount; i++) {
-      divs.push(
-        <div key={i}>
-          <div>{TicketSwitchDisplay(isChecked ? 0 : 1, i + 1)}</div>
-        </div>
-      );
-    }
-    return divs;
-  };
-
   return (
     <div>
       Ticket Details
@@ -717,7 +705,7 @@ function TicketDetails() {
 
         {Array.from(Array(sessionCount)).map((_, index) => (
           <div>
-            <div>{TicketSwitchDisplay(isChecked ? 0 : 1, index + 1)}</div>
+            <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
           </div>
         ))}
       </Paper>
@@ -1970,9 +1958,9 @@ function BudgetTable() {
   );
 }
 
-function TicketSwitchDisplay(switchStatus: number, sessionNo: number) {
-  const autoTicketForm = AutoTicketForm(sessionNo);
-  const manualTicketForm = ManualTicketForm(sessionNo);
+function TicketSwitchDisplay(switchStatus: number) {
+  const autoTicketForm = AutoTicketForm();
+  const manualTicketForm = ManualTicketForm();
   if (switchStatus == 0) {
     return <div>{autoTicketForm}</div>;
   } else if (switchStatus == 1) {
@@ -1980,16 +1968,12 @@ function TicketSwitchDisplay(switchStatus: number, sessionNo: number) {
   }
 }
 
-function ManualTicketForm(sessionNo: number) {
+function ManualTicketForm() {
   return (
     <Paper
       sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
       elevation={3}
     >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Tickets for the Session {sessionNo}
-      </Typography>
-
       <Box
         sx={{
           width: "100%",
@@ -2044,56 +2028,206 @@ const autoTicketColumns: GridColDef[] = [
   { field: "ticketType", headerName: "Ticket Type", width: 150 },
   { field: "ticketPrice", headerName: "Price", width: 150 },
   { field: "ticketCount", headerName: "Count", width: 250 },
+  { field: "ticketSession", headerName: "Session", width: 250 },
 ];
 
 let autoTicketRows = [];
 
 //new
 function AutoTicketTable() {
+  const [ticketTypeError, setTicketTypeError] = useState(false);
+  const [ticketPriceError, setTicketPriceError] = useState(false);
+  const [ticketCountError, setTicketCountError] = useState(false);
+  const [ticketSessionError, setTicketSessionError] = useState(false);
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [ticketType, setTicketType] = useState("");
   const [ticketPrice, setTicketPrice] = useState("");
-  const [ticketCount, setTicketCount] = useState(0);
+  const [ticketCount, setTicketCount] = useState("");
+  const [ticketSession, setTicketSession] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   const handleTicketTypeChange = (event) => {
     setTicketType(event.target.value);
+    setTicketTypeError(event.target.value.trim() === "");
   };
 
   const handleTicketPriceChange = (event) => {
     setTicketPrice(event.target.value);
+    setTicketPriceError(event.target.value.trim() === "");
   };
 
   const handleTicketCountChange = (event) => {
     setTicketCount(event.target.value);
+    setTicketCountError(event.target.value.trim() === "");
+  };
+
+  const handleTicketSessionChange = (event) => {
+    setTicketSession(event.target.value);
+    setTicketSessionError(event.target.value.trim() === "");
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    setSelectedRows(selectionModel);
+  };
+
+  const validateFields = () => {
+    return (
+      ticketType.trim() !== "" &&
+      ticketPrice.trim() !== "" &&
+      ticketCount.trim() !== "" &&
+      ticketSession.trim() !== ""
+    );
+  };
+
+  const updateRowData = () => {
+    // Check if a row is selected for update
+    if (selectedRows.length === 1 && validateFields()) {
+      setTicketTypeError(false);
+      setTicketPriceError(false);
+      setTicketCountError(false);
+      setTicketSessionError(false);
+
+      // Get the selected row ID
+      const selectedRowId = selectedRows[0];
+
+      // Find the index of the selected row in the sponsorRows array
+      const rowIndex = autoTicketRows.findIndex(
+        (row) => row.id === selectedRowId
+      );
+
+      if (rowIndex !== -1) {
+        // Update the row data with user inputs
+        const updatedRow = {
+          id: selectedRowId,
+          ticketType: ticketType,
+          ticketPrice: ticketPrice,
+          ticketCount: ticketCount,
+          ticketSession: ticketSession,
+        };
+
+        // Replace the old row with the updated row
+        const updatedRows = [...autoTicketRows];
+        updatedRows[rowIndex] = updatedRow;
+
+        // Update sponsorRows with the updated rows
+        autoTicketRows = updatedRows;
+
+        // Refresh the table
+        refreshTable();
+        handleClose(); // Close the modal or any other UI element used for input
+      }
+    } else {
+      // Inform the user to select a single row for update
+      console.log("Please select a single row to update.");
+    }
+  };
+
+  const handleDelete = () => {
+    const updatedRows = autoTicketRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    autoTicketRows = updatedRows;
+    setSelectedRows([]);
+    console.log("Rows", autoTicketRows);
+    setTicketTypeError(false);
+    setTicketPriceError(false);
+    setTicketCountError(false);
+    setTicketSessionError(false);
+    setErrorMessage("");
+    refreshTable();
   };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setTicketTypeError(false);
+    setTicketPriceError(false);
+    setTicketCountError(false);
+    setTicketSessionError(false);
+    setErrorMessage("");
+    setOpen(false);
+  };
 
-  const addNewTeam = () => {
-    const newId = teamRows.length + 1;
-    const newTicket = {
-      id: newId,
-      ticketType: ticketType,
-      ticketPrice: ticketPrice,
-      ticketCount: ticketCount,
-    };
+  const handleOpenForAdd = () => {
+    setTicketType("");
+    setTicketPrice("");
+    setTicketCount("");
+    setTicketSession("");
+    setSelectedRowData(null); // Clear selected row data
+    setOpen(true);
+  };
 
-    const newAutoTicketRows = [...autoTicketRows, newTicket];
+  const handleOpenForUpdate = () => {
+    if (selectedRows.length === 1) {
+      const selectedRowId = selectedRows[0];
+      const selectedRow = autoTicketRows.find(
+        (row) => row.id === selectedRowId
+      );
+      if (selectedRow) {
+        setTicketType(selectedRow.ticketType);
+        setTicketPrice(selectedRow.ticketPrice);
+        setTicketCount(selectedRow.ticketCount);
+        setTicketSession(selectedRow.ticketSession);
+        setSelectedRowData(selectedRow);
+        setOpen(true);
+      }
+    } else {
+      console.log("Please select a single row to update.");
+    }
+  };
 
-    autoTicketRows = newAutoTicketRows;
+  const addNewTicket = () => {
+    if (validateFields()) {
+      setErrorMessage("");
+      // Reset error states
+      setTicketTypeError(false);
+      setTicketPriceError(false);
+      setTicketCountError(false);
+      setTicketSessionError(false);
 
-    refreshTable();
-    handleClose();
+      //----
+      const newId = autoTicketRows.length + 1;
+      const newTicket = {
+        id: newId,
+        ticketType: ticketType,
+        ticketPrice: ticketPrice,
+        ticketCount: ticketCount,
+        ticketSession: ticketSession,
+      };
+
+      const handleButtonClick = selectedRowData ? updateRowData : addNewTicket;
+
+      const newTicketRows = [...autoTicketRows, newTicket];
+
+      autoTicketRows = newTicketRows;
+
+      refreshTable();
+      handleClose();
+    } else {
+      console.log("Please fill in all required fields with correct format.");
+      setErrorMessage(
+        "Please fill in all required fields with correct format."
+      );
+    }
   };
   const [refreshKey, setRefreshKey] = useState(0);
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
   };
+
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
+        key={refreshKey}
         rows={autoTicketRows}
         columns={autoTicketColumns}
         initialState={{
@@ -2103,24 +2237,46 @@ function AutoTicketTable() {
         }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
+        onRowSelectionModelChange={handleSelectionModelChange}
+        rowSelectionModel={selectedRows}
       />
 
       <div>
-        <Button onClick={handleOpen}>Add New Ticket</Button>
+        <IconButton
+          onClick={handleOpenForAdd}
+          aria-label="add"
+          color="secondary"
+        >
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleDelete}
+          aria-label="delete"
+          disabled={selectedRows.length == 0}
+        >
+          <DeleteIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleOpenForUpdate}
+          aria-label="update"
+          disabled={selectedRows.length != 1}
+        >
+          <EditIcon />
+        </IconButton>
         <Modal
           open={open}
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          <Box sx={autoTicketModalStyle}>
+          <Box sx={sponsorModalStyle}>
             <Typography
               id="modal-modal-title"
               variant="h6"
               component="h2"
               sx={{ marginBottom: "1em" }}
             >
-              Ticket Details
+              {selectedRowData ? "Update Ticket Details" : "Add Ticket Details"}
             </Typography>
 
             <TextField
@@ -2128,33 +2284,80 @@ function AutoTicketTable() {
               label="Ticket Type"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={ticketType}
               onChange={handleTicketTypeChange}
+              error={ticketTypeError}
+              helperText={ticketTypeError ? "Ticket Type is required" : ""}
             />
 
             <TextField
               id="ticket_price"
               label="Price"
               variant="filled"
-              sx={{ width: "100%", marginBottom: 2 }}
-              onChange={handleTicketPriceChange}
               type="number"
+              sx={{ width: "100%", marginBottom: 2 }}
+              value={ticketPrice}
+              onChange={handleTicketPriceChange}
+              error={ticketPriceError}
+              helperText={ticketPriceError ? "Price is required" : ""}
             />
 
             <TextField
               id="ticket_count"
               label="Count"
               variant="filled"
-              sx={{ width: "100%", marginBottom: 2 }}
-              onChange={handleTicketCountChange}
               type="number"
+              sx={{ width: "100%", marginBottom: 2 }}
+              value={ticketCount}
+              onChange={handleTicketCountChange}
+              error={ticketCountError}
+              helperText={ticketCountError ? "Count is required" : ""}
             />
+
+            <Box sx={{ width: "100%", marginBottom: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel id="ticket_session_a">Session</InputLabel>
+                <Select
+                  labelId="ticket_session_select_a"
+                  id="ticket_session_select_a"
+                  value={ticketSession}
+                  label="Session"
+                  onChange={handleTicketSessionChange}
+                  defaultValue=""
+                  error={ticketSessionError}
+                  variant="filled"
+                >
+                  {Array.from(Array(sessionCount)).map((_, index) => (
+                    <MenuItem value={"session" + (index + 1)}>
+                      Session {index + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            {errorMessage && (
+              <div
+                style={{
+                  color: "red",
+                  marginBottom: "2em",
+                  fontSize: "14px",
+                  textDecoration: "italic",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
 
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" onClick={handleClose}>
                 Close
               </Button>
-              <Button variant="contained" onClick={addNewTeam}>
-                Add
+              <Button
+                variant="contained"
+                onClick={selectedRowData ? updateRowData : addNewTicket}
+              >
+                {selectedRowData ? "Update" : "Add"}
               </Button>
             </Stack>
           </Box>
@@ -2164,17 +2367,13 @@ function AutoTicketTable() {
   );
 }
 
-function AutoTicketForm(sessionNo: number) {
+function AutoTicketForm() {
   const [imgFile, setImgFile] = React.useState(null);
   return (
     <Paper
       sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
       elevation={3}
     >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Tickets for the Session {sessionNo}
-      </Typography>
-
       <Box
         sx={{
           width: "100%",
