@@ -1219,7 +1219,7 @@ function SponsorTable() {
     setSponsorContactError(false);
     setSponsorEmailError(false);
     setErrorMessage("");
-    setOpen(false)
+    setOpen(false);
   };
 
   const handleOpenForAdd = () => {
@@ -1389,7 +1389,14 @@ function SponsorTable() {
             />
 
             {errorMessage && (
-              <div style={{ color: "red", marginBottom: "2em", fontSize: "14px", textDecoration: "italic" }}>
+              <div
+                style={{
+                  color: "red",
+                  marginBottom: "2em",
+                  fontSize: "14px",
+                  textDecoration: "italic",
+                }}
+              >
                 {errorMessage}
               </div>
             )}
@@ -1398,14 +1405,6 @@ function SponsorTable() {
               <Button variant="outlined" onClick={handleClose}>
                 Close
               </Button>
-              {/* <Button variant="contained" onClick={addNewSponsor}>
-                Add
-              </Button>
-
-              <Button variant="contained" onClick={updateRowData}>
-                Update
-              </Button> */}
-
               <Button
                 variant="contained"
                 onClick={selectedRowData ? updateRowData : addNewSponsor}
@@ -1445,56 +1444,195 @@ const budgetColumns: GridColDef[] = [
 let budgetRows = [];
 
 function BudgetTable() {
+  const [budgetTitleError, setBudgetTitleError] = useState(false);
+  const [budgetSessionError, setBudgetSessionError] = useState(false);
+  const [budgetTypeError, setBudgetTypeError] = useState(false);
+  const [budgetAmountError, setBudgetAmountError] = useState(false);
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [budgetTitle, setBudgetTitle] = useState("");
   const [budgetSession, setBudgetSession] = useState("");
   const [budgetType, setBudgetType] = useState("");
-  const [budgetAmount, setBudgetAmount] = useState(0);
+  const [budgetAmount, setBudgetAmount] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   const handleBudgetTitleChange = (event) => {
     setBudgetTitle(event.target.value);
+    setBudgetTitleError(event.target.value.trim() === "");
   };
 
   const handleBudgetSessionChange = (event) => {
     setBudgetSession(event.target.value);
+    setBudgetSessionError(event.target.value.trim() === "");
   };
 
   const handleBudgetTypeChange = (event) => {
-    setBudgetType(event.target.value as string);
+    setBudgetType(event.target.value);
+    setBudgetTypeError(event.target.value.trim() === "");
   };
 
   const handleBudgetAmountChange = (event) => {
     setBudgetAmount(event.target.value);
+    setBudgetAmountError(!validateEmail(event.target.value));
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    setSelectedRows(selectionModel);
+  };
+
+  const validateFields = () => {
+    return (
+      budgetTitle.trim() !== "" &&
+      budgetSession.trim() !== "" &&
+      budgetType.trim() !== "" &&
+      budgetAmount.trim() !== ""
+    );
+  };
+
+  const updateRowData = () => {
+    // Check if a row is selected for update
+    if (selectedRows.length === 1 && validateFields()) {
+      setBudgetTitleError(false);
+      setBudgetSessionError(false);
+      setBudgetTypeError(false);
+      setBudgetAmountError(false);
+
+      // Get the selected row ID
+      const selectedRowId = selectedRows[0];
+
+      // Find the index of the selected row in the sponsorRows array
+      const rowIndex = budgetRows.findIndex((row) => row.id === selectedRowId);
+
+      if (rowIndex !== -1) {
+        // Update the row data with user inputs
+        const updatedRow = {
+          id: selectedRowId,
+          budgetTitle: budgetTitle,
+          budgetSession: budgetSession,
+          budgetType: budgetType,
+          budgetAmount: budgetAmount,
+        };
+
+        // Replace the old row with the updated row
+        const updatedRows = [...budgetRows];
+        updatedRows[rowIndex] = updatedRow;
+
+        // Update sponsorRows with the updated rows
+        budgetRows = updatedRows;
+
+        // Refresh the table
+        refreshTable();
+        handleClose(); // Close the modal or any other UI element used for input
+      }
+    } else {
+      // Inform the user to select a single row for update
+      console.log("Please select a single row to update.");
+    }
+  };
+
+  const handleDelete = () => {
+    const updatedRows = budgetRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    budgetRows = updatedRows;
+    setSelectedRows([]);
+    console.log("Rows", budgetRows);
+    setBudgetTitleError(false);
+    setBudgetSessionError(false);
+    setBudgetTypeError(false);
+    setBudgetAmountError(false);
+    setErrorMessage("");
+    refreshTable();
   };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setBudgetTitleError(false);
+    setBudgetSessionError(false);
+    setBudgetTypeError(false);
+    setBudgetAmountError(false);
+    setErrorMessage("");
+    setOpen(false);
+  };
+
+  const handleOpenForAdd = () => {
+    setBudgetTitle("");
+    setBudgetSession("");
+    setBudgetType("");
+    setBudgetAmount("");
+    setSelectedRowData(null); // Clear selected row data
+    setOpen(true);
+  };
+
+  const handleOpenForUpdate = () => {
+    if (selectedRows.length === 1) {
+      const selectedRowId = selectedRows[0];
+      const selectedRow = budgetRows.find((row) => row.id === selectedRowId);
+      if (selectedRow) {
+        setBudgetTitle(selectedRow.budgetTitle);
+        setBudgetSession(selectedRow.budgetSession);
+        setBudgetType(selectedRow.budgetType);
+        setBudgetAmount(selectedRow.budgetAmount);
+        setSelectedRowData(selectedRow);
+        setOpen(true);
+      }
+    } else {
+      console.log("Please select a single row to update.");
+    }
+  };
 
   const addNewBudget = () => {
-    const newId = teamRows.length + 1;
-    const newBudget = {
-      id: newId,
-      budgetTitle: budgetTitle,
-      budgetSession: budgetSession,
-      budgetType: budgetType,
-      budgetAmount: budgetAmount,
-    };
+    if (validateFields()) {
+      setErrorMessage("");
+      // Reset error states
+      setBudgetTitleError(false);
+      setBudgetSessionError(false);
+      setBudgetTypeError(false);
+      setBudgetAmountError(false);
 
-    const newBudgetRows = [...budgetRows, newBudget];
+      //----
+      const newId = budgetRows.length + 1;
+      const newBudget = {
+        id: newId,
+        budgetTitle: budgetTitle,
+        budgetSession: budgetSession,
+        budgetType: budgetType,
+        budgetAmount: budgetAmount,
+      };
 
-    budgetRows = newBudgetRows;
+      const handleButtonClick = selectedRowData ? updateRowData : addNewBudget;
 
-    refreshTable();
-    handleClose();
+      const newBudgetRows = [...budgetRows, newBudget];
+
+      budgetRows = newBudgetRows;
+
+      refreshTable();
+      handleClose();
+    } else {
+      console.log("Please fill in all required fields with correct format.");
+      setErrorMessage(
+        "Please fill in all required fields with correct format."
+      );
+    }
   };
   const [refreshKey, setRefreshKey] = useState(0);
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
   };
+
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
+        key={refreshKey}
         rows={budgetRows}
         columns={budgetColumns}
         initialState={{
@@ -1504,24 +1642,46 @@ function BudgetTable() {
         }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
+        onRowSelectionModelChange={handleSelectionModelChange}
+        rowSelectionModel={selectedRows}
       />
 
       <div>
-        <Button onClick={handleOpen}>Add New Budget</Button>
+        <IconButton
+          onClick={handleOpenForAdd}
+          aria-label="add"
+          color="secondary"
+        >
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleDelete}
+          aria-label="delete"
+          disabled={selectedRows.length == 0}
+        >
+          <DeleteIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleOpenForUpdate}
+          aria-label="update"
+          disabled={selectedRows.length != 1}
+        >
+          <EditIcon />
+        </IconButton>
         <Modal
           open={open}
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          <Box sx={teamModalStyle}>
+          <Box sx={sponsorModalStyle}>
             <Typography
               id="modal-modal-title"
               variant="h6"
               component="h2"
               sx={{ marginBottom: "1em" }}
             >
-              Budget Details
+              {selectedRowData ? "Update Budget Details" : "Add Budget Details"}
             </Typography>
 
             <TextField
@@ -1529,18 +1689,23 @@ function BudgetTable() {
               label="Budget Title"
               variant="filled"
               sx={{ width: "100%", marginBottom: 2 }}
+              value={budgetTitle}
               onChange={handleBudgetTitleChange}
+              error={budgetTitleError}
+              helperText={budgetTitleError ? "Budget Title is required" : ""}
             />
 
             <Box sx={{ width: "100%", marginBottom: 2 }}>
               <FormControl fullWidth>
                 <InputLabel id="budget_session">Session</InputLabel>
                 <Select
-                  labelId="budget_type_select"
+                  labelId="budget_session_select"
                   id="demo-simple-select"
                   value={budgetSession}
                   label="Session"
                   onChange={handleBudgetSessionChange}
+                  defaultValue=""
+                  error={budgetSessionError}
                   variant="filled"
                 >
                   {Array.from(Array(sessionCount)).map((_, index) => (
@@ -1561,6 +1726,8 @@ function BudgetTable() {
                   value={budgetType}
                   label="Type"
                   onChange={handleBudgetTypeChange}
+                  error={budgetTypeError}
+                  defaultValue=""
                   variant="filled"
                 >
                   <MenuItem value={"Income"}>Income</MenuItem>
@@ -1573,17 +1740,36 @@ function BudgetTable() {
               id="budget_amount"
               label="Amount"
               variant="filled"
-              sx={{ width: "100%", marginBottom: 2 }}
-              onChange={handleBudgetAmountChange}
               type="number"
+              sx={{ width: "100%", marginBottom: 2 }}
+              value={budgetAmount}
+              onChange={handleBudgetAmountChange}
+              error={budgetAmountError}
+              helperText={budgetAmountError ? "Amount is required" : ""}
             />
+
+            {errorMessage && (
+              <div
+                style={{
+                  color: "red",
+                  marginBottom: "2em",
+                  fontSize: "14px",
+                  textDecoration: "italic",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
 
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" onClick={handleClose}>
                 Close
               </Button>
-              <Button variant="contained" onClick={addNewBudget}>
-                Add
+              <Button
+                variant="contained"
+                onClick={selectedRowData ? updateRowData : addNewBudget}
+              >
+                {selectedRowData ? "Update" : "Add"}
               </Button>
             </Stack>
           </Box>
