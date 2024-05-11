@@ -703,11 +703,9 @@ function TicketDetails() {
           Tickets Details
         </Typography>
 
-        {Array.from(Array(sessionCount)).map((_, index) => (
-          <div>
-            <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
-          </div>
-        ))}
+        <div>
+          <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
+        </div>
       </Paper>
     </div>
   );
