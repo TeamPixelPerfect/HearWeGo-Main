@@ -407,6 +407,11 @@ let sessionCount = 1;
 
 function EventDetails() {
   const [numberOfSessions, setNumberOfSessions] = useState(0);
+  const [country, setCountry] = React.useState("");
+
+  const handleCountryChange = (event: SelectChangeEvent) => {
+    setCountry(event.target.value);
+  };
 
   const [timeValue, setTimeValue] = React.useState<Dayjs | null>(
     dayjs("2022-04-17T15:30")
@@ -609,7 +614,25 @@ function EventDetails() {
                     </Grid>
 
                     <Grid xs={6}>
-                      <SelectCountry />
+                      <FormControl variant="filled" sx={{ width: "100%" }}>
+                        <InputLabel id="demo-simple-select-standard-label">
+                          Country
+                        </InputLabel>
+                        <Select
+                          labelId="event_country"
+                          id="event_country"
+                          value={country}
+                          onChange={handleCountryChange}
+                          label="Country"
+                        >
+                          <MenuItem value="">
+                            <em>None</em>
+                          </MenuItem>
+                          <MenuItem value={10}>Sri Lanka</MenuItem>
+                          <MenuItem value={20}>USA</MenuItem>
+                          <MenuItem value={30}>Japan</MenuItem>
+                        </Select>
+                      </FormControl>
                     </Grid>
                   </Grid>
                   <TextField
@@ -711,159 +734,6 @@ function TicketDetails() {
   );
 }
 
-function SelectCountry() {
-  const [type, setType] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setType(event.target.value);
-  };
-
-  return (
-    <div>
-      <FormControl variant="filled" sx={{ width: "100%" }}>
-        <InputLabel id="demo-simple-select-standard-label">Country</InputLabel>
-        <Select
-          labelId="event_country"
-          id="event_country"
-          value={type}
-          onChange={handleChange}
-          label="Country"
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Sri Lanka</MenuItem>
-          <MenuItem value={20}>USA</MenuItem>
-          <MenuItem value={30}>Japan</MenuItem>
-        </Select>
-      </FormControl>
-    </div>
-  );
-}
-
-function SessionForm() {
-  const [timeValue, setTimeValue] = React.useState<Dayjs | null>(
-    dayjs("2022-04-17T15:30")
-  );
-  return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Session 01
-      </Typography>
-
-      <Box sx={{ width: "100%", display: "flex" }}>
-        <Box sx={{ width: "65%" }}>
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid
-              container
-              rowSpacing={2}
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-              marginBottom={2}
-            >
-              <Grid xs={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={["DateField"]}>
-                    <DateField
-                      label="Date"
-                      defaultValue={dayjs("2022-04-17")}
-                      format="LL"
-                      variant="filled"
-                      sx={{ width: "100%" }}
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
-              </Grid>
-
-              <Grid xs={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={["TimeField"]}>
-                    <TimeField
-                      label="Time"
-                      value={timeValue}
-                      onChange={(newValue) => setTimeValue(newValue)}
-                      variant="filled"
-                      sx={{ width: "100%" }}
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
-              </Grid>
-
-              <Grid xs={6}>
-                <TextField
-                  id="duration"
-                  label="Duration"
-                  type="number"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="filled"
-                  sx={{ width: "100%" }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="start">Hours</InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              <Grid xs={6}>
-                <SelectCountry />
-              </Grid>
-            </Grid>
-            <TextField
-              id="event_venue"
-              label="Venue"
-              variant="filled"
-              sx={{ width: "100%", marginBottom: 2 }}
-            />
-            <Autocomplete
-              sx={{ maxWidth: "90%" }}
-              multiple
-              id="artists"
-              options={sessionArtist}
-              getOptionLabel={(option) => option.name}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Artits"
-                  // placeholder="Favorites"
-                  variant="filled"
-                  sx={{ maxWidth: "100%" }}
-                  style={{ boxSizing: "initial" }}
-                />
-              )}
-            />
-          </Box>
-        </Box>
-
-        <Box sx={{ width: "35%" }}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={["DateCalendar"]} sx={{ width: "100%" }}>
-              <DemoItem>
-                <DateCalendar defaultValue={dayjs("2022-04-17")} disabled />
-              </DemoItem>
-            </DemoContainer>
-          </LocalizationProvider>
-        </Box>
-      </Box>
-
-      <Box sx={{ width: "100%" }}>
-        <TextField
-          id="session-des"
-          label="Description"
-          multiline
-          rows={4}
-          variant="filled"
-          sx={{ width: "100%" }}
-        />
-      </Box>
-    </Paper>
-  );
-}
 
 const sessionArtist = [
   { name: "Michael Jackson" },
@@ -1966,6 +1836,284 @@ function TicketSwitchDisplay(switchStatus: number) {
   }
 }
 
+const manulTicketColumns: GridColDef[] = [
+  { field: "id", headerName: "ID", width: 70 },
+  { field: "ticketSession", headerName: "Session", width: 150 },
+  { field: "ticketLocation", headerName: "Where to Buy Tickets", width: 150 },
+];
+
+let manualTicketRows = [];
+
+function ManualTicketTable() {
+  const [ticketLocationError, setTicketLocationError] = useState(false);
+  const [ticketSessionError, setTicketSessionError] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [ticketSession, setTicketSession] = useState("");
+  const [ticketLocation, setTicketLocation] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowData, setSelectedRowData] = useState(null);
+
+  const handleTicketLocationChange = (event) => {
+    setTicketLocation(event.target.value);
+    setTicketLocationError(event.target.value.trim() === "");
+  };
+
+  const handleTicketSessionChange = (event) => {
+    setTicketSession(event.target.value);
+    setTicketSessionError(event.target.value.trim() === "");
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    setSelectedRows(selectionModel);
+  };
+
+  const validateFields = () => {
+    return ticketLocation.trim() !== "" && ticketSession.trim() !== "";
+  };
+
+  const updateRowData = () => {
+    // Check if a row is selected for update
+    if (selectedRows.length === 1 && validateFields()) {
+      setTicketLocationError(false);
+      setTicketSessionError(false);
+
+      // Get the selected row ID
+      const selectedRowId = selectedRows[0];
+
+      // Find the index of the selected row in the sponsorRows array
+      const rowIndex = manualTicketRows.findIndex(
+        (row) => row.id === selectedRowId
+      );
+
+      if (rowIndex !== -1) {
+        // Update the row data with user inputs
+        const updatedRow = {
+          id: selectedRowId,
+          ticketSession: ticketSession,
+          ticketLocation: ticketLocation,
+        };
+
+        // Replace the old row with the updated row
+        const updatedRows = [...manualTicketRows];
+        updatedRows[rowIndex] = updatedRow;
+
+        // Update sponsorRows with the updated rows
+        manualTicketRows = updatedRows;
+
+        // Refresh the table
+        refreshTable();
+        handleClose(); // Close the modal or any other UI element used for input
+      }
+    } else {
+      // Inform the user to select a single row for update
+      console.log("Please select a single row to update.");
+    }
+  };
+
+  const handleDelete = () => {
+    const updatedRows = manualTicketRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    manualTicketRows = updatedRows;
+    setSelectedRows([]);
+    setTicketLocationError(false);
+    setTicketSessionError(false);
+    setErrorMessage("");
+    refreshTable();
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setTicketLocationError(false);
+    setTicketSessionError(false);
+    setErrorMessage("");
+    setOpen(false);
+  };
+
+  const handleOpenForAdd = () => {
+    setTicketLocation("");
+    setTicketSession("");
+    setSelectedRowData(null); // Clear selected row data
+    setOpen(true);
+  };
+
+  const handleOpenForUpdate = () => {
+    if (selectedRows.length === 1) {
+      const selectedRowId = selectedRows[0];
+      const selectedRow = manualTicketRows.find(
+        (row) => row.id === selectedRowId
+      );
+      if (selectedRow) {
+        setTicketLocation(selectedRow.ticketLocation);
+        setTicketSession(selectedRow.ticketSession);
+        setSelectedRowData(selectedRow);
+        setOpen(true);
+      }
+    } else {
+      console.log("Please select a single row to update.");
+    }
+  };
+
+  const addNewTicket = () => {
+    if (validateFields()) {
+      setErrorMessage("");
+      // Reset error states
+      setTicketLocationError(false);
+      setTicketSessionError(false);
+
+      //----
+      const newId = manualTicketRows.length + 1;
+      const newTicket = {
+        id: newId,
+        ticketLocation: ticketLocation,
+        ticketSession: ticketSession,
+      };
+
+      const handleButtonClick = selectedRowData ? updateRowData : addNewTicket;
+
+      const newTicketRows = [...manualTicketRows, newTicket];
+
+      manualTicketRows = newTicketRows;
+
+      refreshTable();
+      handleClose();
+    } else {
+      console.log("Please fill in all required fields with correct format.");
+      setErrorMessage(
+        "Please fill in all required fields with correct format."
+      );
+    }
+  };
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  return (
+    <div style={{ width: "100%" }}>
+      <DataGrid
+        key={refreshKey}
+        rows={manualTicketRows}
+        columns={manulTicketColumns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        onRowSelectionModelChange={handleSelectionModelChange}
+        rowSelectionModel={selectedRows}
+      />
+
+      <div>
+        <IconButton
+          onClick={handleOpenForAdd}
+          aria-label="add"
+          color="secondary"
+        >
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleDelete}
+          aria-label="delete"
+          disabled={selectedRows.length == 0}
+        >
+          <DeleteIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleOpenForUpdate}
+          aria-label="update"
+          disabled={selectedRows.length != 1}
+        >
+          <EditIcon />
+        </IconButton>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={sponsorModalStyle}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1em" }}
+            >
+              {selectedRowData ? "Update Ticket Details" : "Add Ticket Details"}
+            </Typography>
+
+            <TextField
+              id="ticket_location"
+              label="Whare to Buy Tickets"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              value={ticketLocation}
+              onChange={handleTicketLocationChange}
+              error={ticketLocationError}
+              helperText={
+                ticketLocationError ? "Ticket Location is required" : ""
+              }
+            />
+
+            <Box sx={{ width: "100%", marginBottom: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel id="ticket_session_a">Session</InputLabel>
+                <Select
+                  labelId="ticket_session_select_a"
+                  id="ticket_session_select_a"
+                  value={ticketSession}
+                  label="Session"
+                  onChange={handleTicketSessionChange}
+                  defaultValue=""
+                  error={ticketSessionError}
+                  variant="filled"
+                >
+                  {Array.from(Array(sessionCount)).map((_, index) => (
+                    <MenuItem value={"session" + (index + 1)}>
+                      Session {index + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            {errorMessage && (
+              <div
+                style={{
+                  color: "red",
+                  marginBottom: "2em",
+                  fontSize: "14px",
+                  textDecoration: "italic",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
+
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+              <Button
+                variant="contained"
+                onClick={selectedRowData ? updateRowData : addNewTicket}
+              >
+                {selectedRowData ? "Update" : "Add"}
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
+      </div>
+    </div>
+  );
+}
+
 function ManualTicketForm() {
   return (
     <Paper
@@ -1977,15 +2125,10 @@ function ManualTicketForm() {
           width: "100%",
           display: "flex",
           justifyContent: "center",
-          marginBottom: "1em",
+          marginBottom: "3em",
         }}
       >
-        <TextField
-          id="ticket-location"
-          label="Where to Buy Tickets"
-          variant="filled"
-          sx={{ width: "100%" }}
-        />
+        <ManualTicketTable />
       </Box>
 
       <Box
