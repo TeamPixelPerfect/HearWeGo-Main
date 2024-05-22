@@ -51,37 +51,16 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { CardActionArea, IconButton } from "@mui/material";
 import { countries } from "country-flag-icons";
+import { Event } from "@/app/constants/models";
+import { addEvent } from "@/app/services/EventServices";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 import { InputRow } from "../../../styles/artistDashboardCretaeEvent.styles";
 
 import { IOSSwitch } from "../../../styles/switch.styles";
 
 import DropFile from "../../../components/DropFile";
-import ReactCountryFlag from "react-country-flag";
-
-const QontoConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 10,
-    left: "calc(-50% + 16px)",
-    right: "calc(50% + 16px)",
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: "#784af4",
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: "#784af4",
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    borderColor:
-      theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
-    borderTopWidth: 3,
-    borderRadius: 1,
-  },
-}));
+import { useAppSelector } from "@/lib/hooks";
 
 const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
   ({ theme, ownerState }) => ({
@@ -105,20 +84,6 @@ const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
     },
   })
 );
-
-function QontoStepIcon(props: StepIconProps) {
-  const { active, completed, className } = props;
-
-  return (
-    <QontoStepIconRoot ownerState={{ active }} className={className}>
-      {completed ? (
-        <Check className="QontoStepIcon-completedIcon" />
-      ) : (
-        <div className="QontoStepIcon-circle" />
-      )}
-    </QontoStepIconRoot>
-  );
-}
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -189,18 +154,6 @@ function ColorlibStepIcon(props: StepIconProps) {
   );
 }
 
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
 const steps = [
   "Event Details",
   "Ticket Details",
@@ -233,9 +186,7 @@ function CreateEvent() {
   const handleNext = () => {
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed,
-          // find the first step that has been completed
-          steps.findIndex((step, i) => !(i in completed))
+        ? steps.findIndex((step, i) => !(i in completed))
         : activeStep + 1;
     setActiveStep(newActiveStep);
   };
@@ -371,65 +322,137 @@ function CreateEvent() {
   );
 }
 
-function SelectEventType() {
-  const [type, setType] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setType(event.target.value);
-  };
-
-  return (
-    <div>
-      <FormControl variant="filled" sx={{ width: "100%" }}>
-        <InputLabel id="demo-simple-select-standard-label">
-          Event Type
-        </InputLabel>
-        <Select
-          labelId="event_type"
-          id="event_type"
-          value={type}
-          onChange={handleChange}
-          label="Event Type"
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Classical</MenuItem>
-          <MenuItem value={20}>Club Party</MenuItem>
-          <MenuItem value={30}>Other</MenuItem>
-        </Select>
-      </FormControl>
-    </div>
-  );
-}
-
 let sessionCount = 1;
 
 function EventDetails() {
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [eventData, setEventData] = useState<Event>({
+    event_img: "",
+    event_name: "",
+    event_type: "",
+    age_from: 0,
+    age_to: 0,
+    no_of_sessions: 1,
+    sessions: [
+      {
+        session_id: "",
+        session_name: "",
+        session_date: "",
+        session_time: "",
+        duration: "",
+        venue: "",
+        artists: [
+          {
+            artist_id: "",
+            artist_name: "",
+          },
+        ],
+        session_special_notice: "",
+      },
+    ],
+    sponsor: [
+      {
+        sponsor_type: "",
+        sponsor_name: "",
+        sponsor_contact: "",
+        sponsor_email: "",
+      },
+    ],
+    teams: [
+      {
+        team_type: "",
+        team_name: "",
+        contact: "",
+        email: "",
+      },
+    ],
+    description: "",
+    event_status: "",
+  });
+
   const [numberOfSessions, setNumberOfSessions] = useState(0);
   const [country, setCountry] = React.useState("");
+  const [timeValue, setTimeValue] = React.useState<Dayjs | null>(
+    dayjs("2022-04-17T15:30")
+  );
+  const [isAgeEnabled, setIsAgeEnabled] = useState(false);
+  const [imgFile, setImgFile] = React.useState(null);
+  const [loading, setLoading] = useState(false);
+  const [value, setValue] = React.useState(0);
 
   const handleCountryChange = (event: SelectChangeEvent) => {
     setCountry(event.target.value);
   };
 
-  const [timeValue, setTimeValue] = React.useState<Dayjs | null>(
-    dayjs("2022-04-17T15:30")
-  );
-
-  const handleNumberOfSessionsChange = (event) => {
-    const value = parseInt(event.target.value);
-    setNumberOfSessions(isNaN(value) ? 0 : value);
-    sessionCount = value;
-  };
-
-  const [isAgeEnabled, setIsAgeEnabled] = useState(false);
-
   const handleCheckboxChange = (event) => {
     setIsAgeEnabled(event.target.checked);
   };
 
-  const [imgFile, setImgFile] = React.useState(null);
+  const handleNumberOfSessionsChange = (event) => {
+    const value = parseInt(event.target.value);
+    setNumberOfSessions(isNaN(value) ? 0 : value);
+    setEventData((prevData) => ({
+      ...prevData,
+      no_of_sessions: value,
+    }));
+    sessionCount = value;
+  };
+
+  const handleSessionChange = (index, field, value) => {
+    const newSessions = [...eventData.sessions];
+    newSessions[index][field] = value;
+    setEventData({ ...eventData, sessions: newSessions });
+  };
+
+  
+  const [eventNameError, setEventNameError] = useState(false);
+  const [eventTypeError, setEventTypeError] = useState(false);
+  const [eventDateError, setEventDateError] = useState(false);
+  const [eventTimeError, setEventTimeError] = useState(false);
+  const [eventVenueError, setEventVenueError] = useState(false);
+  const [eventArtistError, setEventArtistError] = useState(false);
+  const [eventDurationError, setEventDurationError] = useState(false);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  const handleEventAddData = () => {
+    setEventNameError(false);
+    setEventTypeError(false);
+    setEventDateError(false);
+    setEventTimeError(false);
+    setEventVenueError(false);
+    setEventArtistError(false);
+    setEventDurationError(false);
+
+    let errors = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ];
+
+    if(eventData.event_name === ""){
+      setEventNameError(true);
+      errors[0] = true;
+    }
+    if(eventData.event_type === ""){
+      setEventTypeError(true);
+      errors[1] = true;
+    }
+
+    setLoading(true);
+
+    addEvent(artist ? artist.token : "", eventData).then((res) => {
+      console.log("Response:::", res);
+      setLoading(false);
+    })
+  };
   return (
     <>
       <Paper
@@ -469,8 +492,24 @@ function EventDetails() {
                 label="Event Name"
                 variant="filled"
                 sx={{ width: "100%" }}
+                onChange={(e) => {
+                  setEventData((data) => {
+                    return { ...data, event_name: e.target.value };
+                  });
+                }}
               />
-              <SelectEventType />
+              {/* <SelectEventType /> */}
+              <TextField
+                id="event_type"
+                label="Event Type"
+                variant="filled"
+                sx={{ width: "100%" }}
+                onChange={(e) => {
+                  setEventData((data) => {
+                    return { ...data, event_type: e.target.value };
+                  });
+                }}
+              />
 
               <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
                 <Box
@@ -490,6 +529,12 @@ function EventDetails() {
                     variant="filled"
                     sx={{ width: "48%" }}
                     disabled={!isAgeEnabled}
+                    value={eventData.age_from}
+                    onChange={(e) => {
+                      setEventData((data) => {
+                        return { ...data, age_from: e.target.value };
+                      });
+                    }}
                   />
 
                   <TextField
@@ -502,6 +547,12 @@ function EventDetails() {
                     variant="filled"
                     sx={{ width: "48%" }}
                     disabled={!isAgeEnabled}
+                    value={eventData.age_to}
+                    onChange={(e) => {
+                      setEventData((data) => {
+                        return { ...data, age_to: e.target.value };
+                      });
+                    }}
                   />
                 </Box>
 
@@ -527,6 +578,7 @@ function EventDetails() {
                 variant="filled"
                 sx={{ width: "66%" }}
                 onChange={handleNumberOfSessionsChange}
+                value={eventData.no_of_sessions}
               />
             </Stack>
           </Box>
@@ -563,33 +615,28 @@ function EventDetails() {
                     marginBottom={2}
                   >
                     <Grid xs={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={["DateField"]}>
-                          <DateField
-                            label="Date"
-                            defaultValue={dayjs("2022-04-17")}
-                            format="LL"
-                            variant="filled"
-                            sx={{ width: "100%" }}
-                            key={index}
-                          />
-                        </DemoContainer>
-                      </LocalizationProvider>
+                      <TextField
+                        id="event_date"
+                        label=""
+                        variant="filled"
+                        sx={{ width: "100%" }}
+                        type="date"
+                        onChange={(newValue) => handleSessionChange(index, 'session_date', newValue)}
+                        // value={eventData.sessions[index].session_date}
+                        // onChange={(newValue) => handleSessionChange(index, 'session_date', newValue)}
+                      />
                     </Grid>
 
                     <Grid xs={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={["TimeField"]}>
-                          <TimeField
-                            label="Time"
-                            value={timeValue}
-                            onChange={(newValue) => setTimeValue(newValue)}
-                            variant="filled"
-                            sx={{ width: "100%" }}
-                            key={index}
-                          />
-                        </DemoContainer>
-                      </LocalizationProvider>
+                      <TextField
+                        id="event_time"
+                        label=""
+                        variant="filled"
+                        sx={{ width: "100%" }}
+                        type="time"
+                        // value={eventData.sessions[index].session_time}
+                        // onChange={(newValue) => handleSessionChange(index, 'session_time', newValue)}
+                      />
                     </Grid>
 
                     <Grid xs={6}>
@@ -648,6 +695,7 @@ function EventDetails() {
                     options={sessionArtist}
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions
+                    
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -695,6 +743,14 @@ function EventDetails() {
 
       <SponsorField />
       <TeamField />
+
+      <LoadingButton
+          loading={loading}
+          variant="contained"
+          onClick={handleEventAddData}
+        >
+          Submit
+        </LoadingButton>
     </>
   );
 }
@@ -734,7 +790,6 @@ function TicketDetails() {
   );
 }
 
-
 const sessionArtist = [
   { name: "Michael Jackson" },
   { name: "Michael Jackson" },
@@ -768,18 +823,6 @@ function TeamField() {
     </Paper>
   );
 }
-
-const teamModalStyle = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
 
 const teamColumns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -846,21 +889,17 @@ function TeamTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setTeamTypeError(false);
       setTeamNameError(false);
       setTeamContactError(false);
       setTeamEmailError(false);
 
-      // Get the selected row ID
       const selectedRowId = selectedRows[0];
 
-      // Find the index of the selected row in the sponsorRows array
       const rowIndex = teamRows.findIndex((row) => row.id === selectedRowId);
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
           teamType: teamType,
@@ -869,19 +908,15 @@ function TeamTable() {
           teamEmail: teamEmail,
         };
 
-        // Replace the old row with the updated row
         const updatedRows = [...teamRows];
         updatedRows[rowIndex] = updatedRow;
 
-        // Update sponsorRows with the updated rows
         teamRows = updatedRows;
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose();
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -917,7 +952,7 @@ function TeamTable() {
     setTeamName("");
     setTeamContact("");
     setTeamEmail("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null);
     setOpen(true);
   };
 
@@ -941,7 +976,6 @@ function TeamTable() {
   const addNewTeam = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setTeamTypeError(false);
       setTeamNameError(false);
       setTeamContactError(false);
