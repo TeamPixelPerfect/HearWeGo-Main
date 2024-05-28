@@ -11,6 +11,7 @@ import Check from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import PublishIcon from "@mui/icons-material/Publish";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import FormHelperText from "@mui/material/FormHelperText";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -49,7 +50,7 @@ import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { CardActionArea, IconButton } from "@mui/material";
+import { CardActionArea, FilledInput, IconButton } from "@mui/material";
 import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
@@ -405,7 +406,6 @@ function EventDetails() {
     setEventData({ ...eventData, sessions: newSessions });
   };
 
-  
   const [eventNameError, setEventNameError] = useState(false);
   const [eventTypeError, setEventTypeError] = useState(false);
   const [eventDateError, setEventDateError] = useState(false);
@@ -427,21 +427,13 @@ function EventDetails() {
     setEventArtistError(false);
     setEventDurationError(false);
 
-    let errors = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-    ];
+    let errors = [false, false, false, false, false, false, false];
 
-    if(eventData.event_name === ""){
+    if (eventData.event_name === "") {
       setEventNameError(true);
       errors[0] = true;
     }
-    if(eventData.event_type === ""){
+    if (eventData.event_type === "") {
       setEventTypeError(true);
       errors[1] = true;
     }
@@ -451,7 +443,7 @@ function EventDetails() {
     addEvent(artist ? artist.token : "", eventData).then((res) => {
       console.log("Response:::", res);
       setLoading(false);
-    })
+    });
   };
   return (
     <>
@@ -592,7 +584,9 @@ function EventDetails() {
           Sessions
         </Typography>
 
-        {Array.from(Array(sessionCount)).map((_, index) => (
+        <SessionTable />
+
+        {/* {Array.from(Array(sessionCount)).map((_, index) => (
           <Paper
             sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
             elevation={3}
@@ -738,19 +732,19 @@ function EventDetails() {
               />
             </Box>
           </Paper>
-        ))}
+        ))} */}
       </Paper>
 
       <SponsorField />
       <TeamField />
 
       <LoadingButton
-          loading={loading}
-          variant="contained"
-          onClick={handleEventAddData}
-        >
-          Submit
-        </LoadingButton>
+        loading={loading}
+        variant="contained"
+        onClick={handleEventAddData}
+      >
+        Submit
+      </LoadingButton>
     </>
   );
 }
@@ -809,6 +803,377 @@ const sessionArtist = [
   { name: "Michael Jackson" },
   { name: "Michael Jackson" },
 ];
+
+const sessionModalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+const sessionColumns: GridColDef[] = [
+  { field: "id", headerName: "ID", width: 70 },
+  { field: "sessionDate", headerName: "Session Date", width: 150 },
+  { field: "sessionTime", headerName: "Session Time", width: 150 },
+  { field: "duration", headerName: "Duration", width: 150 },
+  { field: "venue", headerName: "Venue", width: 250 },
+  { field: "artists", headerName: "Artists", width: 250 },
+  { field: "description", headerName: "Description", width: 250 },
+];
+
+let sessionRows = [];
+
+function SessionTable() {
+  const defaultDate = dayjs().format("YYYY-MM-DD");
+  const defaultTime = "20:00";
+
+  const [sessionDate, setSessionDate] = useState(defaultDate);
+  const [sessionTime, setSessionTime] = useState(defaultTime);
+  const [duration, setDuration] = useState("");
+  const [venue, setVenue] = useState("");
+  const [artists, setArtists] = useState([]);
+  const [description, setDescription] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const sessionArtist = [
+    { name: "Artist 1" },
+    { name: "Artist 2" },
+    { name: "Artist 3" },
+  ];
+
+  const handleSessionDateChange = (event) => {
+    setSessionDate(event.target.value);
+  };
+
+  const handleSessionTimeChange = (event) => {
+    setSessionTime(event.target.value);
+  };
+
+  const handleDurationChange = (event) => {
+    setDuration(event.target.value);
+  };
+
+  const handleVenueChange = (event) => {
+    setVenue(event.target.value);
+  };
+
+  const handleArtistsChange = (event, newValue) => {
+    setArtists(newValue);
+  };
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    setSelectedRows(selectionModel);
+  };
+
+  const validateFields = () => {
+    return (
+      sessionDate.trim() !== "" &&
+      sessionTime.trim() !== "" &&
+      duration.trim() !== "" &&
+      venue.trim() !== "" &&
+      artists.length > 0
+    );
+  };
+
+  const addNewSession = () => {
+    if (validateFields()) {
+      setErrorMessage("");
+
+      const newId = sessionRows.length + 1;
+      const newSession = {
+        id: newId,
+        sessionDate: sessionDate,
+        sessionTime: sessionTime,
+        duration: duration,
+        venue: venue,
+        artists: artists.map((artist) => artist.name).join(", "),
+        description: description,
+      };
+
+      sessionRows = [...sessionRows, newSession];
+
+      refreshTable();
+      handleClose();
+    } else {
+      setErrorMessage(
+        "Please fill in all required fields with correct format."
+      );
+    }
+  };
+
+  const updateRowData = () => {
+    if (selectedRows.length === 1 && validateFields()) {
+      const selectedRowId = selectedRows[0];
+
+      const rowIndex = sessionRows.findIndex((row) => row.id === selectedRowId);
+
+      if (rowIndex !== -1) {
+        const updatedRow = {
+          id: selectedRowId,
+          sessionDate: sessionDate,
+          sessionTime: sessionTime,
+          duration: duration,
+          venue: venue,
+          artists: artists.map((artist) => artist.name).join(", "),
+          description: description,
+        };
+
+        sessionRows[rowIndex] = updatedRow;
+
+        refreshTable();
+        handleClose();
+      }
+    } else {
+      setErrorMessage("Please select a single row to update.");
+    }
+  };
+
+  const handleDelete = () => {
+    const updatedRows = sessionRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    sessionRows = updatedRows;
+    setSelectedRows([]);
+    refreshTable();
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setErrorMessage("");
+    setOpen(false);
+  };
+
+  const handleOpenForAdd = () => {
+    setSessionDate("");
+    setSessionTime("");
+    setDuration("");
+    setVenue("");
+    setArtists([]);
+    setDescription("");
+    setSelectedRowData(null);
+    setOpen(true);
+  };
+
+  const handleOpenForUpdate = () => {
+    if (selectedRows.length === 1) {
+      const selectedRowId = selectedRows[0];
+      const selectedRow = sessionRows.find((row) => row.id === selectedRowId);
+      if (selectedRow) {
+        setSessionDate(selectedRow.sessionDate);
+        setSessionTime(selectedRow.sessionTime);
+        setDuration(selectedRow.duration);
+        setVenue(selectedRow.venue);
+        setArtists(selectedRow.artists.split(", ").map((name) => ({ name })));
+        setDescription(selectedRow.description);
+        setSelectedRowData(selectedRow);
+        setOpen(true);
+      }
+    } else {
+      setErrorMessage("Please select a single row to update.");
+    }
+  };
+
+  const refreshTable = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  return (
+    <div style={{ width: "100%" }}>
+      <DataGrid
+        key={refreshKey}
+        rows={sessionRows}
+        columns={sessionColumns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        onRowSelectionModelChange={handleSelectionModelChange}
+        rowSelectionModel={selectedRows}
+      />
+
+      <div>
+        <IconButton
+          onClick={handleOpenForAdd}
+          aria-label="add"
+          color="secondary"
+        >
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleDelete}
+          aria-label="delete"
+          disabled={selectedRows.length === 0}
+        >
+          <DeleteIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleOpenForUpdate}
+          aria-label="update"
+          disabled={selectedRows.length !== 1}
+        >
+          <EditIcon />
+        </IconButton>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          // sx={{ width: "100%", display: "flex", justifyContent: "center", backgroundColor: "#ffffff"}}
+        >
+          <Box
+            sx={{
+              position: "absolute" as "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 800,
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1em" }}
+            >
+              {selectedRowData ? "Update Session" : "Add Session"}
+            </Typography>
+
+            <Box
+              sx={{ display: "flex", justifyContent: "center", width: "100%" }}
+            >
+              <Box sx={{ width: "50%", paddingRight: 2 }}>
+                <FormControl
+                  sx={{ width: "100%", marginBottom: "1em" }}
+                  variant="filled"
+                >
+                  <FormHelperText id="session-date">Date</FormHelperText>
+                  <FilledInput
+                    id="session_date"
+                    sx={{ width: "100%" }}
+                    type="date"
+                    value={sessionDate}
+                    onChange={handleSessionDateChange}
+                    defaultValue="2024-10-10"
+                  />
+                </FormControl>
+
+                <TextField
+                  id="duration"
+                  label="Duration"
+                  variant="filled"
+                  sx={{ width: "100%", marginBottom: 2 }}
+                  type="number"
+                  value={duration}
+                  onChange={handleDurationChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="start">Hours</InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ width: "50%" }}>
+                <FormControl
+                  sx={{ width: "100%", marginBottom: "1em" }}
+                  variant="filled"
+                >
+                  <FormHelperText id="session-time">Time</FormHelperText>
+                  <FilledInput
+                    id="session_time"
+                    sx={{ width: "100%" }}
+                    type="time"
+                    value={sessionTime}
+                    onChange={handleSessionTimeChange}
+                  />
+                </FormControl>
+
+                <TextField
+                  id="venue"
+                  label="Venue"
+                  variant="filled"
+                  sx={{ width: "100%", marginBottom: 2 }}
+                  value={venue}
+                  onChange={handleVenueChange}
+                />
+              </Box>
+            </Box>
+
+            <Autocomplete
+              sx={{ width: "90%", marginBottom: 2 }}
+              multiple
+              id="artists"
+              options={sessionArtist}
+              getOptionLabel={(option) => option.name}
+              filterSelectedOptions
+              value={artists}
+              onChange={handleArtistsChange}
+              renderInput={(params) => (
+                <TextField {...params} label="Artists" variant="filled" />
+              )}
+            />
+
+            <TextField
+              id="description"
+              label="Description"
+              variant="filled"
+              sx={{ width: "100%", marginBottom: 2 }}
+              multiline
+              rows={4}
+              value={description}
+              onChange={handleDescriptionChange}
+            />
+
+            {errorMessage && (
+              <div
+                style={{
+                  color: "red",
+                  marginBottom: "2em",
+                  fontSize: "14px",
+                  textDecoration: "italic",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
+
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+              <Button
+                variant="contained"
+                onClick={selectedRowData ? updateRowData : addNewSession}
+              >
+                {selectedRowData ? "Update" : "Add"}
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
+      </div>
+    </div>
+  );
+}
 
 function TeamField() {
   return (
