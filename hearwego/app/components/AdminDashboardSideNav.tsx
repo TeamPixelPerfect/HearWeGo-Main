@@ -43,7 +43,7 @@ const ArtistDashboardSideNav = () => {
       <Box
         sx={{ cursor: "pointer", marginBottom: "1em" }}
         onClick={() => {
-          Router.push("/artist");
+          Router.push("/admin");
         }}
       >
         {!matches ? (
