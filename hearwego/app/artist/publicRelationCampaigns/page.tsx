@@ -57,6 +57,12 @@ export default function Context() {
   const handleCreateCampaignOpen = () => setOpenCreateCampaign(true);
   const handleCreateCampaignClose = () => setOpenCreateCampaign(false);
 
+  
+  const [openCreateNewCampaign, setOpenCreateNewCampaign] = React.useState(false);
+  const handleCreateNewCampaignOpen = () => setOpenCreateCampaign(true);
+  const handleCreateNewCampaignClose = () => setOpenCreateCampaign(false);
+
+  
   const [openPostScheduling, setOpenPostScheduling] = React.useState(false);
   const handlePostSchedulingOpen = () => setOpenPostScheduling(true);
   const handlePostSchedulingClose = () => setOpenPostScheduling(false);
@@ -82,7 +88,7 @@ export default function Context() {
     setAnchorEl(null);
   };
   return (
-    //
+    
     <>
       <TabsNav sx={{ width: "100%", typography: "body1" }}>
         <TabContext value={value}>
@@ -152,9 +158,10 @@ export default function Context() {
                         >
                           <Typography component="h2">Cancel</Typography>
                         </Button>
-                        <Button variant="contained">
-                          <Typography component="h2">Create</Typography>
+                        <Button variant="contained" >
+                          <Typography component="h2" onClick={handleCreateNewCampaignOpen}>Create</Typography>
                         </Button>
+                        
                       </Stack>
                     </Box>
                   </Box>
@@ -201,7 +208,7 @@ export default function Context() {
                     <Typography
                       sx={{
                         paddingLeft: "10px",
-                        color: theme.palette.text.primary,
+                        color: theme.palette.text.primary,  
                       }}
                     >
                       Damidu Thathsara<br></br>
