@@ -61,6 +61,7 @@ import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
+import { getAllArtists } from "@/app/services/ArtistServices";
 
 import { InputRow } from "../../../styles/artistDashboardCretaeEvent.styles";
 
@@ -332,7 +333,6 @@ function CreateEvent() {
     </>
   );
 }
-
 
 function EventDetails({ sessionRows, setSessionRows }) {
   const artist = useAppSelector((state) => state.artist.user);
@@ -667,6 +667,19 @@ const sessionModalStyle = {
   p: 4,
 };
 
+const filter = createFilterOptions();
+
+const handleFilter = (options, params) => {
+  const filtered = filter(options, params);
+  const { inputValue } = params;
+
+  if (inputValue !== '' && !options.some((option) => option.label === inputValue)) {
+    filtered.push({ label: inputValue, _id: 'nar' });
+  }
+
+  return filtered;
+};
+
 let sessionCount = 0;
 
 type SessionRow = {
@@ -695,12 +708,27 @@ function SessionTable({ sessionRows, setSessionRows }) {
   const [duration, setDuration] = useState('');
   const [venue, setVenue] = useState('');
   const [artists, setArtists] = useState([]);
+  const [selectedArtists, setSelectedArtists] = useState([]);
   const [description, setDescription] = useState('');
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
   const [selectedRowData, setSelectedRowData] = useState<SessionRow | null>(null);
   const [open, setOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const getArtists = () => {
+    getAllArtists().then((res) => {
+      const data = res?.data.map((opt: any) => ({
+        label: opt.artistName,
+        _id: opt.artist_id,
+      }));
+      setArtists(data);
+    });
+  };
+
+  useEffect(() => {
+    getArtists();
+  }, []);
 
   const sessionArtist = [
     { name: 'Artist 1' },
@@ -725,7 +753,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
   };
 
   const handleArtistsChange = (event, newValue) => {
-    setArtists(newValue);
+    setSelectedArtists(newValue);
   };
 
   const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -749,7 +777,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
         sessionTime,
         duration,
         venue,
-        artists: artists.map((artist) => artist.name).join(', '),
+        artists: selectedArtists.map((artist) => artist.label).join(', '),
         description,
       };
 
@@ -775,7 +803,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
           sessionTime,
           duration,
           venue,
-          artists: artists.map((artist) => artist.name).join(', '),
+          artists: selectedArtists.map((artist) => artist.label).join(', '),
           description,
         };
 
@@ -814,7 +842,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
     setSessionTime('');
     setDuration('');
     setVenue('');
-    setArtists([]);
+    setSelectedArtists([]);
     setDescription('');
     setSelectedRowData(null);
     setOpen(true);
@@ -829,7 +857,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
         setSessionTime(selectedRow.sessionTime);
         setDuration(selectedRow.duration);
         setVenue(selectedRow.venue);
-        setArtists(selectedRow.artists.split(', ').map((name) => ({ name })));
+        setSelectedArtists(selectedRow.artists.split(', ').map((name) => ({ label: name, _id: '' })));
         setDescription(selectedRow.description);
         setSelectedRowData(selectedRow);
         setOpen(true);
@@ -948,10 +976,11 @@ function SessionTable({ sessionRows, setSessionRows }) {
               sx={{ width: '90%', marginBottom: 2 }}
               multiple
               id='artists'
-              options={sessionArtist}
-              getOptionLabel={(option) => option.name}
+              options={artists}
+              getOptionLabel={(option) => option.label}
+              filterOptions={handleFilter}
               filterSelectedOptions
-              value={artists}
+              value={selectedArtists}
               onChange={handleArtistsChange}
               renderInput={(params) => <TextField {...params} label='Artists' variant='filled' />}
             />
