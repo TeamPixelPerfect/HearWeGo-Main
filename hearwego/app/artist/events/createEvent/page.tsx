@@ -15,7 +15,12 @@ import FormHelperText from "@mui/material/FormHelperText";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRowSelectionModel,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
@@ -55,6 +60,7 @@ import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { createFilterOptions } from "@mui/material";
 
 import { InputRow } from "../../../styles/artistDashboardCretaeEvent.styles";
 
@@ -167,6 +173,8 @@ function CreateEvent() {
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
   }>({});
+
+  const [sessionRows, setSessionRows] = useState([]);
 
   const totalSteps = () => {
     return steps.length;
@@ -285,7 +293,9 @@ function CreateEvent() {
         ) : (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-              <div>{EventCreateShow(activeStep)}</div>
+              <div>
+                {EventCreateShow(activeStep, sessionRows, setSessionRows)}
+              </div>
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
               <Button
@@ -323,9 +333,8 @@ function CreateEvent() {
   );
 }
 
-let sessionCount = 1;
 
-function EventDetails() {
+function EventDetails({ sessionRows, setSessionRows }) {
   const artist = useAppSelector((state) => state.artist.user);
 
   const [eventData, setEventData] = useState<Event>({
@@ -390,15 +399,7 @@ function EventDetails() {
     setIsAgeEnabled(event.target.checked);
   };
 
-  const handleNumberOfSessionsChange = (event) => {
-    const value = parseInt(event.target.value);
-    setNumberOfSessions(isNaN(value) ? 0 : value);
-    setEventData((prevData) => ({
-      ...prevData,
-      no_of_sessions: value,
-    }));
-    sessionCount = value;
-  };
+  
 
   const handleSessionChange = (index, field, value) => {
     const newSessions = [...eventData.sessions];
@@ -490,7 +491,7 @@ function EventDetails() {
                   });
                 }}
               />
-              {/* <SelectEventType /> */}
+
               <TextField
                 id="event_type"
                 label="Event Type"
@@ -566,10 +567,8 @@ function EventDetails() {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                defaultValue={sessionCount}
                 variant="filled"
                 sx={{ width: "66%" }}
-                onChange={handleNumberOfSessionsChange}
                 value={eventData.no_of_sessions}
               />
             </Stack>
@@ -584,155 +583,7 @@ function EventDetails() {
           Sessions
         </Typography>
 
-        <SessionTable />
-
-        {/* {Array.from(Array(sessionCount)).map((_, index) => (
-          <Paper
-            sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-            elevation={3}
-          >
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{ marginBottom: "1em" }}
-            >
-              Session {index + 1}
-            </Typography>
-
-            <Box sx={{ width: "100%", display: "flex" }}>
-              <Box sx={{ width: "65%" }}>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Grid
-                    container
-                    rowSpacing={2}
-                    columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-                    marginBottom={2}
-                  >
-                    <Grid xs={6}>
-                      <TextField
-                        id="event_date"
-                        label=""
-                        variant="filled"
-                        sx={{ width: "100%" }}
-                        type="date"
-                        onChange={(newValue) => handleSessionChange(index, 'session_date', newValue)}
-                        // value={eventData.sessions[index].session_date}
-                        // onChange={(newValue) => handleSessionChange(index, 'session_date', newValue)}
-                      />
-                    </Grid>
-
-                    <Grid xs={6}>
-                      <TextField
-                        id="event_time"
-                        label=""
-                        variant="filled"
-                        sx={{ width: "100%" }}
-                        type="time"
-                        // value={eventData.sessions[index].session_time}
-                        // onChange={(newValue) => handleSessionChange(index, 'session_time', newValue)}
-                      />
-                    </Grid>
-
-                    <Grid xs={6}>
-                      <TextField
-                        id="duration"
-                        label="Duration"
-                        type="number"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        variant="filled"
-                        sx={{ width: "100%" }}
-                        key={index}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="start">
-                              Hours
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-
-                    <Grid xs={6}>
-                      <FormControl variant="filled" sx={{ width: "100%" }}>
-                        <InputLabel id="demo-simple-select-standard-label">
-                          Country
-                        </InputLabel>
-                        <Select
-                          labelId="event_country"
-                          id="event_country"
-                          value={country}
-                          onChange={handleCountryChange}
-                          label="Country"
-                        >
-                          <MenuItem value="">
-                            <em>None</em>
-                          </MenuItem>
-                          <MenuItem value={10}>Sri Lanka</MenuItem>
-                          <MenuItem value={20}>USA</MenuItem>
-                          <MenuItem value={30}>Japan</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                  <TextField
-                    id="event_venue"
-                    label="Venue"
-                    variant="filled"
-                    sx={{ width: "100%", marginBottom: 2 }}
-                  />
-                  <Autocomplete
-                    sx={{ maxWidth: "90%" }}
-                    multiple
-                    id="artists"
-                    options={sessionArtist}
-                    getOptionLabel={(option) => option.name}
-                    filterSelectedOptions
-                    
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Artits"
-                        // placeholder="Favorites"
-                        variant="filled"
-                        sx={{ maxWidth: "100%" }}
-                        style={{ boxSizing: "initial" }}
-                      />
-                    )}
-                  />
-                </Box>
-              </Box>
-
-              <Box sx={{ width: "35%" }}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer
-                    components={["DateCalendar"]}
-                    sx={{ width: "100%" }}
-                  >
-                    <DemoItem>
-                      <DateCalendar
-                        defaultValue={dayjs("2022-04-17")}
-                        disabled
-                      />
-                    </DemoItem>
-                  </DemoContainer>
-                </LocalizationProvider>
-              </Box>
-            </Box>
-
-            <Box sx={{ width: "100%" }}>
-              <TextField
-                id="session-des"
-                label="Description"
-                multiline
-                rows={4}
-                variant="filled"
-                sx={{ width: "100%" }}
-              />
-            </Box>
-          </Paper>
-        ))} */}
+        <SessionTable sessionRows={sessionRows} setSessionRows={setSessionRows} />
       </Paper>
 
       <SponsorField />
@@ -816,53 +667,60 @@ const sessionModalStyle = {
   p: 4,
 };
 
+let sessionCount = 0;
+
+type SessionRow = {
+  id: number;
+  sessionDate: string;
+  sessionTime: string;
+  duration: string;
+  venue: string;
+  artists: string;
+  description: string;
+};
+
 const sessionColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "sessionDate", headerName: "Session Date", width: 150 },
-  { field: "sessionTime", headerName: "Session Time", width: 150 },
-  { field: "duration", headerName: "Duration", width: 150 },
-  { field: "venue", headerName: "Venue", width: 250 },
-  { field: "artists", headerName: "Artists", width: 250 },
-  { field: "description", headerName: "Description", width: 250 },
+  { field: 'id', headerName: 'ID', width: 70 },
+  { field: 'sessionDate', headerName: 'Date', width: 100 },
+  { field: 'sessionTime', headerName: 'Time', width: 100 },
+  { field: 'duration', headerName: 'Duration', width: 100 },
+  { field: 'venue', headerName: 'Venue', width: 100 },
+  { field: 'artists', headerName: 'Artists', width: 200 },
+  { field: 'description', headerName: 'Description', width: 200 },
 ];
 
-let sessionRows = [];
-
-function SessionTable() {
-  const defaultDate = dayjs().format("YYYY-MM-DD");
-  const defaultTime = "20:00";
-
-  const [sessionDate, setSessionDate] = useState(defaultDate);
-  const [sessionTime, setSessionTime] = useState(defaultTime);
-  const [duration, setDuration] = useState("");
-  const [venue, setVenue] = useState("");
+function SessionTable({ sessionRows, setSessionRows }) {
+  const [sessionDate, setSessionDate] = useState('');
+  const [sessionTime, setSessionTime] = useState('');
+  const [duration, setDuration] = useState('');
+  const [venue, setVenue] = useState('');
   const [artists, setArtists] = useState([]);
-  const [description, setDescription] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [description, setDescription] = useState('');
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<SessionRow | null>(null);
   const [open, setOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
 
   const sessionArtist = [
-    { name: "Artist 1" },
-    { name: "Artist 2" },
-    { name: "Artist 3" },
+    { name: 'Artist 1' },
+    { name: 'Artist 2' },
+    { name: 'Artist 3' },
   ];
 
-  const handleSessionDateChange = (event) => {
+  const handleSessionDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSessionDate(event.target.value);
   };
 
-  const handleSessionTimeChange = (event) => {
+  const handleSessionTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSessionTime(event.target.value);
   };
 
-  const handleDurationChange = (event) => {
+  const handleDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDuration(event.target.value);
   };
 
-  const handleVenueChange = (event) => {
+  const handleVenueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVenue(event.target.value);
   };
 
@@ -870,119 +728,114 @@ function SessionTable() {
     setArtists(newValue);
   };
 
-  const handleDescriptionChange = (event) => {
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(event.target.value);
   };
 
-  const handleSelectionModelChange = (selectionModel) => {
-    setSelectedRows(selectionModel);
+  const handleSelectionModelChange = (newSelectionModel) => {
+    setSelectedRows(newSelectionModel);
   };
 
   const validateFields = () => {
-    return (
-      sessionDate.trim() !== "" &&
-      sessionTime.trim() !== "" &&
-      duration.trim() !== "" &&
-      venue.trim() !== "" &&
-      artists.length > 0
-    );
+    return sessionDate && sessionTime && duration && venue && artists.length > 0 && description;
   };
 
   const addNewSession = () => {
     if (validateFields()) {
-      setErrorMessage("");
-
-      const newId = sessionRows.length + 1;
-      const newSession = {
+      const newId = sessionRows.length ? Math.max(...sessionRows.map((row) => row.id)) + 1 : 1;
+      const newSession: SessionRow = {
         id: newId,
-        sessionDate: sessionDate,
-        sessionTime: sessionTime,
-        duration: duration,
-        venue: venue,
-        artists: artists.map((artist) => artist.name).join(", "),
-        description: description,
+        sessionDate,
+        sessionTime,
+        duration,
+        venue,
+        artists: artists.map((artist) => artist.name).join(', '),
+        description,
       };
 
-      sessionRows = [...sessionRows, newSession];
-
+      setSessionRows([...sessionRows, newSession]);
+      sessionCount+=1;
       refreshTable();
       handleClose();
     } else {
-      setErrorMessage(
-        "Please fill in all required fields with correct format."
-      );
+      setErrorMessage('Please fill in all required fields with correct format.');
     }
   };
 
   const updateRowData = () => {
     if (selectedRows.length === 1 && validateFields()) {
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
       const rowIndex = sessionRows.findIndex((row) => row.id === selectedRowId);
 
       if (rowIndex !== -1) {
-        const updatedRow = {
+        const updatedRow: SessionRow = {
           id: selectedRowId,
-          sessionDate: sessionDate,
-          sessionTime: sessionTime,
-          duration: duration,
-          venue: venue,
-          artists: artists.map((artist) => artist.name).join(", "),
-          description: description,
+          sessionDate,
+          sessionTime,
+          duration,
+          venue,
+          artists: artists.map((artist) => artist.name).join(', '),
+          description,
         };
 
-        sessionRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...sessionRows.slice(0, rowIndex),
+          updatedRow,
+          ...sessionRows.slice(rowIndex + 1),
+        ];
+
+        setSessionRows(updatedRows);
 
         refreshTable();
         handleClose();
       }
     } else {
-      setErrorMessage("Please select a single row to update.");
+      setErrorMessage('Please select a single row to update.');
     }
   };
 
   const handleDelete = () => {
-    const updatedRows = sessionRows.filter(
-      (row) => !selectedRows.includes(row.id)
-    );
-    sessionRows = updatedRows;
+    const updatedRows = sessionRows.filter((row) => !selectedRows.includes(row.id));
+    setSessionRows(updatedRows);
     setSelectedRows([]);
+    sessionCount-=1;
     refreshTable();
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setErrorMessage("");
+    setErrorMessage('');
     setOpen(false);
   };
 
   const handleOpenForAdd = () => {
-    setSessionDate("");
-    setSessionTime("");
-    setDuration("");
-    setVenue("");
+    setSessionDate('');
+    setSessionTime('');
+    setDuration('');
+    setVenue('');
     setArtists([]);
-    setDescription("");
+    setDescription('');
     setSelectedRowData(null);
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
       const selectedRow = sessionRows.find((row) => row.id === selectedRowId);
       if (selectedRow) {
         setSessionDate(selectedRow.sessionDate);
         setSessionTime(selectedRow.sessionTime);
         setDuration(selectedRow.duration);
         setVenue(selectedRow.venue);
-        setArtists(selectedRow.artists.split(", ").map((name) => ({ name })));
+        setArtists(selectedRow.artists.split(', ').map((name) => ({ name })));
         setDescription(selectedRow.description);
         setSelectedRowData(selectedRow);
         setOpen(true);
       }
     } else {
-      setErrorMessage("Please select a single row to update.");
+      setErrorMessage('Please select a single row to update.');
     }
   };
 
@@ -991,7 +844,7 @@ function SessionTable() {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: '100%' }}>
       <DataGrid
         key={refreshKey}
         rows={sessionRows}
@@ -1008,111 +861,83 @@ function SessionTable() {
       />
 
       <div>
-        <IconButton
-          onClick={handleOpenForAdd}
-          aria-label="add"
-          color="secondary"
-        >
+        <IconButton onClick={handleOpenForAdd} aria-label='add' color='secondary'>
           <AddCircleIcon />
         </IconButton>
-        <IconButton
-          onClick={handleDelete}
-          aria-label="delete"
-          disabled={selectedRows.length === 0}
-        >
+        <IconButton onClick={handleDelete} aria-label='delete' disabled={selectedRows.length === 0}>
           <DeleteIcon />
         </IconButton>
-        <IconButton
-          onClick={handleOpenForUpdate}
-          aria-label="update"
-          disabled={selectedRows.length !== 1}
-        >
+        <IconButton onClick={handleOpenForUpdate} aria-label='update' disabled={selectedRows.length !== 1}>
           <EditIcon />
         </IconButton>
         <Modal
           open={open}
           onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-          // sx={{ width: "100%", display: "flex", justifyContent: "center", backgroundColor: "#ffffff"}}
+          aria-labelledby='modal-modal-title'
+          aria-describedby='modal-modal-description'
         >
           <Box
             sx={{
-              position: "absolute" as "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
               width: 800,
-              bgcolor: "background.paper",
-              border: "2px solid #000",
+              bgcolor: 'background.paper',
+              border: '2px solid #000',
               boxShadow: 24,
               p: 4,
             }}
           >
-            <Typography
-              id="modal-modal-title"
-              variant="h6"
-              component="h2"
-              sx={{ marginBottom: "1em" }}
-            >
-              {selectedRowData ? "Update Session" : "Add Session"}
+            <Typography id='modal-modal-title' variant='h6' component='h2' sx={{ marginBottom: '1em' }}>
+              {selectedRowData ? 'Update Session' : 'Add Session'}
             </Typography>
 
-            <Box
-              sx={{ display: "flex", justifyContent: "center", width: "100%" }}
-            >
-              <Box sx={{ width: "50%", paddingRight: 2 }}>
-                <FormControl
-                  sx={{ width: "100%", marginBottom: "1em" }}
-                  variant="filled"
-                >
-                  <FormHelperText id="session-date">Date</FormHelperText>
+            <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              <Box sx={{ width: '50%', paddingRight: 2 }}>
+                <FormControl sx={{ width: '100%', marginBottom: '1em' }} variant='filled'>
+                  <FormHelperText id='session-date'>Date</FormHelperText>
                   <FilledInput
-                    id="session_date"
-                    sx={{ width: "100%" }}
-                    type="date"
+                    id='session_date'
+                    sx={{ width: '100%' }}
+                    type='date'
                     value={sessionDate}
                     onChange={handleSessionDateChange}
-                    defaultValue="2024-10-10"
+                    defaultValue='2024-10-10'
                   />
                 </FormControl>
 
                 <TextField
-                  id="duration"
-                  label="Duration"
-                  variant="filled"
-                  sx={{ width: "100%", marginBottom: 2 }}
-                  type="number"
+                  id='duration'
+                  label='Duration'
+                  variant='filled'
+                  sx={{ width: '100%', marginBottom: 2 }}
+                  type='number'
                   value={duration}
                   onChange={handleDurationChange}
                   InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="start">Hours</InputAdornment>
-                    ),
+                    endAdornment: <InputAdornment position='start'>Hours</InputAdornment>,
                   }}
                 />
               </Box>
 
-              <Box sx={{ width: "50%" }}>
-                <FormControl
-                  sx={{ width: "100%", marginBottom: "1em" }}
-                  variant="filled"
-                >
-                  <FormHelperText id="session-time">Time</FormHelperText>
+              <Box sx={{ width: '50%' }}>
+                <FormControl sx={{ width: '100%', marginBottom: '1em' }} variant='filled'>
+                  <FormHelperText id='session-time'>Time</FormHelperText>
                   <FilledInput
-                    id="session_time"
-                    sx={{ width: "100%" }}
-                    type="time"
+                    id='session_time'
+                    sx={{ width: '100%' }}
+                    type='time'
                     value={sessionTime}
                     onChange={handleSessionTimeChange}
                   />
                 </FormControl>
 
                 <TextField
-                  id="venue"
-                  label="Venue"
-                  variant="filled"
-                  sx={{ width: "100%", marginBottom: 2 }}
+                  id='venue'
+                  label='Venue'
+                  variant='filled'
+                  sx={{ width: '100%', marginBottom: 2 }}
                   value={venue}
                   onChange={handleVenueChange}
                 />
@@ -1120,24 +945,22 @@ function SessionTable() {
             </Box>
 
             <Autocomplete
-              sx={{ width: "90%", marginBottom: 2 }}
+              sx={{ width: '90%', marginBottom: 2 }}
               multiple
-              id="artists"
+              id='artists'
               options={sessionArtist}
               getOptionLabel={(option) => option.name}
               filterSelectedOptions
               value={artists}
               onChange={handleArtistsChange}
-              renderInput={(params) => (
-                <TextField {...params} label="Artists" variant="filled" />
-              )}
+              renderInput={(params) => <TextField {...params} label='Artists' variant='filled' />}
             />
 
             <TextField
-              id="description"
-              label="Description"
-              variant="filled"
-              sx={{ width: "100%", marginBottom: 2 }}
+              id='description'
+              label='Description'
+              variant='filled'
+              sx={{ width: '100%', marginBottom: 2 }}
               multiline
               rows={4}
               value={description}
@@ -1145,27 +968,17 @@ function SessionTable() {
             />
 
             {errorMessage && (
-              <div
-                style={{
-                  color: "red",
-                  marginBottom: "2em",
-                  fontSize: "14px",
-                  textDecoration: "italic",
-                }}
-              >
+              <div style={{ color: 'red', marginBottom: '2em', fontSize: '14px', textDecoration: 'italic' }}>
                 {errorMessage}
               </div>
             )}
 
-            <Stack direction="row" spacing={2}>
-              <Button variant="outlined" onClick={handleClose}>
+            <Stack direction='row' spacing={2}>
+              <Button variant='outlined' onClick={handleClose}>
                 Close
               </Button>
-              <Button
-                variant="contained"
-                onClick={selectedRowData ? updateRowData : addNewSession}
-              >
-                {selectedRowData ? "Update" : "Add"}
+              <Button variant='contained' onClick={selectedRowData ? updateRowData : addNewSession}>
+                {selectedRowData ? 'Update' : 'Add'}
               </Button>
             </Stack>
           </Box>
@@ -3043,9 +2856,14 @@ interface CountryType {
   suggested?: boolean;
 }
 
-function EventCreateShow(n: number) {
+function EventCreateShow(n: number, sessionRows, setSessionRows) {
   if (n == 0) {
-    return <EventDetails />;
+    return (
+      <EventDetails 
+        sessionRows={sessionRows} 
+        setSessionRows={setSessionRows} 
+      />
+    );
   } else if (n == 1) {
     return <TicketDetails />;
   } else if (n == 2) {
