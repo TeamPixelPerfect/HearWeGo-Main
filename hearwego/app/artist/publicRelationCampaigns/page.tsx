@@ -256,9 +256,12 @@ export default function Context() {
                         value="11"
                         sx={{
                           minHeight: "100%",
+                          backgroundColor: theme.palette.background.default,
                         }}
                       >
-                        hi
+                        <Button>
+                          <Typography>+</Typography>
+                        </Button>
                       </TabPanel>
                       <TabPanel value="12">hellow</TabPanel>
                     </TabContext>
