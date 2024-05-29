@@ -8,7 +8,7 @@ import {
   ArtistDetail,
   PostTextField,
   PostContextBox,
-  
+  BorderLinearProgress,
 } from "../../styles/pressRelease.style";
 import SinglePRCampaign from "../../components/SinglePRCampaign";
 import Button from "@mui/material/Button";
@@ -37,6 +37,7 @@ import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
 import DropFile from "../../components/DropFile";
 import { useTheme } from "@mui/material";
+import { SingleTask } from "../../components/SinglePRCampaign";
 
 const options = [
   "None",
@@ -45,7 +46,6 @@ const options = [
   "New Music Video Release",
 ];
 
-
 export default function Context() {
   const [songFile, setSongFile] = React.useState(null);
 
@@ -53,16 +53,27 @@ export default function Context() {
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+  const [value11, setValue11] = React.useState("11");
+  const handle11Change = (event: React.SyntheticEvent, newValue: string) => {
+    setValue11(newValue);
+  };
+
   const [openCreateCampaign, setOpenCreateCampaign] = React.useState(false);
-  const handleCreateCampaignOpen = () => setOpenCreateCampaign(true);
+  const handleCreateCampaignOpen = () => {
+    setOpenCreateCampaign(true);
+    setOpenCreateNewCampaign(false);
+  };
   const handleCreateCampaignClose = () => setOpenCreateCampaign(false);
 
-  
-  const [openCreateNewCampaign, setOpenCreateNewCampaign] = React.useState(false);
-  const handleCreateNewCampaignOpen = () => setOpenCreateCampaign(true);
-  const handleCreateNewCampaignClose = () => setOpenCreateCampaign(false);
+  const [openCreateNewCampaign, setOpenCreateNewCampaign] =
+    React.useState(false);
+  const handleCreateNewCampaignOpen = () => {
+    setOpenCreateNewCampaign(true);
+    setOpenCreateCampaign(false);
+  };
+  const handleCreateNewCampaignClose = () => setOpenCreateNewCampaign(false);
 
-  
   const [openPostScheduling, setOpenPostScheduling] = React.useState(false);
   const handlePostSchedulingOpen = () => setOpenPostScheduling(true);
   const handlePostSchedulingClose = () => setOpenPostScheduling(false);
@@ -88,7 +99,6 @@ export default function Context() {
     setAnchorEl(null);
   };
   return (
-    
     <>
       <TabsNav sx={{ width: "100%", typography: "body1" }}>
         <TabContext value={value}>
@@ -158,14 +168,102 @@ export default function Context() {
                         >
                           <Typography component="h2">Cancel</Typography>
                         </Button>
-                        <Button variant="contained" >
-                          <Typography component="h2" onClick={handleCreateNewCampaignOpen}>Create</Typography>
+                        <Button variant="contained">
+                          <Typography
+                            component="h2"
+                            onClick={handleCreateNewCampaignOpen}
+                          >
+                            Create
+                          </Typography>
                         </Button>
-                        
                       </Stack>
                     </Box>
                   </Box>
                 </CreateCampaignPopup>
+              </Modal>
+              <Modal
+                open={openCreateNewCampaign}
+                onClose={handleCreateNewCampaignClose}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Box
+                  sx={{
+                    backgroundColor: theme.palette.background.default,
+                    width: "27%",
+                    height: "70%",
+                    borderRadius: "15px",
+                  }}
+                >
+                  <Typography variant="h6" sx={{ textAlign: "center" }}>
+                    Classic Song Mixtape Album Cover
+                  </Typography>
+                  <Box sx={{ flexGrow: 1, padding: "15px" }}>
+                    <BorderLinearProgress variant="determinate" value={60} />
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      color: "black",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        paddingLeft: "10px",
+                        color: theme.palette.text.primary,
+                      }}
+                    >
+                      Progress
+                    </Typography>
+                    <Typography
+                      sx={{
+                        paddingRight: "10px",
+                        color: theme.palette.text.primary,
+                      }}
+                    >
+                      60% Completed
+                    </Typography>
+                  </Box>
+                  <TabsNav sx={{ width: "100%", typography: "body1" }}>
+                    <TabContext value={value11}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          position: "relative",
+                          alignItems: "baseline",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <TabList
+                          onChange={handle11Change}
+                          aria-label="lab API tabs example"
+                          sx={{
+                            justifyContent: "space-between",
+                            width: "100%",
+                          }}
+                        >
+                          <TabItem label="Tasks" value="11" />
+                          <TabItem label="Posts" value="12" />
+                        </TabList>
+                      </Box>
+
+                      <TabPanel
+                        value="11"
+                        sx={{
+                          minHeight: "100%",
+                        }}
+                      >
+                        hi
+                      </TabPanel>
+                      <TabPanel value="12">hellow</TabPanel>
+                    </TabContext>
+                  </TabsNav>
+                </Box>
               </Modal>
               <Button
                 onClick={handlePostSchedulingOpen}
@@ -208,7 +306,7 @@ export default function Context() {
                     <Typography
                       sx={{
                         paddingLeft: "10px",
-                        color: theme.palette.text.primary,  
+                        color: theme.palette.text.primary,
                       }}
                     >
                       Damidu Thathsara<br></br>
@@ -409,7 +507,7 @@ export default function Context() {
               <SinglePRCampaign />
             </Box>
           </TabPanel>
-          <TabPanel value="2"></TabPanel>
+          <TabPanel value="2">Item Two</TabPanel>
           <TabPanel value="3">Item Three</TabPanel>
           <TabPanel value="4">Item Four</TabPanel>
         </TabContext>
