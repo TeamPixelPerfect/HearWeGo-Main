@@ -38,6 +38,7 @@ import { renderTimeViewClock } from "@mui/x-date-pickers";
 import DropFile from "../../components/DropFile";
 import { useTheme } from "@mui/material";
 import { SingleTask } from "../../components/SinglePRCampaign";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 const options = [
   "None",
@@ -72,7 +73,25 @@ export default function Context() {
     setOpenCreateNewCampaign(true);
     setOpenCreateCampaign(false);
   };
-  const handleCreateNewCampaignClose = () => setOpenCreateNewCampaign(false);
+  const handleCreateNewCampaignClose = () => {
+    if (window.confirm("Are you sure you want to close this?")) {
+      setTasks([]);
+      setOpenCreateNewCampaign(false);
+    }
+  };
+
+  const [tasks, setTasks] = React.useState<object[]>([]);
+
+  const AddNewTaskToCampaign = () => {
+    setTasks([...tasks, { text: "New Task" }]);
+  };
+
+  const handleTextChange = (index: number, newText: any) => {
+    const updatedTasks = tasks.map((task, i) =>
+      i === index ? { text: newText } : task
+    );
+    setTasks(updatedTasks);
+  };
 
   const [openPostScheduling, setOpenPostScheduling] = React.useState(false);
   const handlePostSchedulingOpen = () => setOpenPostScheduling(true);
@@ -194,8 +213,10 @@ export default function Context() {
                   sx={{
                     backgroundColor: theme.palette.background.default,
                     width: "27%",
-                    height: "70%",
+                    maxHeight: "70%",
+                    minHeight: "70%",
                     borderRadius: "15px",
+                    overflow: "auto",
                   }}
                 >
                   <Typography variant="h6" sx={{ textAlign: "center" }}>
@@ -259,9 +280,26 @@ export default function Context() {
                           backgroundColor: theme.palette.background.default,
                         }}
                       >
-                        <Button>
-                          <Typography>+</Typography>
+                        <Button onClick={AddNewTaskToCampaign}>
+                          <AddCircleOutlineIcon />
                         </Button>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "100%",
+                          }}
+                        >
+                          {tasks.map((task, index) => (
+                            <SingleTask
+                              key={index}
+                              text={task.text}
+                              onTextChange={(newText: any) =>
+                                handleTextChange(index, newText)
+                              }
+                            />
+                          ))}
+                        </Box>
                       </TabPanel>
                       <TabPanel value="12">hellow</TabPanel>
                     </TabContext>

@@ -25,7 +25,8 @@ import Icon from "@mui/material/Icon";
 import Checkbox from "@mui/material/Checkbox";
 import Stack from "@mui/material/Stack";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { useTheme } from "@mui/material";
+import { TextField, useTheme } from "@mui/material";
+import { text } from "stream/consumers";
 
 export default function SinglePRCampaign() {
   const [value, setValue] = React.useState("1");
@@ -39,6 +40,18 @@ export default function SinglePRCampaign() {
   const [openSeeMore, setopenSeeMore] = React.useState(false);
   const handleSeeMoreOpen = () => setopenSeeMore(true);
   const handleSeeMoreClose = () => setopenSeeMore(false);
+
+  const [tasks, setTasks] = React.useState<{ text: string }[]>([]); // Provide the correct type for tasks
+  const AddNewTaskToCampaign = () => {
+    setTasks([...tasks, { text: "New Task" }]);
+  };
+  const handleTextChange = (index: number, newText: string) => {
+    const updatedTasks = tasks.map((task, i) =>
+      i === index ? { text: newText } : task
+    );
+    setTasks(updatedTasks);
+  };
+
   return (
     <Box>
       <SingleCampaign>
@@ -65,7 +78,12 @@ export default function SinglePRCampaign() {
               <Typography variant="h6" sx={{ textAlign: "center" }}>
                 Classic Song Mixtape Album Cover
               </Typography>
-              <Box sx={{ flexGrow: 1, padding: "15px" }}>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  padding: "15px",
+                }}
+              >
                 <BorderLinearProgress variant="determinate" value={60} />
               </Box>
               <Box
@@ -116,19 +134,30 @@ export default function SinglePRCampaign() {
                   <TabPanel
                     value="1"
                     sx={{
-                      backgroundColor: "primary.main",
                       minHeight: "100%",
                     }}
                   >
-                    <div>
-                      <SingleTask />
-                      <SingleTask />
-                      <SingleTask />
-                      <SingleTask />
-                      <SingleTask />
-                      <SingleTask />
-                      <SingleTask />
-                    </div>
+                    <Button onClick={AddNewTaskToCampaign}>
+                      <Typography>Add Task</Typography>
+                    </Button>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "100%",
+                      }}
+                    >
+                      {tasks.map((task, index) => (
+                        <SingleTask
+                          key={index}
+                          text={task.text}
+                          onTextChange={(newText: any) =>
+                            handleTextChange(index, newText)
+                          }
+                        />
+                      ))}
+                    </Box>
+
                     <Stack
                       direction="row"
                       spacing={1}
@@ -234,13 +263,36 @@ function LinearProgressWithLabel(
   );
 }
 //a single task component for a Campaign
-export function SingleTask() {
+export const SingleTask = ({
+  text,
+  onTextChange,
+}: {
+  text: string;
+  onTextChange: (text: string) => void;
+}) => {
   const [isChecked, setIsChecked] = React.useState(false);
 
   const theme = useTheme();
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
+  };
+
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [taskText, setTaskText] = React.useState(text);
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = () => {
+    setIsEditing(false);
+    onTextChange(taskText); // Notify parent component of text change
+  };
+
+  const handleInputChange = (e: {
+    target: { value: React.SetStateAction<Promise<string>> };
+  }) => {
+    setTaskText(e.target.value);
   };
   return (
     <Box
@@ -264,11 +316,28 @@ export function SingleTask() {
         <Icon sx={{ color: theme.palette.text.primary, marginRight: "15px" }}>
           <ListAltIcon />
         </Icon>
-        <Typography sx={{ color: theme.palette.text.primary }}>
-          Organize a Meeting
-        </Typography>
+        <div>
+          {isEditing ? (
+            <div>
+              <TextField
+                id="filled-basic"
+                variant="filled"
+                type="text"
+                value={taskText as unknown as string}
+                onChange={handleInputChange}
+                sx={{ alignItems: "center", justifyContent: "center" }}
+              />
+              <Button onClick={handleSaveClick}>Save</Button>
+            </div>
+          ) : (
+            <div>
+              <h2>{taskText}</h2>
+              <button onClick={handleEditClick}>Edit</button>
+            </div>
+          )}
+        </div>
       </Box>
       <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
     </Box>
   );
-}
+};
