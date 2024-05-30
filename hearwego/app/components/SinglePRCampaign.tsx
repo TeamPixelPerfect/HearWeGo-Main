@@ -26,8 +26,9 @@ import Checkbox from "@mui/material/Checkbox";
 import Stack from "@mui/material/Stack";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { TextField, useTheme } from "@mui/material";
-import { text } from "stream/consumers";
-
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import SaveIcon from "@mui/icons-material/Save";
+import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
 export default function SinglePRCampaign() {
   const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
@@ -73,7 +74,15 @@ export default function SinglePRCampaign() {
           >
             See More
           </Button>
-          <Modal open={openSeeMore} onClose={handleSeeMoreClose}>
+          <Modal
+            open={openSeeMore}
+            onClose={handleSeeMoreClose}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <PostSchedulePopup sx={{ backgroundColor: "background.default" }}>
               <Typography variant="h6" sx={{ textAlign: "center" }}>
                 Classic Song Mixtape Album Cover
@@ -138,7 +147,7 @@ export default function SinglePRCampaign() {
                     }}
                   >
                     <Button onClick={AddNewTaskToCampaign}>
-                      <Typography>Add Task</Typography>
+                      <AddCircleOutlineIcon />
                     </Button>
                     <Box
                       sx={{
@@ -168,16 +177,9 @@ export default function SinglePRCampaign() {
                         variant="contained"
                         sx={{
                           width: "25%",
-                          backgroundColor: "background.default",
-                          color: "primary.main",
+                          backgroundColor: "background.main",
+                          color: "primary.default",
                         }}
-                      >
-                        Cancle
-                      </Button>
-                      <Button
-                        onClick={handleSeeMoreClose}
-                        variant="contained"
-                        sx={{ width: "25%" }}
                       >
                         Done
                       </Button>
@@ -193,7 +195,6 @@ export default function SinglePRCampaign() {
                             width: "100%",
                             display: "flex",
                             justifyContent: "space-between",
-                            padding: "10px",
                           }}
                         >
                           <Stack direction="row" spacing="2">
@@ -310,32 +311,76 @@ export const SingleTask = ({
       <Box
         sx={{
           display: "flex",
-          textDecoration: isChecked ? "line-through" : "none",
+          alignItems: "center",
+          width: "100%",
         }}
       >
         <Icon sx={{ color: theme.palette.text.primary, marginRight: "15px" }}>
           <ListAltIcon />
         </Icon>
-        <div>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           {isEditing ? (
-            <div>
-              <TextField
-                id="filled-basic"
-                variant="filled"
-                type="text"
-                value={taskText as unknown as string}
-                onChange={handleInputChange}
-                sx={{ alignItems: "center", justifyContent: "center" }}
-              />
-              <Button onClick={handleSaveClick}>Save</Button>
-            </div>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  textDecoration: isChecked ? "line-through" : "none",
+                }}
+              >
+                <TextField
+                  fullWidth
+                  id="filled-basic"
+                  variant="standard"
+                  type="text"
+                  value={taskText as unknown as string}
+                  onChange={handleInputChange}
+                  sx={{ alignItems: "center", justifyContent: "center" }}
+                />
+              </Box>
+              <Button onClick={handleSaveClick}>
+                <SaveIcon />
+              </Button>
+            </Box>
           ) : (
-            <div>
-              <h2>{taskText}</h2>
-              <button onClick={handleEditClick}>Edit</button>
-            </div>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  textDecoration: isChecked ? "line-through" : "none",
+                }}
+              >
+                <h4>{taskText}</h4>
+              </Box>
+              <Button onClick={handleEditClick}>
+                <ModeEditOutlineIcon />
+              </Button>
+            </Box>
           )}
-        </div>
+        </Box>
       </Box>
       <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
     </Box>

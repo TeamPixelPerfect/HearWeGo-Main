@@ -217,6 +217,7 @@ export default function Context() {
                     minHeight: "70%",
                     borderRadius: "15px",
                     overflow: "auto",
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
                   }}
                 >
                   <Typography variant="h6" sx={{ textAlign: "center" }}>
@@ -300,6 +301,27 @@ export default function Context() {
                             />
                           ))}
                         </Box>
+                        <Box
+                          sx={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "right",
+                            alignItems: "right",
+                            padding: "10px",
+                          }}
+                        >
+                          <Button
+                            onClick={handleCreateNewCampaignClose}
+                            variant="contained"
+                            sx={{
+                              width: "25%",
+                              backgroundColor: "background.main",
+                              color: "primary.default",
+                            }}
+                          >
+                            Done
+                          </Button>
+                        </Box>
                       </TabPanel>
                       <TabPanel value="12">hellow</TabPanel>
                     </TabContext>
@@ -310,13 +332,17 @@ export default function Context() {
                 onClick={handlePostSchedulingOpen}
                 variant="contained"
                 startIcon={<ScheduleIcon />}
-                // sx={{ width: "60%" }}
               >
                 Post Scheduling
               </Button>
               <Modal
                 open={openPostScheduling}
                 onClose={handlePostSchedulingClose}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <PostSchedulePopup>
                   <Typography
