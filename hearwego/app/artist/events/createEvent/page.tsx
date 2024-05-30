@@ -62,6 +62,8 @@ import { addEvent } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
 import { getAllArtists } from "@/app/services/ArtistServices";
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { InputRow } from "../../../styles/artistDashboardCretaeEvent.styles";
 
@@ -467,21 +469,14 @@ function EventDetails({
   eventData,
   setEventData
 }) {
-  const artist = useAppSelector((state) => state.artist.user);
-
-  const [numberOfSessions, setNumberOfSessions] = useState(0);
-  const [country, setCountry] = React.useState("");
-  const [timeValue, setTimeValue] = React.useState<Dayjs | null>(
-    dayjs("2022-04-17T15:30")
-  );
   const [isAgeEnabled, setIsAgeEnabled] = useState(false);
   const [imgFile, setImgFile] = React.useState(null);
-  const [loading, setLoading] = useState(false);
-  const [value, setValue] = React.useState(0);
 
-  const handleCountryChange = (event: SelectChangeEvent) => {
-    setCountry(event.target.value);
-  };
+  useEffect(() => {
+    if(imgFile) {
+      setEventData({ ...eventData, event_img: imgFile });
+    }
+  }, [imgFile]);
 
   const handleCheckboxChange = (event) => {
     setIsAgeEnabled(event.target.checked);
@@ -523,6 +518,7 @@ function EventDetails({
               aspectX={1}
               aspectY={1}
               shape="rect"
+              
             />
           </Box>
           <Box sx={{ width: "50%" }}>
