@@ -21,9 +21,25 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Link from "next/link";
+import TabPanel from "@mui/lab/TabPanel";
+import PressReleaseSavedRow from "@/app/components/PressReleaseSavedRow";
 
 import { TabsNav, TabItem } from "../../styles/PressReleaseOriginal.styles";
 
+const PressReleaseDetails = [
+  {
+    id: "1",
+    img: "https://i.discogs.com/RTFGo4KUqbx8PhupphvPjzv5hdijnj5ks_gaEzyEexY/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQzMTc3/Ni0xNjY5OTcyOTcx/LTI3NjIuanBlZw.jpeg",	
+    title: "Press Release 1",
+    date: "2021-09-01",
+    venue: "Venue 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleShare: () => {},
+     
+  },
+]
 export default function PressRelease() {
   const [headline, setHeadline] = useState("");
   const [subHeadline, setSubHeadline] = useState("");
@@ -31,8 +47,8 @@ export default function PressRelease() {
   const [date, setDate] = useState(null);
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState(null);
-  const [songFile, setSongFile] = useState(null);
-  const [value, setValue] = useState("1");
+  // const [songFile, setSongFile] = useState(null);
+  // const [value, setValue] = useState("1");
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
@@ -40,10 +56,13 @@ export default function PressRelease() {
   const [openSuccessfullySharedDialog, setOpenSuccessfullySharedDialog] =
     useState(false);
 
+  const [logoFile, setLogoFile] = React.useState(null);
+  const [signatureFile, setSignatureFile] = React.useState(null);
+
+  const [value, setValue] = React.useState("1");
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-
   const handleCancelOpen = () => {
     setOpenCancelDialog(true);
   };
@@ -143,363 +162,398 @@ export default function PressRelease() {
                       <TabItem label="Already Shared" value="4" />
                     </TabList>
                   </Box>
-                </TabContext>
-              </TabsNav>
-
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  // backgroundColor:"red"
-                }}
-              >
-                <Box>
-                  <Box
-                    sx={{
-                      padding: "30px",
-                      // backgroundColor: "white",
-                    }}
-                  >
-                    {" "}
-                    {/* Component for uploading album image */}
-                    <DropFile
-                      fileTypes="Logo Image"
-                      fileExtensions="JPEG,PNG,WEBP,SVG"
-                      isCircular={false}
-                      width="350px"
-                      height="300px"
-                      file={songFile}
-                      setFile={setSongFile}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                    />
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    width: "60%",
-                    marginLeft: "50px",
-                    padding: "30px",
-                    //  backgroundColor:"blue"
-                  }}
-                >
-                  {/* Headline and Subheadline */}
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": {
-                        m: 1,
-                        width: "60ch",
-                        marginTop: "20px",
-                        maxWidth: "90%",
-                        //backgroundColor: "red",
-                      },
-                    }}
-                  >
-                    <TextField
-                      id="Press_Headline"
-                      label="Headline"
-                      variant="filled"
-                      value={headline}
-                      onChange={(e) => setHeadline(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": {
-                        m: 1,
-                        width: "60ch",
-                        maxWidth: "90%",
-                        marginTop: "20px",
-                      },
-                    }}
-                  >
-                    <TextField
-                      id="Press_SubHeadline"
-                      label="Sub Headline"
-                      variant="filled"
-                      value={subHeadline}
-                      onChange={(e) => setSubHeadline(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  {/* Date Picker */}
-
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": {
-                        m: 1,
-                        width: "60ch",
-                        maxWidth: "90%",
-                        marginTop: "20px",
-                      },
-                    }}
-                  >
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DemoContainer components={[" DatePicker"]}>
-                        <DatePicker
-                          label="Date"
-                          value={date}
-                          onChange={(value) => setDate(value)}
-                          required
-                        />
-                      </DemoContainer>
-                    </LocalizationProvider>
-                  </Box>
-
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": {
-                        m: 1,
-                        width: "60ch",
-                        maxWidth: "90%",
-                        //backgroundColor: "red",
-                        marginTop: "20px",
-                      },
-                    }}
-                  >
-                    <TextField
-                      id="PressRelease_Venue"
-                      label="Venue"
-                      variant="filled"
-                      value={venue}
-                      onChange={(e) => setVenue(e.target.value)}
-                      required
-                    />
-                  </Box>
-
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": {
-                        m: 1,
-                        width: "60ch",
-                        maxWidth: "90%",
-                        marginTop: "20px",
-                      },
-                    }}
-                  >
-                    <TextField
-                      id="description"
-                      label="Description"
-                      multiline
-                      rows={4}
-                      variant="filled"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      required
-                    />
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      //backgroundColor:"yellow"
+                  <TabPanel
+                    value="1"
+                    style={{
+                      width: "100%",
+                      padding: "1em 0",
                     }}
                   >
                     <Box
-                      component="form"
                       sx={{
-                        "& > :not(style)": {
-                          m: 1,
-                          width: "40ch",
-                          maxWidth: "90%",
-                          marginTop: "20px",
-                        },
+                        width: "100%",
+                        display: "flex",
+                        // backgroundColor:"red"
                       }}
                     >
-                      <Box
-                        sx={
-                          {
-                            // padding: "30px",
-                            //backgroundColor: "blue",
-                          }
-                        }
-                      >
-                        {" "}
-                        {/* Component for uploading album image */}
-                        <DropFile
-                          fileTypes="Signature"
-                          fileExtensions="JPEG,PNG,WEBP,SVG"
-                          isCircular={false}
-                          width="320px"
-                          height="160px"
-                          file={songFile}
-                          setFile={setSongFile}
-                          aspectX={1}
-                          aspectY={1}
-                          shape="rect"
-                        />
+                      <Box>
+                        <Box
+                          sx={{
+                            padding: "30px",
+                            // backgroundColor: "white",
+                          }}
+                        >
+                          {" "}
+                          {/* Component for uploading album image */}
+                          <DropFile
+                            fileTypes="Logo Image"
+                            fileExtensions="JPEG,PNG,WEBP,SVG"
+                            isCircular={false}
+                            width="350px"
+                            height="300px"
+                            file={logoFile}
+                            setFile={setLogoFile}
+                            aspectX={1}
+                            aspectY={1}
+                            shape="rect"
+                          />
+                        </Box>
                       </Box>
-                    </Box>
-                    <Box
-                      component="form"
-                      sx={{
-                        "& > :not(style)": {
-                          m: 1,
-                          width: "60ch",
-                          maxWidth: "90%",
-                          marginTop: "100px",
-                          //backgroundColor: "red",
-                        },
-                      }}
-                    >
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={[" DatePicker"]}>
-                          <DatePicker
-                            label="Release Date"
-                            value={releaseDate}
-                            onChange={(value) => setReleaseDate(value)}
+                      <Box
+                        sx={{
+                          width: "60%",
+                          marginLeft: "50px",
+                          padding: "30px",
+                          //  backgroundColor:"blue"
+                        }}
+                      >
+                        {/* Headline and Subheadline */}
+                        <Box
+                          component="form"
+                          sx={{
+                            "& > :not(style)": {
+                              m: 1,
+                              width: "60ch",
+                              marginTop: "20px",
+                              maxWidth: "90%",
+                              //backgroundColor: "red",
+                            },
+                          }}
+                        >
+                          <TextField
+                            id="Press_Headline"
+                            label="Headline"
+                            variant="filled"
+                            value={headline}
+                            onChange={(e) => setHeadline(e.target.value)}
                             required
                           />
-                        </DemoContainer>
-                      </LocalizationProvider>
+                        </Box>
+                        <Box
+                          component="form"
+                          sx={{
+                            "& > :not(style)": {
+                              m: 1,
+                              width: "60ch",
+                              maxWidth: "90%",
+                              marginTop: "20px",
+                            },
+                          }}
+                        >
+                          <TextField
+                            id="Press_SubHeadline"
+                            label="Sub Headline"
+                            variant="filled"
+                            value={subHeadline}
+                            onChange={(e) => setSubHeadline(e.target.value)}
+                            required
+                          />
+                        </Box>
+                        {/* Date Picker */}
+
+                        <Box
+                          component="form"
+                          sx={{
+                            "& > :not(style)": {
+                              m: 1,
+                              width: "60ch",
+                              maxWidth: "90%",
+                              marginTop: "20px",
+                            },
+                          }}
+                        >
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={[" DatePicker"]}>
+                              <DatePicker
+                                label="Date"
+                                value={date}
+                                onChange={(value) => setDate(value)}
+                                required
+                              />
+                            </DemoContainer>
+                          </LocalizationProvider>
+                        </Box>
+
+                        <Box
+                          component="form"
+                          sx={{
+                            "& > :not(style)": {
+                              m: 1,
+                              width: "60ch",
+                              maxWidth: "90%",
+                              //backgroundColor: "red",
+                              marginTop: "20px",
+                            },
+                          }}
+                        >
+                          <TextField
+                            id="PressRelease_Venue"
+                            label="Venue"
+                            variant="filled"
+                            value={venue}
+                            onChange={(e) => setVenue(e.target.value)}
+                            required
+                          />
+                        </Box>
+
+                        <Box
+                          component="form"
+                          sx={{
+                            "& > :not(style)": {
+                              m: 1,
+                              width: "60ch",
+                              maxWidth: "90%",
+                              marginTop: "20px",
+                            },
+                          }}
+                        >
+                          <TextField
+                            id="description"
+                            label="Description"
+                            multiline
+                            rows={4}
+                            variant="filled"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+                          />
+                        </Box>
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            //backgroundColor:"yellow"
+                          }}
+                        >
+                          <Box
+                            component="form"
+                            sx={{
+                              "& > :not(style)": {
+                                m: 1,
+                                width: "40ch",
+                                maxWidth: "90%",
+                                marginTop: "20px",
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={
+                                {
+                                  // padding: "30px",
+                                  //backgroundColor: "blue",
+                                }
+                              }
+                            >
+                              {" "}
+                              {/* Component for uploading album image */}
+                              <DropFile
+                                fileTypes="Signature"
+                                fileExtensions="JPEG,PNG,WEBP,SVG"
+                                isCircular={false}
+                                width="320px"
+                                height="160px"
+                                file={signatureFile}
+                                setFile={setSignatureFile}
+                                aspectX={1}
+                                aspectY={1}
+                                shape="rect"
+                              />
+                            </Box>
+                          </Box>
+                          <Box
+                            component="form"
+                            sx={{
+                              "& > :not(style)": {
+                                m: 1,
+                                width: "60ch",
+                                maxWidth: "90%",
+                                marginTop: "100px",
+                                //backgroundColor: "red",
+                              },
+                            }}
+                          >
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DemoContainer components={[" DatePicker"]}>
+                                <DatePicker
+                                  label="Release Date"
+                                  value={releaseDate}
+                                  onChange={(value) => setReleaseDate(value)}
+                                  required
+                                />
+                              </DemoContainer>
+                            </LocalizationProvider>
+                          </Box>
+                        </Box>
+                      </Box>
                     </Box>
-                  </Box>
-                </Box>
-              </Box>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <Stack direction="row" spacing={2}>
-                  <Button variant="outlined" onClick={handleCancelOpen}>
-                    Cancel
-                  </Button>
-                  <LoadingButton
-                    startIcon={<SaveIcon />}
-                    variant="contained"
-                    onClick={handleSaveOpen}
-                  >
-                    Save
-                  </LoadingButton>
-                </Stack>
-              </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <Stack direction="row" spacing={2}>
+                        <Button variant="outlined" onClick={handleCancelOpen}>
+                          Cancel
+                        </Button>
+                        <LoadingButton
+                          startIcon={<SaveIcon />}
+                          variant="contained"
+                          onClick={handleSaveOpen}
+                        >
+                          Save
+                        </LoadingButton>
+                      </Stack>
+                    </div>
 
-              <Dialog
-                open={openCancelDialog}
-                onClose={handleCancelClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">
-                  {"Save as Draft?"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    Do you want to save this press release as a draft?
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleCancelClose}>No</Button>
-                  <Button onClick={handleSaveAsDraft} autoFocus>
-                    Yes
-                  </Button>
-                </DialogActions>
-              </Dialog>
+                    <Dialog
+                      open={openCancelDialog}
+                      onClose={handleCancelClose}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        {"Save as Draft?"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          Do you want to save this press release as a draft?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleCancelClose}>No</Button>
+                        <Button onClick={handleSaveAsDraft} autoFocus>
+                          Yes
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
 
-              <Dialog
-                open={openSaveDialog}
-                onClose={handleSaveClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">
-                  {"Share Press Release?"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    Do you want to share this press release now?
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleSaveItem}>No</Button>
-                  <Button onClick={handleShareOpen} autoFocus>
-                    Yes
-                  </Button>
-                </DialogActions>
-              </Dialog>
+                    <Dialog
+                      open={openSaveDialog}
+                      onClose={handleSaveClose}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        {"Share Press Release?"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          Do you want to share this press release now?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleSaveItem}>No</Button>
+                        <Button onClick={handleShareOpen} autoFocus>
+                          Yes
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
 
-              <Dialog
-                open={openShareDialog}
-                onClose={handleShareClose}
-                aria-labelledby="share-dialog-title"
-                aria-describedby="share-dialog-description"
-              >
-                <DialogTitle id="share-dialog-title">
-                  {"Share Options"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="share-dialog-description">
-                    Choose your sharing options here.
-                  </DialogContentText>
-                  {/* Add your share options here */}
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleShareClose}>Cancel</Button>
-                  <Button
-                    onClick={() => {
-                      handleShare();
-                      handleShareClose();
+                    <Dialog
+                      open={openShareDialog}
+                      onClose={handleShareClose}
+                      aria-labelledby="share-dialog-title"
+                      aria-describedby="share-dialog-description"
+                    >
+                      <DialogTitle id="share-dialog-title">
+                        {"Share Options"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="share-dialog-description">
+                          Choose your sharing options here.
+                        </DialogContentText>
+                        {/* Add your share options here */}
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleShareClose}>Cancel</Button>
+                        <Button
+                          onClick={() => {
+                            handleShare();
+                            handleShareClose();
+                          }}
+                          autoFocus
+                        >
+                          Share
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+
+                    <Dialog
+                      open={openSavedItemsDialog}
+                      onClose={handleSavedItemsClose}
+                      aria-labelledby="saved-items-dialog-title"
+                      aria-describedby="saved-items-dialog-description"
+                    >
+                      <DialogTitle id="saved-items-dialog-title">
+                        {"Saved"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="saved-items-dialog-description">
+                          The press release is saved in saved items.
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleSavedItemsClose} autoFocus>
+                          OK
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+
+                    <Dialog
+                      open={openSuccessfullySharedDialog}
+                      onClose={handleSuccessfullySharedClose}
+                      aria-labelledby="successfully-shared-dialog-title"
+                      aria-describedby="successfully-shared-dialog-description"
+                    >
+                      <DialogTitle id="successfully-shared-dialog-title">
+                        {"Success"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="successfully-shared-dialog-description">
+                          Successfully Shared.
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={handleSuccessfullySharedClose}
+                          autoFocus
+                        >
+                          OK
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </TabPanel>
+                  <TabPanel
+                    value="2"
+                    style={{
+                      width: "100%",
+                      padding: "0",
                     }}
-                    autoFocus
                   >
-                    Share
-                  </Button>
-                </DialogActions>
-              </Dialog>
-
-              <Dialog
-                open={openSavedItemsDialog}
-                onClose={handleSavedItemsClose}
-                aria-labelledby="saved-items-dialog-title"
-                aria-describedby="saved-items-dialog-description"
-              >
-                <DialogTitle id="saved-items-dialog-title">
-                  {"Saved"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="saved-items-dialog-description">
-                    The press release is saved in saved items.
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleSavedItemsClose} autoFocus>
-                    OK
-                  </Button>
-                </DialogActions>
-              </Dialog>
-
-              <Dialog
-                open={openSuccessfullySharedDialog}
-                onClose={handleSuccessfullySharedClose}
-                aria-labelledby="successfully-shared-dialog-title"
-                aria-describedby="successfully-shared-dialog-description"
-              >
-                <DialogTitle id="successfully-shared-dialog-title">
-                  {"Success"}
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="successfully-shared-dialog-description">
-                    Successfully Shared.
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleSuccessfullySharedClose} autoFocus>
-                    OK
-                  </Button>
-                </DialogActions>
-              </Dialog>
+                  
+                    {PressReleaseDetails.map(({id,img,title,date,venue,releaseDate,handleDelete,handleShare }) => (
+                       <PressReleaseSavedRow
+                        id={id}
+                        img={img}
+                        title={title}
+                        date={date}
+                        venue={venue}
+                        releaseDate={releaseDate}
+                        handleDelete={handleDelete}
+                        handelShare={handleShare}
+                       
+                       ></PressReleaseSavedRow>
+                      )
+                    )}
+                  </TabPanel>
+                  <TabPanel value="3">Item Three</TabPanel>
+                  <TabPanel value="4">Item Four</TabPanel>
+                </TabContext>
+              </TabsNav>
             </div>
           </CardContent>
         </React.Fragment>

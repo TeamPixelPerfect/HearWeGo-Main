@@ -2,6 +2,8 @@ import { styled as muiStyled } from "@mui/material/styles";
 import Tab, { tabClasses } from "@mui/material/Tab";
 import { Box } from "@mui/material";
 import Tabs, { tabsClasses } from "@mui/material/Tabs";
+import Stack from '@mui/material/Stack';
+import { styled } from "@mui/material";
 
 export const TabItem = muiStyled(Tab)(({ theme }) => ({
     minHeight: 53,
@@ -35,4 +37,8 @@ export const TabItem = muiStyled(Tab)(({ theme }) => ({
     position: "relative",
     display: "inline-block",
   }));
+
+export const PressReleaseSaved = styled(Stack)(({ theme }) => ({
+    marginBottom: '1em'  
+}));
   
