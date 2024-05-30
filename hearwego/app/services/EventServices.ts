@@ -1,13 +1,20 @@
 import { base_url } from "../constants/keys";
 
-export const getEvents = async (token: String, page?: number, limit?: number) => {
-  const res = await fetch(`${base_url}/EventsManager/events?page=${page}&limit=${limit}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+export const getEvents = async (
+  token: String,
+  page?: number,
+  limit?: number
+) => {
+  const res = await fetch(
+    `${base_url}/EventsManager/events?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   if (res.ok) {
     const events = await res.json();
@@ -19,6 +26,7 @@ export const getEvents = async (token: String, page?: number, limit?: number) =>
 };
 
 export const addEvent = async (token: string, data: any) => {
+  console.log("Sending event data:", data); // Add this line for logging
   const res = await fetch(`${base_url}/EventsManager/events`, {
     method: "POST",
     headers: {
@@ -32,6 +40,7 @@ export const addEvent = async (token: string, data: any) => {
     return event;
   } else {
     const error = await res.json();
+    console.error("Error response:", error); // Add this line to log the error response
     throw new Error(error.message);
   }
 };
