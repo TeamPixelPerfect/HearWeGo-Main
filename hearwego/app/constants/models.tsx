@@ -154,18 +154,13 @@ export interface Event {
   no_of_sessions?: number;
   sessions?: [
     {
-      session_id: string;
+      session_id: number;
       session_name: string;
       session_date: string;
       session_time: string;
       duration: string;
       venue: string;
-      artists: [
-        {
-          artist_id: string;
-          artist_name: string;
-        }
-      ];
+      artists: string[];
       session_special_notice: string;
     }
   ];

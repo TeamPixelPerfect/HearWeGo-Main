@@ -170,12 +170,50 @@ const steps = [
 ];
 
 function CreateEvent() {
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
   }>({});
-
   const [sessionRows, setSessionRows] = useState([]);
+  const [eventData, setEventData] = useState<Event>({
+    event_img: "",
+    event_name: "",
+    event_type: "",
+    age_from: 0,
+    age_to: 0,
+    no_of_sessions: 1,
+    sessions: sessionRows.map(({id, sessionDate, sessionTime, duration, venue, artists, description})=> ({
+      session_id: id,
+      session_name: `session${id}`,
+      session_date: sessionDate,
+      session_time: sessionTime,
+      duration: duration,
+      venue: venue,
+      artists: artists,
+      session_special_notice: description,
+    })),
+    sponsor: [
+      {
+        sponsor_type: "",
+        sponsor_name: "",
+        sponsor_contact: "",
+        sponsor_email: "",
+      },
+    ],
+    teams: [
+      {
+        team_type: "",
+        team_name: "",
+        contact: "",
+        email: "",
+      },
+    ],
+    description: "",
+    event_status: "",
+  });
 
   const totalSteps = () => {
     return steps.length;
@@ -209,11 +247,53 @@ function CreateEvent() {
     setActiveStep(step);
   };
 
-  const handleComplete = () => {
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
+  const handleComplete = async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid) {
+      const newCompleted = completed;
+      newCompleted[activeStep] = true;
+      setCompleted(newCompleted);
+      if (isLastStep()) {
+        
+      }
+      await submitData();
+      handleNext();
+    }
+  };
+
+  const validateCurrentStep = async () => {
+    if (activeStep === 0) {
+      return validateEventDetails();
+    } else if (activeStep === 1) {
+      // Add validation for the second step
+      return true;
+    } else if (activeStep === 2) {
+      // Add validation for the third step
+      return true;
+    } else if (activeStep === 3) {
+      // Add validation for the fourth step
+      return true;
+    }
+    return true;
+  };
+
+  const validateEventDetails = () => {
+    let isValid = true;
+    // Add validation logic here
+    // Update eventData state if necessary
+    // setEventNameError, setEventTypeError, etc. based on validation results
+    return isValid;
+  };
+
+  const submitData = async () => {
+    setLoading(true);
+    try {
+      await addEvent(artist ? artist.token : "", eventData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error submitting event data:", error);
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -295,7 +375,7 @@ function CreateEvent() {
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
               <div>
-                {EventCreateShow(activeStep, sessionRows, setSessionRows)}
+                {EventCreateShow(activeStep, sessionRows, setSessionRows, eventData, setEventData)}
               </div>
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
@@ -334,52 +414,8 @@ function CreateEvent() {
   );
 }
 
-function EventDetails({ sessionRows, setSessionRows }) {
+function EventDetails({ sessionRows, setSessionRows, eventData, setEventData }) {
   const artist = useAppSelector((state) => state.artist.user);
-
-  const [eventData, setEventData] = useState<Event>({
-    event_img: "",
-    event_name: "",
-    event_type: "",
-    age_from: 0,
-    age_to: 0,
-    no_of_sessions: 1,
-    sessions: [
-      {
-        session_id: "",
-        session_name: "",
-        session_date: "",
-        session_time: "",
-        duration: "",
-        venue: "",
-        artists: [
-          {
-            artist_id: "",
-            artist_name: "",
-          },
-        ],
-        session_special_notice: "",
-      },
-    ],
-    sponsor: [
-      {
-        sponsor_type: "",
-        sponsor_name: "",
-        sponsor_contact: "",
-        sponsor_email: "",
-      },
-    ],
-    teams: [
-      {
-        team_type: "",
-        team_name: "",
-        contact: "",
-        email: "",
-      },
-    ],
-    description: "",
-    event_status: "",
-  });
 
   const [numberOfSessions, setNumberOfSessions] = useState(0);
   const [country, setCountry] = React.useState("");
@@ -399,53 +435,12 @@ function EventDetails({ sessionRows, setSessionRows }) {
     setIsAgeEnabled(event.target.checked);
   };
 
-  
-
   const handleSessionChange = (index, field, value) => {
     const newSessions = [...eventData.sessions];
     newSessions[index][field] = value;
     setEventData({ ...eventData, sessions: newSessions });
   };
-
-  const [eventNameError, setEventNameError] = useState(false);
-  const [eventTypeError, setEventTypeError] = useState(false);
-  const [eventDateError, setEventDateError] = useState(false);
-  const [eventTimeError, setEventTimeError] = useState(false);
-  const [eventVenueError, setEventVenueError] = useState(false);
-  const [eventArtistError, setEventArtistError] = useState(false);
-  const [eventDurationError, setEventDurationError] = useState(false);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-
-  const handleEventAddData = () => {
-    setEventNameError(false);
-    setEventTypeError(false);
-    setEventDateError(false);
-    setEventTimeError(false);
-    setEventVenueError(false);
-    setEventArtistError(false);
-    setEventDurationError(false);
-
-    let errors = [false, false, false, false, false, false, false];
-
-    if (eventData.event_name === "") {
-      setEventNameError(true);
-      errors[0] = true;
-    }
-    if (eventData.event_type === "") {
-      setEventTypeError(true);
-      errors[1] = true;
-    }
-
-    setLoading(true);
-
-    addEvent(artist ? artist.token : "", eventData).then((res) => {
-      console.log("Response:::", res);
-      setLoading(false);
-    });
-  };
+  
   return (
     <>
       <Paper
@@ -485,11 +480,7 @@ function EventDetails({ sessionRows, setSessionRows }) {
                 label="Event Name"
                 variant="filled"
                 sx={{ width: "100%" }}
-                onChange={(e) => {
-                  setEventData((data) => {
-                    return { ...data, event_name: e.target.value };
-                  });
-                }}
+                onChange={(e) => setEventData((data) => ({ ...data, event_name: e.target.value }))}
               />
 
               <TextField
@@ -497,11 +488,7 @@ function EventDetails({ sessionRows, setSessionRows }) {
                 label="Event Type"
                 variant="filled"
                 sx={{ width: "100%" }}
-                onChange={(e) => {
-                  setEventData((data) => {
-                    return { ...data, event_type: e.target.value };
-                  });
-                }}
+                onChange={(e) => setEventData((data) => ({ ...data, event_type: e.target.value }))}
               />
 
               <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
@@ -523,11 +510,7 @@ function EventDetails({ sessionRows, setSessionRows }) {
                     sx={{ width: "48%" }}
                     disabled={!isAgeEnabled}
                     value={eventData.age_from}
-                    onChange={(e) => {
-                      setEventData((data) => {
-                        return { ...data, age_from: e.target.value };
-                      });
-                    }}
+                    onChange={(e) => setEventData((data) => ({ ...data, age_from: e.target.value }))}
                   />
 
                   <TextField
@@ -541,11 +524,7 @@ function EventDetails({ sessionRows, setSessionRows }) {
                     sx={{ width: "48%" }}
                     disabled={!isAgeEnabled}
                     value={eventData.age_to}
-                    onChange={(e) => {
-                      setEventData((data) => {
-                        return { ...data, age_to: e.target.value };
-                      });
-                    }}
+                    onChange={(e) => setEventData((data) => ({ ...data, age_to: e.target.value }))}
                   />
                 </Box>
 
@@ -588,14 +567,6 @@ function EventDetails({ sessionRows, setSessionRows }) {
 
       <SponsorField />
       <TeamField />
-
-      <LoadingButton
-        loading={loading}
-        variant="contained"
-        onClick={handleEventAddData}
-      >
-        Submit
-      </LoadingButton>
     </>
   );
 }
@@ -783,6 +754,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
 
       setSessionRows([...sessionRows, newSession]);
       sessionCount+=1;
+      console.log(sessionRows);
       refreshTable();
       handleClose();
     } else {
@@ -2885,12 +2857,14 @@ interface CountryType {
   suggested?: boolean;
 }
 
-function EventCreateShow(n: number, sessionRows, setSessionRows) {
+function EventCreateShow(n: number, sessionRows, setSessionRows, eventData, setEventData) {
   if (n == 0) {
     return (
       <EventDetails 
         sessionRows={sessionRows} 
         setSessionRows={setSessionRows} 
+        eventData={eventData} 
+        setEventData={setEventData} 
       />
     );
   } else if (n == 1) {
