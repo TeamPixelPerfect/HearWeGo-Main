@@ -532,6 +532,7 @@ function EventDetails({
                 label="Event Name"
                 variant="filled"
                 sx={{ width: "100%" }}
+                value={eventData.event_name}
                 onChange={(e) =>
                   setEventData((data) => ({
                     ...data,
@@ -545,6 +546,7 @@ function EventDetails({
                 label="Event Type"
                 variant="filled"
                 sx={{ width: "100%" }}
+                value={eventData.event_type}
                 onChange={(e) =>
                   setEventData((data) => ({
                     ...data,
@@ -571,6 +573,7 @@ function EventDetails({
                     variant="filled"
                     sx={{ width: "48%" }}
                     disabled={!isAgeEnabled}
+                    value={eventData.age_from}
                     onChange={(e) =>
                       setEventData((data) => ({
                         ...data,
@@ -589,6 +592,7 @@ function EventDetails({
                     variant="filled"
                     sx={{ width: "48%" }}
                     disabled={!isAgeEnabled}
+                    value={eventData.age_to}
                     onChange={(e) =>
                       setEventData((data) => ({
                         ...data,
