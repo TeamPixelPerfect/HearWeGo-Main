@@ -302,10 +302,10 @@ export const SingleTask = ({
         padding: "5px",
         display: "flex",
         alignItems: "center",
-        backgroundColor: "background.default",
         justifyContent: "space-between",
         marginBottom: "10px",
         borderRadius: "10px",
+        backgroundColor: isChecked ? "lightgreen" : "background.default",
       }}
     >
       <Box

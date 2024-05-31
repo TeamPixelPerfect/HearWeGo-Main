@@ -77,13 +77,16 @@ export default function Context() {
     if (window.confirm("Are you sure you want to close this?")) {
       setTasks([]);
       setOpenCreateNewCampaign(false);
+      setClickCount(0); // Reset click count when modal is closed
     }
   };
 
   const [tasks, setTasks] = React.useState<object[]>([]);
+  const [clickCount, setClickCount] = React.useState(0); // State to track the number of clicks
 
   const AddNewTaskToCampaign = () => {
     setTasks([...tasks, { text: "New Task" }]);
+    setClickCount(clickCount + 1);
   };
 
   const handleTextChange = (index: number, newText: any) => {
@@ -224,7 +227,10 @@ export default function Context() {
                     Classic Song Mixtape Album Cover
                   </Typography>
                   <Box sx={{ flexGrow: 1, padding: "15px" }}>
-                    <BorderLinearProgress variant="determinate" value={60} />
+                    <BorderLinearProgress
+                      variant="determinate"
+                      value={clickCount}
+                    />
                   </Box>
                   <Box
                     sx={{
@@ -247,7 +253,7 @@ export default function Context() {
                         color: theme.palette.text.primary,
                       }}
                     >
-                      60% Completed
+                      {clickCount}% Completed
                     </Typography>
                   </Box>
                   <TabsNav sx={{ width: "100%", typography: "body1" }}>
