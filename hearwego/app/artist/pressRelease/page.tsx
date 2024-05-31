@@ -24,22 +24,19 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Link from "next/link";
 import TabPanel from "@mui/lab/TabPanel";
 import PressReleaseSavedRow from "@/app/components/PressReleaseSavedRow";
+import Grid from "@mui/material/Grid";
 
 import { TabsNav, TabItem } from "../../styles/PressReleaseOriginal.styles";
 
 const PressReleaseDetails = [
   {
     id: "1",
-    img: "https://i.discogs.com/RTFGo4KUqbx8PhupphvPjzv5hdijnj5ks_gaEzyEexY/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQzMTc3/Ni0xNjY5OTcyOTcx/LTI3NjIuanBlZw.jpeg",	
     title: "Press Release 1",
-    date: "2021-09-01",
-    venue: "Venue 1",
     releaseDate: "2021-09-01",
     handleDelete: () => {},
     handleShare: () => {},
-     
   },
-]
+];
 export default function PressRelease() {
   const [headline, setHeadline] = useState("");
   const [subHeadline, setSubHeadline] = useState("");
@@ -534,21 +531,26 @@ export default function PressRelease() {
                       padding: "0",
                     }}
                   >
-                  
-                    {PressReleaseDetails.map(({id,img,title,date,venue,releaseDate,handleDelete,handleShare }) => (
-                       <PressReleaseSavedRow
-                        id={id}
-                        img={img}
-                        title={title}
-                        date={date}
-                        venue={venue}
-                        releaseDate={releaseDate}
-                        handleDelete={handleDelete}
-                        handelShare={handleShare}
-                       
-                       ></PressReleaseSavedRow>
+                 
+                    {PressReleaseDetails.map(
+                      ({
+                        id,
+                        title,
+                        releaseDate,
+                        handleDelete,
+                        handleShare,
+                      }) => (
+                        <PressReleaseSavedRow
+                          id={id}
+                          title={title}
+                          releaseDate={releaseDate}
+                          handleDelete={handleDelete}
+                          handelShare={handleShare}
+                        ></PressReleaseSavedRow>
                       )
                     )}
+                    
+           
                   </TabPanel>
                   <TabPanel value="3">Item Three</TabPanel>
                   <TabPanel value="4">Item Four</TabPanel>

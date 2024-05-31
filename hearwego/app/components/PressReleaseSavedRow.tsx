@@ -1,196 +1,154 @@
 "use client";
 
+import React, { useState } from "react";
 import Typography from "@mui/material/Typography";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import ShareIcon from "@mui/icons-material/Share";
 import Card from "@mui/material/Card";
-import { PressReleaseSaved } from "../styles/PressReleaseOriginal.styles";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import { PressReleaseSaved } from "../styles/PressReleaseOriginal.styles";
 
 interface Props {
   id: string;
   title: string;
   releaseDate: string;
-  handelShare: (id: string) => void;
+  handleShare: (id: string) => void;
   handleDelete: (id: string) => void;
 }
+
 export default function PressReleaseSavedRow({
   id,
   title,
   releaseDate,
-  handelShare,
+  handleShare,
   handleDelete,
 }: Props) {
+  const [openShareDialog, setOpenShareDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [shareMessage, setShareMessage] = useState("Select your share option");
+  const [deleteMessage, setDeleteMessage] = useState("");
+
+  const handleShareClick = () => {
+    setOpenShareDialog(true);
+  };
+
+  const handleShareClose = () => {
+    setShareMessage("Successfully shared");
+    setTimeout(() => {
+      setOpenShareDialog(false);
+      setShareMessage("Select your share option");
+      handleShare(id);
+    }, 2000);
+  };
+
+  const handleDeleteClick = () => {
+    setOpenDeleteDialog(true);
+    setDeleteMessage("Successfully deleted");
+    setTimeout(() => {
+      setOpenDeleteDialog(false);
+      handleDelete(id);
+    }, 2000);
+  };
+
   return (
     <PressReleaseSaved>
       <Card
         sx={{
-          maxWidth: "30%",
-          height: "100px"	,
+          maxWidth: "12%",
           display: "flex",
-          flexDirection: "row",
-          //justifyContent: "space-between",
-          //backgroundColor: "blue",
+          flexDirection: "column",
           margin: "30px",
         }}
       >
         <Box
           sx={{
+            height: "150px",
             display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             padding: "10px",
+            flexDirection: "column",
             backgroundColor: "white",
           }}
         >
-          <Button onClick={() => handleDelete(id)}>
+          <Button onClick={() => console.log(id)}>
             <PictureAsPdfIcon
               sx={{
                 color: "red",
-                fontSize: "50px",
+                fontSize: "140px",
               }}
             />
           </Button>
         </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            //alignItems: "center",
-            flexDirection: "column",
-            padding: "20px",
-            width: "35%",
-            //backgroundColor: "green",
-          }}
-        >
-          <Typography
+        <Divider />
+        <Box>
+          <Box
             sx={{
-              fontSize: "20px",
-              fontWeight: "bold",
-              //   color: "black",
+              display: "flex",
+              flexDirection: "column",
+              padding: "10px",
             }}
           >
-            {title}
-          </Typography>
-        </Box>
-
-        {/* <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "10px",
-            //backgroundColor: "red",
-            // width: "15%",
-          }}
-        >
-          <Divider
+            <Typography variant="body1">{title}</Typography>
+            <Typography variant="body1">{releaseDate}</Typography>
+          </Box>
+          <Box
             sx={{
-              height: "80%",
-
-              // backgroundColor: "black",
-            }}
-            orientation="vertical"
-            flexItem
-          />
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            //alignItems: "center",
-            flexDirection: "column",
-            padding: "20px",
-            width: "35%",
-            //backgroundColor: "green",
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: "20px",
-              fontWeight: "bold",
-              //   color: "black",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "left",
+              alignItems: "left",
             }}
           >
-            {releaseDate}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "5px",
-            //backgroundColor: "red",
-            // width: "15%",
-          }}
-        >
-          <Divider
-            sx={{
-              height: "80%",
+            <Button onClick={handleShareClick}>
+              <ShareIcon
+                sx={{
+                  fontSize: "20px",
+                }}
+              />
+            </Button>
 
-              // backgroundColor: "black",
-            }}
-            orientation="vertical"
-            flexItem
-          />
+            <Button onClick={handleDeleteClick}>
+              <DeleteIcon
+                sx={{
+                  fontSize: "20px",
+                }}
+              />
+            </Button>
+          </Box>
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            padding: "10px",
-            //backgroundColor: "white",
-          }}
-        >
-          <Button onClick={() => handelShare(id)}>
-            <ShareIcon
-              sx={{
-                // color: "red",
-                fontSize: "30px",
-              }}
-            />
-          </Button>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "10px",
-            //backgroundColor: "red",
-            // width: "15%",
-          }}
-        >
-          <Divider
-            sx={{
-              height: "80%",
-
-              // backgroundColor: "black",
-            }}
-            orientation="vertical"
-            flexItem
-          />
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            padding: "10px",
-            //backgroundColor: "white",
-          }}
-        >
-          <Button onClick={() => handleDelete(id)}>
-            <DeleteIcon
-              sx={{
-                // color: "red",
-                fontSize: "30px",
-              }}
-            />
-          </Button>
-        </Box> */}
       </Card>
+
+      <Dialog open={openShareDialog} onClose={() => setOpenShareDialog(false)}>
+        <DialogTitle>Share</DialogTitle>
+        <DialogContent>
+          <Typography>{shareMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleShareClose} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Delete</DialogTitle>
+        <DialogContent>
+          <Typography>{deleteMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PressReleaseSaved>
   );
 }
