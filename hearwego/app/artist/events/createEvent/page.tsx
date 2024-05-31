@@ -10,6 +10,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Check from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import PublishIcon from "@mui/icons-material/Publish";
+import ErrorIcon from "@mui/icons-material/Error";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FormHelperText from "@mui/material/FormHelperText";
 import { DateField } from "@mui/x-date-pickers/DateField";
@@ -55,15 +56,15 @@ import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { CardActionArea, FilledInput, IconButton } from "@mui/material";
+import { Alert, CardActionArea, FilledInput, IconButton } from "@mui/material";
 import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
 import { getAllArtists } from "@/app/services/ArtistServices";
-import Snackbar from '@mui/material/Snackbar';
-import CloseIcon from '@mui/icons-material/Close';
+import Snackbar from "@mui/material/Snackbar";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { InputRow } from "../../../styles/artistDashboardCretaeEvent.styles";
 
@@ -171,9 +172,22 @@ const steps = [
   "Finishing Touches",
 ];
 
+const errorModalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 function CreateEvent() {
   const artist = useAppSelector((state) => state.artist.user);
 
+  const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState<{
@@ -197,11 +211,16 @@ function CreateEvent() {
     event_created_by: artist ? artist.artist_id : "",
   });
 
+  const [openErrorModal, setOpenErrorModal] = React.useState(false);
+  const [errorMessages, setErrorMessages] = useState([""]);
+  const handleOpenErrorModal = () => setOpenErrorModal(true);
+  const handleCloseErrorModal = () => setOpenErrorModal(false);
+
   useEffect(() => {
     if (artist) {
       setEventData((prevEventData) => ({
         ...prevEventData,
-        event_created_by: artist.artist_id, 
+        event_created_by: artist.artist_id,
       }));
     }
   }, [artist]);
@@ -283,13 +302,13 @@ function CreateEvent() {
   const handleComplete = async () => {
     const isValid = await validateCurrentStep();
     if (isValid) {
-      const newCompleted = { ...completed }; 
+      const newCompleted = { ...completed };
       newCompleted[activeStep] = true;
       setCompleted(newCompleted);
       if (isLastStep()) {
       }
-      console.log(eventData); 
-      console.log(sponsorRows); 
+      console.log(eventData);
+      console.log(sponsorRows);
       await submitData();
       handleNext();
     }
@@ -313,6 +332,34 @@ function CreateEvent() {
 
   const validateEventDetails = () => {
     let isValid = true;
+
+    let errors = [];
+
+    if (!eventData.event_name) {
+      isValid = false;
+      errors.push("Event name is required.");
+    }
+    if (!eventData.event_type) {
+      isValid = false;
+      errors.push("Event type is required.");
+    }
+    if (eventData.age_from < 0) {
+      isValid = false;
+      errors.push("Age from should be greater than 0.");
+    }
+    if (eventData.age_to < 0) {
+      isValid = false;
+      errors.push("Age to should be greater than 0.");
+    }
+    if (sessionRows.length == 0) {
+      isValid = false;
+      errors.push("At least one session is required.");
+    }
+
+    if (!isValid) {
+      setErrorMessages(errors);
+      handleOpenErrorModal();
+    }
     // Add validation logic here
     // Update eventData state if necessary
     // setEventNameError, setEventTypeError, etc. based on validation results
@@ -454,6 +501,42 @@ function CreateEvent() {
           </React.Fragment>
         )}
       </Box>
+
+      <Modal open={openErrorModal} onClose={handleCloseErrorModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 5,
+          }}
+        >
+          <Box sx={{width: "100", display: "flex", justifyContent: "end"}}>
+            <IconButton>
+              <CloseIcon onClick={handleCloseErrorModal} />
+            </IconButton>
+          </Box>
+          <Box sx={{width: "100%", display: "flex", flexDirection: "column", alignItems:"center"}}>
+            <ErrorIcon style={{fontSize: "5em", color: "red"}} />
+            <Typography variant="h6" component="h2"  color="error" sx={{marginBottom: 2}}>
+            Validation Errors
+          </Typography>
+
+          {errorMessages.map((error, index) => (
+              <Alert severity="error" sx={{marginBottom: 1}}>{error}</Alert>
+
+            ))}
+
+          </Box>
+
+          
+        </Box>
+      </Modal>
     </>
   );
 }
@@ -466,13 +549,13 @@ function EventDetails({
   sponsorRows,
   setSponsorRows,
   eventData,
-  setEventData
+  setEventData,
 }) {
   const [isAgeEnabled, setIsAgeEnabled] = useState(false);
   const [imgFile, setImgFile] = React.useState(null);
 
   useEffect(() => {
-    if(imgFile) {
+    if (imgFile) {
       setEventData({ ...eventData, event_img: imgFile });
     }
   }, [imgFile]);
@@ -517,7 +600,6 @@ function EventDetails({
               aspectX={1}
               aspectY={1}
               shape="rect"
-              
             />
           </Box>
           <Box sx={{ width: "50%" }}>
@@ -651,19 +733,16 @@ function EventDetails({
           />
         </Box>
       </Paper>
-      
-      <Paper sx={{ width: "100%", padding: "2em" }} elevation={3}>
-      <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-        Team Details
-      </Typography>
 
-      <Box sx={{ width: "100%" }}>
-        <TeamTable
-          teamRows={teamRows}
-          setTeamRows={setTeamRows}
-        />
-      </Box>
-    </Paper>
+      <Paper sx={{ width: "100%", padding: "2em" }} elevation={3}>
+        <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
+          Team Details
+        </Typography>
+
+        <Box sx={{ width: "100%" }}>
+          <TeamTable teamRows={teamRows} setTeamRows={setTeamRows} />
+        </Box>
+      </Paper>
     </>
   );
 }
@@ -986,6 +1065,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
               border: "2px solid #000",
               boxShadow: 24,
               p: 4,
+              borderRadius: 5,
             }}
           >
             <Typography
@@ -1131,7 +1211,7 @@ const teamColumns: GridColDef[] = [
   { field: "teamEmail", headerName: "E-mail", width: 250 },
 ];
 
-function TeamTable({teamRows, setTeamRows}) {
+function TeamTable({ teamRows, setTeamRows }) {
   const [teamTypeError, setTeamTypeError] = useState(false);
   const [teamNameError, setTeamNameError] = useState(false);
   const [teamContactError, setTeamContactError] = useState(false);
@@ -1141,8 +1221,6 @@ function TeamTable({teamRows, setTeamRows}) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
-  
 
   const [teamType, setTeamType] = useState("");
   const [teamName, setTeamName] = useState("");
@@ -1164,12 +1242,16 @@ function TeamTable({teamRows, setTeamRows}) {
     setTeamNameError(event.target.value.trim() === "");
   };
 
-  const handleTeamContactChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTeamContactChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTeamContact(event.target.value);
     setTeamContactError(event.target.value.trim() === "");
   };
 
-  const handleTeamEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTeamEmailChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTeamEmail(event.target.value);
     setTeamEmailError(!validateEmail(event.target.value));
   };
@@ -1225,7 +1307,9 @@ function TeamTable({teamRows, setTeamRows}) {
   };
 
   const handleDelete = () => {
-    const updatedRows = teamRows.filter((row) => !selectedRows.includes(row.id));
+    const updatedRows = teamRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
     setTeamRows(updatedRows);
     setSelectedRows([]);
     setTeamTypeError(false);
@@ -1236,7 +1320,6 @@ function TeamTable({teamRows, setTeamRows}) {
     refreshTable();
   };
 
-  
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setTeamTypeError(false);
@@ -1281,7 +1364,9 @@ function TeamTable({teamRows, setTeamRows}) {
       setTeamContactError(false);
       setTeamEmailError(false);
 
-      const newId = teamRows.length ? Math.max(...teamRows.map((row) => row.id)) + 1 : 1;
+      const newId = teamRows.length
+        ? Math.max(...teamRows.map((row) => row.id)) + 1
+        : 1;
       const newTeam: TeamRow = {
         id: newId,
         teamType,
@@ -1299,7 +1384,6 @@ function TeamTable({teamRows, setTeamRows}) {
       );
     }
   };
-  
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -1446,6 +1530,7 @@ const sponsorModalStyle = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  borderRadius: 5,
 };
 
 type SponsorRow = {
@@ -1464,7 +1549,7 @@ const sponsorColumns: GridColDef[] = [
   { field: "sponsorEmail", headerName: "E-mail", width: 250 },
 ];
 
-function SponsorTable({sponsorRows, setSponsorRows}) {
+function SponsorTable({ sponsorRows, setSponsorRows }) {
   const [sponsorTypeError, setSponsorTypeError] = useState(false);
   const [sponsorNameError, setSponsorNameError] = useState(false);
   const [sponsorContactError, setSponsorContactError] = useState(false);
@@ -1480,27 +1565,37 @@ function SponsorTable({sponsorRows, setSponsorRows}) {
   const [sponsorContact, setSponsorContact] = useState("");
   const [sponsorEmail, setSponsorEmail] = useState("");
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
-  const [selectedRowData, setSelectedRowData] = useState<SponsorRow | null>(null);
+  const [selectedRowData, setSelectedRowData] = useState<SponsorRow | null>(
+    null
+  );
   const [open, setOpen] = React.useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleSponsorTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSponsorTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setSponsorType(event.target.value);
     setSponsorTypeError(event.target.value.trim() === "");
   };
 
-  const handleSponsorNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSponsorNameChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setSponsorName(event.target.value);
     setSponsorNameError(event.target.value.trim() === "");
   };
 
-  const handleSponsorContactChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSponsorContactChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setSponsorContact(event.target.value);
     setSponsorContactError(event.target.value.trim() === "");
   };
 
-  const handleSponsorEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSponsorEmailChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setSponsorEmail(event.target.value);
     setSponsorEmailError(!validateEmail(event.target.value));
   };
@@ -1556,7 +1651,9 @@ function SponsorTable({sponsorRows, setSponsorRows}) {
   };
 
   const handleDelete = () => {
-    const updatedRows = sponsorRows.filter((row) => !selectedRows.includes(row.id));
+    const updatedRows = sponsorRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
     setSponsorRows(updatedRows);
     setSelectedRows([]);
     setSponsorTypeError(false);
@@ -1611,7 +1708,9 @@ function SponsorTable({sponsorRows, setSponsorRows}) {
       setSponsorContactError(false);
       setSponsorEmailError(false);
 
-      const newId = sponsorRows.length ? Math.max(...sponsorRows.map((row) => row.id)) + 1 : 1;
+      const newId = sponsorRows.length
+        ? Math.max(...sponsorRows.map((row) => row.id)) + 1
+        : 1;
       const newSponsor: SponsorRow = {
         id: newId,
         sponsorType,
@@ -1765,7 +1864,6 @@ function SponsorTable({sponsorRows, setSponsorRows}) {
     </div>
   );
 }
-
 
 function BudgetDetails() {
   return (
