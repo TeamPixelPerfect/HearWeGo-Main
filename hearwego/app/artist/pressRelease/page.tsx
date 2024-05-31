@@ -36,6 +36,48 @@ const PressReleaseDetails = [
     handleDelete: () => {},
     handleShare: () => {},
   },
+  {
+    id: "2",
+    title: "Press Release 2",
+    releaseDate: "2021-03-18",
+    handleDelete: () => {},
+    handleShare: () => {},
+  },
+  {
+    id: "3",
+    title: "Press Release 3",
+    releaseDate: "2021-03-18",
+    handleDelete: () => {},
+    handleShare: () => {},
+  },
+  {
+    id: "4",
+    title: "Press Release 4",
+    releaseDate: "2021-03-18",
+    handleDelete: () => {},
+    handleShare: () => {},
+  },
+  {
+    id: "5",
+    title: "Press Release 5",
+    releaseDate: "2021-03-18",
+    handleDelete: () => {},
+    handleShare: () => {},
+  },
+  {
+    id: "6",
+    title: "Press Release 6",
+    releaseDate: "2021-03-18",
+    handleDelete: () => {},
+    handleShare: () => {},
+  },
+  {
+    id: "7",
+    title: "Press Release 7",
+    releaseDate: "2021-03-18",
+    handleDelete: () => {},
+    handleShare: () => {},
+  },
 ];
 export default function PressRelease() {
   const [headline, setHeadline] = useState("");
@@ -525,33 +567,28 @@ export default function PressRelease() {
                     </Dialog>
                   </TabPanel>
                   <TabPanel
-                    value="2"
-                    style={{
-                      width: "100%",
-                      padding: "0",
-                    }}
-                  >
-                 
+                  value="2"
+                  style={{
+                    width: "100%",
+                    padding: "0",
+                  }}
+                >
+                  <Grid container spacing={1}>
                     {PressReleaseDetails.map(
-                      ({
-                        id,
-                        title,
-                        releaseDate,
-                        handleDelete,
-                        handleShare,
-                      }) => (
-                        <PressReleaseSavedRow
-                          id={id}
-                          title={title}
-                          releaseDate={releaseDate}
-                          handleDelete={handleDelete}
-                          handelShare={handleShare}
-                        ></PressReleaseSavedRow>
+                      ({ id, title, releaseDate, handleDelete, handleShare }) => (
+                        <Grid item xs={12} sm={6} md={5} lg={3} key={id}>
+                          <PressReleaseSavedRow
+                            id={id}
+                            title={title}
+                            releaseDate={releaseDate}
+                            handleDelete={handleDelete}
+                            handleShare={handleShare}
+                          />
+                        </Grid>
                       )
                     )}
-                    
-           
-                  </TabPanel>
+                  </Grid>
+                </TabPanel>
                   <TabPanel value="3">Item Three</TabPanel>
                   <TabPanel value="4">Item Four</TabPanel>
                 </TabContext>

@@ -61,7 +61,8 @@ export default function PressReleaseSavedRow({
     <PressReleaseSaved>
       <Card
         sx={{
-          maxWidth: "12%",
+          // maxWidth: "12%",
+          width: "200px",
           display: "flex",
           flexDirection: "column",
           margin: "30px",
