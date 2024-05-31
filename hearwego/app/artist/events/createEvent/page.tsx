@@ -194,7 +194,17 @@ function CreateEvent() {
     teams: [],
     description: "",
     event_status: "private",
+    event_created_by: artist ? artist.artist_id : "",
   });
+
+  useEffect(() => {
+    if (artist) {
+      setEventData((prevEventData) => ({
+        ...prevEventData,
+        event_created_by: artist.artist_id, 
+      }));
+    }
+  }, [artist]);
 
   useEffect(() => {
     setEventData({
@@ -219,12 +229,14 @@ function CreateEvent() {
           session_special_notice: description,
         })
       ),
-    });
-  }, [sessionRows]);
-
-  useEffect(() => {
-    setEventData({
-      ...eventData,
+      sponsor: sponsorRows.map(
+        ({ id, sponsorType, sponsorName, sponsorContact, sponsorEmail }) => ({
+          sponsor_type: sponsorType,
+          sponsor_name: sponsorName,
+          sponsor_contact: sponsorContact,
+          sponsor_email: sponsorEmail,
+        })
+      ),
       teams: teamRows.map(
         ({ id, teamType, teamName, teamContact, teamEmail }) => ({
           team_type: teamType,
@@ -234,21 +246,7 @@ function CreateEvent() {
         })
       ),
     });
-  }, [teamRows]);
-
-  useEffect(() => {
-    setEventData({
-      ...eventData,
-      sponsor: sponsorRows.map(
-        ({ id, sponsorType, sponsorName, sponsorContact, sponsorEmail }) => ({
-          sponsor_type: sponsorType,
-          sponsor_name: sponsorName,
-          sponsor_contact: sponsorContact,
-          sponsor_email: sponsorEmail,
-        })
-      ),
-    });
-  }, [sponsorRows]);
+  }, [sessionRows, sponsorRows, teamRows]);
 
   const totalSteps = () => {
     return steps.length;
@@ -285,12 +283,13 @@ function CreateEvent() {
   const handleComplete = async () => {
     const isValid = await validateCurrentStep();
     if (isValid) {
-      const newCompleted = { ...completed }; // Changed to use spread operator
+      const newCompleted = { ...completed }; 
       newCompleted[activeStep] = true;
       setCompleted(newCompleted);
       if (isLastStep()) {
       }
-      console.log(eventData); // Add this line to log eventData before submission
+      console.log(eventData); 
+      console.log(sponsorRows); 
       await submitData();
       handleNext();
     }
@@ -1622,6 +1621,7 @@ function SponsorTable({sponsorRows, setSponsorRows}) {
       };
 
       setSponsorRows([...sponsorRows, newSponsor]);
+      console.log(sponsorRows);
       refreshTable();
       handleClose();
     } else {

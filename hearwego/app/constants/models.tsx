@@ -182,4 +182,5 @@ export interface Event {
   ];
   description?: string;
   event_status?: string;
+  event_created_by?: string;
 }
