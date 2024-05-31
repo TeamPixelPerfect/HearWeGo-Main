@@ -241,8 +241,8 @@ function CreateEvent() {
       ...eventData,
       sponsor: sponsorRows.map(
         ({ id, sponsorType, sponsorName, sponsorContact, sponsorEmail }) => ({
-          team_type: sponsorType,
-          team_name: sponsorName,
+          sponsor_type: sponsorType,
+          sponsor_name: sponsorName,
           sponsor_contact: sponsorContact,
           sponsor_email: sponsorEmail,
         })
