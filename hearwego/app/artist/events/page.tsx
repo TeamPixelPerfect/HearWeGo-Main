@@ -50,6 +50,7 @@ import {
   EventDetailRow,
 } from "../../styles/artistDashboardEventsPage.styles";
 import { getEvents } from "@/app/services/EventServices";
+import { RoundaboutLeft } from "@mui/icons-material";
 
 //event cards display
 export default function ArtistEvents() {
@@ -178,15 +179,21 @@ function EventArea() {
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
+  const [createdArtist, setCreatedArtist] = useState("");
+  const [filter, setFilter] = useState("event_created_by");
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
+    if(artist){
+      setCreatedArtist(artist.artist_id);
+    }
     if (artist?.token) {
-      getEvents(artist?.token, page, limit).then((events) => {
+      getEvents(artist?.token, page, limit, filter, createdArtist ).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
       });
     }
-  }, [page]);
+  }, [artist, page]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -315,7 +322,7 @@ function EventArea() {
           marginTop: "1em",
         }}
       >
-        <Pagination count={10} color="primary" page={page} onChange={handlePageChange} />
+        <Pagination count={5} color="primary" page={page} onChange={handlePageChange} />
       </Box>
     </>
   );
