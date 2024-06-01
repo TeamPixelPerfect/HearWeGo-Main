@@ -49,10 +49,7 @@ export default function PressReleaseDraftRow({
       handleDelete(id);
     }, 2000);
   };
-  const handleEditClick = () => {
-    handleEdit(id);
-    switchTab("1");
-  };
+
 
   return (
     <PressReleaseDraft>

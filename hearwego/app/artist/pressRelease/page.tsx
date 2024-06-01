@@ -83,7 +83,7 @@ const PressReleaseDetailsDraft = [
     handleDelete: () => {},
     handleEdit: () => {},
   },
-]
+];
 
 const PressReleaseDetailsShared = [
   {
@@ -114,7 +114,7 @@ const PressReleaseDetailsShared = [
     handleDelete: () => {},
     handleEdit: () => {},
   },
-]
+];
 export default function PressRelease() {
   const [headline, setHeadline] = useState("");
   const [subHeadline, setSubHeadline] = useState("");
@@ -122,22 +122,26 @@ export default function PressRelease() {
   const [date, setDate] = useState(null);
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState(null);
-  // const [songFile, setSongFile] = useState(null);
-  // const [value, setValue] = useState("1");
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const [openSavedItemsDialog, setOpenSavedItemsDialog] = useState(false);
   const [openSuccessfullySharedDialog, setOpenSuccessfullySharedDialog] =
     useState(false);
-
-  const [logoFile, setLogoFile] = React.useState(null);
-  const [signatureFile, setSignatureFile] = React.useState(null);
-
-  const [value, setValue] = React.useState("1");
+  const [logoFile, setLogoFile] = useState(null);
+  const [signatureFile, setSignatureFile] = useState(null);
+  const [value, setValue] = useState("1");
+  const [headlineError, setHeadlineError] = useState("");
+  const [subHeadlineError, setSubHeadlineError] = useState("");
+  const [dateError, setDateError] = useState("");
+  const [venueError, setVenueError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+  const [releaseDateError, setReleaseDateError] = useState("");
+  const [open, setOpen] = React.useState(false);
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
   const handleCancelOpen = () => {
     setOpenCancelDialog(true);
   };
@@ -147,9 +151,7 @@ export default function PressRelease() {
   };
 
   const handleSaveOpen = () => {
-    if (validateFields()) {
-      setOpenSaveDialog(true);
-    }
+    setOpenSaveDialog(true);
   };
 
   const handleSaveClose = () => {
@@ -165,22 +167,6 @@ export default function PressRelease() {
     setOpenShareDialog(false);
   };
 
-  const handleSavedItemsOpen = () => {
-    setOpenSavedItemsDialog(true);
-  };
-
-  const handleSavedItemsClose = () => {
-    setOpenSavedItemsDialog(false);
-  };
-
-  const handleSuccessfullySharedOpen = () => {
-    setOpenSuccessfullySharedDialog(true);
-  };
-
-  const handleSuccessfullySharedClose = () => {
-    setOpenSuccessfullySharedDialog(false);
-  };
-
   const handleSaveAsDraft = () => {
     console.log("Saved in drafts");
     handleCancelClose();
@@ -188,24 +174,50 @@ export default function PressRelease() {
 
   const handleSaveItem = () => {
     console.log("The press release is saved in saved items");
-    handleSavedItemsOpen();
     handleSaveClose();
   };
 
-  const handleShare = () => {
-    console.log("Successfully Shared");
-    handleSuccessfullySharedOpen();
-    handleShareClose();
-  };
-
   const validateFields = () => {
-    if (!headline || !subHeadline || !venue || !description || !releaseDate) {
-      alert("All fields are required!");
-      return false;
+    let isValid = true;
+    if (!headline) {
+      setHeadlineError("Headline is required");
+      isValid = false;
+    } else {
+      setHeadlineError("");
     }
-    return true;
+    if (!subHeadline) {
+      setSubHeadlineError("Sub Headline is required");
+      isValid = false;
+    } else {
+      setSubHeadlineError("");
+    }
+
+    if (!date) {
+      setDateError("Date is required");
+      isValid = false;
+    } else {
+      setDateError("");
+    }
+    if (!venue) {
+      setVenueError("Venue is required");
+      isValid = false;
+    } else {
+      setVenueError("");
+    }
+    if (!description) {
+      setDescriptionError("Description is required");
+      isValid = false;
+    } else {
+      setDescriptionError("");
+    }
+    if (!releaseDate) {
+      setReleaseDateError("Release Date is required");
+      isValid = false;
+    } else {
+      setReleaseDateError("");
+    }
+    return isValid;
   };
-  
 
   return (
     <Box sx={{ minWidth: 375 }}>
@@ -302,6 +314,9 @@ export default function PressRelease() {
                             variant="filled"
                             value={headline}
                             onChange={(e) => setHeadline(e.target.value)}
+                            error={!!headlineError}
+                            helperText={headlineError}
+                            fullWidth
                             required
                           />
                         </Box>
@@ -322,6 +337,9 @@ export default function PressRelease() {
                             variant="filled"
                             value={subHeadline}
                             onChange={(e) => setSubHeadline(e.target.value)}
+                            error={!!subHeadlineError}
+                            helperText={subHeadlineError}
+                            fullWidth
                             required
                           />
                         </Box>
@@ -343,7 +361,10 @@ export default function PressRelease() {
                               <DatePicker
                                 label="Date"
                                 value={date}
-                                onChange={(value) => setDate(value)}
+                                onChange={(e) => setDate(e.target.value)}
+                                error={!!dateError}
+                                helperText={dateError}
+                                fullWidth
                                 required
                               />
                             </DemoContainer>
@@ -368,6 +389,9 @@ export default function PressRelease() {
                             variant="filled"
                             value={venue}
                             onChange={(e) => setVenue(e.target.value)}
+                            error={!!venueError}
+                            helperText={venueError}
+                            fullWidth
                             required
                           />
                         </Box>
@@ -391,6 +415,9 @@ export default function PressRelease() {
                             variant="filled"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            error={!!descriptionError}
+                            helperText={descriptionError}
+                            fullWidth
                             required
                           />
                         </Box>
@@ -454,7 +481,12 @@ export default function PressRelease() {
                                 <DatePicker
                                   label="Release Date"
                                   value={releaseDate}
-                                  onChange={(value) => setReleaseDate(value)}
+                                  onChange={(e) =>
+                                    setReleaseDate(e.target.value)
+                                  }
+                                  error={!!releaseDateError}
+                                  helperText={releaseDateError}
+                                  fullWidth
                                   required
                                 />
                               </DemoContainer>
@@ -486,122 +518,68 @@ export default function PressRelease() {
                     </div>
 
                     <Dialog
-                      open={openCancelDialog}
-                      onClose={handleCancelClose}
-                      aria-labelledby="alert-dialog-title"
-                      aria-describedby="alert-dialog-description"
-                    >
-                      <DialogTitle id="alert-dialog-title">
-                        {"Save as Draft?"}
-                      </DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                          Do you want to save this press release as a draft?
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleCancelClose}>No</Button>
-                        <Button onClick={handleSaveAsDraft} autoFocus>
-                          Yes
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
+                open={openCancelDialog}
+                onClose={handleCancelClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">{"Save Draft?"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Do you want to save this press release as a draft?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCancelClose}>No</Button>
+                  <Button onClick={handleSaveAsDraft} autoFocus>
+                    Yes
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
-                    <Dialog
-                      open={openSaveDialog}
-                      onClose={handleSaveClose}
-                      aria-labelledby="alert-dialog-title"
-                      aria-describedby="alert-dialog-description"
-                    >
-                      <DialogTitle id="alert-dialog-title">
-                        {"Share Press Release?"}
-                      </DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                          Do you want to share this press release now?
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleSaveItem}>No</Button>
-                        <Button onClick={handleShareOpen} autoFocus>
-                          Yes
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
+              <Dialog
+                open={openSaveDialog}
+                onClose={handleSaveClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">{"Share Press Release?"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Do you want to share this press release now?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleSaveClose}>No</Button>
+                  <Button onClick={handleShareOpen} autoFocus>
+                    Yes
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
-                    <Dialog
-                      open={openShareDialog}
-                      onClose={handleShareClose}
-                      aria-labelledby="share-dialog-title"
-                      aria-describedby="share-dialog-description"
-                    >
-                      <DialogTitle id="share-dialog-title">
-                        {"Share Options"}
-                      </DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="share-dialog-description">
-                          Choose your sharing options here.
-                        </DialogContentText>
-                        {/* Add your share options here */}
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleShareClose}>Cancel</Button>
-                        <Button
-                          onClick={() => {
-                            handleShare();
-                            handleShareClose();
-                          }}
-                          autoFocus
-                        >
-                          Share
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-
-                    <Dialog
-                      open={openSavedItemsDialog}
-                      onClose={handleSavedItemsClose}
-                      aria-labelledby="saved-items-dialog-title"
-                      aria-describedby="saved-items-dialog-description"
-                    >
-                      <DialogTitle id="saved-items-dialog-title">
-                        {"Saved"}
-                      </DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="saved-items-dialog-description">
-                          The press release is saved in saved items.
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleSavedItemsClose} autoFocus>
-                          OK
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-
-                    <Dialog
-                      open={openSuccessfullySharedDialog}
-                      onClose={handleSuccessfullySharedClose}
-                      aria-labelledby="successfully-shared-dialog-title"
-                      aria-describedby="successfully-shared-dialog-description"
-                    >
-                      <DialogTitle id="successfully-shared-dialog-title">
-                        {"Success"}
-                      </DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="successfully-shared-dialog-description">
-                          Successfully Shared.
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button
-                          onClick={handleSuccessfullySharedClose}
-                          autoFocus
-                        >
-                          OK
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
+              <Dialog
+                open={openShareDialog}
+                onClose={handleShareClose}
+                aria-labelledby="share-dialog-title"
+                aria-describedby="share-dialog-description"
+              >
+                <DialogTitle id="share-dialog-title">{"Share Options"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="share-dialog-description">
+                    Choose your sharing options here.
+                  </DialogContentText>
+                  {/* Add your share options here */}
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleShareClose}>Cancel</Button>
+                  <Button onClick={() => {
+                    console.log("Shared successfully");
+                    handleShareClose();
+                  }} autoFocus>
+                    Share
+                  </Button>
+                </DialogActions>
+              </Dialog>
                   </TabPanel>
                   <TabPanel
                     value="2"
@@ -639,15 +617,14 @@ export default function PressRelease() {
                       padding: "0",
                     }}
                   >
-                  {PressReleaseDetailsDraft.map(
-                    ({
-                      id,
-                      title,
-                      releaseDate,
-                      handleDelete,
-                      handleEdit,
-                    }) => (
-                     
+                    {PressReleaseDetailsDraft.map(
+                      ({
+                        id,
+                        title,
+                        releaseDate,
+                        handleDelete,
+                        handleEdit,
+                      }) => (
                         <PressReleaseDraftRow
                           id={id}
                           title={title}
@@ -655,40 +632,31 @@ export default function PressRelease() {
                           handleDelete={handleDelete}
                           handleEdit={handleEdit}
                         />
-                
-                    )
-                  )}
-                 
-                </TabPanel>
-                  <TabPanel 
-                  value="4"    
-                  style={{
+                      )
+                    )}
+                  </TabPanel>
+                  <TabPanel
+                    value="4"
+                    style={{
                       width: "100%",
                       padding: "0",
                     }}
                   >
                     <Grid container spacing={1}>
                       {PressReleaseDetailsShared.map(
-                        ({
-                          id,
-                          title,
-                          releaseDate,
-                          handleDelete,
-                         
-                        }) => (
+                        ({ id, title, releaseDate, handleDelete }) => (
                           <Grid item xs={12} sm={6} md={5} lg={3} key={id}>
                             <PressReleaseSharedRow
                               id={id}
                               title={title}
                               releaseDate={releaseDate}
                               handleDelete={handleDelete}
-                              
                             />
                           </Grid>
                         )
                       )}
                     </Grid>
-                    </TabPanel>
+                  </TabPanel>
                 </TabContext>
               </TabsNav>
             </div>
