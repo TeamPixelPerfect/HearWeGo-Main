@@ -37,8 +37,7 @@ import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
 import DropFile from "../../components/DropFile";
 import { useTheme } from "@mui/material";
-import { SingleTask } from "../../components/SinglePRCampaign";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { CampaignPopup } from "../../components/SinglePRCampaign";
 
 const options = [
   "None",
@@ -85,7 +84,7 @@ export default function Context() {
   const [clickCount, setClickCount] = React.useState(0); // State to track the number of clicks
 
   const AddNewTaskToCampaign = () => {
-    setTasks([...tasks, { text: "New Task" }]);
+    setTasks([...tasks, { text: "Enter The Task" }]);
     setClickCount(clickCount + 1);
   };
 
@@ -212,127 +211,11 @@ export default function Context() {
                   justifyContent: "center",
                 }}
               >
-                <Box
-                  sx={{
-                    backgroundColor: theme.palette.background.default,
-                    width: "27%",
-                    maxHeight: "70%",
-                    minHeight: "70%",
-                    borderRadius: "15px",
-                    overflow: "auto",
-                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-                  }}
+                <PostSchedulePopup
+                  sx={{ backgroundColor: "background.default" }}
                 >
-                  <Typography variant="h6" sx={{ textAlign: "center" }}>
-                    Classic Song Mixtape Album Cover
-                  </Typography>
-                  <Box sx={{ flexGrow: 1, padding: "15px" }}>
-                    <BorderLinearProgress
-                      variant="determinate"
-                      value={clickCount}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      color: "black",
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        paddingLeft: "10px",
-                        color: theme.palette.text.primary,
-                      }}
-                    >
-                      Progress
-                    </Typography>
-                    <Typography
-                      sx={{
-                        paddingRight: "10px",
-                        color: theme.palette.text.primary,
-                      }}
-                    >
-                      {clickCount}% Completed
-                    </Typography>
-                  </Box>
-                  <TabsNav sx={{ width: "100%", typography: "body1" }}>
-                    <TabContext value={value11}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          position: "relative",
-                          alignItems: "baseline",
-                          justifyContent: "space-between",
-                          width: "100%",
-                        }}
-                      >
-                        <TabList
-                          onChange={handle11Change}
-                          aria-label="lab API tabs example"
-                          sx={{
-                            justifyContent: "space-between",
-                            width: "100%",
-                          }}
-                        >
-                          <TabItem label="Tasks" value="11" />
-                          <TabItem label="Posts" value="12" />
-                        </TabList>
-                      </Box>
-
-                      <TabPanel
-                        value="11"
-                        sx={{
-                          minHeight: "100%",
-                          backgroundColor: theme.palette.background.default,
-                        }}
-                      >
-                        <Button onClick={AddNewTaskToCampaign}>
-                          <AddCircleOutlineIcon />
-                        </Button>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            width: "100%",
-                          }}
-                        >
-                          {tasks.map((task, index) => (
-                            <SingleTask
-                              key={index}
-                              text={task.text}
-                              onTextChange={(newText: any) =>
-                                handleTextChange(index, newText)
-                              }
-                            />
-                          ))}
-                        </Box>
-                        <Box
-                          sx={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "right",
-                            alignItems: "right",
-                            padding: "10px",
-                          }}
-                        >
-                          <Button
-                            onClick={handleCreateNewCampaignClose}
-                            variant="contained"
-                            sx={{
-                              width: "25%",
-                              backgroundColor: "background.main",
-                              color: "primary.default",
-                            }}
-                          >
-                            Done
-                          </Button>
-                        </Box>
-                      </TabPanel>
-                      <TabPanel value="12">hellow</TabPanel>
-                    </TabContext>
-                  </TabsNav>
-                </Box>
+                  <CampaignPopup />
+                </PostSchedulePopup>
               </Modal>
               <Button
                 onClick={handlePostSchedulingOpen}

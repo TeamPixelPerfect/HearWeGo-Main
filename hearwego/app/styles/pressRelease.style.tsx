@@ -165,7 +165,7 @@ export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
 }));
 
 export const PostForPopup = muiStyled(Box)(({ theme }) => ({
-  width: "50%",
+  width: "100%",
   height: "200px",
   backgroundImage: "url('https://source.unsplash.com/random')",
   backgroundRepeat: "no-repeat",
