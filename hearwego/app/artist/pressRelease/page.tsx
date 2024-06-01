@@ -151,7 +151,9 @@ export default function PressRelease() {
   };
 
   const handleSaveOpen = () => {
-    setOpenSaveDialog(true);
+    if (validateFields()) {
+      setOpenSaveDialog(true);
+    }
   };
 
   const handleSaveClose = () => {
@@ -167,6 +169,22 @@ export default function PressRelease() {
     setOpenShareDialog(false);
   };
 
+  const handleSavedItemsOpen = () => {
+    setOpenSavedItemsDialog(true);
+  };
+
+  const handleSavedItemsClose = () => {
+    setOpenSavedItemsDialog(false);
+  };
+
+  const handleSuccessfullySharedOpen = () => {
+    setOpenSuccessfullySharedDialog(true);
+  };
+
+  const handleSuccessfullySharedClose = () => {
+    setOpenSuccessfullySharedDialog(false);
+  };
+
   const handleSaveAsDraft = () => {
     console.log("Saved in drafts");
     handleCancelClose();
@@ -174,7 +192,14 @@ export default function PressRelease() {
 
   const handleSaveItem = () => {
     console.log("The press release is saved in saved items");
+    handleSavedItemsOpen();
     handleSaveClose();
+  };
+
+  const handleShare = () => {
+    console.log("Successfully Shared");
+    handleSuccessfullySharedOpen();
+    handleShareClose();
   };
 
   const validateFields = () => {
@@ -190,13 +215,6 @@ export default function PressRelease() {
       isValid = false;
     } else {
       setSubHeadlineError("");
-    }
-
-    if (!date) {
-      setDateError("Date is required");
-      isValid = false;
-    } else {
-      setDateError("");
     }
     if (!venue) {
       setVenueError("Venue is required");
@@ -218,7 +236,6 @@ export default function PressRelease() {
     }
     return isValid;
   };
-
   return (
     <Box sx={{ minWidth: 375 }}>
       <Card variant="outlined">
@@ -518,68 +535,77 @@ export default function PressRelease() {
                     </div>
 
                     <Dialog
-                open={openCancelDialog}
-                onClose={handleCancelClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">{"Save Draft?"}</DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    Do you want to save this press release as a draft?
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleCancelClose}>No</Button>
-                  <Button onClick={handleSaveAsDraft} autoFocus>
-                    Yes
-                  </Button>
-                </DialogActions>
-              </Dialog>
+                      open={openCancelDialog}
+                      onClose={handleCancelClose}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        {"Save Draft?"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          Do you want to save this press release as a draft?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleCancelClose}>No</Button>
+                        <Button onClick={handleSaveAsDraft} autoFocus>
+                          Yes
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
 
-              <Dialog
-                open={openSaveDialog}
-                onClose={handleSaveClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">{"Share Press Release?"}</DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-description">
-                    Do you want to share this press release now?
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleSaveClose}>No</Button>
-                  <Button onClick={handleShareOpen} autoFocus>
-                    Yes
-                  </Button>
-                </DialogActions>
-              </Dialog>
+                    <Dialog
+                      open={openSaveDialog}
+                      onClose={handleSaveClose}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        {"Share Press Release?"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          Do you want to share this press release now?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleSaveClose}>No</Button>
+                        <Button onClick={handleShareOpen} autoFocus>
+                          Yes
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
 
-              <Dialog
-                open={openShareDialog}
-                onClose={handleShareClose}
-                aria-labelledby="share-dialog-title"
-                aria-describedby="share-dialog-description"
-              >
-                <DialogTitle id="share-dialog-title">{"Share Options"}</DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="share-dialog-description">
-                    Choose your sharing options here.
-                  </DialogContentText>
-                  {/* Add your share options here */}
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleShareClose}>Cancel</Button>
-                  <Button onClick={() => {
-                    console.log("Shared successfully");
-                    handleShareClose();
-                  }} autoFocus>
-                    Share
-                  </Button>
-                </DialogActions>
-              </Dialog>
+                    <Dialog
+                      open={openShareDialog}
+                      onClose={handleShareClose}
+                      aria-labelledby="share-dialog-title"
+                      aria-describedby="share-dialog-description"
+                    >
+                      <DialogTitle id="share-dialog-title">
+                        {"Share Options"}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="share-dialog-description">
+                          Choose your sharing options here.
+                        </DialogContentText>
+                         Add your share options here 
+                       </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleShareClose}>Cancel</Button>
+                        <Button
+                          onClick={() => {
+                            console.log("Shared successfully");
+                            handleShareClose();
+                          }}
+                          autoFocus
+                        >
+                          Share
+                        </Button>
+                      </DialogActions>
+                    </Dialog> 
                   </TabPanel>
                   <TabPanel
                     value="2"
