@@ -41,4 +41,10 @@ export const TabItem = muiStyled(Tab)(({ theme }) => ({
 export const PressReleaseSaved = styled(Stack)(({ theme }) => ({
     marginBottom: '1em'  
 }));
+export const PressReleaseDraft = styled(Stack)(({ theme }) => ({
+  marginBottom: '1em'  
+}));
   
+export const PressReleaseShared = styled(Stack)(({ theme }) => ({
+  marginBottom: '1em'  
+}));

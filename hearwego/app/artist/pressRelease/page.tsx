@@ -24,11 +24,13 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Link from "next/link";
 import TabPanel from "@mui/lab/TabPanel";
 import PressReleaseSavedRow from "@/app/components/PressReleaseSavedRow";
+import PressReleaseDraftRow from "@/app/components/PressReleaseDraftRow";
+import PressReleaseSharedRow from "@/app/components/PressReleaseSharedRow";
 import Grid from "@mui/material/Grid";
 
 import { TabsNav, TabItem } from "../../styles/PressReleaseOriginal.styles";
 
-const PressReleaseDetails = [
+const PressReleaseDetailsSaved = [
   {
     id: "1",
     title: "Press Release 1",
@@ -57,28 +59,41 @@ const PressReleaseDetails = [
     handleDelete: () => {},
     handleShare: () => {},
   },
-  {
-    id: "5",
-    title: "Press Release 5",
-    releaseDate: "2021-03-18",
-    handleDelete: () => {},
-    handleShare: () => {},
-  },
-  {
-    id: "6",
-    title: "Press Release 6",
-    releaseDate: "2021-03-18",
-    handleDelete: () => {},
-    handleShare: () => {},
-  },
-  {
-    id: "7",
-    title: "Press Release 7",
-    releaseDate: "2021-03-18",
-    handleDelete: () => {},
-    handleShare: () => {},
-  },
 ];
+
+const PressReleaseDetailsDraft = [
+  {
+    id: "1",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
+  {
+    id: "2",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
+  {
+    id: "3",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
+]
+
+const PressReleaseDetailsShared = [
+  {
+    id: "1",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
+]
 export default function PressRelease() {
   const [headline, setHeadline] = useState("");
   const [subHeadline, setSubHeadline] = useState("");
@@ -169,6 +184,7 @@ export default function PressRelease() {
     }
     return true;
   };
+  
 
   return (
     <Box sx={{ minWidth: 375 }}>
@@ -567,30 +583,91 @@ export default function PressRelease() {
                     </Dialog>
                   </TabPanel>
                   <TabPanel
-                  value="2"
-                  style={{
-                    width: "100%",
-                    padding: "0",
-                  }}
-                >
-                  <Grid container spacing={1}>
-                    {PressReleaseDetails.map(
-                      ({ id, title, releaseDate, handleDelete, handleShare }) => (
-                        <Grid item xs={12} sm={6} md={5} lg={3} key={id}>
-                          <PressReleaseSavedRow
-                            id={id}
-                            title={title}
-                            releaseDate={releaseDate}
-                            handleDelete={handleDelete}
-                            handleShare={handleShare}
-                          />
-                        </Grid>
-                      )
-                    )}
-                  </Grid>
+                    value="2"
+                    style={{
+                      width: "100%",
+                      padding: "0",
+                    }}
+                  >
+                    <Grid container spacing={1}>
+                      {PressReleaseDetailsSaved.map(
+                        ({
+                          id,
+                          title,
+                          releaseDate,
+                          handleDelete,
+                          handleShare,
+                        }) => (
+                          <Grid item xs={12} sm={6} md={5} lg={3} key={id}>
+                            <PressReleaseSavedRow
+                              id={id}
+                              title={title}
+                              releaseDate={releaseDate}
+                              handleDelete={handleDelete}
+                              handleShare={handleShare}
+                            />
+                          </Grid>
+                        )
+                      )}
+                    </Grid>
+                  </TabPanel>
+                  <TabPanel
+                    value="3"
+                    style={{
+                      width: "100%",
+                      padding: "0",
+                    }}
+                  >
+                  {PressReleaseDetailsDraft.map(
+                    ({
+                      id,
+                      title,
+                      releaseDate,
+                      handleDelete,
+                      handleEdit,
+                    }) => (
+                     
+                        <PressReleaseDraftRow
+                          id={id}
+                          title={title}
+                          releaseDate={releaseDate}
+                          handleDelete={handleDelete}
+                          handleEdit={handleEdit}
+                        />
+                
+                    )
+                  )}
+                 
                 </TabPanel>
-                  <TabPanel value="3">Item Three</TabPanel>
-                  <TabPanel value="4">Item Four</TabPanel>
+                  <TabPanel 
+                  value="4"    
+                  style={{
+                      width: "100%",
+                      padding: "0",
+                    }}
+                  >
+                    <Grid container spacing={1}>
+                      {PressReleaseDetailsShared.map(
+                        ({
+                          id,
+                          title,
+                          releaseDate,
+                          handleDelete,
+                         
+                        }) => (
+                          <Grid item xs={12} sm={6} md={5} lg={3} key={id}>
+                            <PressReleaseSharedRow
+                              id={id}
+                              title={title}
+                              releaseDate={releaseDate}
+                              handleDelete={handleDelete}
+                              
+                            />
+                          </Grid>
+                        )
+                      )}
+                    </Grid>
+                    </TabPanel>
                 </TabContext>
               </TabsNav>
             </div>

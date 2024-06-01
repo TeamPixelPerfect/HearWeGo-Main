@@ -13,40 +13,26 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import { PressReleaseSaved } from "../styles/PressReleaseOriginal.styles";
+import { PressReleaseShared } from "../styles/PressReleaseOriginal.styles";
 
 interface Props {
   id: string;
   title: string;
   releaseDate: string;
-  handleShare: (id: string) => void;
   handleDelete: (id: string) => void;
 }
 
-export default function PressReleaseSavedRow({
+export default function PressReleaseSharedRow({
   id,
   title,
   releaseDate,
-  handleShare,
   handleDelete,
 }: Props) {
-  const [openShareDialog, setOpenShareDialog] = useState(false);
+ 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [shareMessage, setShareMessage] = useState("Select your share option");
   const [deleteMessage, setDeleteMessage] = useState("");
 
-  const handleShareClick = () => {
-    setOpenShareDialog(true);
-  };
 
-  const handleShareClose = () => {
-    setShareMessage("Successfully shared");
-    setTimeout(() => {
-      setOpenShareDialog(false);
-      setShareMessage("Select your share option");
-      handleShare(id);
-    }, 2000);
-  };
 
   const handleDeleteClick = () => {
     setOpenDeleteDialog(true);
@@ -58,7 +44,7 @@ export default function PressReleaseSavedRow({
   };
 
   return (
-    <PressReleaseSaved>
+    <PressReleaseShared>
       <Card
         sx={{
           // maxWidth: "12%",
@@ -89,12 +75,21 @@ export default function PressReleaseSavedRow({
           </Button>
         </Box>
         <Divider />
-        <Box>
+        <Box sx={{
+          //backgroundColor: "yellow",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          
+        }}>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
               padding: "10px",
+              //backgroundColor: "red",
+              width: "70%",
             }}
           >
             <Typography variant="body1">{title}</Typography>
@@ -102,42 +97,28 @@ export default function PressReleaseSavedRow({
           </Box>
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "row",
+              // display: "flex",
+              // flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              // backgroundColor: "white",
+              //backgroundColor: "blue",
+              width: "30%",	
+             
             }}
           >
             <Button onClick={handleDeleteClick}>
               <DeleteIcon
                 sx={{
-                  fontSize: "20px",
+                  fontSize: "25px",
                 }}
               />
             </Button>
-            <Button onClick={handleShareClick}>
-              <ShareIcon
-                sx={{
-                  fontSize: "20px",
-                }}
-              />
-            </Button>
+            
           </Box>
         </Box>
       </Card>
 
-      <Dialog open={openShareDialog} onClose={() => setOpenShareDialog(false)}>
-        <DialogTitle>Share</DialogTitle>
-        <DialogContent>
-          <Typography>{shareMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleShareClose} color="primary">
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
+      
 
       <Dialog
         open={openDeleteDialog}
@@ -153,6 +134,6 @@ export default function PressReleaseSavedRow({
           </Button>
         </DialogActions>
       </Dialog>
-    </PressReleaseSaved>
+    </PressReleaseShared>
   );
 }
