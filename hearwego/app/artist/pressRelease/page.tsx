@@ -93,6 +93,27 @@ const PressReleaseDetailsShared = [
     handleDelete: () => {},
     handleEdit: () => {},
   },
+  {
+    id: "2",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
+  {
+    id: "3",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
+  {
+    id: "4",
+    title: "Press Release 1",
+    releaseDate: "2021-09-01",
+    handleDelete: () => {},
+    handleEdit: () => {},
+  },
 ]
 export default function PressRelease() {
   const [headline, setHeadline] = useState("");

@@ -17,6 +17,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Link from "next/link";
 
 interface Props {
   id: string;
@@ -24,6 +25,7 @@ interface Props {
   releaseDate: string;
   handleEdit: (id: string) => void;
   handleDelete: (id: string) => void;
+  switchTab: (tabId: string) => void; 
 }
 
 export default function PressReleaseDraftRow({
@@ -32,9 +34,12 @@ export default function PressReleaseDraftRow({
   releaseDate,
   handleEdit,
   handleDelete,
+  switchTab,
 }: Props) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
+
+
 
   const handleDeleteClick = () => {
     setOpenDeleteDialog(true);
@@ -43,6 +48,10 @@ export default function PressReleaseDraftRow({
       setOpenDeleteDialog(false);
       handleDelete(id);
     }, 2000);
+  };
+  const handleEditClick = () => {
+    handleEdit(id);
+    switchTab("1");
   };
 
   return (
@@ -92,18 +101,20 @@ export default function PressReleaseDraftRow({
         </Box>
 
         <Divider sx={{ height: "80%" }} orientation="vertical" flexItem />
-
+       
+       
         <Box sx={{ display: "flex", padding: "10px" }}>
-          <Button onClick={() => handleEdit(id)}>
-            <EditIcon sx={{ fontSize: "30px" }} />
+        <Button onClick={() => handleEdit(id)}>
+            <EditIcon sx={{ fontSize: "25px" }} />
           </Button>
         </Box>
+     
 
         <Divider sx={{ height: "80%" }} orientation="vertical" flexItem />
 
         <Box sx={{ display: "flex", padding: "10px" }}>
           <Button onClick={handleDeleteClick}>
-            <DeleteIcon sx={{ fontSize: "30px" }} />
+            <DeleteIcon sx={{ fontSize: "25px" }} />
           </Button>
         </Box>
       </Card>
