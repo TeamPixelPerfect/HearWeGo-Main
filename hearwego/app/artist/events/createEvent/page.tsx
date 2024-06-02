@@ -197,7 +197,8 @@ function CreateEvent() {
   const [teamRows, setTeamRows] = useState([]);
   const [sponsorRows, setSponsorRows] = useState([]);
   const [eventData, setEventData] = useState<Event>({
-    event_img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
+    event_img:
+      "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
     event_name: "",
     event_type: "",
     age_from: 0,
@@ -518,25 +519,35 @@ function CreateEvent() {
             borderRadius: 5,
           }}
         >
-          <Box sx={{width: "100", display: "flex", justifyContent: "end"}}>
+          <Box sx={{ width: "100", display: "flex", justifyContent: "end" }}>
             <IconButton>
               <CloseIcon onClick={handleCloseErrorModal} />
             </IconButton>
           </Box>
-          <Box sx={{width: "100%", display: "flex", flexDirection: "column", alignItems:"center"}}>
-            <ErrorIcon style={{fontSize: "5em", color: "red"}} />
-            <Typography variant="h6" component="h2"  color="error" sx={{marginBottom: 2}}>
-            Validation Errors
-          </Typography>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <ErrorIcon style={{ fontSize: "5em", color: "red" }} />
+            <Typography
+              variant="h6"
+              component="h2"
+              color="error"
+              sx={{ marginBottom: 2 }}
+            >
+              Validation Errors
+            </Typography>
 
-          {errorMessages.map((error, index) => (
-              <Alert severity="error" sx={{marginBottom: 1}}>{error}</Alert>
-
+            {errorMessages.map((error, index) => (
+              <Alert severity="error" sx={{ marginBottom: 1 }}>
+                {error}
+              </Alert>
             ))}
-
           </Box>
-
-          
         </Box>
       </Modal>
     </>
@@ -751,6 +762,7 @@ function EventDetails({
 
 function TicketDetails() {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
+  const [imgFile, setImgFile] = React.useState(null);
 
   const handleSwitchChange = (event) => {
     setIsChecked(event.target.checked);
@@ -758,7 +770,6 @@ function TicketDetails() {
 
   return (
     <div>
-      Ticket Details
       <InputRow>
         <FormGroup>
           <FormControlLabel
@@ -775,24 +786,38 @@ function TicketDetails() {
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
           Tickets Details
         </Typography>
-        
+
         <div>
-        {isChecked ? (
-          <div>
-            <Typography variant="h6" component="div" sx={{ marginBottom: "1em" }}>
-              Auto Generated Tickets
-            </Typography>
-            <AutoTicketTable />
-          </div>
-        ) : (
-          <div>
-            <Typography variant="h6" component="div" sx={{ marginBottom: "1em" }}>
-              Manual Ticket Generation
-            </Typography>
-            <ManualTicketTable />
-          </div>
-        )}
-          {/* <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div> */}
+          {isChecked ? (
+            <div>
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginBottom: "1em",
+                }}
+              >
+                <DropFile
+                  fileTypes="Ticket Cover Image"
+                  fileExtensions="JPEG,PNG,WEBP,SVG"
+                  isCircular={false}
+                  width="100%"
+                  height="250px"
+                  file={imgFile}
+                  setFile={setImgFile}
+                  aspectX={1}
+                  aspectY={1}
+                  shape="rect"
+                />
+              </Box>
+              <AutoTicketTable />
+            </div>
+          ) : (
+            <div>
+              <ManualTicketTable />
+            </div>
+          )}
         </div>
       </Paper>
     </div>
@@ -973,7 +998,9 @@ function SessionTable({ sessionRows, setSessionRows }) {
   };
 
   const handleDelete = () => {
-    const updatedRows = sessionRows.filter((row) => !selectedRows.includes(row.id));
+    const updatedRows = sessionRows.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
 
     const reindexedRows = updatedRows.map((row, index) => ({
       ...row,
@@ -3752,7 +3779,11 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "AD", label: "Andorra", currency: "Euro (EUR)" },
   { code: "AE", label: "United Arab Emirates", currency: "UAE Dirham (AED)" },
   { code: "AF", label: "Afghanistan", currency: "Afghan Afghani (AFN)" },
-  { code: "AG", label: "Antigua and Barbuda", currency: "East Caribbean Dollar (XCD)" },
+  {
+    code: "AG",
+    label: "Antigua and Barbuda",
+    currency: "East Caribbean Dollar (XCD)",
+  },
   { code: "AI", label: "Anguilla", currency: "East Caribbean Dollar (XCD)" },
   { code: "AL", label: "Albania", currency: "Albanian Lek (ALL)" },
   { code: "AM", label: "Armenia", currency: "Armenian Dram (AMD)" },
@@ -3765,11 +3796,19 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "AW", label: "Aruba", currency: "Aruban Florin (AWG)" },
   { code: "AX", label: "Aland Islands", currency: "Euro (EUR)" },
   { code: "AZ", label: "Azerbaijan", currency: "Azerbaijani Manat (AZN)" },
-  { code: "BA", label: "Bosnia and Herzegovina", currency: "Bosnia-Herzegovina Convertible Mark (BAM)" },
+  {
+    code: "BA",
+    label: "Bosnia and Herzegovina",
+    currency: "Bosnia-Herzegovina Convertible Mark (BAM)",
+  },
   { code: "BB", label: "Barbados", currency: "Barbadian Dollar (BBD)" },
   { code: "BD", label: "Bangladesh", currency: "Bangladeshi Taka (BDT)" },
   { code: "BE", label: "Belgium", currency: "Euro (EUR)" },
-  { code: "BF", label: "Burkina Faso", currency: "West African CFA Franc (XOF)" },
+  {
+    code: "BF",
+    label: "Burkina Faso",
+    currency: "West African CFA Franc (XOF)",
+  },
   { code: "BG", label: "Bulgaria", currency: "Bulgarian Lev (BGN)" },
   { code: "BH", label: "Bahrain", currency: "Bahraini Dinar (BHD)" },
   { code: "BI", label: "Burundi", currency: "Burundian Franc (BIF)" },
@@ -3780,28 +3819,64 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "BO", label: "Bolivia", currency: "Bolivian Boliviano (BOB)" },
   { code: "BR", label: "Brazil", currency: "Brazilian Real (BRL)" },
   { code: "BS", label: "Bahamas", currency: "Bahamian Dollar (BSD)" },
-  { code: "BT", label: "Bhutan", currency: "Bhutanese Ngultrum (BTN), Indian Rupee (INR)" },
+  {
+    code: "BT",
+    label: "Bhutan",
+    currency: "Bhutanese Ngultrum (BTN), Indian Rupee (INR)",
+  },
   { code: "BV", label: "Bouvet Island", currency: "Norwegian Krone (NOK)" },
   { code: "BW", label: "Botswana", currency: "Botswana Pula (BWP)" },
   { code: "BY", label: "Belarus", currency: "Belarusian Ruble (BYN)" },
   { code: "BZ", label: "Belize", currency: "Belize Dollar (BZD)" },
   { code: "CA", label: "Canada", currency: "Canadian Dollar (CAD)" },
-  { code: "CC", label: "Cocos (Keeling) Islands", currency: "Australian Dollar (AUD)" },
-  { code: "CD", label: "Congo, Democratic Republic of the", currency: "Congolese Franc (CDF)" },
-  { code: "CF", label: "Central African Republic", currency: "Central African CFA Franc (XAF)" },
-  { code: "CG", label: "Congo, Republic of the", currency: "Central African CFA Franc (XAF)" },
+  {
+    code: "CC",
+    label: "Cocos (Keeling) Islands",
+    currency: "Australian Dollar (AUD)",
+  },
+  {
+    code: "CD",
+    label: "Congo, Democratic Republic of the",
+    currency: "Congolese Franc (CDF)",
+  },
+  {
+    code: "CF",
+    label: "Central African Republic",
+    currency: "Central African CFA Franc (XAF)",
+  },
+  {
+    code: "CG",
+    label: "Congo, Republic of the",
+    currency: "Central African CFA Franc (XAF)",
+  },
   { code: "CH", label: "Switzerland", currency: "Swiss Franc (CHF)" },
-  { code: "CI", label: "Cote d'Ivoire", currency: "West African CFA Franc (XOF)" },
+  {
+    code: "CI",
+    label: "Cote d'Ivoire",
+    currency: "West African CFA Franc (XOF)",
+  },
   { code: "CK", label: "Cook Islands", currency: "New Zealand Dollar (NZD)" },
   { code: "CL", label: "Chile", currency: "Chilean Peso (CLP)" },
-  { code: "CM", label: "Cameroon", currency: "Central African CFA Franc (XAF)" },
+  {
+    code: "CM",
+    label: "Cameroon",
+    currency: "Central African CFA Franc (XAF)",
+  },
   { code: "CN", label: "China", currency: "Chinese Yuan (CNY)" },
   { code: "CO", label: "Colombia", currency: "Colombian Peso (COP)" },
   { code: "CR", label: "Costa Rica", currency: "Costa Rican Colon (CRC)" },
   { code: "CU", label: "Cuba", currency: "Cuban Peso (CUP)" },
   { code: "CV", label: "Cape Verde", currency: "Cape Verdean Escudo (CVE)" },
-  { code: "CW", label: "Curacao", currency: "Netherlands Antillean Guilder (ANG)" },
-  { code: "CX", label: "Christmas Island", currency: "Australian Dollar (AUD)" },
+  {
+    code: "CW",
+    label: "Curacao",
+    currency: "Netherlands Antillean Guilder (ANG)",
+  },
+  {
+    code: "CX",
+    label: "Christmas Island",
+    currency: "Australian Dollar (AUD)",
+  },
   { code: "CY", label: "Cyprus", currency: "Euro (EUR)" },
   { code: "CZ", label: "Czech Republic", currency: "Czech Koruna (CZK)" },
   { code: "DE", label: "Germany", currency: "Euro (EUR)" },
@@ -3819,8 +3894,16 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "ET", label: "Ethiopia", currency: "Ethiopian Birr (ETB)" },
   { code: "FI", label: "Finland", currency: "Euro (EUR)" },
   { code: "FJ", label: "Fiji", currency: "Fijian Dollar (FJD)" },
-  { code: "FK", label: "Falkland Islands (Malvinas)", currency: "Falkland Islands Pound (FKP)" },
-  { code: "FM", label: "Micronesia, Federated States of", currency: "US Dollar (USD)" },
+  {
+    code: "FK",
+    label: "Falkland Islands (Malvinas)",
+    currency: "Falkland Islands Pound (FKP)",
+  },
+  {
+    code: "FM",
+    label: "Micronesia, Federated States of",
+    currency: "US Dollar (USD)",
+  },
   { code: "FO", label: "Faroe Islands", currency: "Danish Krone (DKK)" },
   { code: "FR", label: "France", currency: "Euro (EUR)" },
   { code: "GA", label: "Gabon", currency: "Central African CFA Franc (XAF)" },
@@ -3835,14 +3918,26 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "GM", label: "Gambia", currency: "Gambian Dalasi (GMD)" },
   { code: "GN", label: "Guinea", currency: "Guinean Franc (GNF)" },
   { code: "GP", label: "Guadeloupe", currency: "Euro (EUR)" },
-  { code: "GQ", label: "Equatorial Guinea", currency: "Central African CFA Franc (XAF)" },
+  {
+    code: "GQ",
+    label: "Equatorial Guinea",
+    currency: "Central African CFA Franc (XAF)",
+  },
   { code: "GR", label: "Greece", currency: "Euro (EUR)" },
   { code: "GT", label: "Guatemala", currency: "Guatemalan Quetzal (GTQ)" },
   { code: "GU", label: "Guam", currency: "US Dollar (USD)" },
-  { code: "GW", label: "Guinea-Bissau", currency: "West African CFA Franc (XOF)" },
+  {
+    code: "GW",
+    label: "Guinea-Bissau",
+    currency: "West African CFA Franc (XOF)",
+  },
   { code: "GY", label: "Guyana", currency: "Guyanese Dollar (GYD)" },
   { code: "HK", label: "Hong Kong", currency: "Hong Kong Dollar (HKD)" },
-  { code: "HM", label: "Heard Island and McDonald Islands", currency: "Australian Dollar (AUD)" },
+  {
+    code: "HM",
+    label: "Heard Island and McDonald Islands",
+    currency: "Australian Dollar (AUD)",
+  },
   { code: "HN", label: "Honduras", currency: "Honduran Lempira (HNL)" },
   { code: "HR", label: "Croatia", currency: "Croatian Kuna (HRK)" },
   { code: "HT", label: "Haiti", currency: "Haitian Gourde (HTG)" },
@@ -3852,9 +3947,17 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "IL", label: "Israel", currency: "Israeli New Shekel (ILS)" },
   { code: "IM", label: "Isle of Man", currency: "British Pound (GBP)" },
   { code: "IN", label: "India", currency: "Indian Rupee (INR)" },
-  { code: "IO", label: "British Indian Ocean Territory", currency: "US Dollar (USD)" },
+  {
+    code: "IO",
+    label: "British Indian Ocean Territory",
+    currency: "US Dollar (USD)",
+  },
   { code: "IQ", label: "Iraq", currency: "Iraqi Dinar (IQD)" },
-  { code: "IR", label: "Iran, Islamic Republic of", currency: "Iranian Rial (IRR)" },
+  {
+    code: "IR",
+    label: "Iran, Islamic Republic of",
+    currency: "Iranian Rial (IRR)",
+  },
   { code: "IS", label: "Iceland", currency: "Icelandic Krona (ISK)" },
   { code: "IT", label: "Italy", currency: "Euro (EUR)" },
   { code: "JE", label: "Jersey", currency: "British Pound (GBP)" },
@@ -3866,19 +3969,43 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "KH", label: "Cambodia", currency: "Cambodian Riel (KHR)" },
   { code: "KI", label: "Kiribati", currency: "Australian Dollar (AUD)" },
   { code: "KM", label: "Comoros", currency: "Comorian Franc (KMF)" },
-  { code: "KN", label: "Saint Kitts and Nevis", currency: "East Caribbean Dollar (XCD)" },
-  { code: "KP", label: "Korea, Democratic People's Republic of", currency: "North Korean Won (KPW)" },
-  { code: "KR", label: "Korea, Republic of", currency: "South Korean Won (KRW)" },
+  {
+    code: "KN",
+    label: "Saint Kitts and Nevis",
+    currency: "East Caribbean Dollar (XCD)",
+  },
+  {
+    code: "KP",
+    label: "Korea, Democratic People's Republic of",
+    currency: "North Korean Won (KPW)",
+  },
+  {
+    code: "KR",
+    label: "Korea, Republic of",
+    currency: "South Korean Won (KRW)",
+  },
   { code: "KW", label: "Kuwait", currency: "Kuwaiti Dinar (KWD)" },
-  { code: "KY", label: "Cayman Islands", currency: "Cayman Islands Dollar (KYD)" },
+  {
+    code: "KY",
+    label: "Cayman Islands",
+    currency: "Cayman Islands Dollar (KYD)",
+  },
   { code: "KZ", label: "Kazakhstan", currency: "Kazakhstani Tenge (KZT)" },
-  { code: "LA", label: "Lao People's Democratic Republic", currency: "Lao Kip (LAK)" },
+  {
+    code: "LA",
+    label: "Lao People's Democratic Republic",
+    currency: "Lao Kip (LAK)",
+  },
   { code: "LB", label: "Lebanon", currency: "Lebanese Pound (LBP)" },
   { code: "LC", label: "Saint Lucia", currency: "East Caribbean Dollar (XCD)" },
   { code: "LI", label: "Liechtenstein", currency: "Swiss Franc (CHF)" },
   { code: "LK", label: "Sri Lanka", currency: "Sri Lankan Rupee (LKR)" },
   { code: "LR", label: "Liberia", currency: "Liberian Dollar (LRD)" },
-  { code: "LS", label: "Lesotho", currency: "Lesotho Loti (LSL), South African Rand (ZAR)" },
+  {
+    code: "LS",
+    label: "Lesotho",
+    currency: "Lesotho Loti (LSL), South African Rand (ZAR)",
+  },
   { code: "LT", label: "Lithuania", currency: "Euro (EUR)" },
   { code: "LU", label: "Luxembourg", currency: "Euro (EUR)" },
   { code: "LV", label: "Latvia", currency: "Euro (EUR)" },
@@ -3890,12 +4017,20 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "MF", label: "Saint Martin (French part)", currency: "Euro (EUR)" },
   { code: "MG", label: "Madagascar", currency: "Malagasy Ariary (MGA)" },
   { code: "MH", label: "Marshall Islands", currency: "US Dollar (USD)" },
-  { code: "MK", label: "Macedonia, the Former Yugoslav Republic of", currency: "Macedonian Denar (MKD)" },
+  {
+    code: "MK",
+    label: "Macedonia, the Former Yugoslav Republic of",
+    currency: "Macedonian Denar (MKD)",
+  },
   { code: "ML", label: "Mali", currency: "West African CFA Franc (XOF)" },
   { code: "MM", label: "Myanmar", currency: "Myanmar Kyat (MMK)" },
   { code: "MN", label: "Mongolia", currency: "Mongolian Tugrik (MNT)" },
   { code: "MO", label: "Macao", currency: "Macanese Pataca (MOP)" },
-  { code: "MP", label: "Northern Mariana Islands", currency: "US Dollar (USD)" },
+  {
+    code: "MP",
+    label: "Northern Mariana Islands",
+    currency: "US Dollar (USD)",
+  },
   { code: "MQ", label: "Martinique", currency: "Euro (EUR)" },
   { code: "MR", label: "Mauritania", currency: "Mauritanian Ouguiya (MRU)" },
   { code: "MS", label: "Montserrat", currency: "East Caribbean Dollar (XCD)" },
@@ -3919,10 +4054,18 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "NU", label: "Niue", currency: "New Zealand Dollar (NZD)" },
   { code: "NZ", label: "New Zealand", currency: "New Zealand Dollar (NZD)" },
   { code: "OM", label: "Oman", currency: "Omani Rial (OMR)" },
-  { code: "PA", label: "Panama", currency: "Panamanian Balboa (PAB), US Dollar (USD)" },
+  {
+    code: "PA",
+    label: "Panama",
+    currency: "Panamanian Balboa (PAB), US Dollar (USD)",
+  },
   { code: "PE", label: "Peru", currency: "Peruvian Sol (PEN)" },
   { code: "PF", label: "French Polynesia", currency: "CFP Franc (XPF)" },
-  { code: "PG", label: "Papua New Guinea", currency: "Papua New Guinean Kina (PGK)" },
+  {
+    code: "PG",
+    label: "Papua New Guinea",
+    currency: "Papua New Guinean Kina (PGK)",
+  },
   { code: "PH", label: "Philippines", currency: "Philippine Peso (PHP)" },
   { code: "PK", label: "Pakistan", currency: "Pakistani Rupee (PKR)" },
   { code: "PL", label: "Poland", currency: "Polish Zloty (PLN)" },
@@ -3939,14 +4082,26 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "RU", label: "Russian Federation", currency: "Russian Ruble (RUB)" },
   { code: "RW", label: "Rwanda", currency: "Rwandan Franc (RWF)" },
   { code: "SA", label: "Saudi Arabia", currency: "Saudi Riyal (SAR)" },
-  { code: "SB", label: "Solomon Islands", currency: "Solomon Islands Dollar (SBD)" },
+  {
+    code: "SB",
+    label: "Solomon Islands",
+    currency: "Solomon Islands Dollar (SBD)",
+  },
   { code: "SC", label: "Seychelles", currency: "Seychellois Rupee (SCR)" },
   { code: "SD", label: "Sudan", currency: "Sudanese Pound (SDG)" },
   { code: "SE", label: "Sweden", currency: "Swedish Krona (SEK)" },
   { code: "SG", label: "Singapore", currency: "Singapore Dollar (SGD)" },
-  { code: "SH", label: "Saint Helena, Ascension and Tristan da Cunha", currency: "Saint Helena Pound (SHP)" },
+  {
+    code: "SH",
+    label: "Saint Helena, Ascension and Tristan da Cunha",
+    currency: "Saint Helena Pound (SHP)",
+  },
   { code: "SI", label: "Slovenia", currency: "Euro (EUR)" },
-  { code: "SJ", label: "Svalbard and Jan Mayen", currency: "Norwegian Krone (NOK)" },
+  {
+    code: "SJ",
+    label: "Svalbard and Jan Mayen",
+    currency: "Norwegian Krone (NOK)",
+  },
   { code: "SK", label: "Slovakia", currency: "Euro (EUR)" },
   { code: "SL", label: "Sierra Leone", currency: "Sierra Leonean Leone (SLL)" },
   { code: "SM", label: "San Marino", currency: "Euro (EUR)" },
@@ -3954,12 +4109,32 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "SO", label: "Somalia", currency: "Somali Shilling (SOS)" },
   { code: "SR", label: "Suriname", currency: "Surinamese Dollar (SRD)" },
   { code: "SS", label: "South Sudan", currency: "South Sudanese Pound (SSP)" },
-  { code: "ST", label: "Sao Tome and Principe", currency: "São Tomé and Príncipe Dobra (STN)" },
-  { code: "SV", label: "El Salvador", currency: "El Salvador Colon (SVC), US Dollar (USD)" },
-  { code: "SX", label: "Sint Maarten (Dutch part)", currency: "Netherlands Antillean Guilder (ANG)" },
+  {
+    code: "ST",
+    label: "Sao Tome and Principe",
+    currency: "São Tomé and Príncipe Dobra (STN)",
+  },
+  {
+    code: "SV",
+    label: "El Salvador",
+    currency: "El Salvador Colon (SVC), US Dollar (USD)",
+  },
+  {
+    code: "SX",
+    label: "Sint Maarten (Dutch part)",
+    currency: "Netherlands Antillean Guilder (ANG)",
+  },
   { code: "SY", label: "Syrian Arab Republic", currency: "Syrian Pound (SYP)" },
-  { code: "SZ", label: "Eswatini", currency: "Swazi Lilangeni (SZL), South African Rand (ZAR)" },
-  { code: "TC", label: "Turks and Caicos Islands", currency: "US Dollar (USD)" },
+  {
+    code: "SZ",
+    label: "Eswatini",
+    currency: "Swazi Lilangeni (SZL), South African Rand (ZAR)",
+  },
+  {
+    code: "TC",
+    label: "Turks and Caicos Islands",
+    currency: "US Dollar (USD)",
+  },
   { code: "TD", label: "Chad", currency: "Central African CFA Franc (XAF)" },
   { code: "TF", label: "French Southern Territories", currency: "Euro (EUR)" },
   { code: "TG", label: "Togo", currency: "West African CFA Franc (XOF)" },
@@ -3971,18 +4146,42 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "TN", label: "Tunisia", currency: "Tunisian Dinar (TND)" },
   { code: "TO", label: "Tonga", currency: "Tongan Pa'anga (TOP)" },
   { code: "TR", label: "Turkey", currency: "Turkish Lira (TRY)" },
-  { code: "TT", label: "Trinidad and Tobago", currency: "Trinidad and Tobago Dollar (TTD)" },
+  {
+    code: "TT",
+    label: "Trinidad and Tobago",
+    currency: "Trinidad and Tobago Dollar (TTD)",
+  },
   { code: "TV", label: "Tuvalu", currency: "Australian Dollar (AUD)" },
-  { code: "TZ", label: "Tanzania, United Republic of", currency: "Tanzanian Shilling (TZS)" },
+  {
+    code: "TZ",
+    label: "Tanzania, United Republic of",
+    currency: "Tanzanian Shilling (TZS)",
+  },
   { code: "UA", label: "Ukraine", currency: "Ukrainian Hryvnia (UAH)" },
   { code: "UG", label: "Uganda", currency: "Ugandan Shilling (UGX)" },
-  { code: "UM", label: "United States Minor Outlying Islands", currency: "US Dollar (USD)" },
+  {
+    code: "UM",
+    label: "United States Minor Outlying Islands",
+    currency: "US Dollar (USD)",
+  },
   { code: "US", label: "United States", currency: "US Dollar (USD)" },
   { code: "UY", label: "Uruguay", currency: "Uruguayan Peso (UYU)" },
   { code: "UZ", label: "Uzbekistan", currency: "Uzbekistani Som (UZS)" },
-  { code: "VA", label: "Holy See (Vatican City State)", currency: "Euro (EUR)" },
-  { code: "VC", label: "Saint Vincent and the Grenadines", currency: "East Caribbean Dollar (XCD)" },
-  { code: "VE", label: "Venezuela, Bolivarian Republic of", currency: "Venezuelan Bolívar Soberano (VES)" },
+  {
+    code: "VA",
+    label: "Holy See (Vatican City State)",
+    currency: "Euro (EUR)",
+  },
+  {
+    code: "VC",
+    label: "Saint Vincent and the Grenadines",
+    currency: "East Caribbean Dollar (XCD)",
+  },
+  {
+    code: "VE",
+    label: "Venezuela, Bolivarian Republic of",
+    currency: "Venezuelan Bolívar Soberano (VES)",
+  },
   { code: "VG", label: "Virgin Islands, British", currency: "US Dollar (USD)" },
   { code: "VI", label: "Virgin Islands, U.S.", currency: "US Dollar (USD)" },
   { code: "VN", label: "Viet Nam", currency: "Vietnamese Dong (VND)" },
@@ -3993,5 +4192,5 @@ const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "YT", label: "Mayotte", currency: "Euro (EUR)" },
   { code: "ZA", label: "South Africa", currency: "South African Rand (ZAR)" },
   { code: "ZM", label: "Zambia", currency: "Zambian Kwacha (ZMW)" },
-  { code: "ZW", label: "Zimbabwe", currency: "Zimbabwean Dollar (ZWL)" }
+  { code: "ZW", label: "Zimbabwe", currency: "Zimbabwean Dollar (ZWL)" },
 ];
