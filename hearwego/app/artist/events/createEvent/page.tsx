@@ -773,7 +773,7 @@ function TicketDetails() {
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
           Tickets Details
         </Typography>
-
+        
         <div>
           <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
         </div>
@@ -956,12 +956,17 @@ function SessionTable({ sessionRows, setSessionRows }) {
   };
 
   const handleDelete = () => {
-    const updatedRows = sessionRows.filter(
-      (row) => !selectedRows.includes(row.id)
-    );
-    setSessionRows(updatedRows);
+    const updatedRows = sessionRows.filter((row) => !selectedRows.includes(row.id));
+
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setSessionRows(reindexedRows);
     setSelectedRows([]);
-    sessionCount -= 1;
+
+    sessionCount = reindexedRows.length;
     refreshTable();
   };
 

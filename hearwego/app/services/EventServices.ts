@@ -46,3 +46,24 @@ export const addEvent = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
+
+
+export const addTicket = async (token: string, data: any) => {
+  console.log("Sending ticket data:", data); // Add this line for logging
+  const res = await fetch(`${base_url}/EventsManager/ticket`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error); // Add this line to log the error response
+    throw new Error(error.message);
+  }
+};
