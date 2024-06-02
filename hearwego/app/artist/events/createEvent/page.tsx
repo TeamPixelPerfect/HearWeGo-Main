@@ -209,6 +209,8 @@ function CreateEvent() {
     description: "",
     event_status: "private",
     event_created_by: artist ? artist.artist_id : "",
+    event_tickets: [],
+    event_budget: [],
   });
 
   const [openErrorModal, setOpenErrorModal] = React.useState(false);

@@ -183,6 +183,27 @@ export interface Event {
   description?: string;
   event_status?: string;
   event_created_by?: string;
+  event_tickets?: [
+    {
+      ticket_catagory: string;
+      ticket_img: string;
+      ticket_currency: string;
+      auto_ticket_type: string;
+      auto_ticket_price: number;
+      auto_tickets_count: number;
+      manual_ticket_location: string;
+      special_notice: string;
+      sesson_id: number;
+    }
+  ];
+  event_budget?: [
+    {
+      budget_title: string;
+      session: string;
+      budget_type: string;
+      amount: number;
+    }
+  ];
 }
 
 export interface Ticket {
