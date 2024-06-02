@@ -777,7 +777,22 @@ function TicketDetails() {
         </Typography>
         
         <div>
-          <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div>
+        {isChecked ? (
+          <div>
+            <Typography variant="h6" component="div" sx={{ marginBottom: "1em" }}>
+              Auto Generated Tickets
+            </Typography>
+            <AutoTicketTable />
+          </div>
+        ) : (
+          <div>
+            <Typography variant="h6" component="div" sx={{ marginBottom: "1em" }}>
+              Manual Ticket Generation
+            </Typography>
+            <ManualTicketTable />
+          </div>
+        )}
+          {/* <div>{TicketSwitchDisplay(isChecked ? 0 : 1)}</div> */}
         </div>
       </Paper>
     </div>
