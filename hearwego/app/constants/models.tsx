@@ -67,7 +67,6 @@ export interface BankDetails {
 }
 
 export interface Artist {
-
   user: {
     _id?: string;
     artist_id?: string;
@@ -114,7 +113,7 @@ export interface Song {
   release_date?: string;
   song_status?: string;
   privacy_status?: string;
-  language?: string[] ;
+  language?: string[];
   record_label?: string;
   song_writers?: { artist_id: string; artist_name: string }[];
   composer?: { artist_id: string; artist_name: string }[];
@@ -145,40 +144,78 @@ export interface Album {
   song?: string[];
 }
 
-export interface Event{
+export interface Event {
   event_id?: string;
-      event_img?: string;
-      event_name?: string;
-      event_type?: string;
-      age_from?: number;
-      age_to?: number;
-      no_of_sessions?: number;
-      sessions?: [
-        {
-          session_id: string,
-          session_name: string,
-          session_date: string,
-          session_time: string,
-          duration: string,
-          venue: string,
-          artists: [
-            {
-              artist_id: string,
-              artist_name: string
-            }
-          ],
-          session_special_notice: string
-        }
-      ];
-      sponsor?: string[];
-      teams?: [
-        {
-          team_type: string,
-          team_name: string,
-          contact_name: string,
-          contact: string,
-          email: string
-        }
-      ];
-      description?: string;
+  event_img?: string;
+  event_name?: string;
+  event_type?: string;
+  age_from?: number;
+  age_to?: number;
+  no_of_sessions?: number;
+  sessions?: [
+    {
+      session_id: number;
+      session_name: string;
+      session_date: string;
+      session_time: string;
+      duration: string;
+      venue: string;
+      artists: string[];
+      session_special_notice: string;
+    }
+  ];
+  sponsor?: [
+    {
+      sponsor_type: string;
+      sponsor_name: string;
+      sponsor_contact: string;
+      sponsor_email: string;
+    }
+  ];
+  teams?: [
+    {
+      team_type: string;
+      team_name: string;
+      contact: string;
+      email: string;
+    }
+  ];
+  description?: string;
+  event_status?: string;
+  event_created_by?: string;
+  event_tickets?: [
+    {
+      ticket_catagory: string;
+      ticket_img: string;
+      ticket_currency: string;
+      auto_ticket_type: string;
+      auto_ticket_price: number;
+      auto_tickets_count: number;
+      manual_ticket_location: string;
+      special_notice: string;
+      sesson_id: number;
+    }
+  ];
+  event_budget?: [
+    {
+      budget_title: string;
+      session: string;
+      budget_type: string;
+      amount: number;
+    }
+  ];
+}
+
+export interface Ticket {
+  ticket_id?: string;
+  ticket_catagory?: string;
+  ticket_img?: string;
+  ticket_currency?: string;
+  auto_ticket_type?: string;
+  auto_ticket_price?: number;
+  auto_tickets_count?: number;
+  manual_ticket_location?: string;
+  special_notice?: string;
+  sesson_id?: number;
+  event_id?: string;
 }
