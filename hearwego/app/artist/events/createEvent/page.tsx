@@ -2662,43 +2662,49 @@ const autoTicketColumns: GridColDef[] = [
 
 let autoTicketRows = [];
 
+type AutoTicketRow = {
+  id: number;
+  ticketType: string;
+  ticketPrice: string;
+  ticketCount: string;
+  ticketSession: string;
+}
+
 //new
-function AutoTicketTable() {
+function AutoTicketTable({autoTicketRows, setAutoTicketRows}) {
   const [ticketTypeError, setTicketTypeError] = useState(false);
   const [ticketPriceError, setTicketPriceError] = useState(false);
   const [ticketCountError, setTicketCountError] = useState(false);
   const [ticketSessionError, setTicketSessionError] = useState(false);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const [errorMessage, setErrorMessage] = useState("");
-
   const [ticketType, setTicketType] = useState("");
   const [ticketPrice, setTicketPrice] = useState("");
   const [ticketCount, setTicketCount] = useState("");
   const [ticketSession, setTicketSession] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<AutoTicketRow | null>(
+    null
+  );
+  const [open, setOpen] = React.useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleTicketTypeChange = (event) => {
+  const handleTicketTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicketType(event.target.value);
     setTicketTypeError(event.target.value.trim() === "");
   };
 
-  const handleTicketPriceChange = (event) => {
+  const handleTicketPriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicketPrice(event.target.value);
     setTicketPriceError(event.target.value.trim() === "");
   };
 
-  const handleTicketCountChange = (event) => {
+  const handleTicketCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicketCount(event.target.value);
     setTicketCountError(event.target.value.trim() === "");
   };
 
-  const handleTicketSessionChange = (event) => {
+  const handleTicketSessionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicketSession(event.target.value);
     setTicketSessionError(event.target.value.trim() === "");
   };
@@ -2717,44 +2723,37 @@ function AutoTicketTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setTicketTypeError(false);
       setTicketPriceError(false);
       setTicketCountError(false);
       setTicketSessionError(false);
 
-      // Get the selected row ID
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
-      // Find the index of the selected row in the sponsorRows array
-      const rowIndex = autoTicketRows.findIndex(
-        (row) => row.id === selectedRowId
-      );
+      const rowIndex = autoTicketRows.findIndex((row) => row.id === selectedRowId);
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
-          ticketType: ticketType,
-          ticketPrice: ticketPrice,
-          ticketCount: ticketCount,
-          ticketSession: ticketSession,
+          ticketType,
+          ticketPrice,
+          ticketCount,
+          ticketSession,
         };
 
-        // Replace the old row with the updated row
-        const updatedRows = [...autoTicketRows];
-        updatedRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...autoTicketRows.slice(0, rowIndex),
+          updatedRow,
+          ...autoTicketRows.slice(rowIndex + 1),
+        ];
 
-        // Update sponsorRows with the updated rows
-        autoTicketRows = updatedRows;
+        setAutoTicketRows(updatedRows);
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose(); 
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -2763,9 +2762,13 @@ function AutoTicketTable() {
     const updatedRows = autoTicketRows.filter(
       (row) => !selectedRows.includes(row.id)
     );
-    autoTicketRows = updatedRows;
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setAutoTicketRows(reindexedRows);
     setSelectedRows([]);
-    console.log("Rows", autoTicketRows);
     setTicketTypeError(false);
     setTicketPriceError(false);
     setTicketCountError(false);
@@ -2774,7 +2777,7 @@ function AutoTicketTable() {
     refreshTable();
   };
 
-  const [open, setOpen] = React.useState(false);
+  
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setTicketTypeError(false);
@@ -2790,16 +2793,14 @@ function AutoTicketTable() {
     setTicketPrice("");
     setTicketCount("");
     setTicketSession("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null); 
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
-      const selectedRow = autoTicketRows.find(
-        (row) => row.id === selectedRowId
-      );
+      const selectedRowId = selectedRows[0] as number;
+      const selectedRow = autoTicketRows.find((row) => row.id === selectedRowId);
       if (selectedRow) {
         setTicketType(selectedRow.ticketType);
         setTicketPrice(selectedRow.ticketPrice);
@@ -2816,38 +2817,31 @@ function AutoTicketTable() {
   const addNewTicket = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setTicketTypeError(false);
       setTicketPriceError(false);
       setTicketCountError(false);
       setTicketSessionError(false);
 
-      //----
-      const newId = autoTicketRows.length + 1;
-      const newTicket = {
+      const newId = autoTicketRows.length
+        ? Math.max(...autoTicketRows.map((row) => row.id)) + 1
+        : 1;
+      const newTicket: AutoTicketRow = {
         id: newId,
         ticketType: ticketType,
-        ticketPrice: ticketPrice,
-        ticketCount: ticketCount,
-        ticketSession: ticketSession,
+        ticketPrice,
+        ticketCount,
+        ticketSession,
       };
 
-      const handleButtonClick = selectedRowData ? updateRowData : addNewTicket;
-
-      const newTicketRows = [...autoTicketRows, newTicket];
-
-      autoTicketRows = newTicketRows;
-
+      setAutoTicketRows([...autoTicketRows, newTicket]);
       refreshTable();
       handleClose();
     } else {
-      console.log("Please fill in all required fields with correct format.");
       setErrorMessage(
         "Please fill in all required fields with correct format."
       );
     }
   };
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
