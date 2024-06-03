@@ -794,15 +794,16 @@ function TicketDetails() {
                 sx={{
                   width: "100%",
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   marginBottom: "1em",
                 }}
               >
+                <Box sx={{width: "30%"}}>
                 <DropFile
                   fileTypes="Ticket Cover Image"
                   fileExtensions="JPEG,PNG,WEBP,SVG"
                   isCircular={false}
-                  width="100%"
+                  width="250px"
                   height="250px"
                   file={imgFile}
                   setFile={setImgFile}
@@ -810,8 +811,47 @@ function TicketDetails() {
                   aspectY={1}
                   shape="rect"
                 />
+
+                </Box>
+              
+                <Box sx={{ width: "70%" }}>
+                  <Autocomplete
+                    id="ticket-currency-select-demo"
+                    sx={{ width: 300, marginBottom: "1em" }}
+                    options={eventCurrencies}
+                    autoHighlight
+                    getOptionLabel={(option) => option.label}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                        {...props}
+                      >
+                        <img
+                          loading="lazy"
+                          width="20"
+                          srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                          src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                          alt=""
+                        />
+                        {option.label} ({option.code}) +{option.phone}
+                      </Box>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Choose a currency"
+                        variant="filled"
+                        inputProps={{
+                          ...params.inputProps,
+                          autoComplete: "new-password", // disable autocomplete and autofill
+                        }}
+                      />
+                    )}
+                  />
+                  <AutoTicketTable />
+                </Box>
               </Box>
-              <AutoTicketTable />
             </div>
           ) : (
             <div>
@@ -2613,11 +2653,11 @@ const autoTicketModalStyle = {
 };
 
 const autoTicketColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
+  { field: "id", headerName: "ID", width: 50 },
   { field: "ticketType", headerName: "Ticket Type", width: 150 },
-  { field: "ticketPrice", headerName: "Price", width: 150 },
-  { field: "ticketCount", headerName: "Count", width: 250 },
-  { field: "ticketSession", headerName: "Session", width: 250 },
+  { field: "ticketPrice", headerName: "Price", width: 80 },
+  { field: "ticketCount", headerName: "Count", width: 70 },
+  { field: "ticketSession", headerName: "Session", width: 150 },
 ];
 
 let autoTicketRows = [];
