@@ -480,7 +480,9 @@ function CreateEvent() {
                   manualTicketRows,
                   setManualTicketRows,
                   eventData,
-                  setEventData
+                  setEventData,
+                  ticketData,
+                  setTicketData,
                 )}
               </div>
             </Typography>
@@ -772,7 +774,7 @@ function EventDetails({
   );
 }
 
-function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows}) {
+function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows, ticketData, setTicketData}) {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
   const [imgFile, setImgFile] = React.useState(null);
 
@@ -856,7 +858,7 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
                         variant="filled"
                         inputProps={{
                           ...params.inputProps,
-                          autoComplete: "new-password", // disable autocomplete and autofill
+                          autoComplete: "new-password", 
                         }}
                       />
                     )}
@@ -877,6 +879,17 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
             </div>
           )}
         </div>
+
+        <Box sx={{ width: "100%", marginBottom: "1em", marginTop: "1em" }}>
+        <TextField
+          id="ticket-des"
+          label="Description"
+          multiline
+          rows={4}
+          variant="filled"
+          sx={{ width: "100%" }}
+        />
+      </Box>
       </Paper>
     </div>
   );
@@ -3156,7 +3169,9 @@ function EventCreateShow(
   manualTicketRows,
   setManualTicketRows,
   eventData,
-  setEventData
+  setEventData,
+  ticketData,
+  setTicketData,
 ) {
   if (n == 0) {
     return (
@@ -3177,6 +3192,8 @@ function EventCreateShow(
       setAutoTicketRows={setAutoTicketRows}
       manualTicketRows={manualTicketRows}
       setManualTicketRows={setManualTicketRows}
+      ticketData={ticketData}
+      setTicketData={setTicketData}
     />;
   } else if (n == 2) {
     return <BudgetDetails />;
