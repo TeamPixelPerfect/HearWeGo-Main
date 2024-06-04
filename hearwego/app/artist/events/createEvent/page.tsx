@@ -212,6 +212,14 @@ function CreateEvent() {
     event_created_by: artist ? artist.artist_id : "",
   });
 
+  const [ticketData, setTicketData] = useState({
+    ticket_catagory: "Not-Provided",
+    auto_ticket_details: [],
+    manual_ticket_details: [],
+    ticket_description: "",
+    event_id: "",
+  });
+
   const [openErrorModal, setOpenErrorModal] = React.useState(false);
   const [errorMessages, setErrorMessages] = useState([""]);
   const handleOpenErrorModal = () => setOpenErrorModal(true);
