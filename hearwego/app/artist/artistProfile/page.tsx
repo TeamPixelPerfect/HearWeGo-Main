@@ -28,18 +28,14 @@ import {
   ADHomeProfilePicture,
   ADHomeSocialIcons,
 } from "@/app/styles/artistDashboard.styles";
-import { Dayjs } from "dayjs";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { logInUser } from "@/lib/features/user.slice";
-import { handleRegister } from "@/app/services/AuthServices";
-import router from "next/router";
-import { AuthTextField } from "@/app/styles/auth.styles";
+
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DropArtistPP from "@/app/components/DropArtistPP";
+
 
 interface SocialMediaType {
   label: string;
@@ -138,6 +134,8 @@ const genres = [
 const ADHomePage = () => {
   const matches = useMediaQuery("(max-width:960px)");
 
+
+
   const [profilePic, setProfilePic] = useState<string>(
     // "https://placehold.co/600x600/png"
     "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
@@ -152,6 +150,7 @@ const ADHomePage = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+  const [profilePicture, setProfilePicture] = useState<any>(null);
 
   return (
     <>
@@ -165,20 +164,27 @@ const ADHomePage = () => {
           {/*  ADHomeCoverBox imgUrl={artist?.user.artistCovers[0]}*/}
           <ADHomeCoverBox
             imgUrl={
-              "https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs/278804074/original/39f1798f84c97ce31effe60bffd192bec8b10306/design-a-single-cover-or-an-album-cover-art.jpeg"
+              "https://www.profilerehab.com/facebook_covers/hearts/tree_heart_cover_1.jpg"
             }
           >
             <ADHomeNameArea>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: matches ? "center" : "flex-end",
-                  flexDirection: matches ? "column" : "row",
-                  justifyContent: matches ? "flex-end" : "center",
-                  mb: matches ? "2em" : 0,
+                 
                 }}
               >
-                <ADHomeProfilePicture imgUrl={artist?.user.profilePicture} />
+                 <DropArtistPP
+              fileTypes="Profile Picture"
+              fileExtensions="PNG,JPEG,WEBP"
+              isCircular={true}
+              width="200px"
+              height="200px"
+              file={profilePicture}
+              setFile={setProfilePicture}
+              aspectX={1}
+              aspectY={1}
+              shape="round"
+            />
                 <Box
                   sx={
                     !matches
