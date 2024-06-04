@@ -196,6 +196,7 @@ function CreateEvent() {
   const [sessionRows, setSessionRows] = useState([]);
   const [teamRows, setTeamRows] = useState([]);
   const [sponsorRows, setSponsorRows] = useState([]);
+  const [autoTicketRows, setAutoTicketRows] = useState([]);
   const [eventData, setEventData] = useState<Event>({
     event_img:
       "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
@@ -473,6 +474,8 @@ function CreateEvent() {
                   setTeamRows,
                   sponsorRows,
                   setSponsorRows,
+                  autoTicketRows,
+                  setAutoTicketRows,
                   eventData,
                   setEventData
                 )}
@@ -766,7 +769,7 @@ function EventDetails({
   );
 }
 
-function TicketDetails() {
+function TicketDetails({autoTicketRows, setAutoTicketRows}) {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
   const [imgFile, setImgFile] = React.useState(null);
 
@@ -855,7 +858,10 @@ function TicketDetails() {
                       />
                     )}
                   />
-                  <AutoTicketTable />
+                  <AutoTicketTable 
+                    autoTicketRows={autoTicketRows}
+                    setAutoTicketRows={setAutoTicketRows}
+                  />
                 </Box>
               </Box>
             </div>
@@ -3030,7 +3036,7 @@ function AutoTicketForm() {
       </Box>
 
       <Box sx={{ width: "100%", marginBottom: "1em" }}>
-        <AutoTicketTable />
+        {/* <AutoTicketTable /> */}
       </Box>
 
       <Box sx={{ width: "100%", marginBottom: "1em" }}>
@@ -3140,6 +3146,8 @@ function EventCreateShow(
   setTeamRows,
   sponsorRows,
   setSponsorRows,
+  autoTicketRows,
+  setAutoTicketRows,
   eventData,
   setEventData
 ) {
@@ -3157,7 +3165,10 @@ function EventCreateShow(
       />
     );
   } else if (n == 1) {
-    return <TicketDetails />;
+    return <TicketDetails 
+      autoTicketRows={autoTicketRows}
+      setAutoTicketRows={setAutoTicketRows}
+    />;
   } else if (n == 2) {
     return <BudgetDetails />;
   } else if (n == 3) {
@@ -3252,7 +3263,7 @@ function SessionInfoCard() {
               <Box sx={{ fontWeight: 600, width: "40%" }}>Ticket Details</Box>
             </Stack>
             <Box sx={{ marginBottom: "1em" }}>
-              <AutoTicketTable />
+              {/* <AutoTicketTable /> */}
             </Box>
 
             <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
