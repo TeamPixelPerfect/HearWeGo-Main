@@ -197,6 +197,7 @@ function CreateEvent() {
   const [teamRows, setTeamRows] = useState([]);
   const [sponsorRows, setSponsorRows] = useState([]);
   const [autoTicketRows, setAutoTicketRows] = useState([]);
+  const [manualTicketRows, setManualTicketRows] = useState([]);
   const [eventData, setEventData] = useState<Event>({
     event_img:
       "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
@@ -476,6 +477,8 @@ function CreateEvent() {
                   setSponsorRows,
                   autoTicketRows,
                   setAutoTicketRows,
+                  manualTicketRows,
+                  setManualTicketRows,
                   eventData,
                   setEventData
                 )}
@@ -769,7 +772,7 @@ function EventDetails({
   );
 }
 
-function TicketDetails({autoTicketRows, setAutoTicketRows}) {
+function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows}) {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
   const [imgFile, setImgFile] = React.useState(null);
 
@@ -867,7 +870,10 @@ function TicketDetails({autoTicketRows, setAutoTicketRows}) {
             </div>
           ) : (
             <div>
-              <ManualTicketTable />
+              <ManualTicketTable
+                manualTicketRows={manualTicketRows}
+                setManualTicketRows={setManualTicketRows}
+              />
             </div>
           )}
         </div>
@@ -2342,9 +2348,15 @@ const manulTicketColumns: GridColDef[] = [
   { field: "ticketLocation", headerName: "Where to Buy Tickets", width: 150 },
 ];
 
-let manualTicketRows = [];
+type ManualTicketRow = {
+  id: number;
+  ticketSession: string;
+  ticketLocation: string;
+}
 
-function ManualTicketTable() {
+// let manualTicketRows = [];
+
+function ManualTicketTable({manualTicketRows, setManualTicketRows}) {
   const [ticketLocationError, setTicketLocationError] = useState(false);
   const [ticketSessionError, setTicketSessionError] = useState(false);
 
@@ -2352,15 +2364,17 @@ function ManualTicketTable() {
 
   const [ticketSession, setTicketSession] = useState("");
   const [ticketLocation, setTicketLocation] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<ManualTicketRow | null>(
+    null
+  );
 
-  const handleTicketLocationChange = (event) => {
+  const handleTicketLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicketLocation(event.target.value);
     setTicketLocationError(event.target.value.trim() === "");
   };
 
-  const handleTicketSessionChange = (event) => {
+  const handleTicketSessionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTicketSession(event.target.value);
     setTicketSessionError(event.target.value.trim() === "");
   };
@@ -2374,40 +2388,33 @@ function ManualTicketTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setTicketLocationError(false);
       setTicketSessionError(false);
 
-      // Get the selected row ID
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
-      // Find the index of the selected row in the sponsorRows array
-      const rowIndex = manualTicketRows.findIndex(
-        (row) => row.id === selectedRowId
-      );
+      const rowIndex = manualTicketRows .findIndex((row) => row.id === selectedRowId);
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
-          ticketSession: ticketSession,
-          ticketLocation: ticketLocation,
+          ticketSession,
+          ticketLocation,
         };
 
-        // Replace the old row with the updated row
-        const updatedRows = [...manualTicketRows];
-        updatedRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...manualTicketRows.slice(0, rowIndex),
+          updatedRow,
+          ...manualTicketRows.slice(rowIndex + 1),
+        ];
 
-        // Update sponsorRows with the updated rows
-        manualTicketRows = updatedRows;
+        setManualTicketRows(updatedRows);
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose(); 
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -2416,7 +2423,13 @@ function ManualTicketTable() {
     const updatedRows = manualTicketRows.filter(
       (row) => !selectedRows.includes(row.id)
     );
-    manualTicketRows = updatedRows;
+    
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setManualTicketRows(reindexedRows);
     setSelectedRows([]);
     setTicketLocationError(false);
     setTicketSessionError(false);
@@ -2436,16 +2449,14 @@ function ManualTicketTable() {
   const handleOpenForAdd = () => {
     setTicketLocation("");
     setTicketSession("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null);
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
-      const selectedRow = manualTicketRows.find(
-        (row) => row.id === selectedRowId
-      );
+      const selectedRowId = selectedRows[0] as number;
+      const selectedRow = manualTicketRows.find((row) => row.id === selectedRowId);
       if (selectedRow) {
         setTicketLocation(selectedRow.ticketLocation);
         setTicketSession(selectedRow.ticketSession);
@@ -2460,28 +2471,22 @@ function ManualTicketTable() {
   const addNewTicket = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setTicketLocationError(false);
       setTicketSessionError(false);
 
-      //----
-      const newId = manualTicketRows.length + 1;
+      const newId = manualTicketRows.length
+        ? Math.max(...manualTicketRows.map((row) => row.id)) + 1
+        : 1;
       const newTicket = {
         id: newId,
-        ticketLocation: ticketLocation,
-        ticketSession: ticketSession,
+        ticketLocation,
+        ticketSession,
       };
 
-      const handleButtonClick = selectedRowData ? updateRowData : addNewTicket;
-
-      const newTicketRows = [...manualTicketRows, newTicket];
-
-      manualTicketRows = newTicketRows;
-
+      setManualTicketRows([...manualTicketRows, newTicket]);
       refreshTable();
       handleClose();
     } else {
-      console.log("Please fill in all required fields with correct format.");
       setErrorMessage(
         "Please fill in all required fields with correct format."
       );
@@ -2628,7 +2633,7 @@ function ManualTicketForm() {
           marginBottom: "3em",
         }}
       >
-        <ManualTicketTable />
+        {/* <ManualTicketTable /> */}
       </Box>
 
       <Box
@@ -3148,6 +3153,8 @@ function EventCreateShow(
   setSponsorRows,
   autoTicketRows,
   setAutoTicketRows,
+  manualTicketRows,
+  setManualTicketRows,
   eventData,
   setEventData
 ) {
@@ -3168,6 +3175,8 @@ function EventCreateShow(
     return <TicketDetails 
       autoTicketRows={autoTicketRows}
       setAutoTicketRows={setAutoTicketRows}
+      manualTicketRows={manualTicketRows}
+      setManualTicketRows={setManualTicketRows}
     />;
   } else if (n == 2) {
     return <BudgetDetails />;
