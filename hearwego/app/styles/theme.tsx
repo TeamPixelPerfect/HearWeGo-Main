@@ -75,7 +75,7 @@ export const hearWeGoDarkTheme = createTheme({
     },
     text: {
       primary: "#fff",
-      secondary: "#787878",
+      secondary: "#cccccc",
     },
   },
 });

@@ -7,12 +7,12 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
   width: "100%",
   background: theme.palette.mode === "light" ? "#EEF2FF" : "#0F172A",
   ".ad-left": {
-    width: "18%",
+    width: "215px",
     minWidth: "60px",
     height: "100vh",
   },
   ".ad-right": {
-    width: "82%",
+    width: "calc(100% - 215px)",
     maxWidth: "100%",
     minWidth: "350px",
     padding: "1em 1em 1em 0",
@@ -31,11 +31,11 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
   },
 }));
 
-export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
+export const ArtistDashboardSideNavContainer = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
+  // justifyContent: "center",
+  alignItems: "flex-start",
   padding: "0.5em 0",
   background: theme.palette.background.paper,
   minHeight: "100%",
@@ -44,8 +44,8 @@ export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
   // height: "fit-content",
   position: "fixed",
   zIndex: "10",
-  borderRadius: "0 30px 0 0",
-  boxShadow: "2px 3px 5px rgba(0,0,0,0.3)",
+  // borderRadius: "0 30px 0 0",
+  // boxShadow: "1px 1px 1px rgba(0,0,0,0.1)",
   transition: "width 1s",
   // transform: "translateX(-100%)",
   a: {
@@ -63,15 +63,28 @@ export const ArtistDashboardSideNavContainer = styled("div")(({ theme }) => ({
 }));
 
 export const ADNavItemGroupBox = styled("div")(({ theme }) => ({
-  margin: "0.5em 1em",
+  marginBottom: "1em",
+  width: "215px",
   // background: "rgba(0,0,0,.2)",
-  "& label": {
+  "a": {
+    color: theme.palette.text.secondary,
+  },
+  ".active": {
+    borderRight: `2px solid ${theme.palette.secondary.light}`,
+    background: "rgba(99,102,242,0.2)",
+  },
+  ".active a": {
+    color: theme.palette.secondary.light,
+  },
+  "& .label": {
     color: "#6366F1",
-    fontSize: "16px",
-    fontStyle: "italic",
-    marginBottom: "1em",
+    fontSize: "12px",
+    // fontStyle: "italic",
+    // marginBottom: "1em",
     // padding: "0 16px",
-    fontFamily: "Dancing Script",
+    // fontFamily: "Dancing Script",
+    padding: "0.5em 1.5em",
+    fontWeight: 400,
     // textDecoration: "underline",
   },
 }));
@@ -79,12 +92,12 @@ export const ADNavItemGroupBox = styled("div")(({ theme }) => ({
 export const ADNavItemBox = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  padding: "4px 16px",
+  padding: "10px 16px",
   marginBottom: "0.2em",
   width: "100%",
   cursor: "Pointer",
   "&:hover": {
-    background: "rgba(99,102,242,.2)",
+    background: "rgba(99,102,242,0.1)",
   },
   "@media (max-width:960px)": {
     padding: "4px",
