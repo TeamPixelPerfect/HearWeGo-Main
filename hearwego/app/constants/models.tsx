@@ -209,13 +209,22 @@ export interface Event {
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
-  ticket_img?: string;
-  ticket_currency?: string;
-  auto_ticket_type?: string;
-  auto_ticket_price?: number;
-  auto_tickets_count?: number;
-  manual_ticket_location?: string;
-  special_notice?: string;
-  sesson_id?: number;
+  auto_ticket_details?: [
+    {
+      ticket_currency: string;
+      ticket_img: string;
+      ticket_type: string;
+      ticket_price: string;
+      ticket_count: string;
+      ticket_session: string;
+    }
+  ];
+  manual_ticket_details?: [
+    {
+      ticket_location: string;
+      ticket_session: string;
+    }
+  ];
+  ticket_description?: string;
   event_id?: string;
 }
