@@ -82,7 +82,7 @@ export const CampaignContent = muiStyled(CardContent)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
-//Created the styled component for the
+//Created the styled component for the 
 export const CreateCampaignPopup = muiStyled("div")(({ theme }) => ({
   position: "relative",
   top: "50%",
@@ -104,18 +104,20 @@ export const NameBox = styled(Box)(({ theme }) => ({
   padding: "5px",
 }));
 
-//created the styled component for the Post schedule
+//created the styled component for the Post schedule 
 export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
   position: "relative",
-  width: "27%",
-  minHeight: "70%",
-  maxHeight: "70%",
+  top: "50%",
+  left: "53%",
+  transform: "translate(-50%, -50%)",
+  width: "30%",
+  height: "fit-content",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   padding: "1em",
   borderRadius: "10px",
   background: theme.palette.background.default,
-  overflowY: "auto",
 }));
+
 
 export const ArtistDetail = muiStyled(Box)(({ theme }) => ({
   width: "100%",
@@ -165,11 +167,11 @@ export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
 }));
 
 export const PostForPopup = muiStyled(Box)(({ theme }) => ({
-  width: "100%",
+  width: "50%",
   height: "200px",
   backgroundImage: "url('https://source.unsplash.com/random')",
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "cover",
+  backgroundRepeat:"no-repeat",
+  backgroundSize:"cover",
   display: "flex",
   alignItems: "flex-end",
   borderRadius: "10px",

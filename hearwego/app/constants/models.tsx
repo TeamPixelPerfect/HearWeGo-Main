@@ -154,32 +154,56 @@ export interface Event {
   no_of_sessions?: number;
   sessions?: [
     {
-      session_id: string;
+      session_id: number;
       session_name: string;
       session_date: string;
       session_time: string;
       duration: string;
       venue: string;
-      artists: [
-        {
-          artist_id: string;
-          artist_name: string;
-        }
-      ];
+      artists: string[];
       session_special_notice: string;
     }
   ];
-  sponsor?: string[];
+  sponsor?: [
+    {
+      sponsor_type: string;
+      sponsor_name: string;
+      sponsor_contact: string;
+      sponsor_email: string;
+    }
+  ];
   teams?: [
     {
       team_type: string;
       team_name: string;
-      contact_name: string;
       contact: string;
       email: string;
     }
   ];
   description?: string;
+  event_status?: string;
+  event_created_by?: string;
+  event_tickets?: [
+    {
+      ticket_catagory: string;
+      ticket_img: string;
+      ticket_currency: string;
+      auto_ticket_type: string;
+      auto_ticket_price: number;
+      auto_tickets_count: number;
+      manual_ticket_location: string;
+      special_notice: string;
+      sesson_id: number;
+    }
+  ];
+  event_budget?: [
+    {
+      budget_title: string;
+      session: string;
+      budget_type: string;
+      amount: number;
+    }
+  ];
 }
 
 export interface PRPost {
@@ -192,5 +216,18 @@ export interface PRPost {
   Scheduled_Date: string;
   Scheduled_Time: string;
   SocialMedias ?: string[];
-  
+}
+
+export interface Ticket {
+  ticket_id?: string;
+  ticket_catagory?: string;
+  ticket_img?: string;
+  ticket_currency?: string;
+  auto_ticket_type?: string;
+  auto_ticket_price?: number;
+  auto_tickets_count?: number;
+  manual_ticket_location?: string;
+  special_notice?: string;
+  sesson_id?: number;
+  event_id?: string;
 }

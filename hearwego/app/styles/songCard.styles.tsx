@@ -1,14 +1,19 @@
 import { Box, ButtonGroup, Card, IconButton, styled } from "@mui/material";
 
-export const SongCard = styled(Card)(({ theme }) => ({
-  background:
-    theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+export const SongCard = styled(Box)(({ theme }) => ({
+  // background:
+  // theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
   display: "flex",
   alignItems: "center",
   // justifyContent: "space-between",
   padding: "8px 16px",
   height: "80px",
   marginBottom: "12px",
+  border:
+    theme.palette.mode === "light"
+      ? "1px solid rgba(0, 0, 0, 0.12)"
+      : "1px solid rgba(255, 255, 255, 0.12)",
+  boxShadow: "none",
 
   "& h6": {
     fontSize: "16px",
@@ -17,13 +22,15 @@ export const SongCard = styled(Card)(({ theme }) => ({
 
   "&:hover": {
     background:
-      theme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+      theme.palette.mode === "dark"
+        ? "rgba(255,255,255,0.1)"
+        : "rgba(0,0,0,0.1)",
   },
 }));
 
 export const SongCardItem = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "width"
-})<{width: string}>(({ theme, width }) => ({
+  shouldForwardProp: (prop) => prop !== "width",
+})<{ width: string }>(({ theme, width }) => ({
   display: "flex",
   justifyContent: "flex-start",
   alignItems: "center",
@@ -62,15 +69,19 @@ export const SongCardPlayButton = styled(IconButton)(({ theme }) => ({
   fontSize: "32px",
 }));
 
-export const AlbumCard = styled(Card)(({ theme }) => ({
-  background:
-    theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+export const AlbumCard = styled(Box)(({ theme }) => ({
+  // background:
+  //   theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
   display: "flex",
   alignItems: "center",
   // justifyContent: "space-between",
   padding: 0,
   height: "100px",
   marginBottom: "12px",
+  border:
+    theme.palette.mode === "light"
+      ? "1px solid rgba(0, 0, 0, 0.12)"
+      : "1px solid rgba(255, 255, 255, 0.12)",
 
   "& h6": {
     fontSize: "16px",
@@ -84,19 +95,21 @@ export const AlbumCard = styled(Card)(({ theme }) => ({
 
   "&:hover": {
     background:
-      theme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+      theme.palette.mode === "dark"
+        ? "rgba(255,255,255,0.1)"
+        : "rgba(0,0,0,0.1)",
   },
 }));
 
 export const AlbumCardCoverArt = styled(Box, {
   shouldForwardProp: (prop) => prop !== "imgUrl",
 })<{ imgUrl: string }>(({ theme, imgUrl }) => ({
-    height: "100px",
-    width: "80px",
-    background: `url(${imgUrl})`,
-    backgroundPosition: "center",
-    backgroundSize: "cover",
-    marginRight: "12px"
+  height: "100px",
+  width: "80px",
+  background: `url(${imgUrl})`,
+  backgroundPosition: "center",
+  backgroundSize: "cover",
+  marginRight: "12px",
 }));
 
 export const SongCardButtonGroup = styled(ButtonGroup)(({ theme }) => ({
@@ -109,6 +122,6 @@ export const SongCardButtonGroup = styled(ButtonGroup)(({ theme }) => ({
     textTransform: "capitalize",
     "&:hover": {
       // background:  theme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
-    }
+    },
   },
 }));

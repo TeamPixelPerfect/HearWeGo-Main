@@ -1841,53 +1841,6 @@ const ArtistSignUp = () => {
                 />
               </Box>
             </Stack>
-            <Stack
-              spacing={1}
-              direction={matches ? "column" : "row"}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <DropFile
-                fileTypes="Cover Photo"
-                fileExtensions="PNG,JPEG,WEBP"
-                isCircular={false}
-                width={matches ? "100%" : "32.5%"}
-                height="170px"
-                file={coverPhoto1}
-                setFile={setCoverPhoto1}
-                aspectX={16}
-                aspectY={9}
-                shape="rect"
-              />
-              <DropFile
-                fileTypes="Cover Photo"
-                fileExtensions="PNG,JPEG,WEBP"
-                isCircular={false}
-                width={matches ? "100%" : "32.5%"}
-                height="170px"
-                file={coverPhoto2}
-                setFile={setCoverPhoto2}
-                aspectX={16}
-                aspectY={9}
-                shape="rect"
-              />
-              <DropFile
-                fileTypes="Cover Photo"
-                fileExtensions="PNG,JPEG,WEBP"
-                isCircular={false}
-                width={matches ? "100%" : "32.5%"}
-                height="170px"
-                file={coverPhoto3}
-                setFile={setCoverPhoto3}
-                aspectX={16}
-                aspectY={9}
-                shape="rect"
-              />
-            </Stack>
           </Box>
 
           <Typography sx={{ marginTop: "1em", color: "red", fontSize: "12px" }}>
