@@ -231,3 +231,16 @@ export interface Ticket {
   sesson_id?: number;
   event_id?: string;
 }
+
+export interface PRPost {
+  PrPostID: string;
+  ArtistName: string;
+  post_img: string;
+  post_social_media?: string;
+  schedule_date: string;
+  Description: string;
+  Scheduled_Date: string;
+  Scheduled_Time: string;
+  SocialMedias ?: string[];
+  
+}
