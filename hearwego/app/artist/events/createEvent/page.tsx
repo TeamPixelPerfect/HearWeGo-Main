@@ -200,6 +200,8 @@ function CreateEvent() {
   const [sponsorRows, setSponsorRows] = useState([]);
   const [autoTicketRows, setAutoTicketRows] = useState([]);
   const [manualTicketRows, setManualTicketRows] = useState([]);
+  const [isAutoTicket, setIsAutoTicket] = useState(false);
+  const [isManualTicket, setIsManualTicket] = useState(false);
   const [eventData, setEventData] = useState<Event>({
     event_img:
       "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
@@ -228,6 +230,16 @@ function CreateEvent() {
   const [errorMessages, setErrorMessages] = useState([""]);
   const handleOpenErrorModal = () => setOpenErrorModal(true);
   const handleCloseErrorModal = () => setOpenErrorModal(false);
+
+  useEffect(() => {
+    if (isAutoTicket){
+      setTicketData({...ticketData, ticket_catagory: "Auto"});
+    }
+    if (isManualTicket){
+      setTicketData({...ticketData, ticket_catagory: "Manual"});
+    }
+  }
+  , [isAutoTicket, isManualTicket]);
 
   useEffect(() => {
     if (artist) {
@@ -307,6 +319,7 @@ function CreateEvent() {
         })
       ),
     });
+    console.log("Manula Tikets::::" , ticketData.manual_ticket_details);
   }, [autoTicketRows, manualTicketRows]);
 
   const totalSteps = () => {
@@ -560,6 +573,10 @@ function CreateEvent() {
                   setEventData,
                   ticketData,
                   setTicketData,
+                  isAutoTicket,
+                  setIsAutoTicket,
+                  isManualTicket,
+                  setIsManualTicket,
                 )}
               </div>
             </Typography>
@@ -856,18 +873,24 @@ function EventDetails({
   );
 }
 
-function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows, ticketData, setTicketData}) {
+function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows, ticketData, setTicketData, isAutoTicket, setIsAutoTicket, isManualTicket, setIsManualTicket}) {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
   const [imgFile, setImgFile] = React.useState(null);
 
-  const handleSwitchChange = (event) => {
-    setIsChecked(event.target.checked);
+  useEffect(() => {
     if(isChecked){
-      setTicketData({...ticketData, ticket_catagory: "Auto"});
+      setIsAutoTicket(true);
+      setIsManualTicket(false);
     }
     else{
-      setTicketData({...ticketData, ticket_catagory: "Manual"});
+      setIsAutoTicket(false);
+      setIsManualTicket(true);
     }
+  }
+  , [isChecked]);
+  
+  const handleSwitchChange = (event) => {
+    setIsChecked(event.target.checked);
   };
 
   return (
@@ -3267,6 +3290,10 @@ function EventCreateShow(
   setEventData,
   ticketData,
   setTicketData,
+  isAutoTicket,
+  setIsAutoTicket,
+  isManualTicket,
+  setIsManualTicket,
 ) {
   if (n == 0) {
     return (
@@ -3289,6 +3316,10 @@ function EventCreateShow(
       setManualTicketRows={setManualTicketRows}
       ticketData={ticketData}
       setTicketData={setTicketData}
+      isAutoTicket={isAutoTicket}
+      setIsAutoTicket={setIsAutoTicket}
+      isManualTicket={isManualTicket}
+      setIsManualTicket={setIsManualTicket}
     />;
   } else if (n == 2) {
     return <BudgetDetails />;
