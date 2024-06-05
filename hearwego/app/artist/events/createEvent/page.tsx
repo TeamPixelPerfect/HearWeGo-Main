@@ -60,6 +60,8 @@ import { Alert, CardActionArea, FilledInput, IconButton } from "@mui/material";
 import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
+import { Ticket } from "@/app/constants/models";
+import { addTicket } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
 import { getAllArtists } from "@/app/services/ArtistServices";
@@ -329,8 +331,7 @@ function CreateEvent() {
     if (activeStep === 0) {
       return validateEventDetails();
     } else if (activeStep === 1) {
-      // Add validation for the second step
-      return true;
+      return validateTicketDetails();
     } else if (activeStep === 2) {
       // Add validation for the third step
       return true;
@@ -371,11 +372,14 @@ function CreateEvent() {
       setErrorMessages(errors);
       handleOpenErrorModal();
     }
-    // Add validation logic here
-    // Update eventData state if necessary
-    // setEventNameError, setEventTypeError, etc. based on validation results
     return isValid;
   };
+
+  const validateTicketDetails = () => {
+    let isValid = true;
+
+    return isValid;
+  }
 
   const submitData = async () => {
     setLoading(true);
@@ -780,6 +784,12 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
 
   const handleSwitchChange = (event) => {
     setIsChecked(event.target.checked);
+    if(isChecked){
+      setTicketData({...ticketData, ticket_catagory: "Auto"});
+    }
+    else{
+      setTicketData({...ticketData, ticket_catagory: "Manual"});
+    }
   };
 
   return (
@@ -798,7 +808,7 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
         elevation={3}
       >
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-          Tickets Details
+          Ticket Details
         </Typography>
 
         <div>
@@ -888,6 +898,13 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
           rows={4}
           variant="filled"
           sx={{ width: "100%" }}
+          value={ticketData.ticket_description}
+          onChange={(e) =>
+            setTicketData((data) => ({
+              ...data,
+              ticket_description: e.target.value,
+            }))
+          }
         />
       </Box>
       </Paper>
