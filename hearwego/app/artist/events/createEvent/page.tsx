@@ -361,6 +361,15 @@ function CreateEvent() {
     const newCompleted = { ...completed };
     newCompleted[activeStep] = true;
     setCompleted(newCompleted);
+
+    if (activeStep === 1) {
+      // If the user skips the second step, set ticket_catagory to "Not-Provided"
+      setTicketData((prevTicketData) => ({
+        ...prevTicketData,
+        ticket_catagory: "Not-Provided",
+      }));
+    }
+
     handleNext();
   };
 
