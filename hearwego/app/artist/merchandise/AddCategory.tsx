@@ -1,11 +1,23 @@
-import React from 'react'
+import { Box, Modal } from "@mui/material";
+import React from "react";
 
 const AddCategory = () => {
   return (
-    <div>
-      Add Category Popup
-    </div>
-  )
-}
+    <Modal open={true}>
+      <Box
+        sx={{
+          width: "50%",
+          height: "50%",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "background.paper",
+          boxShadow: 24,
+        }}
+      >
+        Add Category
+      </Box>
+    </Modal>
+  );
+};
 
-export default AddCategory
+export default AddCategory;
