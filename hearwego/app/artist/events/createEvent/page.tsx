@@ -456,7 +456,7 @@ function CreateEvent() {
         };
       }
   
-      await addTicketData(artist ? artist.token : "", updatedTicketData);
+      await addTicket(artist ? artist.token : "", updatedTicketData);
     } catch (error) {
       console.error("Error submitting event data:", error);
     } finally {
