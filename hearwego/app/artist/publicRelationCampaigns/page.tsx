@@ -8,6 +8,7 @@ import {
   ArtistDetail,
   PostTextField,
   PostContextBox,
+  BorderLinearProgress,
 } from "../../styles/pressRelease.style";
 import SinglePRCampaign from "../../components/SinglePRCampaign";
 import Button from "@mui/material/Button";
@@ -35,7 +36,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { renderTimeViewClock } from "@mui/x-date-pickers";
 import DropFile from "../../components/DropFile";
-import { Grid, Card, useTheme } from "@mui/material";
+import { Card, Grid, useTheme } from "@mui/material";
+import { CampaignPopup } from "../../components/SinglePRCampaign";
 
 const options = [
   "None",
@@ -51,9 +53,47 @@ export default function Context() {
   const handle01Change = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+  const [value11, setValue11] = React.useState("11");
+  const handle11Change = (event: React.SyntheticEvent, newValue: string) => {
+    setValue11(newValue);
+  };
+
   const [openCreateCampaign, setOpenCreateCampaign] = React.useState(false);
-  const handleCreateCampaignOpen = () => setOpenCreateCampaign(true);
+  const handleCreateCampaignOpen = () => {
+    setOpenCreateCampaign(true);
+    setOpenCreateNewCampaign(false);
+  };
   const handleCreateCampaignClose = () => setOpenCreateCampaign(false);
+
+  const [openCreateNewCampaign, setOpenCreateNewCampaign] =
+    React.useState(false);
+  const handleCreateNewCampaignOpen = () => {
+    setOpenCreateNewCampaign(true);
+    setOpenCreateCampaign(false);
+  };
+  const handleCreateNewCampaignClose = () => {
+    if (window.confirm("Are you sure you want to close this?")) {
+      setTasks([]);
+      setOpenCreateNewCampaign(false);
+      setClickCount(0); // Reset click count when modal is closed
+    }
+  };
+
+  const [tasks, setTasks] = React.useState<object[]>([]);
+  const [clickCount, setClickCount] = React.useState(0); // State to track the number of clicks
+
+  const AddNewTaskToCampaign = () => {
+    setTasks([...tasks, { text: "Enter The Task" }]);
+    setClickCount(clickCount + 1);
+  };
+
+  const handleTextChange = (index: number, newText: any) => {
+    const updatedTasks = tasks.map((task, i) =>
+      i === index ? { text: newText } : task
+    );
+    setTasks(updatedTasks);
+  };
 
   const [openPostScheduling, setOpenPostScheduling] = React.useState(false);
   const handlePostSchedulingOpen = () => setOpenPostScheduling(true);
@@ -80,7 +120,6 @@ export default function Context() {
     setAnchorEl(null);
   };
   return (
-    //
     <Grid container sx={{ width: "100%", margin: 0 }}>
       <Card
         sx={{
@@ -158,24 +197,48 @@ export default function Context() {
                             <Typography component="h2">Cancel</Typography>
                           </Button>
                           <Button variant="contained">
-                            <Typography component="h2">Create</Typography>
+                            <Typography
+                              component="h2"
+                              onClick={handleCreateNewCampaignOpen}
+                            >
+                              Create
+                            </Typography>
                           </Button>
                         </Stack>
                       </Box>
                     </Box>
                   </CreateCampaignPopup>
                 </Modal>
+                <Modal
+                  open={openCreateNewCampaign}
+                  onClose={handleCreateNewCampaignClose}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <PostSchedulePopup
+                    sx={{ backgroundColor: "background.default" }}
+                  >
+                    <CampaignPopup />
+                  </PostSchedulePopup>
+                </Modal>
                 <Button
                   onClick={handlePostSchedulingOpen}
                   variant="contained"
                   startIcon={<ScheduleIcon />}
-                  // sx={{ width: "60%" }}
                 >
                   Post Scheduling
                 </Button>
                 <Modal
                   open={openPostScheduling}
                   onClose={handlePostSchedulingClose}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
                   <PostSchedulePopup>
                     <Typography
@@ -407,7 +470,7 @@ export default function Context() {
                 <SinglePRCampaign />
               </Box>
             </TabPanel>
-            <TabPanel value="2"></TabPanel>
+            <TabPanel value="2">Item Two</TabPanel>
             <TabPanel value="3">Item Three</TabPanel>
             <TabPanel value="4">Item Four</TabPanel>
           </TabContext>
