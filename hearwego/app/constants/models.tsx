@@ -67,7 +67,6 @@ export interface BankDetails {
 }
 
 export interface Artist {
-
   user: {
     _id?: string;
     artist_id?: string;
@@ -114,7 +113,7 @@ export interface Song {
   release_date?: string;
   song_status?: string;
   privacy_status?: string;
-  language?: string[] ;
+  language?: string[];
   record_label?: string;
   song_writers?: { artist_id: string; artist_name: string }[];
   composer?: { artist_id: string; artist_name: string }[];
@@ -145,40 +144,53 @@ export interface Album {
   song?: string[];
 }
 
-export interface Event{
+export interface Event {
   event_id?: string;
-      event_img?: string;
-      event_name?: string;
-      event_type?: string;
-      age_from?: number;
-      age_to?: number;
-      no_of_sessions?: number;
-      sessions?: [
+  event_img?: string;
+  event_name?: string;
+  event_type?: string;
+  age_from?: number;
+  age_to?: number;
+  no_of_sessions?: number;
+  sessions?: [
+    {
+      session_id: string;
+      session_name: string;
+      session_date: string;
+      session_time: string;
+      duration: string;
+      venue: string;
+      artists: [
         {
-          session_id: string,
-          session_name: string,
-          session_date: string,
-          session_time: string,
-          duration: string,
-          venue: string,
-          artists: [
-            {
-              artist_id: string,
-              artist_name: string
-            }
-          ],
-          session_special_notice: string
+          artist_id: string;
+          artist_name: string;
         }
       ];
-      sponsor?: string[];
-      teams?: [
-        {
-          team_type: string,
-          team_name: string,
-          contact_name: string,
-          contact: string,
-          email: string
-        }
-      ];
-      description?: string;
+      session_special_notice: string;
+    }
+  ];
+  sponsor?: string[];
+  teams?: [
+    {
+      team_type: string;
+      team_name: string;
+      contact_name: string;
+      contact: string;
+      email: string;
+    }
+  ];
+  description?: string;
+}
+
+export interface PRPost {
+  PrPostID: string;
+  ArtistName: string;
+  post_img: string;
+  post_social_media?: string;
+  schedule_date: string;
+  Description: string;
+  Scheduled_Date: string;
+  Scheduled_Time: string;
+  SocialMedias ?: string[];
+  
 }
