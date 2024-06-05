@@ -280,6 +280,35 @@ function CreateEvent() {
     });
   }, [sessionRows, sponsorRows, teamRows]);
 
+  useEffect(() => {
+    setTicketData({
+      ...ticketData,
+      auto_ticket_details: autoTicketRows.map(
+        ({
+          id,
+          ticketType,
+          ticketPrice,
+          ticketCount,
+          ticketSession,
+        }) => ({
+          ticket_currency: "LKR",
+          ticket_img: "",
+          ticket_type: ticketType,
+          auto_tickets_count: ticketCount,
+          ticket_price: ticketPrice,
+          ticket_count: ticketCount,
+          ticket_session: ticketSession,
+        })
+      ),
+      manual_ticket_details: manualTicketRows.map(
+        ({ id, ticketLocation, ticketSession }) => ({
+          ticket_location: ticketLocation,
+          ticket_session: ticketSession,
+        })
+      ),
+    });
+  }, [autoTicketRows, manualTicketRows]);
+
   const totalSteps = () => {
     return steps.length;
   };
