@@ -59,30 +59,27 @@ const ArtistDashboardSideNav = () => {
           </IconButton>
         )}
       </Box>
-      <Box sx={{overflowY: "scroll"}}>
-        <Box
-          sx={
-            matches
-              ? { padding: "0", width: "inherit" }
-              : { padding: "0", width: "inherit" }
-          }
-        >
-          {sideMenuOpts.map((opt) => {
-            return (
-              <ADNavItemGroup
-                groupLabel={opt.groupLabel}
-                items={opt.items}
-              ></ADNavItemGroup>
-            );
-          })}
-        </Box>
+      <Box sx={{ overflowY: "scroll", maxHeight: "85vh", scrollbarWidth: "10px" }}>
+        {sideMenuOpts.map((opt) => {
+          return (
+            <ADNavItemGroup
+              groupLabel={opt.groupLabel}
+              items={opt.items}
+            ></ADNavItemGroup>
+          );
+        })}
         <ADNavItemGroupBox>
           <ADNavItemBox sx={{ marginBottom: "2em" }}>
             <Link
               href="/artist"
               style={{ display: "flex", alignItems: "center" }}
             >
-              <SettingsIcon sx={{ marginRight: "10px", color: theme.palette.secondary.light }} />
+              <SettingsIcon
+                sx={{
+                  marginRight: "10px",
+                  color: theme.palette.secondary.light,
+                }}
+              />
               {!matches && (
                 <Box style={{ color: theme.palette.secondary.main }}>
                   Settings

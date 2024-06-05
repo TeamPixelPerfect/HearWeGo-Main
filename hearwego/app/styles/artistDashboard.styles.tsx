@@ -78,11 +78,11 @@ export const ADNavItemGroupBox = styled("div")(({ theme }) => ({
   },
   "& .label": {
     color: "#6366F1",
-    fontSize: "12px",
+    fontSize: "13px",
     // fontStyle: "italic",
     // marginBottom: "1em",
     // padding: "0 16px",
-    // fontFamily: "Dancing Script",
+    fontFamily: "Dancing Script",
     padding: "0.5em 1.5em",
     fontWeight: 400,
     // textDecoration: "underline",

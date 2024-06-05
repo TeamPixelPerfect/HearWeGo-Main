@@ -12,6 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface Props {
   groupLabel: string;
@@ -26,11 +27,13 @@ const ADNavItemGroup = ({ groupLabel, items }: Props) => {
   const matches = useMediaQuery("(max-width:960px)");
   const theme = useTheme();
 
+  const pathname = usePathname();
+
   return (
     <ADNavItemGroupBox>
       {!matches && <label>{groupLabel}</label>}
       {items.map((item) => (
-        <ADNavItemBox>
+        <ADNavItemBox className={pathname.includes(item.link) ? "active" : ""}>
           {!matches ? (
             <Link
               href={item.link}
