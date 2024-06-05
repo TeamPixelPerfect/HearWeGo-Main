@@ -325,12 +325,15 @@ function CreateEvent() {
     return completedSteps() === totalSteps();
   };
 
-  const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
+  const handleNext = async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid) {
+      const newActiveStep =
+        isLastStep() && !allStepsCompleted()
+          ? steps.findIndex((step, i) => !(i in completed))
+          : activeStep + 1;
+      setActiveStep(newActiveStep);
+    }
   };
 
   const handleBack = () => {
@@ -348,12 +351,17 @@ function CreateEvent() {
       newCompleted[activeStep] = true;
       setCompleted(newCompleted);
       if (isLastStep()) {
+        await submitData();
       }
-      console.log(eventData);
-      console.log(sponsorRows);
-      await submitData();
       handleNext();
     }
+  };
+
+  const handleSkip = () => {
+    const newCompleted = { ...completed };
+    newCompleted[activeStep] = true;
+    setCompleted(newCompleted);
+    handleNext();
   };
 
   const validateCurrentStep = async () => {
@@ -413,13 +421,40 @@ function CreateEvent() {
   const submitData = async () => {
     setLoading(true);
     try {
-      await addEvent(artist ? artist.token : "", eventData);
+      const createdEvent = await addEvent(artist ? artist.token : "", eventData);
+      const eventId = createdEvent.event_id;
+  
+      let updatedTicketData = {
+        ...ticketData,
+        event_id: eventId,
+      };
+  
+      if (ticketData.ticket_catagory === "Manual") {
+        updatedTicketData = {
+          ...updatedTicketData,
+          auto_ticket_details: [],
+        };
+      } else if (ticketData.ticket_catagory === "Auto") {
+        updatedTicketData = {
+          ...updatedTicketData,
+          manual_ticket_details: [],
+        };
+      } else if (ticketData.ticket_catagory === "Not-Provided") {
+        updatedTicketData = {
+          ...updatedTicketData,
+          auto_ticket_details: [],
+          manual_ticket_details: [],
+        };
+      }
+  
+      await addTicketData(artist ? artist.token : "", updatedTicketData);
     } catch (error) {
       console.error("Error submitting event data:", error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleReset = () => {
     setActiveStep(0);
@@ -529,6 +564,11 @@ function CreateEvent() {
                 Back
               </Button>
               <Box sx={{ flex: "1 1 auto" }} />
+              {activeStep < 3 && (
+                <Button onClick={handleSkip} sx={{ mr: 1 }}>
+                  Skip
+                </Button>
+              )}
               <Button onClick={handleNext} sx={{ mr: 1 }}>
                 Next
               </Button>
