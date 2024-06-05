@@ -40,6 +40,7 @@ const Header = ({ app }: Props) => {
   const user = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
+    console.log(localStorage.getItem("hwg-theme"));
     dispatch(setApp(app));
   }, []);
 
