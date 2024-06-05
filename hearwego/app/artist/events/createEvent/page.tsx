@@ -202,6 +202,7 @@ function CreateEvent() {
   const [manualTicketRows, setManualTicketRows] = useState([]);
   const [isAutoTicket, setIsAutoTicket] = useState(false);
   const [isManualTicket, setIsManualTicket] = useState(false);
+  const [ticketImage, setTicketImage] = useState("https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg");
   const [eventData, setEventData] = useState<Event>({
     event_img:
       "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
@@ -304,7 +305,7 @@ function CreateEvent() {
           ticketSession,
         }) => ({
           ticket_currency: "LKR",
-          ticket_img: "",
+          ticket_img: ticketImage,
           ticket_type: ticketType,
           auto_tickets_count: ticketCount,
           ticket_price: ticketPrice,
@@ -577,6 +578,8 @@ function CreateEvent() {
                   setIsAutoTicket,
                   isManualTicket,
                   setIsManualTicket,
+                  ticketImage,
+                  setTicketImage,
                 )}
               </div>
             </Typography>
@@ -873,9 +876,16 @@ function EventDetails({
   );
 }
 
-function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows, ticketData, setTicketData, isAutoTicket, setIsAutoTicket, isManualTicket, setIsManualTicket}) {
+function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, setManualTicketRows, ticketData, setTicketData, isAutoTicket, setIsAutoTicket, isManualTicket, setIsManualTicket, ticketImage, setTicketImage}) {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
   const [imgFile, setImgFile] = React.useState(null);
+
+  useEffect(() => {
+    if (ticketImage) {
+      setTicketImage(ticketImage);
+    }
+  }, [ticketImage]);
+
 
   useEffect(() => {
     if(isChecked){
@@ -888,7 +898,7 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
     }
   }
   , [isChecked]);
-  
+
   const handleSwitchChange = (event) => {
     setIsChecked(event.target.checked);
   };
@@ -930,8 +940,8 @@ function TicketDetails({autoTicketRows, setAutoTicketRows, manualTicketRows, set
                   isCircular={false}
                   width="250px"
                   height="250px"
-                  file={imgFile}
-                  setFile={setImgFile}
+                  file={ticketImage}
+                  setFile={setTicketImage}
                   aspectX={1}
                   aspectY={1}
                   shape="rect"
@@ -3294,6 +3304,8 @@ function EventCreateShow(
   setIsAutoTicket,
   isManualTicket,
   setIsManualTicket,
+  ticketImage,
+  setTicketImage
 ) {
   if (n == 0) {
     return (
@@ -3320,6 +3332,8 @@ function EventCreateShow(
       setIsAutoTicket={setIsAutoTicket}
       isManualTicket={isManualTicket}
       setIsManualTicket={setIsManualTicket}
+      ticketImage={ticketImage}
+      setTicketImage={setTicketImage}
     />;
   } else if (n == 2) {
     return <BudgetDetails />;
