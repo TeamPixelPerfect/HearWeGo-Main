@@ -142,11 +142,45 @@ const products = [
 ];
 
 
-const category = {
+const categories =[
+
+{
   id: 1,
-  name: 'Category Name',
-  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s', // Provide the URL of the category image
-};
+  name: 'Category Name1',
+  image: 'https://hulaglobal.com/wp-content/uploads/2022/08/Hula-global-fashion-summer-guide.jpg', // Provide the URL of the category image
+},
+{
+  id: 2,
+  name: 'Category Name2',
+  image: 'https://bournecrisp.com.au/wp-content/uploads/2019/07/accessories-make-or-break-1100x733.jpg', // Provide the URL of the category image
+},
+{
+  id: 3,
+  name: 'Category Name3',
+  image: 'https://www.thespruce.com/thmb/JOkEQZjfndNozM9C5fOXxvhoyOU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/spr-tier-2-slippers-test-group-julia-fields-2-287418ff07c24849b0ef293adf4637f6.jpeg', // Provide the URL of the category image
+},
+{
+  id: 4,
+  name: 'Category Name4',
+  image: 'https://www.designersmk.com/wp-content/uploads/2023/08/home-accessories-1-1024x662.jpg', // Provide the URL of the category image
+},
+{
+  id: 5,
+  name: 'Category Name5',
+  image: 'https://musiclessonsincorona.com/wp-content/uploads/2016/10/Most-Popular-Musical-Instruments-That-Students-Learn.jpeg', // Provide the URL of the category image
+},
+{
+  id: 6,
+  name: 'Category Name6',
+  image: 'https://static-01.daraz.lk/p/ba2ce801d17277faa688ff56b7c301dd.jpg', // Provide the URL of the category image
+},
+{
+  id: 7,
+  name: 'Category Name7',
+  image: 'https://m.media-amazon.com/images/S/aplus-media-library-service-media/e0b884c3-c7a3-4253-93d0-25cb0373f424.__CR158,0,2425,1500_PT0_SX970_V1___.jpg', // Provide the URL of the category image
+},
+
+]
 
 export default function ArtistStore() {
   return (
@@ -248,9 +282,41 @@ export default function ArtistStore() {
             ))}
           </Grid>
         </div>
-        <div>
-      <CategoryComponent category={category} />
-    </div>
+
+        <div
+          style={{ padding: "20px", display: "flex", flexDirection: "column" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <Button
+              sx={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                textTransform: "none",
+              }}
+            >
+              <Typography variant="h5" gutterBottom>
+                Category
+              </Typography>
+            </Button>
+         
+          </div>
+
+        <Grid container spacing={2}>
+            {categories.map((category) => (
+              <Grid item xs={6} sm={8} md={8} lg={3} key={category.id}>
+               <CategoryComponent category={category} />
+              </Grid>
+            ))}
+          </Grid>
+         </div>
+     
       </WhiteArea>
     </>
   );

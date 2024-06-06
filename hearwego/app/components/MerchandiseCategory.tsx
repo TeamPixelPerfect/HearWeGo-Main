@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import Button from '@mui/material/Button';  
 
 interface Category {
   id: number;
@@ -11,40 +13,48 @@ interface CategoryProps {
   category: Category;
 }
 
+
 const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
   return (
     <Card
       style={{
-        maxWidth: 350,
+        maxWidth: 450,
         position: 'relative',
         overflow: 'hidden',
+        
       }}
     >
-      <img
-        src={category.image}
-        alt={category.name}
+      <div
         style={{
-          width: '100%',
-          height: 400,
-          objectFit: 'cover',
-        }}
-      />
-      <CardContent
-        style={{
-          position: 'absolute',
-          bottom: 5,
-          left: 0,
-          width: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          color: 'white',
-          padding: '8px',
-          boxSizing: 'border-box',
+          position: 'relative',
         }}
       >
-        <Typography variant="h6" component="div">
-          {category.name}
-        </Typography>
-      </CardContent>
+        <img
+          src={category.image}
+          alt={category.name}
+          style={{
+            width: '100%',
+            height: 300,
+            objectFit: 'cover',
+            filter: 'brightness(50%)', // Darkening the image
+          }}
+        />
+        <CardContent
+          style={{
+            position: 'absolute',
+            bottom: "20%",
+            left: "0%",
+            width: '100%',
+            textAlign: 'center',
+          }}
+        >
+            <Button>
+          <Typography variant="h4" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+            {category.name}
+          </Typography>
+          </Button>
+        </CardContent>
+      </div>
     </Card>
   );
 };
