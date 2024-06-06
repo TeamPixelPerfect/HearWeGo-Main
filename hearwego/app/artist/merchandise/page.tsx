@@ -1,7 +1,6 @@
 "use client";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { ADTabBox } from "@/app/styles/artistDashboard.styles";
-import { Drafts, Inventory } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -21,38 +20,17 @@ import Categories from "./Categories";
 import Promotions from "./Promotions";
 import Orders from "./Orders";
 import Store from "./Store";
-import AddProduct from "./addProduct/page";
+import Drafts from "./Drafts";
+import Inventory from "./Inventory";
 
 const ArtistMerchandise = () => {
   const theme = useTheme();
   const router = useRouter();
 
   const [tabValue, setTabValue] = useState(0);
-  const [openCreateStore, setOpenCreateStore] = useState(false);
-  const [openAddProduct, setOpenAddProduct] = useState(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const handleOpenCreateStore = () => {
-    setOpenCreateStore(true);
-  };
-
-  const handleCloseCreateStore = () => {
-    setOpenCreateStore(false);
-  };
-
-  const handleOpenAddProduct = () => {
-    setOpenAddProduct(true);
-  };
-
-  const handleCloseAddProduct = () => {
-    setOpenAddProduct(false);
-  };
-  const handleAddProduct = (product: any) => {
-    // Handle adding the product (e.g., send to API, update state)
-    console.log("Product added:", product);
   };
 
   return (
@@ -88,24 +66,20 @@ const ArtistMerchandise = () => {
               variant="contained"
               startIcon={<IoAddOutline />}
               sx={{ textTransform: "capitalize" }}
-              onClick={handleOpenCreateStore}
             >
-              Creat New Store
+              Create New Store
             </Button>
 
             <Button
               variant="contained"
               startIcon={<IoAddOutline />}
               sx={{ textTransform: "capitalize" }}
-              onClick={handleOpenAddProduct}
+              onClick={() => {
+                router.push("/artist/merchandise/addProduct");
+              }}
             >
               Add New Product
             </Button>
-            <AddProduct
-              open={openAddProduct}
-              onClose={handleCloseAddProduct}
-              handleAddProduct={handleAddProduct}
-            />
           </Stack>
         </Box>
         <ADTabBox>
