@@ -23,7 +23,7 @@ const initialCart: CartItem[] = [
     quantity: 1,
     color: 'Black',
     availableColors: ['Black', 'Gray', 'White'],
-    image: 'https://m.media-amazon.com/images/I/A13usaonutL._CLa%7C2140%2C2000%7C71INiT3PTcL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png',
+    image:'https://m.media-amazon.com/images/I/91IM87eeuCL._CLa%7C2140%2C2000%7C81am2B0c2BL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png',
   },
   {
     id: 2,
@@ -74,11 +74,11 @@ const App: React.FC = () => {
         <TableBody>
           {cart.map(item => (
             <TableRow key={item.id}>
-              <TableCell>
-                <img src={item.image} alt={item.name} style={{ maxWidth: '50px', marginRight: '10px' }} />
+              <TableCell sx={{display:'flex',justifyContent:'flex-start',alignItems:'center'}}>
+                <img src={item.image} alt ={item.name} style={{ maxWidth: '50px', marginRight: '10px' }} />
                 {item.name}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{justifyContent:'center'}}>
                 <Button onClick={() => handleQuantityChange(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>-</Button>
                 {item.quantity}
                 <Button onClick={() => handleQuantityChange(item.id, item.quantity + 1)}>+</Button>
