@@ -6,14 +6,14 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
-import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import SwipeableBanner from "../../../../components/MerchandiseBanner";
+import ProductCard from "../../../../components/MerchandiseProduct";
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CategoryComponent from "../../../../components/MerchandiseCategory";
 
 import {
   Search,
@@ -22,10 +22,137 @@ import {
   WhiteArea,
 } from "../../../../styles/ArtistStrore.styles";
 
+const banners = [
+  {
+    id: 1,
+    image: "https://blog.daraz.lk/wp-content/uploads/2022/11/Banner.jpg",
+    title: "Banner 1",
+  },
+  {
+    id: 2,
+    image:
+      "https://blog.daraz.lk/wp-content/uploads/2022/11/Amazing-Black-Friday-Deals-On-Fashion-Up-To-30-Off-Banner.jpg",
+    title: "Banner 2",
+  },
+  {
+    id: 3,
+    image:
+      "https://blog.daraz.lk/wp-content/uploads/2023/03/Avurudu-Wasi-English-Banner-02.jpg",
+    title: "Banner 3",
+  },
+];
+
+const products = [
+  {
+    id: 1,
+    name: "SampleProduct1",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
+  },
+  {
+    id: 2,
+    name: "SampleProduct2",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
+  },
+  {
+    id: 3,
+    name: "SampleProduct3",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
+  },
+  {
+    id: 4,
+    name: "SampleProduct4",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_Hvy958Oj2sGzhIWCv-QezqAAcqzsct3HdA&s",
+  },
+  {
+    id: 5,
+    name: "SampleProduct5",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT92vvUqXdziIP4FrxCPJo7G6oemT4TnpxUSg&s",
+  },
+  {
+    id: 6,
+    name: "SampleProduct6",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5oBDb1RPCPRI9YcsN461xLBsPSixy1hf_Gw&s",
+  },
+  {
+    id: 7,
+    name: "SampleProduct7",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeGtLvPukCF2z-9ruBGJgfK1ufoqI63244lw&s",
+  },
+  {
+    id: 8,
+    name: "SampleProduct8",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://estudio.lk/wp-content/uploads/2021/09/WhatsApp-Image-2021-08-30-at-9.36.34-PM-300x300.jpeg",
+  },
+  {
+    id: 9,
+    name: "Sample roduct9",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3TvBn8PhR6toQ_Tv2Z-4SUhCp2YesmO5caA&s",
+  },
+  {
+    id: 10,
+    name: "SampleProduct10",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUPbylf85GIvt4JPKd6w3lgObJhEj9_jWIQ&s",
+  },
+  {
+    id: 11,
+    name: "SampleProduct11",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQJIynAUBiePm7bn2ozvVZAgtItfWsOdYMoA&s",
+  },
+  {
+    id: 12,
+    name: "SampleProduct12",
+    description: "This is a sample product description.",
+    price: 29.99,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s",
+  },
+];
+
+
+const category = {
+  id: 1,
+  name: 'Category Name',
+  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s', // Provide the URL of the category image
+};
+
 export default function ArtistStore() {
   return (
     <>
-       <AppBar position="static">
+      {/* Search bar */}
+      <AppBar position="static">
         <Toolbar>
           <IconButton
             size="large"
@@ -33,7 +160,10 @@ export default function ArtistStore() {
             aria-label="open drawer"
             sx={{ mr: 2 }}
           >
-            <MenuIcon />
+            <Avatar
+              alt="Remy Sharp"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7MqiW7aEQD6l9uy0Icz9mn48gFLO5eahaMw&s"
+            />
           </IconButton>
 
           <Search>
@@ -64,89 +194,63 @@ export default function ArtistStore() {
       </AppBar>
 
       <WhiteArea>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={6}>
-      <Box sx={{
-      display: "flex",
-      flexDirection: "row",
-      
-    
-
-      }}>
-     
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            margin: "10px",
             width: "100%",
-            height: "auto",
-            padding: { xs: "10px", sm: "20px" },
-            border: "1px solid #E6ECF0",
-            overflowY: "auto",
-            maxHeight: "800px"
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <Accordion sx={{ width: "100%" }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="main-panel-content"
-              id="main-panel-header"
-            >
-              <Typography sx={{ fontSize: "20px" }}>Category</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              {[1, 2, 3, 4, 5].map((category) => (
-                <Accordion
-                  key={`category-${category}`}
-                  sx={{ width: "100%", border: "none", boxShadow: "none" }}
-                >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls={`panel${category}-content`}
-                    id={`panel${category}-header`}
-                    sx={{ flexDirection: "row-reverse" }}
-                  >
-                    <Typography sx={{ fontSize: "18px" }}>{`Category ${category}`}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography sx={{ fontSize: "15px", marginLeft: "20px" }}>{`Category ${category}`}</Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </AccordionDetails>
-          </Accordion>
+          <Box
+            sx={{
+              width: "100%",
+              marginTop: "20px",
+              borderRadius: "10px",
+            }}
+          >
+            <SwipeableBanner banners={banners} />
           </Box>
+        </Box>
 
-          <Grid container spacing={2}>
-    <Grid item xs={12} sm={6} md={2} lg={20}>
-      <Box sx={{
-      display: "flex",
-      flexDirection: "row",
-      }}>
+        <div
+          style={{ padding: "20px", display: "flex", flexDirection: "column" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <Button
+              sx={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                textTransform: "none",
+              }}
+            >
+              <Typography variant="h5" gutterBottom>
+                Products
+              </Typography>
+            </Button>
+            <Button variant="contained" color="primary">
+              See More
+            </Button>
+          </div>
 
-      
-    <Box sx={{
-      width: "100%",
-      height: "300px",
-      backgroundColor: "red",
-      margin: "10px",
-    }}>
-      </Box>
-      <Box sx={{
-      width: "100%",
-      height: "100px",
-      backgroundColor: "yellow",
-      margin: "10px",
-    }}>
-      </Box>
-      </Box>
-    </Grid>
-    </Grid>
-      </Box>
-  </Grid>
-</Grid>
-    
+          <Grid container spacing={4}>
+            {products.map((product) => (
+              <Grid item xs={4} sm={4} md={2} lg={2} key={product.id}>
+                <ProductCard product={product} />
+              </Grid>
+            ))}
+          </Grid>
+        </div>
+        <div>
+      <CategoryComponent category={category} />
+    </div>
       </WhiteArea>
     </>
   );

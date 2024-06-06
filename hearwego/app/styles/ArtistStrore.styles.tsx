@@ -33,6 +33,7 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export const WhiteArea = styled(Stack)(({ theme }) => ({
     // backgroundColor:"#EEF2FF",
-    marginTop: '20px',
+    // marginTop: '20px',
+    padding: '10px',
     marginBottom: '1em'  
   }));
