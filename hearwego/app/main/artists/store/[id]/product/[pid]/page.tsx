@@ -19,6 +19,7 @@ import ProductCard from "../../../../../../components/MerchandiseProduct";
 import { useState } from "react";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { SelectChangeEvent } from '@mui/material/Select';
 
 
 
@@ -32,113 +33,130 @@ import {
 const products = [
   {
     id: 1,
-    name: "SampleProduct1",
+    name: "Shirt",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 999.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
-    rating: 4.5,
+    rating: 4.5, 
+    Category: "Clothing"
+
+ 
   },
   {
     id: 2,
-    name: "SampleProduct2",
+    name: "Printed Mug",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 450.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
     rating: 4,
+    Category: "Mug"
   },
   {
     id: 3,
-    name: "SampleProduct3",
+    name: "Canon EOS Rebel T7i DSLR Camera",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 13325.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
     rating: 3.5,
+    Category: "Camera"
   },
   {
     id: 4,
-    name: "SampleProduct4",
+    name: "Wrist Bands",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 500.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_Hvy958Oj2sGzhIWCv-QezqAAcqzsct3HdA&s",
     rating: 4.5,
+    Category: "Accessories"
   },
   {
     id: 5,
-    name: "SampleProduct5",
+    name: "Cap",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 290.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT92vvUqXdziIP4FrxCPJo7G6oemT4TnpxUSg&s",
     rating: 2.5,
+    Category: "Clothing"
   },
   {
     id: 6,
-    name: "SampleProduct6",
+    name: "Trvelling Bag",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 2900.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5oBDb1RPCPRI9YcsN461xLBsPSixy1hf_Gw&s",
     rating: 3.5,
+    Category: "Bag"
   },
   {
     id: 7,
-    name: "SampleProduct7",
+    name: "Men Cap",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 699.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeGtLvPukCF2z-9ruBGJgfK1ufoqI63244lw&s",
     rating: 1.5,
+    Category: "Clothing"
   },
   {
     id: 8,
-    name: "SampleProduct8",
+    name: "Couple Shirts",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 2900.99,
     image:
       "https://estudio.lk/wp-content/uploads/2021/09/WhatsApp-Image-2021-08-30-at-9.36.34-PM-300x300.jpeg",
     rating: 2,
+    Category: "Clothing"
   },
   {
     id: 9,
-    name: "Sample roduct9",
+    name: "Wrist Bands",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 290.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3TvBn8PhR6toQ_Tv2Z-4SUhCp2YesmO5caA&s",
     rating: 4.5,
+    Category: "Accessories"
   },
   {
     id: 10,
-    name: "SampleProduct10",
+    name: "Shirt",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 3909.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUPbylf85GIvt4JPKd6w3lgObJhEj9_jWIQ&s",
     rating: 3.5,
+    Category: "Clothing"
   },
   {
     id: 11,
-    name: "SampleProduct11",
+    name: "Mug",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 829.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQJIynAUBiePm7bn2ozvVZAgtItfWsOdYMoA&s",
     rating: 2.5,
+    Category: "Mug"
   },
   {
     id: 12,
-    name: "SampleProduct12",
+    name: "Camera",
     description: "This is a sample product description.",
-    price: 29.99,
+    price: 9900.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s",
     rating: 1.5,
+    Category: "Camera"
+
   },
 ];
+
+
 interface Product {
   id: number;
   name: string;
@@ -221,30 +239,26 @@ const productsC: Product[] = [
 export default function ArtistStoreProduct() {
   const [category, setCategory] = useState<string>("All");
   const [subcategory, setSubcategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = React.useState("");
 
-  const handleChangeCategory = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setCategory(event.target.value as string);
+  const handleChangeCategory = (event: SelectChangeEvent<string>) => {
+    setCategory(event.target.value);
     setSubcategory("All");
   };
-
-  const handleChangeSubcategory = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setSubcategory(event.target.value as string);
+  
+  const handleChangeSubcategory = (event: SelectChangeEvent<string>) => {
+    setSubcategory(event.target.value);
+  };
+  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
   };
 
-  // Filter products based on selected category and subcategory
-  const filteredProducts = productsC.filter(
-    (product) =>
-      (category === "All" || product.category === category) &&
-      (subcategory === "All" || product.subcategory === subcategory)
+  // Filter products based on the search query
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Initialize useHistory
 
-  // Function to handle clicking on the arrow
 
   return (
     <>
@@ -275,6 +289,8 @@ export default function ArtistStoreProduct() {
               }}
               placeholder="Search here"
               inputProps={{ "aria-label": "search" }}
+              value={searchQuery}
+              onChange={handleSearchInputChange}
             />
           </Search>
 
@@ -390,7 +406,8 @@ export default function ArtistStoreProduct() {
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
+                  
+alignItems: "center",
                   marginBottom: "20px",
                 }}
               >
@@ -401,7 +418,7 @@ export default function ArtistStoreProduct() {
               </div>
 
               <Grid container spacing={4}>
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <Grid item xs={6} sm={4} md={2} lg={3} key={product.id}>
                     <ProductCard product={product} />
                   </Grid>

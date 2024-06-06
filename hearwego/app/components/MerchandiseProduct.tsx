@@ -8,7 +8,8 @@ interface Product {
   description: string;
   price: number;
   image: string;
-  rating: number; // Add rating property
+  rating: number; 
+  category:string;// Add rating property
 }
 
 interface ProductCardProps {
@@ -48,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {product.description}
         </Typography>
         <Typography variant="h6" color="text.primary" sx={{ marginTop: 2 }}>
-          ${product.price}
+          {product.price}
         </Typography>
       </CardContent>
     </StyledCard>

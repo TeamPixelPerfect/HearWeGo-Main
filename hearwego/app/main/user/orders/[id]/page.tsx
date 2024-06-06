@@ -4,6 +4,7 @@ const SingleOrder = () => {
   return (
     <div>
       Single Order Page
+      
     </div>
   )
 }
