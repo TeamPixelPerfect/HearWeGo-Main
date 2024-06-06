@@ -62,10 +62,12 @@ const AddProduct = ({
             onClose();
           }}
         >
-          {({ handleSubmit, isSubmitting, errors, touched }) => (
+          {({ handleSubmit, isSubmitting, errors, touched,values,handleChange }) => (
             <form onSubmit={handleSubmit}>
               <div>
                 <TextField
+                  value={values.title}
+                  onChange={handleChange}
                   name="title"
                   type="text"
                   label="Product Title"
