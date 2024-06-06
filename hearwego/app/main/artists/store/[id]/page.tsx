@@ -50,6 +50,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
+    rating: 4.5,  
   },
   {
     id: 2,
@@ -58,6 +59,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
+    rating: 4,
   },
   {
     id: 3,
@@ -66,6 +68,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
+    rating: 3.5,
   },
   {
     id: 4,
@@ -74,6 +77,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_Hvy958Oj2sGzhIWCv-QezqAAcqzsct3HdA&s",
+    rating: 4.5,
   },
   {
     id: 5,
@@ -82,6 +86,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT92vvUqXdziIP4FrxCPJo7G6oemT4TnpxUSg&s",
+    rating: 2.5,
   },
   {
     id: 6,
@@ -90,6 +95,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5oBDb1RPCPRI9YcsN461xLBsPSixy1hf_Gw&s",
+    rating: 3.5,
   },
   {
     id: 7,
@@ -98,6 +104,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeGtLvPukCF2z-9ruBGJgfK1ufoqI63244lw&s",
+    rating: 1.5,
   },
   {
     id: 8,
@@ -106,6 +113,7 @@ const products = [
     price: 29.99,
     image:
       "https://estudio.lk/wp-content/uploads/2021/09/WhatsApp-Image-2021-08-30-at-9.36.34-PM-300x300.jpeg",
+    rating: 2,
   },
   {
     id: 9,
@@ -114,6 +122,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3TvBn8PhR6toQ_Tv2Z-4SUhCp2YesmO5caA&s",
+    rating: 4.5,
   },
   {
     id: 10,
@@ -122,6 +131,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUPbylf85GIvt4JPKd6w3lgObJhEj9_jWIQ&s",
+    rating: 3.5,
   },
   {
     id: 11,
@@ -130,6 +140,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQJIynAUBiePm7bn2ozvVZAgtItfWsOdYMoA&s",
+    rating: 2.5,
   },
   {
     id: 12,
@@ -138,6 +149,7 @@ const products = [
     price: 29.99,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s",
+    rating: 1.5,
   },
 ];
 
@@ -276,7 +288,7 @@ export default function ArtistStore() {
 
           <Grid container spacing={4}>
             {products.map((product) => (
-              <Grid item xs={4} sm={4} md={2} lg={2} key={product.id}>
+              <Grid item xs={5} sm={4} md={2} lg={2} key={product.id}>
                 <ProductCard product={product} />
               </Grid>
             ))}
