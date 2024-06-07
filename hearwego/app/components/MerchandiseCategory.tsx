@@ -1,7 +1,11 @@
+"use client";
+import {useRouter} from 'next/router';
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import Button from '@mui/material/Button';  
+import Link from 'next/link';
+
 
 interface Category {
   id: number;
@@ -48,11 +52,13 @@ const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
             textAlign: 'center',
           }}
         >
+          <Link href="/main/artists/store/1/category/1">
             <Button>
           <Typography variant="h4" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
             {category.name}
           </Typography>
           </Button>
+          </Link>
         </CardContent>
       </div>
     </Card>
