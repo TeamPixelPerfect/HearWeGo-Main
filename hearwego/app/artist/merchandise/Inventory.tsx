@@ -8,148 +8,140 @@ import {
   Select,
   InputLabel,
   FormControl,
-  Slider,
   Checkbox,
   FormControlLabel,
-  Card,
-  CardContent,
-  CardMedia,
-  Button,
 } from "@mui/material";
 import React, { useState } from "react";
+import SingleProductCard from "../../components/SingleProductCardMerchA";
 
 const productsData = [
   {
     pid: 1,
     title: "Apple iPhone 13",
-    description:
-      "Latest model of Apple iPhone with A15 Bionic chip and advanced camera system.",
+    description: "Latest model with A15 Bionic chip",
     category: "Electronics",
     price: 999,
-    quantity: 50,
+    quantity: 25,
     image:
-      "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-pro-max-sierra-blue-select?wid=940&hei=1112&fmt=png-alpha&.v=1631831006000",
+      "data:image/jpeg;base64,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",
   },
   {
     pid: 2,
     title: "Samsung Galaxy S21",
-    description:
-      "High-end Android smartphone with dynamic AMOLED display and triple camera setup.",
+    description: "Flagship model with Exynos 2100",
     category: "Electronics",
-    price: 799,
+    price: 899,
     quantity: 30,
-    image:
-      "https://images.samsung.com/is/image/samsung/p6pim/levant/sm-g991bzvgmea/gallery/levant-galaxy-s21-5g-g991-sm-g991bzvgmea-thumb-368427963?$320_320_PNG$",
+    image: "https://via.placeholder.com/200x200.png?text=Galaxy+S21",
   },
   {
     pid: 3,
     title: "Sony WH-1000XM4",
-    description:
-      "Industry-leading noise-canceling headphones with superior sound quality.",
+    description: "Noise-canceling wireless headphones",
     category: "Electronics",
     price: 349,
-    quantity: 20,
-    image:
-      "https://cdn.sony-asia.com/image/2020/03/1600x900/wh1000xm4_b_1200x1200.png",
+    quantity: 15,
+    image: "https://via.placeholder.com/200x200.png?text=Sony+WH-1000XM4",
   },
   {
     pid: 4,
     title: "Nike Air Max 270",
-    description:
-      "Comfortable and stylish sneakers with excellent cushioning and support.",
-    category: "Footwear",
+    description: "Comfortable and stylish sneakers",
+    category: "Fashion",
     price: 150,
-    quantity: 100,
-    image:
-      "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/ba4b2d64-bf23-4f7b-9499-8320bfc0148c/air-max-270-shoes-KkLcGR.png",
+    quantity: 50,
+    image: "https://via.placeholder.com/200x200.png?text=Nike+Air+Max+270",
   },
   {
     pid: 5,
-    title: "Adidas Ultraboost",
-    description:
-      "High-performance running shoes with responsive cushioning and lightweight design.",
-    category: "Footwear",
+    title: "Adidas Ultraboost 21",
+    description: "High-performance running shoes",
+    category: "Fashion",
     price: 180,
-    quantity: 75,
-    image:
-      "https://assets.adidas.com/images/w_600,f_auto,q_auto/4cd3dc2fa1d64b69a93fad26011026e4_9366/Ultraboost_21_Shoes_Black_FY0378_01_standard.jpg",
+    quantity: 40,
+    image: "https://via.placeholder.com/200x200.png?text=Adidas+Ultraboost+21",
   },
   {
     pid: 6,
-    title: "Levi's 501 Original Jeans",
-    description:
-      "Classic straight leg jeans with timeless style and durable construction.",
-    category: "Apparel",
-    price: 60,
-    quantity: 200,
-    image:
-      "https://lsco.scene7.com/is/image/lsco/005010494-alt1-pdp?$qv_desktop_full$",
+    title: "The Great Gatsby",
+    description: "Classic novel by F. Scott Fitzgerald",
+    category: "Books",
+    price: 10,
+    quantity: 100,
+    image: "https://via.placeholder.com/200x200.png?text=The+Great+Gatsby",
   },
   {
     pid: 7,
-    title: "Patagonia Down Sweater",
-    description:
-      "Warm and lightweight down jacket, perfect for outdoor activities and casual wear.",
-    category: "Apparel",
-    price: 229,
-    quantity: 40,
-    image:
-      "https://www.patagonia.com/dis/dw/image/v2/ABBM_PRD/on/demandware.static/-/Sites-patagonia-master/default/dw558b60b1/images/hi-res/84674_BLK.jpg?sw=750&sh=750&sm=fit&sfrm=png",
+    title: "Sony PlayStation 5",
+    description: "Next-gen gaming console",
+    category: "Electronics",
+    price: 499,
+    quantity: 20,
+    image: "https://via.placeholder.com/200x200.png?text=PlayStation+5",
   },
   {
     pid: 8,
-    title: "Apple MacBook Pro",
-    description:
-      "Powerful laptop with M1 chip, Retina display, and long battery life.",
-    category: "Electronics",
-    price: 1299,
-    quantity: 25,
-    image:
-      "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mbp13touch-silver-select-202011_GEO_EMEA_LANG_EN?wid=1808&hei=1686&fmt=jpeg&qlt=90&.v=1613672866000",
+    title: "Dell XPS 13",
+    description: "Powerful and portable laptop",
+    category: "Computers",
+    price: 1099,
+    quantity: 10,
+    image: "https://via.placeholder.com/200x200.png?text=Dell+XPS+13",
   },
   {
     pid: 9,
-    title: "Dell XPS 13",
-    description:
-      "Compact and powerful ultrabook with InfinityEdge display and premium build quality.",
-    category: "Electronics",
+    title: "Apple MacBook Air",
+    description: "Lightweight laptop with M1 chip",
+    category: "Computers",
     price: 999,
     quantity: 15,
-    image:
-      "https://i.dell.com/sites/csimages/Merchandizing_Imagery/all/xps-13-9310-laptop_cdp_m1.jpg",
+    image: "https://via.placeholder.com/200x200.png?text=MacBook+Air",
   },
   {
     pid: 10,
-    title: "KitchenAid Stand Mixer",
-    description:
-      "Versatile stand mixer with powerful motor and multiple attachments for various kitchen tasks.",
-    category: "Home Appliances",
-    price: 379,
-    quantity: 10,
-    image:
-      "https://cdn.shopify.com/s/files/1/2072/2461/products/1204_product_1_89e6bbd8-f65c-4428-b827-e057d6a15d49.png?v=1570135861",
+    title: "Samsung QLED TV",
+    description: "Ultra HD Smart TV with Quantum Dot technology",
+    category: "Electronics",
+    price: 1200,
+    quantity: 8,
+    image: "https://via.placeholder.com/200x200.png?text=Samsung+QLED+TV",
   },
 ];
 
-const ProductInventory = () => {
+const Inventory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [outOfStockFilter, setOutOfStockFilter] = useState(false);
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = (event: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleCategoryChange = (event) => {
+  const handleCategoryChange = (event: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
     setCategoryFilter(event.target.value);
   };
 
-  const handlePriceChange = (event, newValue) => {
-    setPriceRange(newValue);
+  const handleMinPriceChange = (event: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
+    setMinPrice(event.target.value);
   };
 
-  const handleOutOfStockChange = (event) => {
+  const handleMaxPriceChange = (event: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
+    setMaxPrice(event.target.value);
+  };
+
+  const handleOutOfStockChange = (event: {
+    target: { checked: boolean | ((prevState: boolean) => boolean) };
+  }) => {
     setOutOfStockFilter(event.target.checked);
   };
 
@@ -167,7 +159,8 @@ const ProductInventory = () => {
     )
     .filter(
       (product) =>
-        product.price >= priceRange[0] && product.price <= priceRange[1]
+        (minPrice === "" || product.price >= parseFloat(minPrice)) &&
+        (maxPrice === "" || product.price <= parseFloat(maxPrice))
     )
     .filter((product) => !outOfStockFilter || product.quantity === 0);
 
@@ -180,9 +173,12 @@ const ProductInventory = () => {
       sx={{
         width: "100%",
         minHeight: "100vh",
+        bgcolor: "background.default",
+        p: 3,
+        borderRadius: "10px",
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Box sx={{ mb: 3, mt: 3 }}>
           <TextField
             fullWidth
@@ -218,16 +214,29 @@ const ProductInventory = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Typography id="price-range-slider" gutterBottom>
-              Price Range
-            </Typography>
-            <Slider
-              value={priceRange}
-              onChange={handlePriceChange}
-              valueLabelDisplay="auto"
-              min={0}
-              max={1000}
-              step={10}
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Min Price"
+              value={minPrice}
+              onChange={handleMinPriceChange}
+              type="number"
+              InputProps={{
+                inputProps: { min: 0 },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Max Price"
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+              type="number"
+              InputProps={{
+                inputProps: { min: 0 },
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -244,48 +253,8 @@ const ProductInventory = () => {
         </Grid>
         <Grid container spacing={2}>
           {filteredProducts.map((product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.pid}>
-              <Card
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={product.image} // Ensure that each product has an 'image' field
-                  alt={product.title}
-                />
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {product.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {product.description}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary">
-                    Category: {product.category}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary">
-                    Price: ${product.price}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary">
-                    Quantity: {product.quantity}
-                  </Typography>
-                </CardContent>
-                <Box sx={{ flexGrow: 1 }} />
-                <Box sx={{ p: 2 }}>
-                  <Button variant="contained" fullWidth>
-                    View Details
-                  </Button>
-                </Box>
-              </Card>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product.pid}>
+              <SingleProductCard product={product} />
             </Grid>
           ))}
         </Grid>
@@ -294,4 +263,4 @@ const ProductInventory = () => {
   );
 };
 
-export default ProductInventory;
+export default Inventory;
