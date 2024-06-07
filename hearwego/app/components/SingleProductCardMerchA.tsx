@@ -47,15 +47,15 @@ const SingleProductCard = ({ product }) => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setEditedProduct({ ...editedProduct, [name]: value });
     setIsDirty(true);
   };
 
-  const saveEditedProduct = async (editedProduct) => {
+  const saveEditedProduct = async (editedProduct: any) => {
     // Simulate API call
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
         console.log("Saving edited product:", editedProduct);
         resolve();
