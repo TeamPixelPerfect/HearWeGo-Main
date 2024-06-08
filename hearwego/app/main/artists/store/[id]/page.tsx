@@ -45,7 +45,7 @@ const banners = [
   },
 ];
 
-const products = [
+export const products = [
   {
     id: 1,
     name: "Shirt",

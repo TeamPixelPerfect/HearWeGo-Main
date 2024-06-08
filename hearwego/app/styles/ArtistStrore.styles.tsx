@@ -4,6 +4,10 @@
 import { styled } from '@mui/material/styles';
 import InputBase from "@mui/material/InputBase";
 import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+
 
 export const Search = styled("div")(({ theme }) => ({
   p: "20px",
@@ -58,4 +62,38 @@ export const CommentsContainer = styled("div")(({ theme }) => ({
   marginTop: theme.spacing(4),
   borderTop: `1px solid ${theme.palette.divider}`,
   paddingTop: theme.spacing(2),
+}));
+
+
+
+
+export const RootContainer = styled(Container)(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+}));
+
+export const ImagesContainer = styled(Grid)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+}));
+
+export const Image = styled("img")(({ theme }) => ({
+  maxWidth: "100%",
+  maxHeight: 400,
+}));
+
+export const DetailsContainer = styled(Grid)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+}));
+
+export const CommentSection = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(4),
+}));
+
+export const CommentForm = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2),
 }));

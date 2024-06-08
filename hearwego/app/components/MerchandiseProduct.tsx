@@ -67,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.description}
           </Typography>
           <Typography variant="h6" color="text.primary" sx={{ marginTop: 2 }}>
-            {product.price}
+            Rs{product.price}
           </Typography>
         </CardContent>
       </StyledCard>
