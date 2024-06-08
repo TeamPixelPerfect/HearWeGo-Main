@@ -77,7 +77,7 @@ const ArtistMerchandise = () => {
               startIcon={<IoAddOutline />}
               sx={{ textTransform: "capitalize" }}
               onClick={() => {
-                router.push("/artist/merchandise/add");
+                router.push("/artist/merchandise/addProduct");
               }}
             >
               Add New Product
