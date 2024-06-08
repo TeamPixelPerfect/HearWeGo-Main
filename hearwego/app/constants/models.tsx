@@ -207,3 +207,17 @@ export interface Ticket {
   ticket_description?: string;
   event_id?: string;
 }
+
+export interface Budget {
+  budget_id?: string;
+  budget_currency?: string;
+  budget_details?: [
+    {
+      budget_title: string;
+      budget_type: string;
+      budget_session: string;
+      budget_amount: number;
+    }
+  ];
+  event_id?: string;
+}

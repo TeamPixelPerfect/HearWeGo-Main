@@ -28,7 +28,7 @@ export const getEvents = async (
 };
 
 export const addEvent = async (token: string, data: any) => {
-  console.log("Sending event data:", data); // Add this line for logging
+  console.log("Sending event data:", data); 
   const res = await fetch(`${base_url}/EventsManager/events`, {
     method: "POST",
     headers: {
@@ -42,14 +42,14 @@ export const addEvent = async (token: string, data: any) => {
     return event;
   } else {
     const error = await res.json();
-    console.error("Error response:", error); // Add this line to log the error response
+    console.error("Error response:", error);
     throw new Error(error.message);
   }
 };
 
 
 export const addTicket = async (token: string, data: any) => {
-  console.log("Sending ticket data:", data); // Add this line for logging
+  console.log("Sending ticket data:", data); 
   const res = await fetch(`${base_url}/EventsManager/ticket`, {
     method: "POST",
     headers: {
@@ -63,7 +63,27 @@ export const addTicket = async (token: string, data: any) => {
     return ticket;
   } else {
     const error = await res.json();
-    console.error("Error response:", error); // Add this line to log the error response
+    console.error("Error response:", error); 
+    throw new Error(error.message);
+  }
+};
+
+export const addBudget = async (token: string, data: any) => {
+  console.log("Sending budget data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/budget`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const budget = await res.json();
+    return budget;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error); 
     throw new Error(error.message);
   }
 };
