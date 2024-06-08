@@ -203,9 +203,9 @@ function CreateEvent() {
   const [isAutoTicket, setIsAutoTicket] = useState(false);
   const [isManualTicket, setIsManualTicket] = useState(false);
   const [ticketImage, setTicketImage] = useState("https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg");
+  const [eventImage, setEventImage] = useState("");
   const [eventData, setEventData] = useState<Event>({
-    event_img:
-      "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
+    event_img: eventImage,
     event_name: "",
     event_type: "",
     age_from: 0,
@@ -444,7 +444,17 @@ function CreateEvent() {
   const submitData = async () => {
     setLoading(true);
     try {
-      const createdEvent = await addEvent(artist ? artist.token : "", eventData);
+      let updatedEventData = {
+        ...eventData
+      };
+
+      if(eventData.event_img === ""){
+        updatedEventData = {
+          ...updatedEventData,
+          event_img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg"
+        }
+      }
+      const createdEvent = await addEvent(artist ? artist.token : "", updatedEventData);
       const eventId = createdEvent.event_id;
   
       let updatedTicketData = {
@@ -580,6 +590,8 @@ function CreateEvent() {
                   setIsManualTicket,
                   ticketImage,
                   setTicketImage,
+                  eventImage,
+                  setEventImage
                 )}
               </div>
             </Typography>
@@ -594,7 +606,7 @@ function CreateEvent() {
               </Button>
               <Box sx={{ flex: "1 1 auto" }} />
               {activeStep < 3 && (
-                <Button onClick={handleSkip} sx={{ mr: 1 }}>
+                <Button onClick={handleSkip} sx={{ mr: 1 }} disabled={activeStep === 0}>
                   Skip
                 </Button>
               )}
@@ -679,9 +691,17 @@ function EventDetails({
   setSponsorRows,
   eventData,
   setEventData,
+  eventImage,
+  setEventImage
 }) {
   const [isAgeEnabled, setIsAgeEnabled] = useState(false);
   const [imgFile, setImgFile] = React.useState(null);
+
+  useEffect(() => {
+    if (eventImage) {
+      setEventImage(eventImage);
+    }
+  }, [eventImage]);
 
   useEffect(() => {
     if (imgFile) {
@@ -724,8 +744,8 @@ function EventDetails({
               isCircular={false}
               width="250px"
               height="250px"
-              file={imgFile}
-              setFile={setImgFile}
+              file={eventImage}
+              setFile={setEventImage}
               aspectX={1}
               aspectY={1}
               shape="rect"
@@ -3305,7 +3325,9 @@ function EventCreateShow(
   isManualTicket,
   setIsManualTicket,
   ticketImage,
-  setTicketImage
+  setTicketImage,
+  eventImage,
+  setEventImage
 ) {
   if (n == 0) {
     return (
@@ -3318,6 +3340,8 @@ function EventCreateShow(
         setSponsorRows={setSponsorRows}
         eventData={eventData}
         setEventData={setEventData}
+        eventImage={eventImage}
+        setEventImage={setEventImage}
       />
     );
   } else if (n == 1) {
