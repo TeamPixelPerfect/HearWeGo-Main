@@ -22,7 +22,8 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image1: string;
+  image2: string;
   rating: number;
   category: string;
   subcategory: string;
@@ -50,7 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <CardMedia
           component="img"
           height="140"
-          image={product.image}
+          image={product.image1}
           alt={product.name}
         />
         <CardContent>

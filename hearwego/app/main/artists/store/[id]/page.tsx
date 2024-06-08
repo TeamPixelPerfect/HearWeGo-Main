@@ -51,8 +51,10 @@ export const products = [
     name: "Shirt",
     description: "This is a sample product description.",
     price: 999.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
+    image2:
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
     category: "Clothing",
     subcategory: "Shirt",
@@ -76,8 +78,10 @@ export const products = [
     name: "Printed Mug",
     description: "This is a sample product description.",
     price: 450.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4,
     category: "Mug",
     subcategory: "Mug",
@@ -101,8 +105,10 @@ export const products = [
     name: "Canon EOS Rebel T7i DSLR Camera",
     description: "This is a sample product description.",
     price: 13325.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     category: "Camera",
     subcategory: "Camera",
@@ -126,8 +132,10 @@ export const products = [
     name: "Wrist Bands",
     description: "This is a sample product description.",
     price: 500.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_Hvy958Oj2sGzhIWCv-QezqAAcqzsct3HdA&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
     category: "Accessories",
     subcategory: "Wrist Bands",
@@ -151,8 +159,10 @@ export const products = [
     name: "Cap",
     description: "This is a sample product description.",
     price: 290.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT92vvUqXdziIP4FrxCPJo7G6oemT4TnpxUSg&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
     category: "Clothing",
     subcategory: "Cap",
@@ -176,8 +186,10 @@ export const products = [
     name: "Trvelling Bag",
     description: "This is a sample product description.",
     price: 2900.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5oBDb1RPCPRI9YcsN461xLBsPSixy1hf_Gw&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     category: "Bag",
     subcategory: "Bag",
@@ -201,8 +213,10 @@ export const products = [
     name: "Men Cap",
     description: "This is a sample product description.",
     price: 699.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeGtLvPukCF2z-9ruBGJgfK1ufoqI63244lw&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
     category: "Clothing",
     subcategory: "Cap",
@@ -226,8 +240,10 @@ export const products = [
     name: "Couple Shirts",
     description: "This is a sample product description.",
     price: 2900.99,
-    image:
+    image1:
       "https://estudio.lk/wp-content/uploads/2021/09/WhatsApp-Image-2021-08-30-at-9.36.34-PM-300x300.jpeg",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2,
     category: "Clothing",
     subcategory: "Shirt",
@@ -251,8 +267,10 @@ export const products = [
     name: "Wrist Bands",
     description: "This is a sample product description.",
     price: 290.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3TvBn8PhR6toQ_Tv2Z-4SUhCp2YesmO5caA&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
     category: "Accessories",
     subcategory: "Wrist Bands",
@@ -276,8 +294,10 @@ export const products = [
     name: "Shirt",
     description: "This is a sample product description.",
     price: 3909.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUPbylf85GIvt4JPKd6w3lgObJhEj9_jWIQ&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     category: "Clothing",
     subcategory: "Shirt",
@@ -301,8 +321,10 @@ export const products = [
     name: "Mug",
     description: "This is a sample product description.",
     price: 829.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQJIynAUBiePm7bn2ozvVZAgtItfWsOdYMoA&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
     category: "Mug",
     subcategory: "Mug",
@@ -326,8 +348,10 @@ export const products = [
     name: "Camera",
     description: "This is a sample product description.",
     price: 9900.99,
-    image:
+    image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s",
+      image2:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
     category: "Camera",
     subcategory: "Camera",

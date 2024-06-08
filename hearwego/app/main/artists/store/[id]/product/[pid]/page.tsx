@@ -14,6 +14,14 @@ import {
 import { Box, Card, CardContent, Rating } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import { Paper } from "@mui/material";
+import { styled } from "@mui/system";
+import { Add, Remove } from "@mui/icons-material";
+import IconButton from "@mui/material/IconButton";
+import ShoppingCart from "@mui/icons-material/ShoppingCart";
+import Link from "next/link";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+
+// import Rating from "@mui/material/Rating";
 
 interface Comment {
   id: number;
@@ -42,14 +50,14 @@ interface ProductCardProps {
 export const products: Product[] = [
   {
     id: 1,
-    name: "Shirt",
+    name: "CANON EOS R7",
     description: "This is a sample product description.",
-    price: 999.99,
+    price: 25000.0,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
-    rating: 4.5,
-    category: "Clothing",
-    subcategory: "Shirt",
+    rating: 4,
+    category: "Camera",
+    subcategory: "Camera",
     comments: [
       {
         id: 1,
@@ -70,77 +78,77 @@ export const products: Product[] = [
 ];
 
 const ProductDetail: React.FC = () => {
-  const [comments, setComments] = useState<Comment[]>(products[0].comments);
-  const [newComment, setNewComment] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const product = products[0];
   const [selectedImage, setSelectedImage] = useState(0);
   const productImages = [
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5oBDb1RPCPRI9YcsN461xLBsPSixy1hf_Gw&s",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxVUpd37ROVc_7LEW291Ql0HkBUUNUjEqjaA&s",
   ];
 
   const handleImageSwap = () => {
     setSelectedImage((prev) => (prev + 1) % productImages.length);
   };
 
+  const handleAddToCart = () => {
+    // Handle add to cart functionality
+    alert("Added to cart!");
+  };
+  const handleQuantityChange = (type: string) => {
+    if (type === "increment") {
+      setQuantity(quantity + 1);
+    } else {
+      if (quantity > 1) setQuantity(quantity - 1);
+    }
+  };
+
   return (
     <>
-      <Box
+       <Box
         sx={{
           display: "flex",
-          width: "100%",
-          flexDirection: "row",
+          flexDirection: { xs: "column", md: "row" },
           marginTop: "20px",
-          // justifyContent: "center",
-          // alignItems: "center",
         }}
       >
         <Box
           sx={{
-            width: "50%",
+            width: { xs: "100%", md: "50%" },
             display: "flex",
             flexDirection: "row",
-            justifyContent: "right",
-            backgroundColor: "red",
-            // margin: "20px",
+            justifyContent: { xs: "center", md: "right" },
           }}
         >
-          <Box
-            sx={{
-              width: "60%",
-              // height: "20%",
-              // display: "flex",
-              // justifyContent: "center",
-              // alignItems: "center",
-              margin: "40px",
-              borderRadius: "10px",
-              backgroundColor: "green",
-              barder: "1px solid black",
-            }}
-          >
-            <Box
-              sx={{
-                width: "100%",
-                // marginTop: "20px",
-                borderRadius: "10px",
-                backgroundColor: "blue",
-                barder: "1px solid black",
-              }}
-            >
+          <Box sx={{ width: { xs: "100%", md: "60%" }, margin: "40px" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Link href="/main/artists/store/1">
+                <Button>
+                  <ArrowBackIosIcon />
+                </Button>
+              </Link>
+              <Typography
+                sx={{
+                  textAlign: "left",
+                  marginBottom: "0px",
+                  fontSize: "32px",
+                }}
+              >
+                Product Details
+              </Typography>
+            </div>
+            <Box sx={{ height: { xs: "250px", md: "350px" },marginTop:'20px'}}>
               <Carousel autoPlay={true} indicators={false}>
                 {productImages.map((image, index) => (
-                  <Paper key={index} style={{ position: "relative" }}>
-                    <img
-                      src={image}
-                      alt={product.name}
-                      style={{
-                        width: "100%",
-                        height: "350px",
-                        borderRadius: "10px",
-                        barder: "1px solid black",
-                      }}
-                    />
-                  </Paper>
+                  <img
+                    key={index}
+                    src={image}
+                    alt={product.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "10px",
+                    }}
+                  />
                 ))}
               </Carousel>
             </Box>
@@ -148,155 +156,73 @@ const ProductDetail: React.FC = () => {
         </Box>
         <Box
           sx={{
-            width: "50%",
+            width: { xs: "100%", md: "50%" },
             display: "flex",
             flexDirection: "column",
             justifyContent: "left",
             alignItems: "left",
-            backgroundColor: "yellow",
           }}
         >
           <Box
             sx={{
               display: "flex",
-              width: "50%",
-              height: "50%",
               flexDirection: "column",
               alignItems: "left",
-              backgroundColor: "pink",
-              marginTop: "40px",
+              marginTop: { xs: "20px", md: "90px" },
               padding: "20px",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                backgroundColor: "purple",
-                fontSize: "48px",
-                fontWeight: "bold",
-              }}
+            <Typography
+              sx={{ marginBottom: "10px", fontSize: { xs: "32px", md: "40px",fontWeight:"bold" } }}
             >
               {product.name}
-            </Box>
-            <Box
+            </Typography>
+            <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+              <Rating
+                name="read-only-rating"
+                value={product.rating}
+                readOnly
+                precision={0.5}
+              />
+            </Typography>
+            <Typography
               sx={{
-                display: "flex",
-                backgroundColor: "red",
-              }}
-            >
-              <Rating value={product.rating} readOnly />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                backgroundColor: "purple",
-                fontSize: "32px",
+                marginBottom: "20px",
+                fontSize: "24px",
                 fontWeight: "bold",
-                padding: "10px",
+                color: "red",
               }}
             >
               Rs.{product.price}
+            </Typography>
+            <Typography variant="body1">Quantity</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <IconButton onClick={() => handleQuantityChange("decrement")}>
+                <Remove />
+              </IconButton>
+              <Typography>{quantity}</Typography>
+              <IconButton onClick={() => handleQuantityChange("increment")}>
+                <Add />
+              </IconButton>
             </Box>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{
-        display:"flex",
-        height:"200px",
-        flexDirection:"row",
-        alignItems:"center",
-    
-        backgroundColor:"blue",
-      }}>
-        <Box sx={{
-           width: "50%",
-           height: "100%",
-           display: "flex",
-           flexDirection: "row",
-           justifyContent: "right",
-           backgroundColor: "pink",
-           // margin: "20px",
-
-        }}>
-          <Box sx={{
-            display: "flex",  
-            height:"100px",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            margin: "40px",
-            borderRadius: "10px",
-            backgroundColor: "green",
-          }}>
-
-          </Box>
-
-        </Box>
-
-      </Box>
-      {/* <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "20px",
-          // backgroundColor: "yellow",
-          marginTop: "20px",
-        }}
-      >
-        <Typography variant="body1">{product.description}</Typography>
-        <Button variant="contained" color="primary">
-          Add to Cart
-        </Button>
-        <Box marginTop={4} width="100%">
-          <Typography variant="h5" marginBottom={2}>
-            Comments
-          </Typography>
-          <List>
-            {comments.map((comment, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={comment.username}
-                  secondary={comment.comment}
-                />
-              </ListItem>
-            ))}
-          </List>
-          <Box marginTop={2}>
-            <Typography variant="h6">Leave a comment</Typography>
-            <TextField
-              label="Your Comment"
-              multiline
-              rows={4}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
             <Button
               variant="contained"
               color="primary"
-              onClick={() => {
-                setComments([
-                  ...comments,
-                  {
-                    id: comments.length + 1,
-                    username: "JohnDoe",
-                    comment: newComment,
-                    rating: 5,
-                    date: new Date().toISOString().split("T")[0],
-                  },
-                ]);
-                setNewComment("");
-              }}
+              endIcon={<ShoppingCart />}
+              onClick={handleAddToCart}
+              sx={{ textTransform: "none",width:"30%" }}
             >
-              Submit
+              Add to Cart
             </Button>
           </Box>
         </Box>
-      </Box> */}
+      </Box>
     </>
   );
 };
