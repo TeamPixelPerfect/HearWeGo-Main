@@ -102,9 +102,9 @@ export const products = [
   },
   {
     id: 3,
-    name: "Canon EOS Rebel T7i DSLR Camera",
+    name: "CANON EOS R7",
     description: "This is a sample product description.",
-    price: 13325.99,
+    price: 2500,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
       image2:

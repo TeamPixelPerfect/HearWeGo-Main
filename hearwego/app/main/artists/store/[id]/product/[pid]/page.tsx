@@ -2,26 +2,19 @@
 
 import React, { useState } from "react";
 import {
-  Container,
-  Grid,
-  Typography,
+  Box,
   Button,
+  Typography,
+  IconButton,
+  Rating,
   TextField,
-  List,
-  ListItem,
-  ListItemText,
+  Card,
+  CardContent,
+  Paper,
 } from "@mui/material";
-import { Box, Card, CardContent, Rating } from "@mui/material";
+import { Add, Remove, ShoppingCart, ArrowBackIos } from "@mui/icons-material";
 import Carousel from "react-material-ui-carousel";
-import { Paper } from "@mui/material";
-import { styled } from "@mui/system";
-import { Add, Remove } from "@mui/icons-material";
-import IconButton from "@mui/material/IconButton";
-import ShoppingCart from "@mui/icons-material/ShoppingCart";
 import Link from "next/link";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-
-// import Rating from "@mui/material/Rating";
 
 interface Comment {
   id: number;
@@ -43,15 +36,12 @@ interface Product {
   comments: Comment[];
 }
 
-interface ProductCardProps {
-  product: Product;
-}
-
 export const products: Product[] = [
   {
     id: 1,
     name: "CANON EOS R7",
-    description: "This is a sample product description.",
+    description:
+      "The Canon EOS R7 is a compact yet powerful mirrorless camera, boasting high-resolution imaging and rapid autofocus. Its ergonomic design and intuitive controls make it a versatile choice for photographers of all levels.",
     price: 25000.0,
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
@@ -62,14 +52,14 @@ export const products: Product[] = [
       {
         id: 1,
         username: "JohnDoe",
-        comment: "Great shirt, fits perfectly!",
+        comment: "Great camera, high-quality images!",
         rating: 5,
         date: "2021-09-01",
       },
       {
         id: 2,
         username: "JaneSmith",
-        comment: "Love the quality of the fabric.",
+        comment: "Love the autofocus feature.",
         rating: 4,
         date: "2021-09-02",
       },
@@ -79,32 +69,55 @@ export const products: Product[] = [
 
 const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
+  const [commentInput, setCommentInput] = useState("");
+  const [previousComments, setPreviousComments] = useState<Comment[]>(products[0].comments);
+  const [commentRating, setCommentRating] = useState<number | null>(null);
+  const [commentsVisible, setCommentsVisible] = useState(false);
+
   const product = products[0];
-  const [selectedImage, setSelectedImage] = useState(0);
   const productImages = [
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxVUpd37ROVc_7LEW291Ql0HkBUUNUjEqjaA&s",
   ];
 
-  const handleImageSwap = () => {
-    setSelectedImage((prev) => (prev + 1) % productImages.length);
-  };
-
   const handleAddToCart = () => {
-    // Handle add to cart functionality
     alert("Added to cart!");
   };
+
   const handleQuantityChange = (type: string) => {
-    if (type === "increment") {
-      setQuantity(quantity + 1);
-    } else {
-      if (quantity > 1) setQuantity(quantity - 1);
+    setQuantity((prev) => (type === "increment" ? prev + 1 : Math.max(1, prev - 1)));
+  };
+
+  const handleCommentInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCommentInput(event.target.value);
+  };
+
+  const handleCommentRatingChange = (event: React.ChangeEvent<{}>, newValue: number | null) => {
+    setCommentRating(newValue);
+  };
+
+  const handleAddComment = () => {
+    if (commentInput.trim() && commentRating !== null) {
+      const newComment: Comment = {
+        id: previousComments.length + 1,
+        username: "Guest",
+        comment: commentInput,
+        rating: commentRating,
+        date: new Date().toLocaleDateString(),
+      };
+      setPreviousComments([...previousComments, newComment]);
+      setCommentInput("");
+      setCommentRating(null);
     }
+  };
+
+  const toggleCommentsVisibility = () => {
+    setCommentsVisible(!commentsVisible);
   };
 
   return (
     <>
-       <Box
+      <Box
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
@@ -123,7 +136,7 @@ const ProductDetail: React.FC = () => {
             <div style={{ display: "flex", alignItems: "center" }}>
               <Link href="/main/artists/store/1">
                 <Button>
-                  <ArrowBackIosIcon />
+                  <ArrowBackIos />
                 </Button>
               </Link>
               <Typography
@@ -136,7 +149,9 @@ const ProductDetail: React.FC = () => {
                 Product Details
               </Typography>
             </div>
-            <Box sx={{ height: { xs: "250px", md: "350px" },marginTop:'20px'}}>
+            <Box
+              sx={{ height: { xs: "250px", md: "350px" }, marginTop: "20px" }}
+            >
               <Carousel autoPlay={true} indicators={false}>
                 {productImages.map((image, index) => (
                   <img
@@ -152,6 +167,16 @@ const ProductDetail: React.FC = () => {
                 ))}
               </Carousel>
             </Box>
+            <Typography
+              variant="body1"
+              sx={{
+                marginTop: "2px",
+                color: "gray",
+                textAlign: "left",
+              }}
+            >
+              {product.description}
+            </Typography>
           </Box>
         </Box>
         <Box
@@ -173,7 +198,10 @@ const ProductDetail: React.FC = () => {
             }}
           >
             <Typography
-              sx={{ marginBottom: "10px", fontSize: { xs: "32px", md: "40px",fontWeight:"bold" } }}
+              sx={{
+                marginBottom: "10px",
+                fontSize: { xs: "32px", md: "40px", fontWeight: "bold" },
+              }}
             >
               {product.name}
             </Typography>
@@ -216,13 +244,87 @@ const ProductDetail: React.FC = () => {
               color="primary"
               endIcon={<ShoppingCart />}
               onClick={handleAddToCart}
-              sx={{ textTransform: "none",width:"30%" }}
+              sx={{ textTransform: "none", width: "30%" }}
             >
               Add to Cart
             </Button>
           </Box>
         </Box>
       </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={toggleCommentsVisibility}
+          sx={{ textTransform: "none" }}
+        >
+          {commentsVisible ? "Hide Comments" : "View Comments"}
+        </Button>
+      </Box>
+
+      {commentsVisible && (
+        <>
+          <Box sx={{ padding: "20px" }}>
+            <Typography variant="h5" sx={{ marginBottom: "20px" }}>
+              Rating and Reviews
+            </Typography>
+            {previousComments.map((comment) => (
+              <Card key={comment.id} sx={{ marginBottom: "10px" }}>
+                <CardContent>
+                  <Typography variant="body2" color="textSecondary">
+                    {comment.date}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    {comment.username}
+                  </Typography>
+                  <Rating value={comment.rating} readOnly precision={0.5} />
+                  <Typography variant="body2" sx={{ marginTop: "10px" }}>
+                    {comment.comment}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+
+          <Box sx={{ padding: "20px" }}>
+            <Typography variant="h5" sx={{ marginBottom: "20px" }}>
+              Add a Comment
+            </Typography>
+            <TextField
+              label="Your Comment"
+              multiline
+              // fullWidth
+              rows={4}
+              value={commentInput}
+              onChange={handleCommentInputChange}
+              variant="outlined"
+              sx={{ marginBottom: "20px",width:"100%" }}
+            />
+            <Rating
+              name="comment-rating"
+              value={commentRating}
+              onChange={handleCommentRatingChange}
+              precision={0.5}
+              sx={{ margin: "10px" }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddComment}
+            sx={{marginBottom:"15px"}}>
+              Submit
+            </Button>
+          </Box>
+        </>
+      )}
     </>
   );
 };
