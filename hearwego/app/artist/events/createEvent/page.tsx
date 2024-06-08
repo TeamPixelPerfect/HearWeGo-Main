@@ -2157,7 +2157,15 @@ const budgetColumns: GridColDef[] = [
 
 let budgetRows = [];
 
-function BudgetTable() {
+type BudgetRow = {
+  id: number;
+  budgetTitle: string;
+  budgetSession: string;
+  budgetType: string;
+  budgetAmount: string;
+}
+
+function BudgetTable({budgetRows, setBudgetRows}) {
   const [budgetTitleError, setBudgetTitleError] = useState(false);
   const [budgetSessionError, setBudgetSessionError] = useState(false);
   const [budgetTypeError, setBudgetTypeError] = useState(false);
@@ -2174,25 +2182,26 @@ function BudgetTable() {
   const [budgetSession, setBudgetSession] = useState("");
   const [budgetType, setBudgetType] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
-
-  const handleBudgetTitleChange = (event) => {
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<BudgetRow | null>(
+    null
+  );
+  const handleBudgetTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBudgetTitle(event.target.value);
     setBudgetTitleError(event.target.value.trim() === "");
   };
 
-  const handleBudgetSessionChange = (event) => {
+  const handleBudgetSessionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBudgetSession(event.target.value);
     setBudgetSessionError(event.target.value.trim() === "");
   };
 
-  const handleBudgetTypeChange = (event) => {
+  const handleBudgetTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBudgetType(event.target.value);
     setBudgetTypeError(event.target.value.trim() === "");
   };
 
-  const handleBudgetAmountChange = (event) => {
+  const handleBudgetAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBudgetAmount(event.target.value);
     setBudgetAmountError(!validateEmail(event.target.value));
   };
@@ -2211,42 +2220,37 @@ function BudgetTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setBudgetTitleError(false);
       setBudgetSessionError(false);
       setBudgetTypeError(false);
       setBudgetAmountError(false);
 
-      // Get the selected row ID
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
-      // Find the index of the selected row in the sponsorRows array
       const rowIndex = budgetRows.findIndex((row) => row.id === selectedRowId);
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
-          budgetTitle: budgetTitle,
-          budgetSession: budgetSession,
-          budgetType: budgetType,
-          budgetAmount: budgetAmount,
+          budgetTitle,
+          budgetSession,
+          budgetType,
+          budgetAmount,
         };
 
-        // Replace the old row with the updated row
-        const updatedRows = [...budgetRows];
-        updatedRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...budgetRows.slice(0, rowIndex),
+          updatedRow,
+          ...budgetRows.slice(rowIndex + 1),
+        ];
 
-        // Update sponsorRows with the updated rows
-        budgetRows = updatedRows;
+        setBudgetRows(updatedRows);
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose(); 
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -2255,9 +2259,13 @@ function BudgetTable() {
     const updatedRows = budgetRows.filter(
       (row) => !selectedRows.includes(row.id)
     );
-    budgetRows = updatedRows;
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setBudgetRows(reindexedRows);
     setSelectedRows([]);
-    console.log("Rows", budgetRows);
     setBudgetTitleError(false);
     setBudgetSessionError(false);
     setBudgetTypeError(false);
@@ -2282,13 +2290,13 @@ function BudgetTable() {
     setBudgetSession("");
     setBudgetType("");
     setBudgetAmount("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null); 
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
       const selectedRow = budgetRows.find((row) => row.id === selectedRowId);
       if (selectedRow) {
         setBudgetTitle(selectedRow.budgetTitle);
@@ -2306,28 +2314,24 @@ function BudgetTable() {
   const addNewBudget = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setBudgetTitleError(false);
       setBudgetSessionError(false);
       setBudgetTypeError(false);
       setBudgetAmountError(false);
 
       //----
-      const newId = budgetRows.length + 1;
-      const newBudget = {
+      const newId = budgetRows.length
+        ? Math.max(...budgetRows.map((row) => row.id)) + 1
+        : 1;
+      const newBudget: BudgetRow = {
         id: newId,
-        budgetTitle: budgetTitle,
-        budgetSession: budgetSession,
-        budgetType: budgetType,
-        budgetAmount: budgetAmount,
+        budgetTitle,
+        budgetSession,
+        budgetType,
+        budgetAmount,
       };
 
-      const handleButtonClick = selectedRowData ? updateRowData : addNewBudget;
-
-      const newBudgetRows = [...budgetRows, newBudget];
-
-      budgetRows = newBudgetRows;
-
+      setBudgetRows([...budgetRows, newBudget]);
       refreshTable();
       handleClose();
     } else {
