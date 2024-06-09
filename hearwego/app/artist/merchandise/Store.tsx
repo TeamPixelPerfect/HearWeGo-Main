@@ -1,9 +1,23 @@
+"use client";
 import React, { useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import { Paper, Box, Typography, Grid, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import SwipeableBanner from "@/app/components/SwipebannermerchARTIST";
+import TextField from "@mui/material/TextField";
+import { motion } from "framer-motion";
+import styled from "@emotion/styled";
+
+
+
+const AnimatedIcon = styled(motion.span)({
+  display: "inline-block",
+  marginRight: "8px",
+  "&:last-child": {
+    marginRight: "0",
+  },
+});
 const banners = [
   {
     id: 1,
@@ -52,6 +66,22 @@ const Store = () => {
   const [editingPromoId, setEditingPromoId] = useState(null);
   const [newImage, setNewImage] = useState("");
 
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [storeDescription, setStoreDescription] = useState(
+    "We offer a wide range of high-quality products to meet your needs. Explore our collections and find the perfect items for you."
+  );
+  const [editedDescription, setEditedDescription] = useState(storeDescription);
+
+  const handleEditDescription = () => {
+    setIsEditingDescription(true);
+    setEditedDescription(storeDescription);
+  };
+
+  const handleSaveDescription = () => {
+    setIsEditingDescription(false);
+    setStoreDescription(editedDescription);
+  };
+
   const handleEditPromo = (id) => {
     setEditingPromoId(id);
     // Assuming you want to start editing with the existing image
@@ -82,19 +112,84 @@ const Store = () => {
       }}
     >
       <Box sx={{ width: "100%" }}>
-        {/* Existing component */}
-        <SwipeableBanner banners={banners} />
+      <SwipeableBanner banners={banners} autoPlay={false} indicators={false} height="500px" />
+       
       </Box>
-      <Box sx={{ maxWidth: "800px", marginTop: "40px" }}>
-        <Typography variant="h4" gutterBottom>
-          Welcome to Our Store
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          We offer a wide range of high-quality products to meet your needs.
-          Explore our collections and find the perfect items for you.
-        </Typography>
+      <Box
+        sx={{
+          width: "100%",
+          // backgroundColor: "#f9f9f9",
+          padding: "40px 20px",
+          textAlign: "center",
+          marginTop: "40px",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Grid container justifyContent="center" alignItems="center" spacing={2}>
+          <Grid item xs={12} md={8}>
+            {isEditingDescription ? (
+              <>
+                <TextField
+                  multiline
+                  fullWidth
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                />
+                <IconButton onClick={handleSaveDescription}>
+                  <SaveIcon />
+                </IconButton>
+              </>
+            ) : (
+              <>
+                <Typography variant="h4" gutterBottom sx={{fontWeight:"bold",marginBottom:"10px"}}>
+                  Welcome to Our Store
+                </Typography>
+                <Typography variant="body1" gutterBottom sx={{color:"grey"}}>
+                  {storeDescription}
+                </Typography>
+                <IconButton onClick={handleEditDescription}>
+                  <EditIcon />
+                </IconButton>
+              </>
+            )}
+          </Grid>
+        </Grid>
       </Box>
-      <Grid
+    
+      <Box
+        sx={{
+          width: "100%",
+          backgroundColor: "#f0f0f0",
+          padding: "40px 20px",
+          textAlign: "center",
+          marginTop: "40px",
+        }}
+      >
+        <Grid container justifyContent="center" alignItems="center" spacing={4}>
+          <Grid item xs={12} md={8}>
+            <Typography variant="h5" gutterBottom>
+              Shipping Information
+            </Typography>
+            <Paper elevation={3} sx={{ p: 3, maxWidth: 400, margin: 'auto', borderRadius: '10px' }}>
+              <AnimatedIcon whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.8 }}>
+                <EditIcon />
+              </AnimatedIcon>
+              <Typography variant="body1" gutterBottom>
+                <strong>Delivery Fees:</strong> {shippingInfo.deliveryFees}
+              </Typography>
+              <AnimatedIcon whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.8 }}>
+                <EditIcon />
+              </AnimatedIcon>
+              <Typography variant="body1">
+                <strong>Delivery Services:</strong> {shippingInfo.deliveryServices}
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+
+   
+      {/* <Grid
         container
         spacing={4}
         justifyContent="center"
@@ -134,8 +229,8 @@ const Store = () => {
               </>
             )}
           </Grid>
-        ))}
-        <Grid item xs={12} md={4}>
+        ))} */}
+        {/* <Grid item xs={12} md={4}>
           <Typography variant="h5" gutterBottom>
             Shipping Information
           </Typography>
@@ -146,7 +241,7 @@ const Store = () => {
             Delivery Services: {shippingInfo.deliveryServices}
           </Typography>
         </Grid>
-      </Grid>
+      </Grid> */}
     </Box>
   );
 };
