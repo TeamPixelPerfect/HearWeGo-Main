@@ -3383,15 +3383,41 @@ function EventCreateShow(
 function EventFormFinish() {
   return (
     <Box sx={{ display: "flex" }}>
-      <Box sx={{ width: "50%" }}>
-        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
-          <EventInfoCard />
-          <BudgetInfoCard />
-        </Stack>
-      </Box>
-      <Box sx={{ width: "50%" }}>
-        <SessionInfoCard />
-      </Box>
+      <Card sx={{ width: "100%", display: "flex" }}>
+        <Box sx={{ width: "50%" }}>
+          <CardMedia 
+            image="https://shorturl.at/kotTU"
+            sx={{width: 250, height: 250}}
+            />
+        </Box>
+        <Box sx={{ width: "50%" }}>
+          <Box sx={{ width: "100%", display: "flex" }}>
+            <Box sx={{ width: "50%" }}>
+              <Typography variant="h6">
+                Event Name
+              </Typography>
+            </Box>
+            <Box sx={{ width: "50%" }}>
+              <Typography variant="subtitle1">
+                Nadagama
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ width: "100%", display: "flex" }}>
+            <Box sx={{ width: "50%" }}>
+              <Typography variant="h6">
+                Event Type
+              </Typography>
+            </Box>
+            <Box sx={{ width: "50%" }}>
+              <Typography variant="subtitle1">
+                Modern
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Card>
     </Box>
   );
 }
