@@ -208,7 +208,7 @@ function CreateEvent() {
   const [ticketImage, setTicketImage] = useState("");
   const [eventImage, setEventImage] = useState("");
   const [eventData, setEventData] = useState<Event>({
-    event_img: eventImage,
+    event_img: "",
     event_name: "",
     event_type: "",
     age_from: 0,
@@ -766,17 +766,17 @@ function EventDetails({
   const [isAgeEnabled, setIsAgeEnabled] = useState(false);
   const [imgFile, setImgFile] = React.useState(null);
 
-  useEffect(() => {
-    if (eventImage) {
-      setEventImage(eventImage);
-    }
-  }, [eventImage]);
-
   // useEffect(() => {
-  //   if (imgFile) {
-  //     setEventData({ ...eventData, event_img: imgFile });
+  //   if (eventImage) {
+  //     setEventImage(eventImage);
   //   }
-  // }, [imgFile]);
+  // }, [eventImage]);
+
+  useEffect(() => {
+    if (imgFile) {
+      setEventData({ ...eventData, event_img: imgFile });
+    }
+  }, [imgFile]);
 
   const handleCheckboxChange = (event) => {
     setIsAgeEnabled(event.target.checked);
@@ -813,8 +813,8 @@ function EventDetails({
               isCircular={false}
               width="250px"
               height="250px"
-              file={eventImage}
-              setFile={setEventImage}
+              file={imgFile}
+              setFile={setImgFile}
               aspectX={1}
               aspectY={1}
               shape="rect"
