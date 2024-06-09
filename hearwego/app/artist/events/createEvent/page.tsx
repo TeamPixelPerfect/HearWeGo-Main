@@ -418,28 +418,6 @@ function CreateEvent() {
     handleNext(true); // Pass true to skip validation
   };
 
-  // const handleSkip = () => {
-  //   const newCompleted = { ...completed };
-  //   newCompleted[activeStep] = true;
-  //   setCompleted(newCompleted);
-
-  //   setSkipped((prevSkipped) => {
-  //     const newSkipped = new Set(prevSkipped.values());
-  //     newSkipped.add(activeStep);
-  //     return newSkipped;
-  //   });
-
-  //   if (activeStep === 1) {
-  //     // If the user skips the second step, set ticket_catagory to "Not-Provided"
-  //     setTicketData((prevTicketData) => ({
-  //       ...prevTicketData,
-  //       ticket_catagory: "Not-Provided",
-  //     }));
-  //   }
-
-  //   handleNext();
-  // };
-
   const validateCurrentStep = async () => {
     if (skipped.has(activeStep)) {
       return true;
