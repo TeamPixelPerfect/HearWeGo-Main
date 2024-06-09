@@ -22,6 +22,7 @@ import {
   Tooltip,
   IconButton,
   Container,
+  Fade,
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -118,7 +119,7 @@ const Promotions = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom align="center">
         Promotions
       </Typography>
 
@@ -198,6 +199,8 @@ const Promotions = () => {
                   color="primary"
                   type="submit"
                   disabled={formik.isSubmitting}
+                  fullWidth
+                  sx={{ py: 1.5 }}
                 >
                   {formik.isSubmitting ? (
                     <CircularProgress size={24} color="inherit" />
@@ -228,47 +231,61 @@ const Promotions = () => {
       <Grid container spacing={3}>
         {filteredPromotions.map((promotion) => (
           <Grid item xs={12} sm={6} md={4} key={promotion.id}>
-            <Card sx={{ mb: 3, bgcolor: "background.default" }}>
-              <CardContent
-                sx={{ display: "flex", justifyContent: "space-between" }}
+            <Fade in>
+              <Card
+                sx={{
+                  mb: 3,
+                  bgcolor: "background.paper",
+                  boxShadow: 3,
+                  transition: "transform 0.3s",
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                  },
+                }}
               >
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h6" component="div" gutterBottom>
-                    {promotion.code}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    <DescriptionIcon sx={{ verticalAlign: "middle", mr: 1 }} />
-                    {promotion.description}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ mt: 1 }}
-                  >
-                    <EventIcon sx={{ verticalAlign: "middle", mr: 1 }} />
-                    {promotion.startDate} - {promotion.endDate}
-                  </Typography>
-                </Box>
-                <Box sx={{ ml: 2 }}>
-                  <QRCode value={generateQRCodeValue(promotion)} size={128} />
-                </Box>
-              </CardContent>
-              <CardActions>
-                <Tooltip title="Edit">
-                  <IconButton onClick={() => handleEditPromotion(promotion)}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton
-                    onClick={() => handleDeletePromotion(promotion.id)}
-                    color="error"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              </CardActions>
-            </Card>
+                <CardContent
+                  sx={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" component="div" gutterBottom>
+                      {promotion.code}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      <DescriptionIcon
+                        sx={{ verticalAlign: "middle", mr: 1 }}
+                      />
+                      {promotion.description}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ mt: 1 }}
+                    >
+                      <EventIcon sx={{ verticalAlign: "middle", mr: 1 }} />
+                      {promotion.startDate} - {promotion.endDate}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ ml: 2 }}>
+                    <QRCode value={generateQRCodeValue(promotion)} size={128} />
+                  </Box>
+                </CardContent>
+                <CardActions>
+                  <Tooltip title="Edit">
+                    <IconButton onClick={() => handleEditPromotion(promotion)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      onClick={() => handleDeletePromotion(promotion.id)}
+                      color="error"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </CardActions>
+              </Card>
+            </Fade>
           </Grid>
         ))}
       </Grid>
