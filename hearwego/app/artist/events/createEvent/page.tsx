@@ -240,6 +240,7 @@ function CreateEvent() {
   const [errorMessages, setErrorMessages] = useState([""]);
   const handleOpenErrorModal = () => setOpenErrorModal(true);
   const handleCloseErrorModal = () => setOpenErrorModal(false);
+  const [skipped, setSkipped] = useState(new Set());
 
   useEffect(() => {
     if (isAutoTicket) {
@@ -357,15 +358,17 @@ function CreateEvent() {
     return completedSteps() === totalSteps();
   };
 
-  const handleNext = async () => {
-    const isValid = await validateCurrentStep();
-    if (isValid) {
-      const newActiveStep =
-        isLastStep() && !allStepsCompleted()
-          ? steps.findIndex((step, i) => !(i in completed))
-          : activeStep + 1;
-      setActiveStep(newActiveStep);
+  const handleNext = async (skipValidation = false) => {
+    if (!skipValidation) {
+      const isValid = await validateCurrentStep();
+      if (!isValid) return;
     }
+  
+    const newActiveStep =
+      isLastStep() && !allStepsCompleted()
+        ? steps.findIndex((step, i) => !(i in completed))
+        : activeStep + 1;
+    setActiveStep(newActiveStep);
   };
 
   const handleBack = () => {
@@ -382,6 +385,11 @@ function CreateEvent() {
       const newCompleted = { ...completed };
       newCompleted[activeStep] = true;
       setCompleted(newCompleted);
+      setSkipped((prevSkipped) => {
+        const newSkipped = new Set(prevSkipped.values());
+        newSkipped.delete(activeStep);
+        return newSkipped;
+      });
       if (isLastStep()) {
         await submitData();
       }
@@ -393,6 +401,11 @@ function CreateEvent() {
     const newCompleted = { ...completed };
     newCompleted[activeStep] = true;
     setCompleted(newCompleted);
+    setSkipped((prevSkipped) => {
+      const newSkipped = new Set(prevSkipped.values());
+      newSkipped.add(activeStep);
+      return newSkipped;
+    });
 
     if (activeStep === 1) {
       // If the user skips the second step, set ticket_catagory to "Not-Provided"
@@ -401,11 +414,37 @@ function CreateEvent() {
         ticket_catagory: "Not-Provided",
       }));
     }
-
-    handleNext();
+    
+    handleNext(true); // Pass true to skip validation
   };
 
+  // const handleSkip = () => {
+  //   const newCompleted = { ...completed };
+  //   newCompleted[activeStep] = true;
+  //   setCompleted(newCompleted);
+
+  //   setSkipped((prevSkipped) => {
+  //     const newSkipped = new Set(prevSkipped.values());
+  //     newSkipped.add(activeStep);
+  //     return newSkipped;
+  //   });
+
+  //   if (activeStep === 1) {
+  //     // If the user skips the second step, set ticket_catagory to "Not-Provided"
+  //     setTicketData((prevTicketData) => ({
+  //       ...prevTicketData,
+  //       ticket_catagory: "Not-Provided",
+  //     }));
+  //   }
+
+  //   handleNext();
+  // };
+
   const validateCurrentStep = async () => {
+    if (skipped.has(activeStep)) {
+      return true;
+    }
+
     if (activeStep === 0) {
       return validateEventDetails();
     } else if (activeStep === 1) {
@@ -454,6 +493,18 @@ function CreateEvent() {
 
   const validateTicketDetails = () => {
     let isValid = true;
+
+    let errors = [];
+
+    if(autoTicketRows.length == 0 && manualTicketRows.length == 0) {
+      isValid = false;
+      errors.push("There is no ticket details provided.");
+    }
+
+    if (!isValid) {
+      setErrorMessages(errors);
+      handleOpenErrorModal();
+    }
 
     return isValid;
   };
@@ -525,6 +576,7 @@ function CreateEvent() {
   const handleReset = () => {
     setActiveStep(0);
     setCompleted({});
+    setSkipped(new Set());
   };
 
   const [open, setOpen] = React.useState(false);
@@ -742,11 +794,11 @@ function EventDetails({
     }
   }, [eventImage]);
 
-  useEffect(() => {
-    if (imgFile) {
-      setEventData({ ...eventData, event_img: imgFile });
-    }
-  }, [imgFile]);
+  // useEffect(() => {
+  //   if (imgFile) {
+  //     setEventData({ ...eventData, event_img: imgFile });
+  //   }
+  // }, [imgFile]);
 
   const handleCheckboxChange = (event) => {
     setIsAgeEnabled(event.target.checked);
