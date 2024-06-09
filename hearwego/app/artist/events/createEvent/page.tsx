@@ -200,6 +200,7 @@ function CreateEvent() {
   const [sponsorRows, setSponsorRows] = useState([]);
   const [autoTicketRows, setAutoTicketRows] = useState([]);
   const [manualTicketRows, setManualTicketRows] = useState([]);
+  const [budgetRows, setBudgetRows] = useState([]);
   const [isAutoTicket, setIsAutoTicket] = useState(false);
   const [isManualTicket, setIsManualTicket] = useState(false);
   const [ticketImage, setTicketImage] = useState("https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg");
@@ -591,7 +592,9 @@ function CreateEvent() {
                   ticketImage,
                   setTicketImage,
                   eventImage,
-                  setEventImage
+                  setEventImage,
+                  budgetRows,
+                  setBudgetRows
                 )}
               </div>
             </Typography>
@@ -2133,7 +2136,7 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
   );
 }
 
-function BudgetDetails() {
+function BudgetDetails({budgetRows, setBudgetRows}) {
   return (
     <div>
       <InputRow>
@@ -2141,7 +2144,10 @@ function BudgetDetails() {
       </InputRow>
 
       <InputRow>
-        <BudgetTable />
+        <BudgetTable
+          budgetRows={budgetRows}
+          setBudgetRows={setBudgetRows}
+        />
       </InputRow>
     </div>
   );
@@ -3331,7 +3337,9 @@ function EventCreateShow(
   ticketImage,
   setTicketImage,
   eventImage,
-  setEventImage
+  setEventImage,
+  budgetRows,
+  setBudgetRows
 ) {
   if (n == 0) {
     return (
@@ -3364,7 +3372,10 @@ function EventCreateShow(
       setTicketImage={setTicketImage}
     />;
   } else if (n == 2) {
-    return <BudgetDetails />;
+    return <BudgetDetails
+      budgetRows={budgetRows}
+      setBudgetRows={setBudgetRows}
+    />;
   } else if (n == 3) {
     return <EventFormFinish />;
   }
@@ -3487,7 +3498,7 @@ function BudgetInfoCard() {
             </Box>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <BudgetTable />
+            {/* <BudgetTable /> */}
           </Typography>
         </CardContent>
       </CardActionArea>
