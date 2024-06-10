@@ -3,67 +3,67 @@
 import React, { useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import { Paper, Button } from "@mui/material";
-import BannerEditForm from "./BannerEditForm";
+import StoreImgEditForm from "./StoreImgEditForm";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 
-interface Banner {
+interface StoreImg {
   id: number;
   image: string | File;
   title: string;
 }
 
-interface SwipeableBannerProps {
-  banners: Banner[];
+interface SwipeableStoreImgProps {
+  StoreImgs: StoreImg[];
   autoPlay?: boolean;
   indicators?: boolean;
   height?: number | string;
 }
 
-const SwipeableBanner: React.FC<SwipeableBannerProps> = ({
-  banners: initialBanners,
+const SwipeableStoreImg: React.FC<SwipeableStoreImgProps> = ({
+  StoreImgs: initialStoreImgs,
   autoPlay = true,
   indicators = false,
   height = "600px",
 }) => {
-  const [banners, setBanners] = useState<Banner[]>(initialBanners);
-  const [editBanner, setEditBanner] = useState<Banner | null>(null);
+  const [StoreImgs, setStoreImgs] = useState<StoreImg[]>(initialStoreImgs);
+  const [editStoreImg, setEditStoreImg] = useState<StoreImg | null>(null);
 
-  const handleEdit = (banner: Banner) => {
-    setEditBanner(banner);
+  const handleEdit = (StoreImg: StoreImg) => {
+    setEditStoreImg(StoreImg);
   };
 
-  const handleSave = (updatedBanner: Banner) => {
-    const updatedBanners = banners.map((banner) =>
-      banner.id === updatedBanner.id ? updatedBanner : banner
+  const handleSave = (updatedStoreImg: StoreImg) => {
+    const updatedStoreImgs = StoreImgs.map((StoreImg) =>
+      StoreImg.id === updatedStoreImg.id ? updatedStoreImg : StoreImg
     );
-    setBanners(updatedBanners);
-    setEditBanner(null);
+    setStoreImgs(updatedStoreImgs);
+    setEditStoreImg(null);
   };
 
   const handleClose = () => {
-    setEditBanner(null);
+    setEditStoreImg(null);
   };
 
   return (
     <>
-      {editBanner && (
-        <BannerEditForm
-          open={!!editBanner}
-          banner={editBanner}
+      {editStoreImg && (
+        <StoreImgEditForm
+          open={!!editStoreImg}
+          StoreImg={editStoreImg}
           onSave={handleSave}
           onClose={handleClose}
         />
       )}
       <Carousel autoPlay={autoPlay} indicators={false}>
-        {banners.map((banner) => (
-          <Paper key={banner.id} style={{ position: "relative", borderRadius: "10px", overflow: "hidden" }}>
+        {StoreImgs.map((StoreImg) => (
+          <Paper key={StoreImg.id} style={{ position: "relative", borderRadius: "10px", overflow: "hidden" }}>
             <img
-              src={typeof banner.image === "string" ? banner.image : URL.createObjectURL(banner.image)}
-              alt={banner.title}
+              src={typeof StoreImg.image === "string" ? StoreImg.image : URL.createObjectURL(StoreImg.image)}
+              alt={StoreImg.title}
               style={{ width: "100%", height: height, objectFit: "cover" }}
             />
-            {banner.title && (
+            {StoreImg.title && (
               <div
                 style={{
                   position: "absolute",
@@ -77,7 +77,7 @@ const SwipeableBanner: React.FC<SwipeableBannerProps> = ({
               >
                 {/* <h2>{banner.title}</h2> */}
                 <IconButton
-                  onClick={() => handleEdit(banner)}
+                  onClick={() => handleEdit(StoreImg)}
                   style={{  marginLeft: "10px" }}
                 >
                   <EditIcon />
@@ -91,4 +91,4 @@ const SwipeableBanner: React.FC<SwipeableBannerProps> = ({
   );
 };
 
-export default SwipeableBanner;
+export default SwipeableStoreImg;

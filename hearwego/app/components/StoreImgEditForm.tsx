@@ -4,30 +4,30 @@ import { TextField, Button, Box, Modal, Paper, Typography, IconButton } from "@m
 import { Close as CloseIcon } from "@mui/icons-material";
 import DropFile from "./DropFile";
 
-interface Banner {
+interface StoreImg {
   id: number;
   image: string | File;
   title: string;
 }
 
-interface BannerEditFormProps {
+interface StoreImgEditFormProps {
   open: boolean;
-  banner: Banner;
-  onSave: (updatedBanner: Banner) => void;
+  StoreImg: StoreImg;
+  onSave: (updatedStoreImg: StoreImg) => void;
   onClose: () => void;
 }
 
-const BannerEditForm: React.FC<BannerEditFormProps> = ({ open, banner, onSave, onClose }) => {
-  const [title, setTitle] = useState(banner.title);
-  const [image, setImage] = useState<string | File>(banner.image);
+const StoreImgEditForm: React.FC<StoreImgEditFormProps> = ({ open, StoreImg, onSave, onClose }) => {
+  const [title, setTitle] = useState(StoreImg.title);
+  const [image, setImage] = useState<string | File>(StoreImg.image);
 
   useEffect(() => {
-    setTitle(banner.title);
-    setImage(banner.image);
-  }, [banner]);
+    setTitle(StoreImg.title);
+    setImage(StoreImg.image);
+  }, [StoreImg]);
 
   const handleSave = () => {
-    onSave({ ...banner, title, image });
+    onSave({ ...StoreImg, title, image });
     onClose();
   };
 
@@ -51,7 +51,7 @@ const BannerEditForm: React.FC<BannerEditFormProps> = ({ open, banner, onSave, o
           <Box padding="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="20px">
               <Typography variant="h6" component="h2">
-                Edit Banner
+                Edit StoreImg
               </Typography>
               <IconButton aria-label="close" onClick={onClose}>
                 <CloseIcon />
@@ -112,4 +112,4 @@ const BannerEditForm: React.FC<BannerEditFormProps> = ({ open, banner, onSave, o
   );
 };
 
-export default BannerEditForm;
+export default StoreImgEditForm;
