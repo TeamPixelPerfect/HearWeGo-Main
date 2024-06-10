@@ -23,7 +23,6 @@ import {
   OrderActions,
   SearchBar,
 } from "@/app/styles/MerchOrdersArtistStyles";
-import { hearWeGoTheme } from "../../styles/theme";
 import { useRouter } from "next/navigation";
 
 export const orders = [

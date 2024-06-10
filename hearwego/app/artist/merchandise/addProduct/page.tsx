@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import DropFile from "@/app/components/DropFile";
+import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Product title is required"),
@@ -36,10 +37,10 @@ const AddProduct = ({
 }: {
   handleAddProduct: (values: any) => void;
 }) => {
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [additionalImageFile, setAdditionalImageFile] = useState<File | null>(
-    null
-  );
+  const router = useRouter();
+  const handleClose = () => {
+    router.push("/artist/merchandise");
+  };
 
   return (
     <Box
@@ -232,8 +233,17 @@ const AddProduct = ({
                         color="primary"
                         disabled={isSubmitting}
                         fullWidth
+                        sx={{ mb: 1 }}
                       >
                         Add Product
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleClose}
+                        fullWidth
+                      >
+                        Cancel
                       </Button>
                     </Grid>
                   </Grid>

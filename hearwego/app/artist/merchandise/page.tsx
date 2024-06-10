@@ -18,7 +18,7 @@ import React, { useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
 import Categories from "./Categories";
 import Promotions from "./Promotions";
-import Orders from "./Orders";
+import Orders from "./Orders/page";
 import Store from "./Store";
 import Drafts from "./Drafts";
 import Inventory from "./Inventory";

@@ -7,10 +7,9 @@ import { Box } from "@mui/system";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
 import DropFile from "../../../components/DropFile";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import * as Yup from "yup";
 
+import * as Yup from "yup";
+import { useRouter } from "next/navigation";
 const CreateStoreForm = () => {
   const validationSchema = Yup.object().shape({
     storeImages: Yup.array()
@@ -27,12 +26,13 @@ const CreateStoreForm = () => {
     }),
   });
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: any) => {
     console.log(values);
   };
 
-  const handleCancel = () => {
-    console.log("Cancelled");
+  const router = useRouter();
+  const handleClose = () => {
+    router.push("/artist/merchandise");
   };
 
   return (
@@ -179,7 +179,7 @@ const CreateStoreForm = () => {
                       >
                         Create Store
                       </Button>
-                      <Button variant="outlined" onClick={handleCancel}>
+                      <Button variant="outlined" onClick={handleClose}>
                         Cancel
                       </Button>
                     </Grid>
@@ -195,4 +195,3 @@ const CreateStoreForm = () => {
 };
 
 export default CreateStoreForm;
-
