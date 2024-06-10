@@ -66,6 +66,9 @@ const ArtistMerchandise = () => {
               variant="contained"
               startIcon={<IoAddOutline />}
               sx={{ textTransform: "capitalize" }}
+              onClick={() => {
+                router.push("/artist/merchandise/addStore");
+              }}
             >
               Create New Store
             </Button>
