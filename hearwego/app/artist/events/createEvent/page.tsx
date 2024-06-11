@@ -11,12 +11,12 @@ import Check from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import PublishIcon from "@mui/icons-material/Publish";
 import ErrorIcon from "@mui/icons-material/Error";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FormHelperText from "@mui/material/FormHelperText";
 import { DateField } from "@mui/x-date-pickers/DateField";
@@ -62,7 +62,13 @@ import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { Alert, CardActionArea, Divider, FilledInput, IconButton } from "@mui/material";
+import {
+  Alert,
+  CardActionArea,
+  Divider,
+  FilledInput,
+  IconButton,
+} from "@mui/material";
 import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
@@ -3396,22 +3402,64 @@ function EventCreateShow(
       <BudgetDetails budgetRows={budgetRows} setBudgetRows={setBudgetRows} />
     );
   } else if (n == 3) {
-    return <EventFormFinish eventData={eventData} setEventData={setEventData} sessionRows={sessionRows} setSessionRows={setSessionRows} />;
+    return (
+      <EventFormFinish
+        eventData={eventData}
+        setEventData={setEventData}
+        sessionRows={sessionRows}
+        setSessionRows={setSessionRows}
+        sponsorRows={sponsorRows}
+        setSponsorRows={setSponsorRows}
+      />
+    );
   }
 }
 
-function EventFormFinish({eventData, setEventData, sessionRows, setSessionRows}) {
-  function createData(
+function EventFormFinish({
+  eventData,
+  setEventData,
+  sessionRows,
+  setSessionRows,
+  sponsorRows,
+  setSponsorRows
+}) {
+  function createSessionData(
     sessionDate: string,
     sessionTime: string,
     duration: string,
     venue: string,
-    artists: string,
+    artists: string
   ) {
     return { sessionDate, sessionTime, duration, venue, artists };
   }
-  
-  const rows = sessionRows.map((session) => createData(session.sessionDate, session.sessionTime, session.duration, session.venue, session.artists));
+
+  function createSponsorData(
+    sponsorType: string,
+    sponsorName: string,
+    sponsorContact: string,
+    sponsorEmail: string,
+  ) {
+    return { sponsorType, sponsorName, sponsorContact, sponsorEmail };
+  }
+
+  const spRows = sponsorRows.map((sponsor) =>
+    createSponsorData(
+      sponsor.sponsorType,
+      sponsor.sponsorName,
+      sponsor.sponsorContact,
+      sponsor.sponsorEmail
+    )
+  );
+
+  const sessRows = sessionRows.map((session) =>
+    createSessionData(
+      session.sessionDate,
+      session.sessionTime,
+      session.duration,
+      session.venue,
+      session.artists
+    )
+  );
   return (
     <Box sx={{ display: "flex" }}>
       <Card sx={{ width: "100%", padding: 2 }}>
@@ -3432,16 +3480,25 @@ function EventFormFinish({eventData, setEventData, sessionRows, setSessionRows})
           >
             <CardMedia
               image={eventData.event_img}
-              sx={{ width: 250, height: 250, borderRadius: 2}}
+              sx={{ width: 250, height: 250, borderRadius: 2 }}
             />
           </Box>
-          <Box sx={{ width: "50%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <Box
+            sx={{
+              width: "50%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
             <Box sx={{ width: "100%", display: "flex" }}>
               <Box sx={{ width: "50%" }}>
                 <Typography variant="h6">Event Name</Typography>
               </Box>
               <Box sx={{ width: "50%" }}>
-                <Typography variant="subtitle1">{eventData.event_name}</Typography>
+                <Typography variant="subtitle1">
+                  {eventData.event_name}
+                </Typography>
               </Box>
             </Box>
 
@@ -3450,7 +3507,9 @@ function EventFormFinish({eventData, setEventData, sessionRows, setSessionRows})
                 <Typography variant="h6">Event Type</Typography>
               </Box>
               <Box sx={{ width: "50%" }}>
-                <Typography variant="subtitle1">{eventData.event_type}</Typography>
+                <Typography variant="subtitle1">
+                  {eventData.event_type}
+                </Typography>
               </Box>
             </Box>
 
@@ -3481,35 +3540,81 @@ function EventFormFinish({eventData, setEventData, sessionRows, setSessionRows})
         </CardContent>
         <Divider />
         <Box sx={{ width: "100%", padding: 2 }}>
-        <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell align="right">Time</TableCell>
-            <TableCell align="right">Duration</TableCell>
-            <TableCell align="right">Venue</TableCell>
-            <TableCell align="right">Artists</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.sessionDate}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
             >
-              <TableCell component="th" scope="row">
-                {row.sessionDate}
-              </TableCell>
-              <TableCell align="right">{row.sessionTime}</TableCell>
-              <TableCell align="right">{row.duration}</TableCell>
-              <TableCell align="right">{row.venue}</TableCell>
-              <TableCell align="right">{row.artists}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell align="right">Time</TableCell>
+                  <TableCell align="right">Duration</TableCell>
+                  <TableCell align="right">Venue</TableCell>
+                  <TableCell align="right">Artists</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sessRows.map((row) => (
+                  <TableRow
+                    key={row.sessionDate}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.sessionDate}
+                    </TableCell>
+                    <TableCell align="right">{row.sessionTime}</TableCell>
+                    <TableCell align="right">{row.duration}</TableCell>
+                    <TableCell align="right">{row.venue}</TableCell>
+                    <TableCell align="right">{row.artists}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          
+        </Box>
+
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Sponsors
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Name</TableCell>
+                  <TableCell align="right">Contact</TableCell>
+                  <TableCell align="right">E-mail</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {spRows.map((row) => (
+                  <TableRow
+                    key={row.sponsorType}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.sponsorType}
+                    </TableCell>
+                    <TableCell align="right">{row.sponsorName}</TableCell>
+                    <TableCell align="right">{row.sponsorContact}</TableCell>
+                    <TableCell align="right">{row.sponsorEmail}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Card>
     </Box>
