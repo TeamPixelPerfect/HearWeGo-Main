@@ -236,6 +236,7 @@ function CreateEvent() {
 
   const [ticketData, setTicketData] = useState<Ticket>({
     ticket_catagory: "Not-Provided",
+    ticket_img: "",
     auto_ticket_details: [],
     manual_ticket_details: [],
     ticket_description: "",
@@ -321,9 +322,9 @@ function CreateEvent() {
         ({ id, ticketType, ticketPrice, ticketCount, ticketSession }) => ({
           ticket_currency: "LKR",
           ticket_img:
-            ticketImage === ""
+            ticketData.ticket_img === ""
               ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg"
-              : ticketImage,
+              : ticketData.ticket_img,
           ticket_type: ticketType,
           auto_tickets_count: ticketCount,
           ticket_price: ticketPrice,
@@ -995,10 +996,10 @@ function TicketDetails({
   const [imgFile, setImgFile] = React.useState(null);
 
   useEffect(() => {
-    if (ticketImage) {
-      setTicketImage(ticketImage);
+    if (imgFile) {
+      setTicketData({ ...ticketData, ticket_img: imgFile });
     }
-  }, [ticketImage]);
+  }, [imgFile]);
 
   useEffect(() => {
     if (isChecked) {
@@ -1051,8 +1052,8 @@ function TicketDetails({
                     isCircular={false}
                     width="250px"
                     height="250px"
-                    file={ticketImage}
-                    setFile={setTicketImage}
+                    file={imgFile}
+                    setFile={setImgFile}
                     aspectX={1}
                     aspectY={1}
                     shape="rect"
@@ -3412,6 +3413,10 @@ function EventCreateShow(
         setSponsorRows={setSponsorRows}
         teamRows={teamRows}
         setTeamRows={setTeamRows}
+        ticketData={ticketData}
+        setTicketData={setTicketData}
+        autoTicketRows={autoTicketRows}
+        manualTicketRows={manualTicketRows}
       />
     );
   }
@@ -3426,6 +3431,10 @@ function EventFormFinish({
   setSponsorRows,
   teamRows,
   setTeamRows,
+  ticketData,
+  setTicketData,
+  autoTicketRows,
+  manualTicketRows,
 }) {
   function createSessionData(
     sessionDate: string,
@@ -3455,8 +3464,26 @@ function EventFormFinish({
     return { teamType, teamName, teamContact, teamEmail };
   }
 
+  function createAutoTicketData(
+    ticketType: string,
+    ticketPrice: string,
+    ticketCount: string,
+    ticketSession: string,
+  ) {
+    return { ticketType, ticketPrice, ticketCount, ticketSession };
+  }
+
+  const autoTickRows = autoTicketRows.map((ticket) =>
+    createAutoTicketData(
+      ticket.ticketType,
+      ticket.ticketPrice,
+      ticket.ticketCount,
+      ticket.ticketSession
+    )
+  );
+
   const tRows = teamRows.map((team) =>
-    createSponsorData(
+    createTeamData(
       team.teamType,
       team.teamName,
       team.teamContact,
@@ -3483,8 +3510,8 @@ function EventFormFinish({
     )
   );
   return (
-    <Box sx={{ display: "flex" }}>
-      <Card sx={{ width: "100%", padding: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <Card sx={{ width: "100%", padding: 2, marginBottom: 2 }}>
         <CardContent>
           <Typography variant="h5" component="div">
             Basic Event Details
@@ -3677,6 +3704,61 @@ function EventFormFinish({
               </TableBody>
             </Table>
           </TableContainer>
+        </Box>
+      </Card>
+
+      <Card sx={{ width: "100%", padding: 2 }}>
+      <CardContent>
+          <Typography variant="h5" component="div">
+            Ticket Details
+          </Typography>
+        </CardContent>
+        <Divider />
+
+        <Box sx={{ width: "100%", padding: 2 }}>
+          {(ticketData.ticket_catagory == "Not Provided") ? (
+            <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
+          ) : (
+            (ticketData.ticket_catagory == "Auto") ? (
+              <TableContainer component={Paper}>
+              <Table
+                sx={{ minWidth: 650 }}
+                size="small"
+                aria-label="a dense table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell align="right">Price</TableCell>
+                    <TableCell align="right">Count</TableCell>
+                    <TableCell align="right">Session</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {autoTickRows.map((row) => (
+                    <TableRow
+                      key={row.ticketType}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.ticketType}
+                      </TableCell>
+                      <TableCell align="right">{row.ticketPrice}</TableCell>
+                      <TableCell align="right">{row.ticketCount}</TableCell>
+                      <TableCell align="right">{row.ticketSession}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            ) : (
+              <Box>
+                <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
+                <Typography variant="h6">Ticket Description: {ticketData.ticket_description}</Typography>
+              </Box>
+            )
+          )}
+          
         </Box>
       </Card>
     </Box>

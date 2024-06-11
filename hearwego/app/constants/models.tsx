@@ -188,6 +188,7 @@ export interface Event {
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
+  ticket_img?: string;
   auto_ticket_details?: [
     {
       ticket_currency: string;
