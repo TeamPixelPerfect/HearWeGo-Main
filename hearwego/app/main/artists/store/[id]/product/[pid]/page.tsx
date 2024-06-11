@@ -14,11 +14,10 @@ import {
   Chip,
 } from "@mui/material";
 import { Add, Remove, ShoppingCart, ArrowBackIos } from "@mui/icons-material";
-import ImageGallery from 'react-image-gallery';
-import 'react-image-gallery/styles/css/image-gallery.css';
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 import Link from "next/link";
-import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-
+import ArrowForwardIos from "@mui/icons-material/ArrowForwardIos";
 
 interface Comment {
   id: number;
@@ -84,7 +83,9 @@ export const products: Product[] = [
 const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [commentInput, setCommentInput] = useState("");
-  const [previousComments, setPreviousComments] = useState<Comment[]>(products[0].comments);
+  const [previousComments, setPreviousComments] = useState<Comment[]>(
+    products[0].comments
+  );
   const [commentRating, setCommentRating] = useState<number | null>(null);
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [selectedSize, setSelectedSize] = useState(products[0].sizes[0]);
@@ -101,14 +102,21 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleQuantityChange = (type: string) => {
-    setQuantity((prev) => (type === "increment" ? prev + 1 : Math.max(1, prev - 1)));
+    setQuantity((prev) =>
+      type === "increment" ? prev + 1 : Math.max(1, prev - 1)
+    );
   };
 
-  const handleCommentInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommentInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setCommentInput(event.target.value);
   };
 
-  const handleCommentRatingChange = (event: React.ChangeEvent<{}>, newValue: number | null) => {
+  const handleCommentRatingChange = (
+    event: React.ChangeEvent<{}>,
+    newValue: number | null
+  ) => {
     setCommentRating(newValue);
   };
 
@@ -173,34 +181,39 @@ const ProductDetail: React.FC = () => {
                 Product Details
               </Typography>
             </div>
+            <Box sx={{marginTop:"30px"}}>
             <ImageGallery
-  items={productImages.map(image => ({ original: image, thumbnail: image }))}
-  showNav={false}
-  showBullets={true}
-  showThumbnails={true}
-  showFullscreenButton={true}
-  showPlayButton={true}
+              items={productImages.map((image) => ({
+                original: image,
+                thumbnail: image,
+              }))}
+              showNav={false}
+              showBullets={true}
+              showThumbnails={true}
+              showFullscreenButton={true}
+              showPlayButton={true}
 
-  // showIndex={false}
-  // renderLeftNav={(onClick, disabled) => (
-  //   <IconButton
-  //     onClick={onClick}
-  //     disabled={disabled}
-  //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
-  //   >
-  //     <ArrowBackIos />
-  //   </IconButton>
-  // )}
-  // renderRightNav={(onClick, disabled) => (
-  //   <IconButton
-  //     onClick={onClick}
-  //     disabled={disabled}
-  //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
-  //   >
-  //     <ArrowForwardIos />
-  //   </IconButton>
-  // )}
-/>
+              // showIndex={false}
+              // renderLeftNav={(onClick, disabled) => (
+              //   <IconButton
+              //     onClick={onClick}
+              //     disabled={disabled}
+              //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
+              //   >
+              //     <ArrowBackIos />
+              //   </IconButton>
+              // )}
+              // renderRightNav={(onClick, disabled) => (
+              //   <IconButton
+              //     onClick={onClick}
+              //     disabled={disabled}
+              //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
+              //   >
+              //     <ArrowForwardIos />
+              //   </IconButton>
+              // )}
+            />
+            </Box>
 
             <Typography
               variant="body1"
@@ -267,7 +280,7 @@ const ProductDetail: React.FC = () => {
                   key={size}
                   variant={selectedSize === size ? "contained" : "outlined"}
                   onClick={() => handleSizeChange(size)}
-                  sx={{ margin: "0 5px",textTransform: 'none'}}
+                  sx={{ margin: "0 5px", textTransform: "none" }}
                 >
                   {size}
                 </Button>
@@ -316,22 +329,22 @@ const ProductDetail: React.FC = () => {
             >
               Add to Cart
             </Button>
-            <Box sx={{ width: '20%', marginTop: '20px', position: 'relative' }}>
-              <Box sx={{ position: 'relative' }}>
+            <Box sx={{ width: "20%", marginTop: "20px", position: "relative" }}>
+              <Box sx={{ position: "relative" }}>
                 <LinearProgress
                   variant="determinate"
                   value={(product.sold / product.productCount) * 100}
-                  sx={{ height: '15px', borderRadius: '15px' }}
+                  sx={{ height: "15px", borderRadius: "15px" }}
                 />
                 <Typography
                   variant="body2"
                   sx={{
-                    position: 'relative',
-                    top: '50%',
-                    fontSize: '12px',
+                    position: "relative",
+                    top: "50%",
+                    fontSize: "12px",
                     left: `${(product.sold / product.productCount) * 100}%`,
-                    transform: 'translate(-70%, -90%)',
-                    color: 'white',
+                    transform: "translate(-70%, -90%)",
+                    color: "white",
                   }}
                 >
                   {product.sold} sold
