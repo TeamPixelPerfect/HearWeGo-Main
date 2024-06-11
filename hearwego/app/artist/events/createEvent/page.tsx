@@ -3501,7 +3501,7 @@ function EventFormFinish({
             }}
           >
             <CardMedia
-              image={eventData.event_img}
+              image={(eventData.event_img=="")? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg":eventData.event_img}
               sx={{ width: 250, height: 250, borderRadius: 2 }}
             />
           </Box>
