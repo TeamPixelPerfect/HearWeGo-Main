@@ -1,15 +1,25 @@
 "use client";
-
-import React from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  TextField,
+  Container,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+} from "@mui/material";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
-import { TextField, Button, Typography, Grid } from "@mui/material";
-import { Box } from "@mui/system";
-import Container from "@mui/material/Container";
-import Card from "@mui/material/Card";
-import DropFile from "../../../components/DropFile";
-
 import * as Yup from "yup";
+import DropFile from "../../../components/DropFile";
 import { useRouter } from "next/navigation";
+
 const CreateStoreForm = () => {
   const validationSchema = Yup.object().shape({
     storeImages: Yup.array()
@@ -28,10 +38,26 @@ const CreateStoreForm = () => {
 
   const handleSubmit = (values: any) => {
     console.log(values);
+    // You can handle form submission here, e.g., send data to backend
   };
 
   const router = useRouter();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
   const handleClose = () => {
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmDialogOpen(false);
+  };
+
+  const handleCancel = () => {
     router.push("/artist/merchandise");
   };
 
@@ -189,6 +215,37 @@ const CreateStoreForm = () => {
             )}
           </Formik>
         </Card>
+
+        <Dialog
+          open={confirmDialogOpen}
+          onClose={handleConfirmClose}
+          aria-labelledby="confirm-dialog-title"
+          aria-describedby="confirm-dialog-description"
+        >
+          <DialogTitle id="confirm-dialog-title">Are you sure?</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="confirm-dialog-description">
+              Are you sure you want to cancel? Any unsaved changes will be lost.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleConfirmClose} color="primary">
+              No
+            </Button>
+            <Button onClick={handleCancel} color="primary" autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+          message={snackbarMessage}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          severity={snackbarSeverity}
+        />
       </Container>
     </Box>
   );
