@@ -3410,6 +3410,8 @@ function EventCreateShow(
         setSessionRows={setSessionRows}
         sponsorRows={sponsorRows}
         setSponsorRows={setSponsorRows}
+        teamRows={teamRows}
+        setTeamRows={setTeamRows}
       />
     );
   }
@@ -3421,7 +3423,9 @@ function EventFormFinish({
   sessionRows,
   setSessionRows,
   sponsorRows,
-  setSponsorRows
+  setSponsorRows,
+  teamRows,
+  setTeamRows,
 }) {
   function createSessionData(
     sessionDate: string,
@@ -3441,6 +3445,24 @@ function EventFormFinish({
   ) {
     return { sponsorType, sponsorName, sponsorContact, sponsorEmail };
   }
+
+  function createTeamData(
+    teamType: string,
+    teamName: string,
+    teamContact: string,
+    teamEmail: string,
+  ) {
+    return { teamType, teamName, teamContact, teamEmail };
+  }
+
+  const tRows = teamRows.map((team) =>
+    createSponsorData(
+      team.teamType,
+      team.teamName,
+      team.teamContact,
+      team.teamEmail
+    )
+  );
 
   const spRows = sponsorRows.map((sponsor) =>
     createSponsorData(
@@ -3610,6 +3632,46 @@ function EventFormFinish({
                     <TableCell align="right">{row.sponsorName}</TableCell>
                     <TableCell align="right">{row.sponsorContact}</TableCell>
                     <TableCell align="right">{row.sponsorEmail}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Teams
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Name</TableCell>
+                  <TableCell align="right">Contact</TableCell>
+                  <TableCell align="right">E-mail</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tRows.map((row) => (
+                  <TableRow
+                    key={row.teamType}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.teamType}
+                    </TableCell>
+                    <TableCell align="right">{row.teamName}</TableCell>
+                    <TableCell align="right">{row.teamContact}</TableCell>
+                    <TableCell align="right">{row.teamEmail}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
