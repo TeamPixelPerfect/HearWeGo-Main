@@ -342,7 +342,6 @@ const Store = () => {
           padding: "40px 20px",
           textAlign: "left",
           marginTop: "10px",
-          // marginBottom: "40px",
         }}
       >
         <Typography variant="h5" gutterBottom sx={{ marginBottom: "20px" }}>
