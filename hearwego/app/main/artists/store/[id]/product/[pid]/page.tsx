@@ -10,11 +10,15 @@ import {
   TextField,
   Card,
   CardContent,
-  Paper,
+  LinearProgress,
+  Chip,
 } from "@mui/material";
 import { Add, Remove, ShoppingCart, ArrowBackIos } from "@mui/icons-material";
-import Carousel from "react-material-ui-carousel";
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import Link from "next/link";
+import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
+
 
 interface Comment {
   id: number;
@@ -31,9 +35,14 @@ interface Product {
   price: number;
   image: string;
   rating: number;
+  ratingCount?: number;
   category: string;
   subcategory: string;
   comments: Comment[];
+  productCount: number;
+  sold: number;
+  sizes: string[];
+  colors: string[];
 }
 
 export const products: Product[] = [
@@ -46,6 +55,7 @@ export const products: Product[] = [
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4,
+    ratingCount: 10,
     category: "Camera",
     subcategory: "Camera",
     comments: [
@@ -64,6 +74,10 @@ export const products: Product[] = [
         date: "2021-09-02",
       },
     ],
+    productCount: 50,
+    sold: 40,
+    sizes: ["Small", "Medium", "Large"],
+    colors: ["Black", "Silver", "Red"],
   },
 ];
 
@@ -73,6 +87,8 @@ const ProductDetail: React.FC = () => {
   const [previousComments, setPreviousComments] = useState<Comment[]>(products[0].comments);
   const [commentRating, setCommentRating] = useState<number | null>(null);
   const [commentsVisible, setCommentsVisible] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(products[0].sizes[0]);
+  const [selectedColor, setSelectedColor] = useState(products[0].colors[0]);
 
   const product = products[0];
   const productImages = [
@@ -115,6 +131,14 @@ const ProductDetail: React.FC = () => {
     setCommentsVisible(!commentsVisible);
   };
 
+  const handleSizeChange = (size: string) => {
+    setSelectedSize(size);
+  };
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+  };
+
   return (
     <>
       <Box
@@ -149,24 +173,35 @@ const ProductDetail: React.FC = () => {
                 Product Details
               </Typography>
             </div>
-            <Box
-              sx={{ height: { xs: "250px", md: "350px" }, marginTop: "20px" }}
-            >
-              <Carousel autoPlay={true} indicators={false}>
-                {productImages.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={product.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: "10px",
-                    }}
-                  />
-                ))}
-              </Carousel>
-            </Box>
+            <ImageGallery
+  items={productImages.map(image => ({ original: image, thumbnail: image }))}
+  showNav={false}
+  showBullets={true}
+  showThumbnails={true}
+  showFullscreenButton={true}
+  showPlayButton={true}
+
+  // showIndex={false}
+  // renderLeftNav={(onClick, disabled) => (
+  //   <IconButton
+  //     onClick={onClick}
+  //     disabled={disabled}
+  //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
+  //   >
+  //     <ArrowBackIos />
+  //   </IconButton>
+  // )}
+  // renderRightNav={(onClick, disabled) => (
+  //   <IconButton
+  //     onClick={onClick}
+  //     disabled={disabled}
+  //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
+  //   >
+  //     <ArrowForwardIos />
+  //   </IconButton>
+  // )}
+/>
+
             <Typography
               variant="body1"
               sx={{
@@ -223,6 +258,39 @@ const ProductDetail: React.FC = () => {
             >
               Rs.{product.price}
             </Typography>
+            <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+              Size
+            </Typography>
+            <Box sx={{ display: "flex", marginBottom: "20px" }}>
+              {product.sizes.map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedSize === size ? "contained" : "outlined"}
+                  onClick={() => handleSizeChange(size)}
+                  sx={{ margin: "0 5px",textTransform: 'none'}}
+                >
+                  {size}
+                </Button>
+              ))}
+            </Box>
+            <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+              Color
+            </Typography>
+            <Box sx={{ display: "flex", marginBottom: "20px" }}>
+              {product.colors.map((color) => (
+                <Chip
+                  key={color}
+                  label={color}
+                  onClick={() => handleColorChange(color)}
+                  sx={{
+                    margin: "0 5px",
+                    backgroundColor:
+                      selectedColor === color ? color.toLowerCase() : "gray",
+                    color: "white",
+                  }}
+                />
+              ))}
+            </Box>
             <Typography variant="body1">Quantity</Typography>
             <Box
               sx={{
@@ -248,6 +316,28 @@ const ProductDetail: React.FC = () => {
             >
               Add to Cart
             </Button>
+            <Box sx={{ width: '20%', marginTop: '20px', position: 'relative' }}>
+              <Box sx={{ position: 'relative' }}>
+                <LinearProgress
+                  variant="determinate"
+                  value={(product.sold / product.productCount) * 100}
+                  sx={{ height: '15px', borderRadius: '15px' }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    position: 'relative',
+                    top: '50%',
+                    fontSize: '12px',
+                    left: `${(product.sold / product.productCount) * 100}%`,
+                    transform: 'translate(-70%, -90%)',
+                    color: 'white',
+                  }}
+                >
+                  {product.sold} sold
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -301,12 +391,11 @@ const ProductDetail: React.FC = () => {
             <TextField
               label="Your Comment"
               multiline
-              // fullWidth
               rows={4}
               value={commentInput}
               onChange={handleCommentInputChange}
               variant="outlined"
-              sx={{ marginBottom: "20px",width:"100%" }}
+              sx={{ marginBottom: "20px", width: "100%" }}
             />
             <Rating
               name="comment-rating"
@@ -319,7 +408,8 @@ const ProductDetail: React.FC = () => {
               variant="contained"
               color="primary"
               onClick={handleAddComment}
-            sx={{marginBottom:"15px"}}>
+              sx={{ marginBottom: "15px" }}
+            >
               Submit
             </Button>
           </Box>

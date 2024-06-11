@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -47,6 +48,7 @@ export const products = [
     image2:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
+    ratingCount: 20,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -55,6 +57,7 @@ export const products = [
         username: "JohnDoe",
         comment: "Great shirt, fits perfectly!",
         rating: 5,
+        ratingCount: 20,
       },
       {
         id: 2,
@@ -74,6 +77,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4,
+    ratingCount: 10,
     category: "Mug",
     subcategory: "Mug",
     comments: [
@@ -101,6 +105,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
+    ratingCount: 15,
     category: "Camera",
     subcategory: "Camera",
     comments: [
@@ -128,6 +133,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
+    ratingCount: 15,
     category: "Accessories",
     subcategory: "Wrist Bands",
     comments: [
@@ -155,6 +161,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
+    ratingCount: 15,
     category: "Clothing",
     subcategory: "Cap",
     comments: [
@@ -182,6 +189,8 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
+    ratingCount: 10,
+
     category: "Bag",
     subcategory: "Bag",
     comments: [
@@ -209,6 +218,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Cap",
     comments: [
@@ -236,6 +246,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -263,6 +274,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
+    ratingCount: 10,
     category: "Accessories",
     subcategory: "Wrist Bands",
     comments: [
@@ -290,6 +302,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -317,6 +330,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
+    ratingCount: 10,
     category: "Mug",
     subcategory: "Mug",
     comments: [
@@ -344,6 +358,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
+    ratingCount: 10,
     category: "Camera",
     subcategory: "Camera",
     comments: [
@@ -364,6 +379,7 @@ export const products = [
 ];
 
 export default function ArtistStoreProduct() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [subcategory, setSubcategory] = useState("All");
@@ -408,6 +424,8 @@ export default function ArtistStoreProduct() {
         );
 
   const filteredProducts = products.filter((product) => {
+    
+    
     return (
       (category === "All" || product.category === category) &&
       (subcategory === "All" || product.subcategory === subcategory) &&
@@ -456,6 +474,10 @@ export default function ArtistStoreProduct() {
             size="large"
             aria-label="show 4 new mails"
             color="inherit"
+            onClick={() => {
+              router.push("/main/user/cart");
+            }}
+             
           >
             <Badge badgeContent={4} color="error">
               <ShoppingCartIcon />
@@ -476,7 +498,7 @@ export default function ArtistStoreProduct() {
           <Box
             sx={{
               display: "flex",
-              width: "40%",
+              width: "25%",
               flexDirection: "row",
 
               // backgroundColor: "red",

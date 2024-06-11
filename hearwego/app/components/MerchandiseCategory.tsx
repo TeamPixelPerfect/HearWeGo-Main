@@ -1,5 +1,5 @@
 "use client";
-import {useRouter} from 'next/router';
+import {useRouter} from 'next/navigation';
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import styled from '@emotion/styled';
@@ -19,6 +19,7 @@ interface CategoryProps {
 
 
 const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
+  const router = useRouter();
   return (
     <Card
       style={{
@@ -52,13 +53,18 @@ const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
             textAlign: 'center',
           }}
         >
-          <Link href="/main/artists/store/1/category/1">
-            <Button>
+          {/* <Link href="/main/artists/store/1/category/1"> */}
+            <Button 
+               onClick={() => {
+                router.push("/main/artists/store/1/category/1");
+              }}
+              >
+           
           <Typography variant="h4" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
             {category.name}
           </Typography>
           </Button>
-          </Link>
+          {/* </Link> */}
         </CardContent>
       </div>
     </Card>

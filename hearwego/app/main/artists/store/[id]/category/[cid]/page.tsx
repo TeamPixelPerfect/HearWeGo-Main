@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -19,6 +19,7 @@ import {
 } from "../../../../../../styles/ArtistStrore.styles";
 
 const CategoryPage: React.FC = () => {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchInputChange = (
@@ -66,6 +67,9 @@ const CategoryPage: React.FC = () => {
             size="large"
             aria-label="show 4 new mails"
             color="inherit"
+            onClick={() => {
+              router.push("/main/user/cart");
+            }}
           >
             <Badge badgeContent={4} color="error">
               <ShoppingCartIcon />

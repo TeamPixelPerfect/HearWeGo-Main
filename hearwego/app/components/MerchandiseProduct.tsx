@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React from "react";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import Link from "next/link";
+import Box from "@mui/material/Box";
 
 interface Comment {
   id: number;
@@ -25,6 +27,7 @@ interface Product {
   image1: string;
   image2: string;
   rating: number;
+  ratingCount: number;
   category: string;
   subcategory: string;
   comments: Comment[];
@@ -58,17 +61,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <Typography gutterBottom variant="h5" component="div">
             {product.name}
           </Typography>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'row',
+          
+           
+            
+            
+          
+          }}>
           <Rating
             name="read-only-rating"
             value={product.rating}
             readOnly
             precision={0.5}
-          />
+           
+          /> <Typography variant="body2" color="text.secondary" sx={{ marginLeft:"20px",marginTop:"2px"}}>{product.ratingCount}</Typography>
+          </Box>
           <Typography variant="body2" color="text.secondary">
             {product.description}
           </Typography>
           <Typography variant="h6" color="text.primary" sx={{ marginTop: 2 }}>
-            Rs{product.price}
+            Rs {product.price}
           </Typography>
         </CardContent>
       </StyledCard>

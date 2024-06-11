@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -56,6 +57,7 @@ export const products = [
     image2:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -78,11 +80,13 @@ export const products = [
     name: "Printed Mug",
     description: "This is a sample product description.",
     price: 450.99,
+  
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4,
+    ratingCount: 10,
     category: "Mug",
     subcategory: "Mug",
     comments: [
@@ -110,6 +114,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
+    ratingCount: 10,
     category: "Camera",
     subcategory: "Camera",
     comments: [
@@ -137,6 +142,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
+    ratingCount: 10,
     category: "Accessories",
     subcategory: "Wrist Bands",
     comments: [
@@ -164,6 +170,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Cap",
     comments: [
@@ -191,6 +198,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
+    ratingCount: 10,
     category: "Bag",
     subcategory: "Bag",
     comments: [
@@ -218,6 +226,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Cap",
     comments: [
@@ -245,6 +254,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -272,6 +282,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
+    ratingCount: 10,
     category: "Accessories",
     subcategory: "Wrist Bands",
     comments: [
@@ -299,6 +310,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
+    ratingCount: 10,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -326,6 +338,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
+    ratingCount: 10,
     category: "Mug",
     subcategory: "Mug",
     comments: [
@@ -353,6 +366,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
+    ratingCount: 10,
     category: "Camera",
     subcategory: "Camera",
     comments: [
@@ -416,6 +430,7 @@ const categories = [
   },
 ];
 const ArtistStore = () => {
+  const router = useRouter();
   // State to manage the search query
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -469,16 +484,21 @@ const ArtistStore = () => {
               onChange={handleSearchInputChange}
             />
           </Search>
-
+         
+         {/* <Link href ="/main/user/cart"> */}
           <IconButton
             size="large"
             aria-label="show 4 new mails"
             color="inherit"
-          >
+            onClick={() => {
+              router.push("/main/user/cart");
+            }}
+             >
             <Badge badgeContent={4} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
+          {/* </Link> */}
         </Toolbar>
       </AppBar>
 
@@ -525,11 +545,17 @@ const ArtistStore = () => {
               </Typography>
             </Button>
 
-            <Link href="/main/artists/store/1/productSeeMore">
-              <Button variant="contained" color="primary">
+            {/* <Link href="/main/artists/store/1/productSeeMore"> */}
+              <Button 
+              variant="contained" 
+              color="primary"
+              onClick={() => {
+                router.push("/main/artists/store/1/productSeeMore");
+              }}
+              >
                 See More
               </Button>
-            </Link>
+            {/* </Link> */}
           </div>
 
           <Grid container spacing={4}>
