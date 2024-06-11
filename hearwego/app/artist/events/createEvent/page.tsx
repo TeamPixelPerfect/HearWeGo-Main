@@ -11,6 +11,12 @@ import Check from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import PublishIcon from "@mui/icons-material/Publish";
 import ErrorIcon from "@mui/icons-material/Error";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FormHelperText from "@mui/material/FormHelperText";
 import { DateField } from "@mui/x-date-pickers/DateField";
@@ -56,7 +62,7 @@ import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { Alert, CardActionArea, FilledInput, IconButton } from "@mui/material";
+import { Alert, CardActionArea, Divider, FilledInput, IconButton } from "@mui/material";
 import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
@@ -339,7 +345,7 @@ function CreateEvent() {
           budget_amount: budgetAmount,
         })
       ),
-    })
+    });
   }, [budgetRows]);
 
   const totalSteps = () => {
@@ -363,7 +369,7 @@ function CreateEvent() {
       const isValid = await validateCurrentStep();
       if (!isValid) return;
     }
-  
+
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
         ? steps.findIndex((step, i) => !(i in completed))
@@ -414,7 +420,7 @@ function CreateEvent() {
         ticket_catagory: "Not-Provided",
       }));
     }
-    
+
     handleNext(true); // Pass true to skip validation
   };
 
@@ -474,7 +480,7 @@ function CreateEvent() {
 
     let errors = [];
 
-    if(autoTicketRows.length == 0 && manualTicketRows.length == 0) {
+    if (autoTicketRows.length == 0 && manualTicketRows.length == 0) {
       isValid = false;
       errors.push("There is no ticket details provided.");
     }
@@ -491,7 +497,7 @@ function CreateEvent() {
     let isValid = true;
 
     return isValid;
-  }
+  };
 
   const submitData = async () => {
     setLoading(true);
@@ -1053,7 +1059,11 @@ function TicketDetails({
                     sx={{ width: 300, marginBottom: "1em" }}
                     disabled
                     options={eventCurrencies}
-                    defaultValue={{ code: "LK", label: "Sri Lanka", currency: "Sri Lankan Rupee (LKR)" }}
+                    defaultValue={{
+                      code: "LK",
+                      label: "Sri Lanka",
+                      currency: "Sri Lankan Rupee (LKR)",
+                    }}
                     autoHighlight
                     getOptionLabel={(option) => option.label}
                     renderOption={(props, option) => (
@@ -2214,8 +2224,14 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
 }
 
 function BudgetDetails({ budgetRows, setBudgetRows }) {
-  const elementToFind = { code: "LK", label: "Sri Lanka", currency: "Sri Lankan Rupee (LKR)" };
-  const indexOfElement = eventCurrencies.findIndex(element => element === elementToFind);
+  const elementToFind = {
+    code: "LK",
+    label: "Sri Lanka",
+    currency: "Sri Lankan Rupee (LKR)",
+  };
+  const indexOfElement = eventCurrencies.findIndex(
+    (element) => element === elementToFind
+  );
   return (
     <div>
       <InputRow>
@@ -2223,7 +2239,11 @@ function BudgetDetails({ budgetRows, setBudgetRows }) {
           id="ticket-currency-select-demo"
           sx={{ width: 300, marginBottom: "1em" }}
           options={eventCurrencies}
-          defaultValue={{ code: "LK", label: "Sri Lanka", currency: "Sri Lankan Rupee (LKR)" }}
+          defaultValue={{
+            code: "LK",
+            label: "Sri Lanka",
+            currency: "Sri Lankan Rupee (LKR)",
+          }}
           disabled
           autoHighlight
           getOptionLabel={(option) => option.currency}
@@ -3376,230 +3396,123 @@ function EventCreateShow(
       <BudgetDetails budgetRows={budgetRows} setBudgetRows={setBudgetRows} />
     );
   } else if (n == 3) {
-    return <EventFormFinish />;
+    return <EventFormFinish eventData={eventData} setEventData={setEventData} sessionRows={sessionRows} setSessionRows={setSessionRows} />;
   }
 }
 
-function EventFormFinish() {
+function EventFormFinish({eventData, setEventData, sessionRows, setSessionRows}) {
+  function createData(
+    sessionDate: string,
+    sessionTime: string,
+    duration: string,
+    venue: string,
+    artists: string,
+  ) {
+    return { sessionDate, sessionTime, duration, venue, artists };
+  }
+  
+  const rows = sessionRows.map((session) => createData(session.sessionDate, session.sessionTime, session.duration, session.venue, session.artists));
   return (
     <Box sx={{ display: "flex" }}>
-      <Card sx={{ width: "100%", display: "flex" }}>
-        <Box sx={{ width: "50%" }}>
-          <CardMedia 
-            image="https://shorturl.at/kotTU"
-            sx={{width: 250, height: 250}}
+      <Card sx={{ width: "100%", padding: 2 }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Basic Event Details
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", display: "flex" }}>
+          <Box
+            sx={{
+              width: "50%",
+              padding: 2,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CardMedia
+              image={eventData.event_img}
+              sx={{ width: 250, height: 250, borderRadius: 2}}
             />
-        </Box>
-        <Box sx={{ width: "50%" }}>
-          <Box sx={{ width: "100%", display: "flex" }}>
-            <Box sx={{ width: "50%" }}>
-              <Typography variant="h6">
-                Event Name
-              </Typography>
-            </Box>
-            <Box sx={{ width: "50%" }}>
-              <Typography variant="subtitle1">
-                Nadagama
-              </Typography>
-            </Box>
           </Box>
+          <Box sx={{ width: "50%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">Event Name</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">{eventData.event_name}</Typography>
+              </Box>
+            </Box>
 
-          <Box sx={{ width: "100%", display: "flex" }}>
-            <Box sx={{ width: "50%" }}>
-              <Typography variant="h6">
-                Event Type
-              </Typography>
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">Event Type</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">{eventData.event_type}</Typography>
+              </Box>
             </Box>
-            <Box sx={{ width: "50%" }}>
-              <Typography variant="subtitle1">
-                Modern
-              </Typography>
+
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">Age Limits</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">-</Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">No. of Sessions</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">0</Typography>
+              </Box>
             </Box>
           </Box>
+        </Box>
+
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Event Sessions
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", padding: 2 }}>
+        <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Date</TableCell>
+            <TableCell align="right">Time</TableCell>
+            <TableCell align="right">Duration</TableCell>
+            <TableCell align="right">Venue</TableCell>
+            <TableCell align="right">Artists</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.sessionDate}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.sessionDate}
+              </TableCell>
+              <TableCell align="right">{row.sessionTime}</TableCell>
+              <TableCell align="right">{row.duration}</TableCell>
+              <TableCell align="right">{row.venue}</TableCell>
+              <TableCell align="right">{row.artists}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
         </Box>
       </Card>
     </Box>
-  );
-}
-
-function SessionInfoCard() {
-  return (
-    <Card sx={{ width: "100%" }}>
-      <CardActionArea>
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>Session 01</Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Date</Box>
-              <Box sx={{ width: "60%" }}>2024-02-19</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Time</Box>
-              <Box sx={{ width: "60%" }}>8.00 P.M.</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Duration</Box>
-              <Box sx={{ width: "60%" }}>3 Hours</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Venue</Box>
-              <Box sx={{ width: "60%" }}>Location</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="column"
-              spacing={1}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Other Artists</Box>
-            </Stack>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ width: "100%", marginBottom: "1em" }}
-            >
-              <Chip avatar={<Avatar>M</Avatar>} label="Avatar" />
-              <Chip
-                avatar={
-                  <Avatar alt="Natacha" src="https://shorturl.at/bhKS9" />
-                }
-                label="Avatar"
-                variant="outlined"
-              />
-            </Stack>
-
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="column"
-              spacing={1}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Ticket Details</Box>
-            </Stack>
-            <Box sx={{ marginBottom: "1em" }}>{/* <AutoTicketTable /> */}</Box>
-
-            <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Special Notice</Box>
-              <Box sx={{ width: "100%", textAlign: "justify" }}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima
-                itaque aliquid, maxime quia ab doloribus tenetur dolor,
-                similique molestiae modi nobis, porro eius vero animi ratione
-                odio laboriosam est asperiores!
-              </Box>
-            </Stack>
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-}
-
-function BudgetInfoCard() {
-  return (
-    <Card sx={{ width: "90%" }}>
-      <CardActionArea>
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>
-              Budget Details
-            </Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {/* <BudgetTable /> */}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-}
-
-function EventInfoCard() {
-  return (
-    <Card sx={{ width: "90%" }}>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image="https://shorturl.at/kotTU"
-          alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>
-              Event Infomation
-            </Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Event Name</Box>
-              <Box sx={{ width: "60%" }}>Naadagama</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Event Type</Box>
-              <Box sx={{ width: "60%" }}>Modern</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Age Limit</Box>
-              <Box sx={{ width: "60%" }}>None</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>No. of Sessions</Box>
-              <Box sx={{ width: "60%" }}>1</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Sponsors</Box>
-              <Box sx={{ width: "60%" }}>Sponsor01, Sponsor02</Box>
-            </Stack>
-
-            <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Description</Box>
-              <Box sx={{ width: "100%", textAlign: "justify" }}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima
-                itaque aliquid, maxime quia ab doloribus tenetur dolor,
-                similique molestiae modi nobis, porro eius vero animi ratione
-                odio laboriosam est asperiores!
-              </Box>
-            </Stack>
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
   );
 }
 
