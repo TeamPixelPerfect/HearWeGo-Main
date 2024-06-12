@@ -32,8 +32,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
-
-
+import EditIcon from "@mui/icons-material/Edit";
+import dayjs from "dayjs";
 import {
   Document,
   Page,
@@ -66,7 +66,7 @@ const PDFDocument = ({ formData, logoData, signatureData }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.section}>
-      {logoData && (
+        {logoData && (
           <Image src={logoData} style={{ width: 100, height: 100 }} />
         )}
         <Text>Headline: {formData.headline}</Text>
@@ -80,7 +80,7 @@ const PDFDocument = ({ formData, logoData, signatureData }) => (
           Release Date:{" "}
           {formData.releaseDate && formData.releaseDate.format("YYYY-MM-DD")}
         </Text>
-        
+
         {signatureData && (
           <Image src={signatureData} style={{ width: 100, height: 100 }} />
         )}
@@ -98,6 +98,7 @@ interface PressReleaseDetails {
   releaseDate: Dayjs | null;
   logo: string;
   signature: string;
+  sharedDateTime: string; // Add sharedDateTime property
 }
 
 export default function PressRelease() {
@@ -107,11 +108,19 @@ export default function PressRelease() {
   const [signatureData, setSignatureData] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [savedItems, setSavedItems] = useState<PressReleaseDetails[]>([]); // State to manage saved items
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); 
-  const [itemToDelete, setItemToDelete] = useState(null); 
+  const [draftItems, setDraftItems] = useState([]);
+  // State to manage drafts
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+  const [userConfirmedCancel, setUserConfirmedCancel] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [savedItemsshared, setSavedItemsshared] = useState<PressReleaseDetails[]>([]); // State to manage shared items
-const [email, setEmail] = useState("");
+  const [savedItemsshared, setSavedItemsshared] = useState<
+    PressReleaseDetails[]
+  >([]); // State to manage shared items
+  const [email, setEmail] = useState("");
+  const [pressReleaseShared, setPressReleaseShared] = useState(false);
 
   const validationSchema = Yup.object({
     headline: Yup.string().required("Headline is required"),
@@ -148,8 +157,41 @@ const [email, setEmail] = useState("");
   };
 
   const handleCancel = () => {
-    // Reset form values or navigate away
+    // Show the confirmation modal
+    setConfirmCancelOpen(true);
+  };
+
+  const handleCancelConfirmed = () => {
+    // Close the confirmation modal
+    setConfirmCancelOpen(false);
+
+    // Check if more than two fields are filled
+    const filledFields = Object.values(formik.values).filter(
+      (value) => value !== null && value !== ""
+    ).length;
+
+    if (filledFields > 2) {
+      // Save the current form data as a draft
+      setDraftItems([...draftItems, formik.values]);
+    }
+
+    // Reset form values
     formik.resetForm();
+  };
+
+  const handleEditDraft = (draft) => {
+    // Set formik values to edit the draft
+    formik.setValues(draft);
+
+    // Optionally, navigate to the form section or show the form
+    // You can use React Router or manage a state to control the section
+    // For demonstration, let's assume redirecting to the "Scheduling" tab (value="1")
+    setValue("1"); // Assuming you have a state value for controlling tabs
+  };
+
+  const handleCancelRejected = () => {
+    // Close the confirmation modal
+    setConfirmCancelOpen(false);
   };
 
   const handleFileChange = (
@@ -169,6 +211,7 @@ const [email, setEmail] = useState("");
   const handleOpenDeleteDialog = (item) => {
     setItemToDelete(item);
     setDeleteDialogOpen(true);
+    setConfirmDeleteOpen(true);
   };
 
   const handleCloseDeleteDialog = () => {
@@ -178,43 +221,63 @@ const [email, setEmail] = useState("");
 
   const handleConfirmDelete = () => {
     if (itemToDelete) {
-      setSavedItems((prevItems) => prevItems.filter((i) => i.id !== itemToDelete.id));
+      setSavedItems((prevItems) =>
+        prevItems.filter((i) => i.id !== itemToDelete.id)
+      );
+      const updatedDrafts = draftItems.filter(
+        (draft) => draft !== itemToDelete
+      );
+      setDraftItems(updatedDrafts);
+      setItemToDelete(null);
     }
     setDeleteDialogOpen(false);
+    setConfirmDeleteOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDeleteOpen(false);
+    setItemToDelete(null);
   };
 
   const handleOpenShareDialog = () => {
     setShareDialogOpen(true);
   };
-  
+
   const handleCloseShareDialog = () => {
     setShareDialogOpen(false);
   };
-  
+
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
-  
+
   // const handleSendPressRelease = () => {
   //   // Logic for sending the press release to the provided email address
   //   console.log(`Sending press release to: ${email}`);
   //   handleCloseShareDialog();
   // };
-  
+
   const handleSendPressRelease = () => {
-    // Logic for sending the press release to the provided email address
-    console.log(`Sending press release to: ${email}`);
-    
-    // Only save to "Already Shared" if the email is provided
     if (email) {
-      const sharedPressRelease = { ...formData, email: email };
-      setSavedItemsshared([sharedPressRelease]); // Set the new state directly without concatenation
+      const sharedPressRelease = {
+        ...formData,
+        email: email,
+        sharedDateTime: new Date().toLocaleString(),
+      };
+      // Update state immutably using spread operator
+      setSavedItemsshared([...savedItemsshared, sharedPressRelease]);
+      setPressReleaseShared(true);
     }
-  
     setOpenModal(false);
     handleCloseShareDialog();
   };
-  
+
+  const deleteSharedItem = (itemToDelete) => {
+    const updatedItems = savedItemsshared.filter(
+      (item) => item.headline !== itemToDelete.headline
+    );
+    setSavedItemsshared(updatedItems);
+  };
 
   const preloadImages = async () => {
     const logoResponse = await fetch(formik.values.logo); // Assuming formik.values.logo contains the URL of the logo image
@@ -325,273 +388,377 @@ const [email, setEmail] = useState("");
                 </TabList>
               </Box>
               <TabPanel value="1">
-                <Paper elevation={3} sx={{ p: 3 }}>
-                  <form onSubmit={formik.handleSubmit}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={4}>
-                        <Box>
-                          <DropFile
-                            fileTypes="Logo"
-                            fileExtensions=".jpg, .jpeg, .png"
-                            isCircular={false}
-                            width="100%"
-                            height="250px"
-                            file={formik.values.logo} // Pass the logo value from formik
-                            setFile={(file) =>
-                              formik.setFieldValue("logo", file)
-                            } // Set the logo value in formik
-                            aspectX={1}
-                            aspectY={1}
-                            shape="rect"
-                            sx={{ margin: "20px" }}
-                          />
-                          {formik.touched.logo && formik.errors.logo ? (
-                            <Typography color="error">
-                              {formik.errors.logo}
+    <Paper elevation={3} sx={{ p: 3 }}>
+      <form onSubmit={formik.handleSubmit}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <Box>
+              <DropFile
+                fileTypes="Logo"
+                fileExtensions=".jpg, .jpeg, .png"
+                isCircular={false}
+                width="100%"
+                height="250px"
+                file={formik.values.logo}
+                setFile={(file) => formik.setFieldValue("logo", file)}
+                aspectX={1}
+                aspectY={1}
+                shape="rect"
+                sx={{ margin: "20px" }}
+              />
+              {formik.touched.logo && formik.errors.logo ? (
+                <Typography color="error">{formik.errors.logo}</Typography>
+              ) : null}
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Headline"
+                  name="headline"
+                  value={formik.values.headline}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  sx={{ marginTop: "20px" }}
+                />
+                {formik.touched.headline && formik.errors.headline ? (
+                  <Typography color="error">{formik.errors.headline}</Typography>
+                ) : null}
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Sub Headline"
+                  name="subHeadline"
+                  value={formik.values.subHeadline}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.touched.subHeadline && formik.errors.subHeadline ? (
+                  <Typography color="error">{formik.errors.subHeadline}</Typography>
+                ) : null}
+              </Grid>
+              <Grid item xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Event Date"
+                    value={formik.values.date}
+                    onChange={(newDate) => formik.setFieldValue("date", newDate)}
+                    renderInput={(params) => <TextField fullWidth {...params} required />}
+                  />
+                </LocalizationProvider>
+                {formik.touched.date && formik.errors.date ? (
+                  <Typography color="error">{formik.errors.date}</Typography>
+                ) : null}
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Venue"
+                  name="venue"
+                  value={formik.values.venue}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  sx={{ width: "100%" }}
+                />
+                {formik.touched.venue && formik.errors.venue ? (
+                  <Typography color="error">{formik.errors.venue}</Typography>
+                ) : null}
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Description"
+                  name="description"
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  multiline
+                  rows={4}
+                  sx={{ width: "100%" }}
+                />
+                {formik.touched.description && formik.errors.description ? (
+                  <Typography color="error">{formik.errors.description}</Typography>
+                ) : null}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <DropFile
+                    fileTypes="Signature"
+                    fileExtensions=".jpg, .jpeg, .png"
+                    isCircular={false}
+                    width="100%"
+                    height="160px"
+                    file={formik.values.signature}
+                    setFile={(file) => formik.setFieldValue("signature", file)}
+                    aspectX={1}
+                    aspectY={1}
+                    shape="rect"
+                  />
+                  {formik.touched.signature && formik.errors.signature ? (
+                    <Typography color="error">{formik.errors.signature}</Typography>
+                  ) : null}
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ width: "100%" }}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Release Date"
+                      value={formik.values.releaseDate}
+                      onChange={(newDate) => formik.setFieldValue("releaseDate", newDate)}
+                      renderInput={(params) => <TextField fullWidth {...params} required />}
+                    />
+                  </LocalizationProvider>
+                  {formik.touched.releaseDate && formik.errors.releaseDate ? (
+                    <Typography color="error">{formik.errors.releaseDate}</Typography>
+                  ) : null}
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            justifyContent: "flex-end",
+            p: 2,
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SaveIcon />}
+            type="submit"
+            onClick={formik.handleSubmit}
+            sx={{ mr: 2 }}
+          >
+            Save
+          </Button>
+          <Button variant="outlined" onClick={handleCancel}>
+            Cancel
+          </Button>
+        </Box>
+      </form>
+    </Paper>
+  </TabPanel>
+  <TabPanel value="2">
+    {savedItems.length > 0 ? (
+      savedItems.map((item, index) => (
+        <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
+          <Typography variant="h5">{item.headline}</Typography>
+          <Typography variant="body1">
+            {item.subHeadline}
+          </Typography>
+          <Typography variant="body2">
+            Event Date:{" "}
+            {item.date && item.date.format("YYYY-MM-DD")}
+          </Typography>
+          {/* Uncomment below lines for Venue and Description if needed */}
+          {/* <Typography variant="body2">Venue: {item.venue}</Typography> */}
+          {/* <Typography variant="body2">Description: {item.description}</Typography> */}
+          <Typography variant="body2">
+            Release Date:{" "}
+            {item.releaseDate &&
+              item.releaseDate.format("YYYY-MM-DD")}
+          </Typography>
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexDirection: "row",
+              gap: "3px",
+              // backgroundColor: "red",
+              justifyContent:"space-between"
+            }}
+          >
+            <PDFDownloadLink
+              document={
+                <PDFDocument
+                  logoData={logoData}
+                  formData={item}
+                  signatureData={signatureData}
+                />
+              }
+              fileName={`${item.headline}.pdf`}
+            >
+              {({ loading }) =>
+                loading ? (
+                  "Loading document..."
+                ) : (
+                  <Button
+                    variant="contained"
+                    startIcon={<PictureAsPdfIcon />}
+                    sx={{ width: "100%" }}
+                  >
+                    Download PDF
+                  </Button>
+                )
+              }
+            </PDFDownloadLink>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "right",
+                gap: "5px",
+
+                // backgroundColor: "green",
+              }}
+            >
+              <Button
+                variant="outlined"
+                startIcon={<DeleteIcon />}
+                onClick={() => handleOpenDeleteDialog(item)}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleOpenShareDialog}
+              >
+                {pressReleaseShared ? (
+                  "Shared"
+                ) : (
+                  <>
+                    <ShareIcon /> Share
+                  </>
+                )}
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+      ))
+    ) : (
+      <Typography variant="body1">
+        No saved press releases.
+      </Typography>
+    )}
+  </TabPanel>
+
+
+              <TabPanel value="3">
+                <Typography variant="h6" sx={{ margin: "10px" }}>
+                  Drafts
+                </Typography>
+                <Grid container spacing={2}>
+                  {draftItems.length > 0 ? (
+                    draftItems.map((draft, index) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                        <Paper
+                          style={{
+                            position: "relative",
+                            padding: 16,
+                            marginBottom: 8,
+                            width: "100%",
+                            height: "100%",
+                            flexDirection: "row",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div style={{ flexGrow: 1 }}>
+                            <Typography variant="body1">
+                              <strong>Headline:</strong> {draft.headline}
                             </Typography>
-                          ) : null}
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12} md={8}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Headline"
-                              name="headline"
-                              value={formik.values.headline}
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                              sx={{ marginTop: "20px" }}
-                            />
-                            {formik.touched.headline &&
-                            formik.errors.headline ? (
-                              <Typography color="error">
-                                {formik.errors.headline}
-                              </Typography>
-                            ) : null}
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Sub Headline"
-                              name="subHeadline"
-                              value={formik.values.subHeadline}
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                            />
-                            {formik.touched.subHeadline &&
-                            formik.errors.subHeadline ? (
-                              <Typography color="error">
-                                {formik.errors.subHeadline}
-                              </Typography>
-                            ) : null}
-                          </Grid>
-                          <Grid item xs={12}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                              <DatePicker
-                                label="Event Date"
-                                value={formik.values.date}
-                                onChange={(newDate) =>
-                                  formik.setFieldValue("date", newDate)
-                                }
-                                renderInput={(params) => (
-                                  <TextField fullWidth {...params} required />
-                                )}
-                              />
-                            </LocalizationProvider>
-                            {formik.touched.date && formik.errors.date ? (
-                              <Typography color="error">
-                                {formik.errors.date}
-                              </Typography>
-                            ) : null}
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              label="Venue"
-                              name="venue"
-                              value={formik.values.venue}
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                              sx={{ width: "50%" }}
-                            />
-                            {formik.touched.venue && formik.errors.venue ? (
-                              <Typography color="error">
-                                {formik.errors.venue}
-                              </Typography>
-                            ) : null}
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              label="Description"
-                              name="description"
-                              value={formik.values.description}
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                              multiline
-                              rows={4}
-                              sx={{ width: "100%" }}
-                            />
-                            {formik.touched.description &&
-                            formik.errors.description ? (
-                              <Typography color="error">
-                                {formik.errors.description}
-                              </Typography>
-                            ) : null}
-                          </Grid>
-                          <Grid item xs={12} md={6}>
-                            <Box>
-                              {/* Include DropFile component for Signature */}
-                              <DropFile
-                                fileTypes="Signature"
-                                fileExtensions=".jpg, .jpeg, .png"
-                                isCircular={false}
-                                width="100%"
-                                height="160px"
-                                file={formik.values.signature} // Pass the signature value from formik
-                                setFile={(file) =>
-                                  formik.setFieldValue("signature", file)
-                                } // Set the signature value in formik
-                                aspectX={1}
-                                aspectY={1}
-                                shape="rect"
-                              />
-                              {formik.touched.signature &&
-                              formik.errors.signature ? (
-                                <Typography color="error">
-                                  {formik.errors.signature}
-                                </Typography>
-                              ) : null}
-                            </Box>
-                          </Grid>
-                          <Grid item xs={10}>
-                            <Box
-                              sx={{
-                                width: "100%",
-                                marginTop: "5px",
-                              }}
+                            <Typography variant="body1">
+                              <strong>Sub Headline:</strong> {draft.subHeadline}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>Date:</strong>{" "}
+                              {draft.date && draft.date.format("YYYY-MM-DD")}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>Venue:</strong> {draft.venue}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>Description:</strong> {draft.description}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>Release Date:</strong>{" "}
+                              {draft.releaseDate &&
+                                draft.releaseDate.format("YYYY-MM-DD")}
+                            </Typography>
+                          </div>
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: 16,
+                              right: 16,
+                            }}
+                          >
+                            <IconButton
+                              aria-label="edit"
+                              onClick={() => handleEditDraft(draft)}
                             >
-                              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                  label="Release Date"
-                                  value={formik.values.releaseDate}
-                                  onChange={(newDate) =>
-                                    formik.setFieldValue("releaseDate", newDate)
-                                  }
-                                  renderInput={(params) => (
-                                    <TextField fullWidth {...params} required />
-                                  )}
-                                />
-                              </LocalizationProvider>
-                              {formik.touched.releaseDate &&
-                              formik.errors.releaseDate ? (
-                                <Typography color="error">
-                                  {formik.errors.releaseDate}
-                                </Typography>
-                              ) : null}
-                            </Box>
-                          </Grid>
-                        </Grid>
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => handleOpenDeleteDialog(draft)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </div>
+                        </Paper>
                       </Grid>
-                    </Grid>
-                    <Box
-                      sx={{
-                        position: "relative",
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        p: 2,
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<SaveIcon />}
-                        type="submit"
-                        onClick={formik.handleSubmit}
-                        sx={{ mr: 2 }}
-                      >
-                        Save
-                      </Button>
-                      <Button variant="outlined" onClick={handleCancel}>
-                        Cancel
-                      </Button>
-                    </Box>
-                  </form>
-                </Paper>
+                    ))
+                  ) : (
+                    <Typography>No drafts available.</Typography>
+                  )}
+                </Grid>
               </TabPanel>
-              {/* Placeholder panels for other tabs */}
-              <TabPanel value="2">
-                {savedItems.length > 0 ? (
-                  savedItems.map((item, index) => (
-                    <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
+
+              <TabPanel value="4">
+                {savedItemsshared.length > 0 ? (
+                  savedItemsshared.map((item, index) => (
+                    <Paper
+                      key={index}
+                      elevation={3}
+                      sx={{ p: 2, mb: 2, position: "relative" }}
+                    >
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleOpenDeleteDialog(item)}
+                        style={{
+                          position: "absolute",
+                          bottom: "10px",
+                          right: "10px",
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
                       <Typography variant="h5">{item.headline}</Typography>
-                      <Typography variant="body1">{item.subHeadline}</Typography>
-                      <Typography variant="body2">
-                        Event Date: {item.date && item.date.format("YYYY-MM-DD")}
+                      <Typography variant="body1">
+                        {item.subHeadline}
                       </Typography>
-                      {/* <Typography variant="body2">Venue: {item.venue}</Typography> */}
-                      {/* <Typography variant="body2">Description: {item.description}</Typography> */}
                       <Typography variant="body2">
-                        Release Date: {item.releaseDate && item.releaseDate.format("YYYY-MM-DD")}
+                        Event Date:{" "}
+                        {item.date && item.date.format("YYYY-MM-DD")}
                       </Typography>
-                      <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-                       
-                        <PDFDownloadLink
-                          document={<PDFDocument  logoData={logoData} formData={item} signatureData={signatureData} />}
-                          fileName={`${item.headline}.pdf`}
-                        >
-                          {({ loading }) =>
-                            loading ? "Loading document..." : <Button variant="contained" startIcon={<PictureAsPdfIcon />}>Download PDF</Button>
-                          }
-                        </PDFDownloadLink>
-                        <Box sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          // backgroundColor: "red",
-                        
-                        }}>
-                        <Button
-                          variant="outlined"
-                          startIcon={<DeleteIcon />}
-                          onClick={() => handleOpenDeleteDialog(item)}
-                          sx={{margin: "3px"}}
-                        >
-                          Delete
-                        </Button>
-                        <Button variant="outlined" startIcon={<ShareIcon />} onClick={handleOpenShareDialog}  sx={{margin: "3px"}}>
-                          Share
-                        </Button>
-                        </Box>
-                      </Box>
+                      <Typography variant="body2">
+                        Shared with: {item.email}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        style={{
+                          position: "absolute",
+                          top: "10px",
+                          right: "10px",
+                        }}
+                      >
+                        {dayjs().format("YYYY-MM-DD  HH:mm:ss")}
+                      </Typography>
                     </Paper>
                   ))
                 ) : (
-                  <Typography variant="body1">No saved press releases.</Typography>
+                  <Typography variant="body1">
+                    No shared press releases.
+                  </Typography>
                 )}
               </TabPanel>
-
-              <TabPanel value="3">
-                <Typography>Drafts content goes here...</Typography>
-              </TabPanel>
-              <TabPanel value="4">
-  {savedItemsshared.length > 0 ? (
-    savedItemsshared.map((item, index) => (
-      <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h5">{item.headline}</Typography>
-        <Typography variant="body1">{item.subHeadline}</Typography>
-        <Typography variant="body2">
-          Event Date: {item.date && item.date.format("YYYY-MM-DD")}
-        </Typography>
-        {/* Include rendering of other press release details */}
-        <Typography variant="body2">Shared with: {item.email}</Typography>
-        {/* Include rendering of other press release details */}
-      </Paper>
-    ))
-  ) : (
-    <Typography variant="body1">No shared press releases.</Typography>
-  )}
-</TabPanel>
             </TabContext>
           </Box>
         </CardContent>
@@ -622,11 +789,7 @@ const [email, setEmail] = useState("");
             Are you sure you want to save this press release?
           </Typography>
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={handleCloseModal}
-              color="secondary"
-              sx={{ mr: 2 }}
-            >
+            <Button onClick={handleCloseModal} color="secondary" sx={{ mr: 2 }}>
               Cancel
             </Button>
             <Button
@@ -687,6 +850,70 @@ const [email, setEmail] = useState("");
           </Button>
           <Button onClick={handleSendPressRelease} color="primary">
             Send
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Shared Item?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this shared item?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={confirmCancelOpen}>
+        <DialogTitle>Confirm Cancel</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to cancel? Unsaved changes will be saved as a
+            draft.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelConfirmed} color="primary">
+            Yes, Cancel
+          </Button>
+          <Button onClick={handleCancelRejected} color="primary" autoFocus>
+            No, Don't Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Shared Item?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this draft item?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
