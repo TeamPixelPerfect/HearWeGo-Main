@@ -1,7 +1,6 @@
 "use client";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { ADTabBox } from "@/app/styles/artistDashboard.styles";
-import { Drafts, Inventory } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -19,8 +18,10 @@ import React, { useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
 import Categories from "./Categories";
 import Promotions from "./Promotions";
-import Orders from "./Orders";
+import Orders from "./Orders/page";
 import Store from "./Store";
+import Drafts from "./Drafts";
+import Inventory from "./Inventory";
 
 const ArtistMerchandise = () => {
   const theme = useTheme();
@@ -38,7 +39,6 @@ const ArtistMerchandise = () => {
         sx={{
           width: "100%",
           minHeight: "100vh",
-          // background: theme.palette.background.default,
         }}
       >
         <Box
@@ -67,17 +67,18 @@ const ArtistMerchandise = () => {
               startIcon={<IoAddOutline />}
               sx={{ textTransform: "capitalize" }}
               onClick={() => {
-                router.push("/artist/merchandise/add");
+                router.push("/artist/merchandise/addStore");
               }}
             >
-              Creat New Store
+              Create New Store
             </Button>
+
             <Button
               variant="contained"
               startIcon={<IoAddOutline />}
               sx={{ textTransform: "capitalize" }}
               onClick={() => {
-                router.push("/artist/merchandise/add");
+                router.push("/artist/merchandise/addProduct");
               }}
             >
               Add New Product
