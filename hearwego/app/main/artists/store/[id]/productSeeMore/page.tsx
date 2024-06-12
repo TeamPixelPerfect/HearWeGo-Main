@@ -8,43 +8,34 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 import AppBar from "@mui/material/AppBar";
-import Avatar from "@mui/material/Avatar";
-import SwipeableBanner from "../../../../components/MerchandiseBanner";
-import ProductCard from "../../../../components/MerchandiseProduct";
-import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import CategoryComponent from "../../../../components/MerchandiseCategory";
-import Link from "next/link";
+import Grid from "@mui/material/Grid";
+import Avatar from "@mui/material/Avatar";
 import { useState } from "react";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import Link from "next/link";
+
+
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  InputBase,
+  Button,
+  TextField,
+} from "@mui/material";
+import { styled, alpha } from "@mui/material/styles";
+import ProductCard from "../../../../../components/MerchandiseProduct";
 
 import {
   Search,
   SearchIconWrapper,
   StyledInputBase,
   WhiteArea,
-} from "../../../../styles/ArtistStrore.styles";
-import { Category } from "@mui/icons-material";
+} from "../../../../../styles/ArtistStrore.styles";
 
-const banners = [
-  {
-    id: 1,
-    image: "https://blog.daraz.lk/wp-content/uploads/2022/11/Banner.jpg",
-    title: "Banner 1",
-  },
-  {
-    id: 2,
-    image:
-      "https://blog.daraz.lk/wp-content/uploads/2022/11/Amazing-Black-Friday-Deals-On-Fashion-Up-To-30-Off-Banner.jpg",
-    title: "Banner 2",
-  },
-  {
-    id: 3,
-    image:
-      "https://blog.daraz.lk/wp-content/uploads/2023/03/Avurudu-Wasi-English-Banner-02.jpg",
-    title: "Banner 3",
-  },
-];
+// Example products array
 
 export const products = [
   {
@@ -57,7 +48,7 @@ export const products = [
     image2:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
-    ratingCount: 10,
+    ratingCount: 20,
     category: "Clothing",
     subcategory: "Shirt",
     comments: [
@@ -66,6 +57,7 @@ export const products = [
         username: "JohnDoe",
         comment: "Great shirt, fits perfectly!",
         rating: 5,
+        ratingCount: 20,
       },
       {
         id: 2,
@@ -80,7 +72,6 @@ export const products = [
     name: "Printed Mug",
     description: "This is a sample product description.",
     price: 450.99,
-  
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
       image2:
@@ -106,15 +97,15 @@ export const products = [
   },
   {
     id: 3,
-    name: "CANON EOS R7",
+    name: "Canon EOS Rebel T7i DSLR Camera",
     description: "This is a sample product description.",
-    price: 2500,
+    price: 13325.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
-    ratingCount: 10,
+    ratingCount: 15,
     category: "Camera",
     subcategory: "Camera",
     comments: [
@@ -142,7 +133,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
-    ratingCount: 10,
+    ratingCount: 15,
     category: "Accessories",
     subcategory: "Wrist Bands",
     comments: [
@@ -170,7 +161,7 @@ export const products = [
       image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
-    ratingCount: 10,
+    ratingCount: 15,
     category: "Clothing",
     subcategory: "Cap",
     comments: [
@@ -199,6 +190,7 @@ export const products = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     ratingCount: 10,
+
     category: "Bag",
     subcategory: "Bag",
     comments: [
@@ -386,73 +378,66 @@ export const products = [
   },
 ];
 
-const categories = [
-  {
-    id: 1,
-    name: "Clothing",
-    image:
-      "https://hulaglobal.com/wp-content/uploads/2022/08/Hula-global-fashion-summer-guide.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 2,
-    name: "Accessories",
-    image:
-      "https://bournecrisp.com.au/wp-content/uploads/2019/07/accessories-make-or-break-1100x733.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 3,
-    name: "Footwear",
-    image:
-      "https://www.thespruce.com/thmb/JOkEQZjfndNozM9C5fOXxvhoyOU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/spr-tier-2-slippers-test-group-julia-fields-2-287418ff07c24849b0ef293adf4637f6.jpeg", // Provide the URL of the category image
-  },
-  {
-    id: 4,
-    name: "Home Accessories",
-    image:
-      "https://www.designersmk.com/wp-content/uploads/2023/08/home-accessories-1-1024x662.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 5,
-    name: "Instruments",
-    image:
-      "https://musiclessonsincorona.com/wp-content/uploads/2016/10/Most-Popular-Musical-Instruments-That-Students-Learn.jpeg", // Provide the URL of the category image
-  },
-  {
-    id: 6,
-    name: "Jewellery",
-    image: "https://static-01.daraz.lk/p/ba2ce801d17277faa688ff56b7c301dd.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 7,
-    name: "watches",
-    image:
-      "https://m.media-amazon.com/images/S/aplus-media-library-service-media/e0b884c3-c7a3-4253-93d0-25cb0373f424.__CR158,0,2425,1500_PT0_SX970_V1___.jpg", // Provide the URL of the category image
-  },
-];
-const ArtistStore = () => {
+export default function ArtistStoreProduct() {
   const router = useRouter();
-  // State to manage the search query
   const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("All");
+  const [subcategory, setSubcategory] = useState("All");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
-  // Function to handle changes in the search input
   const handleSearchInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSearchQuery(event.target.value);
   };
 
-  // Filter products based on the search query
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCategory(event.target.value);
+    setSubcategory("All");
+  };
 
-  //Filter categories based on the search query
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const handleSubcategoryChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSubcategory(event.target.value);
+  };
+  const handleMinPriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMinPrice(event.target.value);
+  };
+
+  const handleMaxPriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMaxPrice(event.target.value);
+  };
+  const categories = Array.from(
+    new Set(products.map((product) => product.category))
   );
+  const subcategories =
+    category === "All"
+      ? []
+      : Array.from(
+          new Set(
+            products
+              .filter((product) => product.category === category)
+              .map((product) => product.subcategory)
+          )
+        );
+
+  const filteredProducts = products.filter((product) => {
+    
+    
+    return (
+      (category === "All" || product.category === category) &&
+      (subcategory === "All" || product.subcategory === subcategory) &&
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (minPrice === "" || product.price >= parseFloat(minPrice)) &&
+      (maxPrice === "" || product.price <= parseFloat(maxPrice))
+    );
+  });
 
   return (
     <>
+      {/* Search bar */}
       {/* Search bar */}
       <AppBar position="static">
         <Toolbar>
@@ -484,8 +469,7 @@ const ArtistStore = () => {
               onChange={handleSearchInputChange}
             />
           </Search>
-         
-         {/* <Link href ="/main/user/cart"> */}
+
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -493,114 +477,161 @@ const ArtistStore = () => {
             onClick={() => {
               router.push("/main/user/cart");
             }}
-             >
+             
+          >
             <Badge badgeContent={4} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
-          {/* </Link> */}
         </Toolbar>
       </AppBar>
-
       <WhiteArea>
         <Box
           sx={{
-            width: "100%",
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            flexDirection: "row",
+            // backgroundColor: "green",
           }}
         >
+          {/* <Grid container spacing={3}>
+          <Grid item xs={12} md={3}> */}
+          <Box
+            sx={{
+              display: "flex",
+              width: "25%",
+              flexDirection: "row",
+
+              // backgroundColor: "red",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "30px",
+                width: "100%",
+                height: "auto",
+                padding: { xs: "10px" },
+                overflowY: "auto",
+                maxHeight: "800px",
+                gap: "20px",
+              }}
+            >
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{
+                  width: "100%",
+                }}
+              >
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={category}
+                  onChange={handleCategoryChange}
+                  label="Category"
+                >
+                  <MenuItem value="All">All</MenuItem>
+                  {categories.map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {cat}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {/* Subcategory filter */}
+              <FormControl variant="outlined" size="small">
+                <InputLabel>Subcategory</InputLabel>
+                <Select
+                  value={subcategory}
+                  onChange={handleSubcategoryChange}
+                  label="Subcategory"
+                >
+                  <MenuItem value="All">All</MenuItem>
+                  {subcategories.map((sub) => (
+                    <MenuItem key={sub} value={sub}>
+                      {sub}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '10px',
+                marginTop: '30px',
+                justifyContent: 'space-between'
+              
+              }}>
+              <TextField
+                label="Minimum Price"
+                type="number"
+                variant="outlined"
+                size="small"
+                value={minPrice}
+                onChange={handleMinPriceChange}
+              />
+              <TextField
+                label="Maximum Price"
+                type="number"
+                variant="outlined"
+                size="small"
+                value={maxPrice}
+                onChange={handleMaxPriceChange}
+              />
+              </Box>
+            </Box>
+          </Box>
           <Box
             sx={{
               width: "100%",
-              marginTop: "20px",
-              borderRadius: "10px",
+              // height: "800px",
+              // backgroundColor: "red",
+              margin: "30px",
+              border: "1px solid #E6ECF0",
             }}
           >
-            <SwipeableBanner banners={banners} />
+            <div
+              style={{
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  // justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "20px",
+                }}
+              >
+                <Link href="/main/artists/store/1">
+                  <Button>
+                    <ArrowBackIosIcon />
+                  </Button>
+                </Link>
+
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{ marginTop: "10px" }}
+                >
+                  Products
+                </Typography>
+              </div>
+
+              <Grid container spacing={4}>
+                {filteredProducts.map((product) => (
+                  <Grid item xs={5} sm={4} md={2} lg={3} key={product.id}>
+                    <ProductCard product={product} />
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
           </Box>
         </Box>
-
-        <div
-          style={{ padding: "20px", display: "flex", flexDirection: "column" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "20px",
-            }}
-          >
-            <Button
-              sx={{
-                fontSize: "20px",
-                fontWeight: "bold",
-                textTransform: "none",
-              }}
-            >
-              <Typography variant="h5" gutterBottom>
-                Products
-              </Typography>
-            </Button>
-
-            {/* <Link href="/main/artists/store/1/productSeeMore"> */}
-              <Button 
-              variant="contained" 
-              color="primary"
-              onClick={() => {
-                router.push("/main/artists/store/1/productSeeMore");
-              }}
-              >
-                See More
-              </Button>
-            {/* </Link> */}
-          </div>
-
-          <Grid container spacing={4}>
-            {filteredProducts.map((product) => (
-              <Grid item xs={5} sm={4} md={2} lg={2} key={product.id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
-        </div>
-
-        <div
-          style={{ padding: "20px", display: "flex", flexDirection: "column" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "20px",
-            }}
-          >
-            <Button
-              sx={{
-                fontSize: "20px",
-                fontWeight: "bold",
-                textTransform: "none",
-              }}
-            >
-              <Typography variant="h5" gutterBottom>
-                Category
-              </Typography>
-            </Button>
-          </div>
-
-          <Grid container spacing={2}>
-            {filteredCategories.map((category) => (
-              <Grid item xs={6} sm={8} md={8} lg={3} key={category.id}>
-                <CategoryComponent category={category} />
-              </Grid>
-            ))}
-          </Grid>
-        </div>
       </WhiteArea>
     </>
   );
-};
-export default ArtistStore;
+}
