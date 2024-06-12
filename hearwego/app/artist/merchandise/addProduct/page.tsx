@@ -9,11 +9,19 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import DropFile from "@/app/components/DropFile";
+import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Product title is required"),
@@ -36,10 +44,25 @@ const AddProduct = ({
 }: {
   handleAddProduct: (values: any) => void;
 }) => {
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [additionalImageFile, setAdditionalImageFile] = useState<File | null>(
-    null
+  const router = useRouter();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
   );
+
+  const handleClose = () => {
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmDialogOpen(false);
+  };
+
+  const handleCancel = () => {
+    router.push("/artist/merchandise");
+  };
 
   return (
     <Box
@@ -74,8 +97,12 @@ const AddProduct = ({
               }}
               validationSchema={validationSchema}
               onSubmit={(values, { setSubmitting }) => {
+                handleConfirmClose();
                 handleAddProduct(values);
                 setSubmitting(false);
+                setSnackbarMessage("Product added successfully!");
+                setSnackbarSeverity("success");
+                setSnackbarOpen(true);
               }}
             >
               {({
@@ -232,8 +259,17 @@ const AddProduct = ({
                         color="primary"
                         disabled={isSubmitting}
                         fullWidth
+                        sx={{ mb: 1 }}
                       >
                         Add Product
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleClose}
+                        fullWidth
+                      >
+                        Cancel
                       </Button>
                     </Grid>
                   </Grid>
@@ -243,6 +279,38 @@ const AddProduct = ({
           </CardContent>
         </Card>
       </Container>
+
+      {/* Confirmation Dialog for Cancel */}
+      <Dialog open={confirmDialogOpen} onClose={handleConfirmClose}>
+        <DialogTitle>Cancel Adding Product</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to cancel adding the product? Your changes
+            will not be saved.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="primary">
+            Yes, Cancel
+          </Button>
+          <Button onClick={handleConfirmClose} color="primary" autoFocus>
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
