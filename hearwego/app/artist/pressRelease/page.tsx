@@ -195,7 +195,7 @@ export default function PressRelease() {
                               color="primary"
                              
                               fullWidth
-                              sx={{ mt: 3 }}
+                             
                             >
                               Save Press Release
                             </Button>
