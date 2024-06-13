@@ -27,6 +27,24 @@ export const getEvents = async (
   }
 };
 
+export const getAllEvents = async (): Promise<Event[]> => {
+  const res = await fetch(`${base_url}/EventsManager/events`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const events = await res.json();
+    return events;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+
 export const addEvent = async (token: string, data: any) => {
   console.log("Sending event data:", data); 
   const res = await fetch(`${base_url}/EventsManager/events`, {

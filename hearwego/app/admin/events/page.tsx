@@ -19,7 +19,7 @@ import {
   duration,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { IoAddOutline, IoClose } from "react-icons/io5";
 import { IoIosPause, IoIosPlay, IoMdMore } from "react-icons/io";
 import { MdAlbum, MdDelete } from "react-icons/md";
@@ -42,6 +42,7 @@ import { useAppSelector } from "@/lib/hooks";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { getEvents } from "@/app/services/EventServices";
+import { getAllEvents } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
 
 function ActionsMenu({ id, handleView, handleEdit, handleDelete }) {
@@ -75,23 +76,97 @@ function ActionsMenu({ id, handleView, handleEdit, handleDelete }) {
   );
 }
 
+let i = 1;
+
 function EventDataGrid() {
-  
-  const eventData = [
+
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    getAllEvents().then((events) => {
+      console.log("Events......",events);
+      setEvents(events.data);
+    });
+    // console.log("Events......",events);
+  }
+  , []);
+
+  function createEventData(
+    event_id: string,
+    event_name: string,
+    event_type: string,
+    age_from: number,
+    age_to: number,
+    no_of_sessions: number,
+    sessions: any,
+    sponsor: any,
+    teams: any,
+    event_status: string,
+    event_created_by: string,
+    createdAt: string,
+    updatedAt: string
+  ){return { event_id, event_name, event_type, age_from, age_to, no_of_sessions, sessions, sponsor, teams, event_status, event_created_by, createdAt, updatedAt };}
+
+  const eventRows = events.map((event) => 
+    createEventData(
+      event.event_id,
+      event.event_name,
+      event.event_type,
+      event.age_from,
+      event.age_to,
+      event.no_of_sessions,
+      event.sessions,
+      event.sponsor,
+      event.teams,
+      event.event_status,
+      event.event_created_by,
+      event.createdAt,
+      event.updatedAt
+    )
+  );
+
+  const columns = [
+    { field: "event_id", headerName: "Event ID", flex: 1 },
+    { field: "event_name", headerName: "Event Name", flex: 2 },
+    { field: "event_type", headerName: "Event Type", flex: 1 },
+    { field: "age_from", headerName: "Age From", flex: 1 },
+    { field: "age_to", headerName: "Age To", flex: 1 },
+    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1 },
+    { field: "sessions", headerName: "Sessions", flex: 2 },
+    { field: "sponsor", headerName: "Sponsor", flex: 2 },
+    { field: "teams", headerName: "Teams", flex: 2 },
+    { field: "event_status", headerName: "Event Status", flex: 1 },
+    { field: "event_created_by", headerName: "Created By", flex: 1 },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
+    { field: "updatedAt", headerName: "Updated At", flex: 1 },
     {
-      event_id: '1',
-      event_name: 'Music Festival',
-      event_type: 'Concert',
-      age_from: 18,
-      age_to: 50,
-      no_of_sessions: 3,
-      event_status: 'Active',
-      event_created_by: 'Admin'
+      field: "action",
+      headerName: "Action",
+      flex: 2,
+      renderCell: (params) => (
+        <ButtonGroup>
+          <IconButton color="primary" sx={{ fontSize: "16px" }}>
+            <FaEdit />
+          </IconButton>
+          <IconButton
+            color="secondary"
+            sx={{ fontSize: "16px" }}
+            onClick={() => {
+              // router.push(`/admin/events/${params.row.event_id}`);
+            }}
+          >
+            <FaEye />
+          </IconButton>
+          <IconButton color="error" sx={{ fontSize: "16px" }}>
+            <MdDelete />
+          </IconButton>
+        </ButtonGroup>
+      ),
     },
-    // Add more event objects as needed
   ];
 
-  const [rows, setRows] = useState(eventData);
 
   const handleView = (id) => {
     // Logic to view an event
@@ -105,38 +180,14 @@ function EventDataGrid() {
 
   const handleDelete = (id) => {
     // Logic to delete an event
-    setRows((prevRows) => prevRows.filter((row) => row.event_id !== id));
+    setEvents((prevRows) => prevRows.filter((row) => row.event_id !== id));
     alert(`Delete event with ID: ${id}`);
   };
-
-  const columns = [
-    { field: 'event_id', headerName: 'ID', width: 50 },
-    { field: 'event_name', headerName: 'Name', width: 100 },
-    { field: 'event_type', headerName: 'Type', width: 100 },
-    { field: 'age_from', headerName: 'Age From', type: 'number', width: 50 },
-    { field: 'age_to', headerName: 'Age To', type: 'number', width: 50 },
-    { field: 'no_of_sessions', headerName: 'Sessions', type: 'number', width: 50 },
-    { field: 'event_status', headerName: 'Status', width: 90 },
-    { field: 'event_created_by', headerName: 'Created By', width: 90 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      renderCell: (params) => (
-        <ActionsMenu
-          id={params.id}
-          handleView={handleView}
-          handleEdit={handleEdit}
-          handleDelete={handleDelete}
-        />
-      ),
-    },
-  ];
 
   return (
     <div style={{ height: 600, width: '100%' }}>
       <DataGrid
-        rows={rows}
+        rows={eventRows}
         columns={columns}
         pageSize={10}
         rowsPerPageOptions={[10]}
