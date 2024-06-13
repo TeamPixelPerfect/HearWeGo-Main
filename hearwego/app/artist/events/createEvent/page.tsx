@@ -11,6 +11,12 @@ import Check from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import PublishIcon from "@mui/icons-material/Publish";
 import ErrorIcon from "@mui/icons-material/Error";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FormHelperText from "@mui/material/FormHelperText";
 import { DateField } from "@mui/x-date-pickers/DateField";
@@ -56,10 +62,20 @@ import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { Alert, CardActionArea, FilledInput, IconButton } from "@mui/material";
+import {
+  Alert,
+  CardActionArea,
+  Divider,
+  FilledInput,
+  IconButton,
+} from "@mui/material";
 import { countries } from "country-flag-icons";
 import { Event } from "@/app/constants/models";
 import { addEvent } from "@/app/services/EventServices";
+import { Ticket } from "@/app/constants/models";
+import { addTicket } from "@/app/services/EventServices";
+import { Budget } from "@/app/constants/models";
+import { addBudget } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
 import { getAllArtists } from "@/app/services/ArtistServices";
@@ -196,9 +212,15 @@ function CreateEvent() {
   const [sessionRows, setSessionRows] = useState([]);
   const [teamRows, setTeamRows] = useState([]);
   const [sponsorRows, setSponsorRows] = useState([]);
+  const [autoTicketRows, setAutoTicketRows] = useState([]);
+  const [manualTicketRows, setManualTicketRows] = useState([]);
+  const [budgetRows, setBudgetRows] = useState([]);
+  const [isAutoTicket, setIsAutoTicket] = useState(false);
+  const [isManualTicket, setIsManualTicket] = useState(false);
+  const [ticketImage, setTicketImage] = useState("");
+  const [eventImage, setEventImage] = useState("");
   const [eventData, setEventData] = useState<Event>({
-    event_img:
-      "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
+    event_img: "",
     event_name: "",
     event_type: "",
     age_from: 0,
@@ -210,14 +232,37 @@ function CreateEvent() {
     description: "",
     event_status: "private",
     event_created_by: artist ? artist.artist_id : "",
-    event_tickets: [],
-    event_budget: [],
+  });
+
+  const [ticketData, setTicketData] = useState<Ticket>({
+    ticket_catagory: "Not-Provided",
+    ticket_img: "",
+    auto_ticket_details: [],
+    manual_ticket_details: [],
+    ticket_description: "",
+    event_id: "",
+  });
+
+  const [budgetData, setBudgetData] = useState<Budget>({
+    budget_currency: "LKR",
+    budget_details: [],
+    event_id: "",
   });
 
   const [openErrorModal, setOpenErrorModal] = React.useState(false);
   const [errorMessages, setErrorMessages] = useState([""]);
   const handleOpenErrorModal = () => setOpenErrorModal(true);
   const handleCloseErrorModal = () => setOpenErrorModal(false);
+  const [skipped, setSkipped] = useState(new Set());
+
+  useEffect(() => {
+    if (isAutoTicket) {
+      setTicketData({ ...ticketData, ticket_catagory: "Auto" });
+    }
+    if (isManualTicket) {
+      setTicketData({ ...ticketData, ticket_catagory: "Manual" });
+    }
+  }, [isAutoTicket, isManualTicket]);
 
   useEffect(() => {
     if (artist) {
@@ -270,6 +315,46 @@ function CreateEvent() {
     });
   }, [sessionRows, sponsorRows, teamRows]);
 
+  useEffect(() => {
+    setTicketData({
+      ...ticketData,
+      auto_ticket_details: autoTicketRows.map(
+        ({ id, ticketType, ticketPrice, ticketCount, ticketSession }) => ({
+          ticket_currency: "LKR",
+          ticket_img:
+            ticketData.ticket_img === ""
+              ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg"
+              : ticketData.ticket_img,
+          ticket_type: ticketType,
+          auto_tickets_count: ticketCount,
+          ticket_price: ticketPrice,
+          ticket_count: ticketCount,
+          ticket_session: ticketSession,
+        })
+      ),
+      manual_ticket_details: manualTicketRows.map(
+        ({ id, ticketLocation, ticketSession }) => ({
+          ticket_location: ticketLocation,
+          ticket_session: ticketSession,
+        })
+      ),
+    });
+  }, [autoTicketRows, manualTicketRows]);
+
+  useEffect(() => {
+    setBudgetData({
+      ...budgetData,
+      budget_details: budgetRows.map(
+        ({ id, budgetTitle, budgetSession, budgetType, budgetAmount }) => ({
+          budget_title: budgetTitle,
+          budget_session: budgetSession,
+          budget_type: budgetType,
+          budget_amount: budgetAmount,
+        })
+      ),
+    });
+  }, [budgetRows]);
+
   const totalSteps = () => {
     return steps.length;
   };
@@ -286,7 +371,12 @@ function CreateEvent() {
     return completedSteps() === totalSteps();
   };
 
-  const handleNext = () => {
+  const handleNext = async (skipValidation = false) => {
+    if (!skipValidation) {
+      const isValid = await validateCurrentStep();
+      if (!isValid) return;
+    }
+
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
         ? steps.findIndex((step, i) => !(i in completed))
@@ -308,24 +398,50 @@ function CreateEvent() {
       const newCompleted = { ...completed };
       newCompleted[activeStep] = true;
       setCompleted(newCompleted);
+      setSkipped((prevSkipped) => {
+        const newSkipped = new Set(prevSkipped.values());
+        newSkipped.delete(activeStep);
+        return newSkipped;
+      });
       if (isLastStep()) {
+        await submitData();
       }
-      console.log(eventData);
-      console.log(sponsorRows);
-      await submitData();
       handleNext();
     }
   };
 
+  const handleSkip = () => {
+    const newCompleted = { ...completed };
+    newCompleted[activeStep] = true;
+    setCompleted(newCompleted);
+    setSkipped((prevSkipped) => {
+      const newSkipped = new Set(prevSkipped.values());
+      newSkipped.add(activeStep);
+      return newSkipped;
+    });
+
+    if (activeStep === 1) {
+      // If the user skips the second step, set ticket_catagory to "Not-Provided"
+      setTicketData((prevTicketData) => ({
+        ...prevTicketData,
+        ticket_catagory: "Not-Provided",
+      }));
+    }
+
+    handleNext(true); // Pass true to skip validation
+  };
+
   const validateCurrentStep = async () => {
+    if (skipped.has(activeStep)) {
+      return true;
+    }
+
     if (activeStep === 0) {
       return validateEventDetails();
     } else if (activeStep === 1) {
-      // Add validation for the second step
-      return true;
+      return validateTicketDetails();
     } else if (activeStep === 2) {
-      // Add validation for the third step
-      return true;
+      return validateBudgetDetails();
     } else if (activeStep === 3) {
       // Add validation for the fourth step
       return true;
@@ -363,16 +479,84 @@ function CreateEvent() {
       setErrorMessages(errors);
       handleOpenErrorModal();
     }
-    // Add validation logic here
-    // Update eventData state if necessary
-    // setEventNameError, setEventTypeError, etc. based on validation results
+    return isValid;
+  };
+
+  const validateTicketDetails = () => {
+    let isValid = true;
+
+    let errors = [];
+
+    if (autoTicketRows.length == 0 && manualTicketRows.length == 0) {
+      isValid = false;
+      errors.push("There is no ticket details provided.");
+    }
+
+    if (!isValid) {
+      setErrorMessages(errors);
+      handleOpenErrorModal();
+    }
+
+    return isValid;
+  };
+
+  const validateBudgetDetails = () => {
+    let isValid = true;
+
     return isValid;
   };
 
   const submitData = async () => {
     setLoading(true);
     try {
-      await addEvent(artist ? artist.token : "", eventData);
+      let updatedEventData = {
+        ...eventData,
+      };
+
+      if (eventData.event_img === "") {
+        updatedEventData = {
+          ...updatedEventData,
+          event_img:
+            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
+        };
+      }
+      const createdEvent = await addEvent(
+        artist ? artist.token : "",
+        updatedEventData
+      );
+      const eventId = createdEvent.event_id;
+
+      let updatedTicketData = {
+        ...ticketData,
+        event_id: eventId,
+      };
+
+      if (ticketData.ticket_catagory === "Manual") {
+        updatedTicketData = {
+          ...updatedTicketData,
+          auto_ticket_details: [],
+        };
+      } else if (ticketData.ticket_catagory === "Auto") {
+        updatedTicketData = {
+          ...updatedTicketData,
+          manual_ticket_details: [],
+        };
+      } else if (ticketData.ticket_catagory === "Not-Provided") {
+        updatedTicketData = {
+          ...updatedTicketData,
+          auto_ticket_details: [],
+          manual_ticket_details: [],
+        };
+      }
+
+      await addTicket(artist ? artist.token : "", updatedTicketData);
+
+      let updatedBudgetData = {
+        ...budgetData,
+        event_id: eventId,
+      };
+
+      await addBudget(artist ? artist.token : "", updatedBudgetData);
     } catch (error) {
       console.error("Error submitting event data:", error);
     } finally {
@@ -383,6 +567,7 @@ function CreateEvent() {
   const handleReset = () => {
     setActiveStep(0);
     setCompleted({});
+    setSkipped(new Set());
   };
 
   const [open, setOpen] = React.useState(false);
@@ -467,8 +652,24 @@ function CreateEvent() {
                   setTeamRows,
                   sponsorRows,
                   setSponsorRows,
+                  autoTicketRows,
+                  setAutoTicketRows,
+                  manualTicketRows,
+                  setManualTicketRows,
                   eventData,
-                  setEventData
+                  setEventData,
+                  ticketData,
+                  setTicketData,
+                  isAutoTicket,
+                  setIsAutoTicket,
+                  isManualTicket,
+                  setIsManualTicket,
+                  ticketImage,
+                  setTicketImage,
+                  eventImage,
+                  setEventImage,
+                  budgetRows,
+                  setBudgetRows
                 )}
               </div>
             </Typography>
@@ -482,6 +683,15 @@ function CreateEvent() {
                 Back
               </Button>
               <Box sx={{ flex: "1 1 auto" }} />
+              {activeStep < 3 && (
+                <Button
+                  onClick={handleSkip}
+                  sx={{ mr: 1 }}
+                  disabled={activeStep === 0}
+                >
+                  Skip
+                </Button>
+              )}
               <Button onClick={handleNext} sx={{ mr: 1 }}>
                 Next
               </Button>
@@ -563,9 +773,17 @@ function EventDetails({
   setSponsorRows,
   eventData,
   setEventData,
+  eventImage,
+  setEventImage,
 }) {
   const [isAgeEnabled, setIsAgeEnabled] = useState(false);
   const [imgFile, setImgFile] = React.useState(null);
+
+  // useEffect(() => {
+  //   if (eventImage) {
+  //     setEventImage(eventImage);
+  //   }
+  // }, [eventImage]);
 
   useEffect(() => {
     if (imgFile) {
@@ -760,9 +978,38 @@ function EventDetails({
   );
 }
 
-function TicketDetails() {
+function TicketDetails({
+  autoTicketRows,
+  setAutoTicketRows,
+  manualTicketRows,
+  setManualTicketRows,
+  ticketData,
+  setTicketData,
+  isAutoTicket,
+  setIsAutoTicket,
+  isManualTicket,
+  setIsManualTicket,
+  ticketImage,
+  setTicketImage,
+}) {
   const [isChecked, setIsChecked] = useState(true); // Assuming default is checked
   const [imgFile, setImgFile] = React.useState(null);
+
+  useEffect(() => {
+    if (imgFile) {
+      setTicketData({ ...ticketData, ticket_img: imgFile });
+    }
+  }, [imgFile]);
+
+  useEffect(() => {
+    if (isChecked) {
+      setIsAutoTicket(true);
+      setIsManualTicket(false);
+    } else {
+      setIsAutoTicket(false);
+      setIsManualTicket(true);
+    }
+  }, [isChecked]);
 
   const handleSwitchChange = (event) => {
     setIsChecked(event.target.checked);
@@ -784,7 +1031,7 @@ function TicketDetails() {
         elevation={3}
       >
         <Typography variant="h5" component="div" sx={{ marginBottom: "1em" }}>
-          Tickets Details
+          Ticket Details
         </Typography>
 
         <div>
@@ -794,31 +1041,100 @@ function TicketDetails() {
                 sx={{
                   width: "100%",
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   marginBottom: "1em",
                 }}
               >
-                <DropFile
-                  fileTypes="Ticket Cover Image"
-                  fileExtensions="JPEG,PNG,WEBP,SVG"
-                  isCircular={false}
-                  width="100%"
-                  height="250px"
-                  file={imgFile}
-                  setFile={setImgFile}
-                  aspectX={1}
-                  aspectY={1}
-                  shape="rect"
-                />
+                <Box sx={{ width: "30%" }}>
+                  <DropFile
+                    fileTypes="Ticket Cover Image"
+                    fileExtensions="JPEG,PNG,WEBP,SVG"
+                    isCircular={false}
+                    width="250px"
+                    height="250px"
+                    file={imgFile}
+                    setFile={setImgFile}
+                    aspectX={1}
+                    aspectY={1}
+                    shape="rect"
+                  />
+                </Box>
+
+                <Box sx={{ width: "70%" }}>
+                  <Autocomplete
+                    id="ticket-currency-select-demo"
+                    sx={{ width: 300, marginBottom: "1em" }}
+                    disabled
+                    options={eventCurrencies}
+                    defaultValue={{
+                      code: "LK",
+                      label: "Sri Lanka",
+                      currency: "Sri Lankan Rupee (LKR)",
+                    }}
+                    autoHighlight
+                    getOptionLabel={(option) => option.label}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                        {...props}
+                      >
+                        <img
+                          loading="lazy"
+                          width="20"
+                          srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                          src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                          alt=""
+                        />
+                        {option.label} ({option.code}) +{option.currency}
+                      </Box>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Choose a currency"
+                        variant="filled"
+                        inputProps={{
+                          ...params.inputProps,
+                          autoComplete: "new-password",
+                        }}
+                      />
+                    )}
+                  />
+                  <AutoTicketTable
+                    autoTicketRows={autoTicketRows}
+                    setAutoTicketRows={setAutoTicketRows}
+                  />
+                </Box>
               </Box>
-              <AutoTicketTable />
             </div>
           ) : (
             <div>
-              <ManualTicketTable />
+              <ManualTicketTable
+                manualTicketRows={manualTicketRows}
+                setManualTicketRows={setManualTicketRows}
+              />
             </div>
           )}
         </div>
+
+        <Box sx={{ width: "100%", marginBottom: "1em", marginTop: "1em" }}>
+          <TextField
+            id="ticket-des"
+            label="Description"
+            multiline
+            rows={4}
+            variant="filled"
+            sx={{ width: "100%" }}
+            value={ticketData.ticket_description}
+            onChange={(e) =>
+              setTicketData((data) => ({
+                ...data,
+                ticket_description: e.target.value,
+              }))
+            }
+          />
+        </Box>
       </Paper>
     </div>
   );
@@ -1914,15 +2230,62 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
   );
 }
 
-function BudgetDetails() {
+function BudgetDetails({ budgetRows, setBudgetRows }) {
+  const elementToFind = {
+    code: "LK",
+    label: "Sri Lanka",
+    currency: "Sri Lankan Rupee (LKR)",
+  };
+  const indexOfElement = eventCurrencies.findIndex(
+    (element) => element === elementToFind
+  );
   return (
     <div>
       <InputRow>
-        <BudgetCurrencySelect />
+        <Autocomplete
+          id="ticket-currency-select-demo"
+          sx={{ width: 300, marginBottom: "1em" }}
+          options={eventCurrencies}
+          defaultValue={{
+            code: "LK",
+            label: "Sri Lanka",
+            currency: "Sri Lankan Rupee (LKR)",
+          }}
+          disabled
+          autoHighlight
+          getOptionLabel={(option) => option.currency}
+          renderOption={(props, option) => (
+            <Box
+              component="li"
+              sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+              {...props}
+            >
+              <img
+                loading="lazy"
+                width="20"
+                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                alt=""
+              />
+              {option.label} ({option.code}) +{option.currency}
+            </Box>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Choose a currency"
+              variant="filled"
+              inputProps={{
+                ...params.inputProps,
+                autoComplete: "new-password",
+              }}
+            />
+          )}
+        />
       </InputRow>
 
       <InputRow>
-        <BudgetTable />
+        <BudgetTable budgetRows={budgetRows} setBudgetRows={setBudgetRows} />
       </InputRow>
     </div>
   );
@@ -1938,7 +2301,15 @@ const budgetColumns: GridColDef[] = [
 
 let budgetRows = [];
 
-function BudgetTable() {
+type BudgetRow = {
+  id: number;
+  budgetTitle: string;
+  budgetSession: string;
+  budgetType: string;
+  budgetAmount: string;
+};
+
+function BudgetTable({ budgetRows, setBudgetRows }) {
   const [budgetTitleError, setBudgetTitleError] = useState(false);
   const [budgetSessionError, setBudgetSessionError] = useState(false);
   const [budgetTypeError, setBudgetTypeError] = useState(false);
@@ -1955,25 +2326,34 @@ function BudgetTable() {
   const [budgetSession, setBudgetSession] = useState("");
   const [budgetType, setBudgetType] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
-
-  const handleBudgetTitleChange = (event) => {
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<BudgetRow | null>(
+    null
+  );
+  const handleBudgetTitleChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setBudgetTitle(event.target.value);
     setBudgetTitleError(event.target.value.trim() === "");
   };
 
-  const handleBudgetSessionChange = (event) => {
+  const handleBudgetSessionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setBudgetSession(event.target.value);
     setBudgetSessionError(event.target.value.trim() === "");
   };
 
-  const handleBudgetTypeChange = (event) => {
+  const handleBudgetTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setBudgetType(event.target.value);
     setBudgetTypeError(event.target.value.trim() === "");
   };
 
-  const handleBudgetAmountChange = (event) => {
+  const handleBudgetAmountChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setBudgetAmount(event.target.value);
     setBudgetAmountError(!validateEmail(event.target.value));
   };
@@ -1992,42 +2372,37 @@ function BudgetTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setBudgetTitleError(false);
       setBudgetSessionError(false);
       setBudgetTypeError(false);
       setBudgetAmountError(false);
 
-      // Get the selected row ID
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
-      // Find the index of the selected row in the sponsorRows array
       const rowIndex = budgetRows.findIndex((row) => row.id === selectedRowId);
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
-          budgetTitle: budgetTitle,
-          budgetSession: budgetSession,
-          budgetType: budgetType,
-          budgetAmount: budgetAmount,
+          budgetTitle,
+          budgetSession,
+          budgetType,
+          budgetAmount,
         };
 
-        // Replace the old row with the updated row
-        const updatedRows = [...budgetRows];
-        updatedRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...budgetRows.slice(0, rowIndex),
+          updatedRow,
+          ...budgetRows.slice(rowIndex + 1),
+        ];
 
-        // Update sponsorRows with the updated rows
-        budgetRows = updatedRows;
+        setBudgetRows(updatedRows);
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose();
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -2036,9 +2411,13 @@ function BudgetTable() {
     const updatedRows = budgetRows.filter(
       (row) => !selectedRows.includes(row.id)
     );
-    budgetRows = updatedRows;
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setBudgetRows(reindexedRows);
     setSelectedRows([]);
-    console.log("Rows", budgetRows);
     setBudgetTitleError(false);
     setBudgetSessionError(false);
     setBudgetTypeError(false);
@@ -2063,13 +2442,13 @@ function BudgetTable() {
     setBudgetSession("");
     setBudgetType("");
     setBudgetAmount("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null);
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
       const selectedRow = budgetRows.find((row) => row.id === selectedRowId);
       if (selectedRow) {
         setBudgetTitle(selectedRow.budgetTitle);
@@ -2087,28 +2466,24 @@ function BudgetTable() {
   const addNewBudget = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setBudgetTitleError(false);
       setBudgetSessionError(false);
       setBudgetTypeError(false);
       setBudgetAmountError(false);
 
       //----
-      const newId = budgetRows.length + 1;
-      const newBudget = {
+      const newId = budgetRows.length
+        ? Math.max(...budgetRows.map((row) => row.id)) + 1
+        : 1;
+      const newBudget: BudgetRow = {
         id: newId,
-        budgetTitle: budgetTitle,
-        budgetSession: budgetSession,
-        budgetType: budgetType,
-        budgetAmount: budgetAmount,
+        budgetTitle,
+        budgetSession,
+        budgetType,
+        budgetAmount,
       };
 
-      const handleButtonClick = selectedRowData ? updateRowData : addNewBudget;
-
-      const newBudgetRows = [...budgetRows, newBudget];
-
-      budgetRows = newBudgetRows;
-
+      setBudgetRows([...budgetRows, newBudget]);
       refreshTable();
       handleClose();
     } else {
@@ -2274,25 +2649,21 @@ function BudgetTable() {
   );
 }
 
-function TicketSwitchDisplay(switchStatus: number) {
-  const autoTicketForm = AutoTicketForm();
-  const manualTicketForm = ManualTicketForm();
-  if (switchStatus == 0) {
-    return <div>{autoTicketForm}</div>;
-  } else if (switchStatus == 1) {
-    return <div>{manualTicketForm}</div>;
-  }
-}
-
 const manulTicketColumns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
   { field: "ticketSession", headerName: "Session", width: 150 },
   { field: "ticketLocation", headerName: "Where to Buy Tickets", width: 150 },
 ];
 
-let manualTicketRows = [];
+type ManualTicketRow = {
+  id: number;
+  ticketSession: string;
+  ticketLocation: string;
+};
 
-function ManualTicketTable() {
+// let manualTicketRows = [];
+
+function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
   const [ticketLocationError, setTicketLocationError] = useState(false);
   const [ticketSessionError, setTicketSessionError] = useState(false);
 
@@ -2300,15 +2671,20 @@ function ManualTicketTable() {
 
   const [ticketSession, setTicketSession] = useState("");
   const [ticketLocation, setTicketLocation] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] =
+    useState<ManualTicketRow | null>(null);
 
-  const handleTicketLocationChange = (event) => {
+  const handleTicketLocationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTicketLocation(event.target.value);
     setTicketLocationError(event.target.value.trim() === "");
   };
 
-  const handleTicketSessionChange = (event) => {
+  const handleTicketSessionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTicketSession(event.target.value);
     setTicketSessionError(event.target.value.trim() === "");
   };
@@ -2322,40 +2698,35 @@ function ManualTicketTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setTicketLocationError(false);
       setTicketSessionError(false);
 
-      // Get the selected row ID
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
-      // Find the index of the selected row in the sponsorRows array
       const rowIndex = manualTicketRows.findIndex(
         (row) => row.id === selectedRowId
       );
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
-          ticketSession: ticketSession,
-          ticketLocation: ticketLocation,
+          ticketSession,
+          ticketLocation,
         };
 
-        // Replace the old row with the updated row
-        const updatedRows = [...manualTicketRows];
-        updatedRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...manualTicketRows.slice(0, rowIndex),
+          updatedRow,
+          ...manualTicketRows.slice(rowIndex + 1),
+        ];
 
-        // Update sponsorRows with the updated rows
-        manualTicketRows = updatedRows;
+        setManualTicketRows(updatedRows);
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose();
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -2364,7 +2735,13 @@ function ManualTicketTable() {
     const updatedRows = manualTicketRows.filter(
       (row) => !selectedRows.includes(row.id)
     );
-    manualTicketRows = updatedRows;
+
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setManualTicketRows(reindexedRows);
     setSelectedRows([]);
     setTicketLocationError(false);
     setTicketSessionError(false);
@@ -2384,13 +2761,13 @@ function ManualTicketTable() {
   const handleOpenForAdd = () => {
     setTicketLocation("");
     setTicketSession("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null);
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
       const selectedRow = manualTicketRows.find(
         (row) => row.id === selectedRowId
       );
@@ -2408,28 +2785,22 @@ function ManualTicketTable() {
   const addNewTicket = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setTicketLocationError(false);
       setTicketSessionError(false);
 
-      //----
-      const newId = manualTicketRows.length + 1;
+      const newId = manualTicketRows.length
+        ? Math.max(...manualTicketRows.map((row) => row.id)) + 1
+        : 1;
       const newTicket = {
         id: newId,
-        ticketLocation: ticketLocation,
-        ticketSession: ticketSession,
+        ticketLocation,
+        ticketSession,
       };
 
-      const handleButtonClick = selectedRowData ? updateRowData : addNewTicket;
-
-      const newTicketRows = [...manualTicketRows, newTicket];
-
-      manualTicketRows = newTicketRows;
-
+      setManualTicketRows([...manualTicketRows, newTicket]);
       refreshTable();
       handleClose();
     } else {
-      console.log("Please fill in all required fields with correct format.");
       setErrorMessage(
         "Please fill in all required fields with correct format."
       );
@@ -2576,7 +2947,7 @@ function ManualTicketForm() {
           marginBottom: "3em",
         }}
       >
-        <ManualTicketTable />
+        {/* <ManualTicketTable /> */}
       </Box>
 
       <Box
@@ -2613,52 +2984,66 @@ const autoTicketModalStyle = {
 };
 
 const autoTicketColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
+  { field: "id", headerName: "ID", width: 50 },
   { field: "ticketType", headerName: "Ticket Type", width: 150 },
-  { field: "ticketPrice", headerName: "Price", width: 150 },
-  { field: "ticketCount", headerName: "Count", width: 250 },
-  { field: "ticketSession", headerName: "Session", width: 250 },
+  { field: "ticketPrice", headerName: "Price", width: 80 },
+  { field: "ticketCount", headerName: "Count", width: 70 },
+  { field: "ticketSession", headerName: "Session", width: 150 },
 ];
 
 let autoTicketRows = [];
 
+type AutoTicketRow = {
+  id: number;
+  ticketType: string;
+  ticketPrice: string;
+  ticketCount: string;
+  ticketSession: string;
+};
+
 //new
-function AutoTicketTable() {
+function AutoTicketTable({ autoTicketRows, setAutoTicketRows }) {
   const [ticketTypeError, setTicketTypeError] = useState(false);
   const [ticketPriceError, setTicketPriceError] = useState(false);
   const [ticketCountError, setTicketCountError] = useState(false);
   const [ticketSessionError, setTicketSessionError] = useState(false);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const [errorMessage, setErrorMessage] = useState("");
-
   const [ticketType, setTicketType] = useState("");
   const [ticketPrice, setTicketPrice] = useState("");
   const [ticketCount, setTicketCount] = useState("");
   const [ticketSession, setTicketSession] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<AutoTicketRow | null>(
+    null
+  );
+  const [open, setOpen] = React.useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleTicketTypeChange = (event) => {
+  const handleTicketTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTicketType(event.target.value);
     setTicketTypeError(event.target.value.trim() === "");
   };
 
-  const handleTicketPriceChange = (event) => {
+  const handleTicketPriceChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTicketPrice(event.target.value);
     setTicketPriceError(event.target.value.trim() === "");
   };
 
-  const handleTicketCountChange = (event) => {
+  const handleTicketCountChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTicketCount(event.target.value);
     setTicketCountError(event.target.value.trim() === "");
   };
 
-  const handleTicketSessionChange = (event) => {
+  const handleTicketSessionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTicketSession(event.target.value);
     setTicketSessionError(event.target.value.trim() === "");
   };
@@ -2677,44 +3062,39 @@ function AutoTicketTable() {
   };
 
   const updateRowData = () => {
-    // Check if a row is selected for update
     if (selectedRows.length === 1 && validateFields()) {
       setTicketTypeError(false);
       setTicketPriceError(false);
       setTicketCountError(false);
       setTicketSessionError(false);
 
-      // Get the selected row ID
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
 
-      // Find the index of the selected row in the sponsorRows array
       const rowIndex = autoTicketRows.findIndex(
         (row) => row.id === selectedRowId
       );
 
       if (rowIndex !== -1) {
-        // Update the row data with user inputs
         const updatedRow = {
           id: selectedRowId,
-          ticketType: ticketType,
-          ticketPrice: ticketPrice,
-          ticketCount: ticketCount,
-          ticketSession: ticketSession,
+          ticketType,
+          ticketPrice,
+          ticketCount,
+          ticketSession,
         };
 
-        // Replace the old row with the updated row
-        const updatedRows = [...autoTicketRows];
-        updatedRows[rowIndex] = updatedRow;
+        const updatedRows = [
+          ...autoTicketRows.slice(0, rowIndex),
+          updatedRow,
+          ...autoTicketRows.slice(rowIndex + 1),
+        ];
 
-        // Update sponsorRows with the updated rows
-        autoTicketRows = updatedRows;
+        setAutoTicketRows(updatedRows);
 
-        // Refresh the table
         refreshTable();
-        handleClose(); // Close the modal or any other UI element used for input
+        handleClose();
       }
     } else {
-      // Inform the user to select a single row for update
       console.log("Please select a single row to update.");
     }
   };
@@ -2723,9 +3103,13 @@ function AutoTicketTable() {
     const updatedRows = autoTicketRows.filter(
       (row) => !selectedRows.includes(row.id)
     );
-    autoTicketRows = updatedRows;
+    const reindexedRows = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
+
+    setAutoTicketRows(reindexedRows);
     setSelectedRows([]);
-    console.log("Rows", autoTicketRows);
     setTicketTypeError(false);
     setTicketPriceError(false);
     setTicketCountError(false);
@@ -2734,7 +3118,6 @@ function AutoTicketTable() {
     refreshTable();
   };
 
-  const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setTicketTypeError(false);
@@ -2750,13 +3133,13 @@ function AutoTicketTable() {
     setTicketPrice("");
     setTicketCount("");
     setTicketSession("");
-    setSelectedRowData(null); // Clear selected row data
+    setSelectedRowData(null);
     setOpen(true);
   };
 
   const handleOpenForUpdate = () => {
     if (selectedRows.length === 1) {
-      const selectedRowId = selectedRows[0];
+      const selectedRowId = selectedRows[0] as number;
       const selectedRow = autoTicketRows.find(
         (row) => row.id === selectedRowId
       );
@@ -2776,38 +3159,31 @@ function AutoTicketTable() {
   const addNewTicket = () => {
     if (validateFields()) {
       setErrorMessage("");
-      // Reset error states
       setTicketTypeError(false);
       setTicketPriceError(false);
       setTicketCountError(false);
       setTicketSessionError(false);
 
-      //----
-      const newId = autoTicketRows.length + 1;
-      const newTicket = {
+      const newId = autoTicketRows.length
+        ? Math.max(...autoTicketRows.map((row) => row.id)) + 1
+        : 1;
+      const newTicket: AutoTicketRow = {
         id: newId,
         ticketType: ticketType,
-        ticketPrice: ticketPrice,
-        ticketCount: ticketCount,
-        ticketSession: ticketSession,
+        ticketPrice,
+        ticketCount,
+        ticketSession,
       };
 
-      const handleButtonClick = selectedRowData ? updateRowData : addNewTicket;
-
-      const newTicketRows = [...autoTicketRows, newTicket];
-
-      autoTicketRows = newTicketRows;
-
+      setAutoTicketRows([...autoTicketRows, newTicket]);
       refreshTable();
       handleClose();
     } else {
-      console.log("Please fill in all required fields with correct format.");
       setErrorMessage(
         "Please fill in all required fields with correct format."
       );
     }
   };
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -2956,135 +3332,6 @@ function AutoTicketTable() {
   );
 }
 
-function AutoTicketForm() {
-  const [imgFile, setImgFile] = React.useState(null);
-  return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "1em",
-        }}
-      >
-        <DropFile
-          fileTypes="Ticket Cover Image"
-          fileExtensions="JPEG,PNG,WEBP,SVG"
-          isCircular={false}
-          width="100%"
-          height="250px"
-          file={imgFile}
-          setFile={setImgFile}
-          aspectX={1}
-          aspectY={1}
-          shape="rect"
-        />
-      </Box>
-
-      <Box sx={{ width: "100%", marginBottom: "1em" }}>
-        <TicketCurrencySelect />
-      </Box>
-
-      <Box sx={{ width: "100%", marginBottom: "1em" }}>
-        <AutoTicketTable />
-      </Box>
-
-      <Box sx={{ width: "100%", marginBottom: "1em" }}>
-        <TextField
-          id="ticket-des"
-          label="Description"
-          multiline
-          rows={4}
-          variant="filled"
-          sx={{ width: "100%" }}
-        />
-      </Box>
-    </Paper>
-  );
-}
-
-function TicketCurrencySelect() {
-  return (
-    <Autocomplete
-      id="ticket-currency-select-demo"
-      sx={{ width: 300 }}
-      options={eventCurrencies}
-      autoHighlight
-      getOptionLabel={(option) => option.label}
-      renderOption={(props, option) => (
-        <Box
-          component="li"
-          sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-          {...props}
-        >
-          <img
-            loading="lazy"
-            width="20"
-            srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-            src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-            alt=""
-          />
-          {option.label} ({option.code}) +{option.phone}
-        </Box>
-      )}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Choose a currency"
-          variant="filled"
-          inputProps={{
-            ...params.inputProps,
-            autoComplete: "new-password", // disable autocomplete and autofill
-          }}
-        />
-      )}
-    />
-  );
-}
-
-function BudgetCurrencySelect() {
-  return (
-    <Autocomplete
-      id="budget-currency-select-demo"
-      sx={{ width: 300 }}
-      options={eventCurrencies}
-      autoHighlight
-      getOptionLabel={(option) => option.label}
-      renderOption={(props, option) => (
-        <Box
-          component="li"
-          sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-          {...props}
-        >
-          <img
-            loading="lazy"
-            width="20"
-            srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-            src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-            alt=""
-          />
-          {option.label} ({option.code}) +{option.phone}
-        </Box>
-      )}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Currency"
-          variant="filled"
-          inputProps={{
-            ...params.inputProps,
-            autoComplete: "new-password", // disable autocomplete and autofill
-          }}
-        />
-      )}
-    />
-  );
-}
-
 interface CountryCurrencyType {
   code: string;
   label: string;
@@ -3100,8 +3347,24 @@ function EventCreateShow(
   setTeamRows,
   sponsorRows,
   setSponsorRows,
+  autoTicketRows,
+  setAutoTicketRows,
+  manualTicketRows,
+  setManualTicketRows,
   eventData,
-  setEventData
+  setEventData,
+  ticketData,
+  setTicketData,
+  isAutoTicket,
+  setIsAutoTicket,
+  isManualTicket,
+  setIsManualTicket,
+  ticketImage,
+  setTicketImage,
+  eventImage,
+  setEventImage,
+  budgetRows,
+  setBudgetRows
 ) {
   if (n == 0) {
     return (
@@ -3114,213 +3377,391 @@ function EventCreateShow(
         setSponsorRows={setSponsorRows}
         eventData={eventData}
         setEventData={setEventData}
+        eventImage={eventImage}
+        setEventImage={setEventImage}
       />
     );
   } else if (n == 1) {
-    return <TicketDetails />;
+    return (
+      <TicketDetails
+        autoTicketRows={autoTicketRows}
+        setAutoTicketRows={setAutoTicketRows}
+        manualTicketRows={manualTicketRows}
+        setManualTicketRows={setManualTicketRows}
+        ticketData={ticketData}
+        setTicketData={setTicketData}
+        isAutoTicket={isAutoTicket}
+        setIsAutoTicket={setIsAutoTicket}
+        isManualTicket={isManualTicket}
+        setIsManualTicket={setIsManualTicket}
+        ticketImage={ticketImage}
+        setTicketImage={setTicketImage}
+      />
+    );
   } else if (n == 2) {
-    return <BudgetDetails />;
+    return (
+      <BudgetDetails budgetRows={budgetRows} setBudgetRows={setBudgetRows} />
+    );
   } else if (n == 3) {
-    return <EventFormFinish />;
+    return (
+      <EventFormFinish
+        eventData={eventData}
+        setEventData={setEventData}
+        sessionRows={sessionRows}
+        setSessionRows={setSessionRows}
+        sponsorRows={sponsorRows}
+        setSponsorRows={setSponsorRows}
+        teamRows={teamRows}
+        setTeamRows={setTeamRows}
+        ticketData={ticketData}
+        setTicketData={setTicketData}
+        autoTicketRows={autoTicketRows}
+        manualTicketRows={manualTicketRows}
+      />
+    );
   }
 }
 
-function EventFormFinish() {
+function EventFormFinish({
+  eventData,
+  setEventData,
+  sessionRows,
+  setSessionRows,
+  sponsorRows,
+  setSponsorRows,
+  teamRows,
+  setTeamRows,
+  ticketData,
+  setTicketData,
+  autoTicketRows,
+  manualTicketRows,
+}) {
+  function createSessionData(
+    sessionDate: string,
+    sessionTime: string,
+    duration: string,
+    venue: string,
+    artists: string
+  ) {
+    return { sessionDate, sessionTime, duration, venue, artists };
+  }
+
+  function createSponsorData(
+    sponsorType: string,
+    sponsorName: string,
+    sponsorContact: string,
+    sponsorEmail: string,
+  ) {
+    return { sponsorType, sponsorName, sponsorContact, sponsorEmail };
+  }
+
+  function createTeamData(
+    teamType: string,
+    teamName: string,
+    teamContact: string,
+    teamEmail: string,
+  ) {
+    return { teamType, teamName, teamContact, teamEmail };
+  }
+
+  function createAutoTicketData(
+    ticketType: string,
+    ticketPrice: string,
+    ticketCount: string,
+    ticketSession: string,
+  ) {
+    return { ticketType, ticketPrice, ticketCount, ticketSession };
+  }
+
+  const autoTickRows = autoTicketRows.map((ticket) =>
+    createAutoTicketData(
+      ticket.ticketType,
+      ticket.ticketPrice,
+      ticket.ticketCount,
+      ticket.ticketSession
+    )
+  );
+
+  const tRows = teamRows.map((team) =>
+    createTeamData(
+      team.teamType,
+      team.teamName,
+      team.teamContact,
+      team.teamEmail
+    )
+  );
+
+  const spRows = sponsorRows.map((sponsor) =>
+    createSponsorData(
+      sponsor.sponsorType,
+      sponsor.sponsorName,
+      sponsor.sponsorContact,
+      sponsor.sponsorEmail
+    )
+  );
+
+  const sessRows = sessionRows.map((session) =>
+    createSessionData(
+      session.sessionDate,
+      session.sessionTime,
+      session.duration,
+      session.venue,
+      session.artists
+    )
+  );
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box sx={{ width: "50%" }}>
-        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
-          <EventInfoCard />
-          <BudgetInfoCard />
-        </Stack>
-      </Box>
-      <Box sx={{ width: "50%" }}>
-        <SessionInfoCard />
-      </Box>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <Card sx={{ width: "100%", padding: 2, marginBottom: 2 }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Basic Event Details
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", display: "flex" }}>
+          <Box
+            sx={{
+              width: "50%",
+              padding: 2,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CardMedia
+              image={(eventData.event_img=="")? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg":eventData.event_img}
+              sx={{ width: 250, height: 250, borderRadius: 2 }}
+            />
+          </Box>
+          <Box
+            sx={{
+              width: "50%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">Event Name</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">
+                  {eventData.event_name}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">Event Type</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">
+                  {eventData.event_type}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">Age Limits</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">-</Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="h6">No. of Sessions</Typography>
+              </Box>
+              <Box sx={{ width: "50%" }}>
+                <Typography variant="subtitle1">0</Typography>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Event Sessions
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell align="right">Time</TableCell>
+                  <TableCell align="right">Duration</TableCell>
+                  <TableCell align="right">Venue</TableCell>
+                  <TableCell align="right">Artists</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sessRows.map((row) => (
+                  <TableRow
+                    key={row.sessionDate}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.sessionDate}
+                    </TableCell>
+                    <TableCell align="right">{row.sessionTime}</TableCell>
+                    <TableCell align="right">{row.duration}</TableCell>
+                    <TableCell align="right">{row.venue}</TableCell>
+                    <TableCell align="right">{row.artists}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          
+        </Box>
+
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Sponsors
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Name</TableCell>
+                  <TableCell align="right">Contact</TableCell>
+                  <TableCell align="right">E-mail</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {spRows.map((row) => (
+                  <TableRow
+                    key={row.sponsorType}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.sponsorType}
+                    </TableCell>
+                    <TableCell align="right">{row.sponsorName}</TableCell>
+                    <TableCell align="right">{row.sponsorContact}</TableCell>
+                    <TableCell align="right">{row.sponsorEmail}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Teams
+          </Typography>
+        </CardContent>
+        <Divider />
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Name</TableCell>
+                  <TableCell align="right">Contact</TableCell>
+                  <TableCell align="right">E-mail</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tRows.map((row) => (
+                  <TableRow
+                    key={row.teamType}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.teamType}
+                    </TableCell>
+                    <TableCell align="right">{row.teamName}</TableCell>
+                    <TableCell align="right">{row.teamContact}</TableCell>
+                    <TableCell align="right">{row.teamEmail}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Card>
+
+      <Card sx={{ width: "100%", padding: 2 }}>
+      <CardContent>
+          <Typography variant="h5" component="div">
+            Ticket Details
+          </Typography>
+        </CardContent>
+        <Divider />
+
+        <Box sx={{ width: "100%", padding: 2 }}>
+          {(ticketData.ticket_catagory == "Not Provided") ? (
+            <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
+          ) : (
+            (ticketData.ticket_catagory == "Auto") ? (
+              <TableContainer component={Paper}>
+              <Table
+                sx={{ minWidth: 650 }}
+                size="small"
+                aria-label="a dense table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell align="right">Price</TableCell>
+                    <TableCell align="right">Count</TableCell>
+                    <TableCell align="right">Session</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {autoTickRows.map((row) => (
+                    <TableRow
+                      key={row.ticketType}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.ticketType}
+                      </TableCell>
+                      <TableCell align="right">{row.ticketPrice}</TableCell>
+                      <TableCell align="right">{row.ticketCount}</TableCell>
+                      <TableCell align="right">{row.ticketSession}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            ) : (
+              <Box>
+                <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
+                <Typography variant="h6">Ticket Description: {ticketData.ticket_description}</Typography>
+              </Box>
+            )
+          )}
+          
+        </Box>
+      </Card>
     </Box>
-  );
-}
-
-function SessionInfoCard() {
-  return (
-    <Card sx={{ width: "100%" }}>
-      <CardActionArea>
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>Session 01</Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Date</Box>
-              <Box sx={{ width: "60%" }}>2024-02-19</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Time</Box>
-              <Box sx={{ width: "60%" }}>8.00 P.M.</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Duration</Box>
-              <Box sx={{ width: "60%" }}>3 Hours</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Venue</Box>
-              <Box sx={{ width: "60%" }}>Location</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="column"
-              spacing={1}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Other Artists</Box>
-            </Stack>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ width: "100%", marginBottom: "1em" }}
-            >
-              <Chip avatar={<Avatar>M</Avatar>} label="Avatar" />
-              <Chip
-                avatar={
-                  <Avatar alt="Natacha" src="https://shorturl.at/bhKS9" />
-                }
-                label="Avatar"
-                variant="outlined"
-              />
-            </Stack>
-
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="column"
-              spacing={1}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Ticket Details</Box>
-            </Stack>
-            <Box sx={{ marginBottom: "1em" }}>
-              <AutoTicketTable />
-            </Box>
-
-            <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Special Notice</Box>
-              <Box sx={{ width: "100%", textAlign: "justify" }}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima
-                itaque aliquid, maxime quia ab doloribus tenetur dolor,
-                similique molestiae modi nobis, porro eius vero animi ratione
-                odio laboriosam est asperiores!
-              </Box>
-            </Stack>
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-}
-
-function BudgetInfoCard() {
-  return (
-    <Card sx={{ width: "90%" }}>
-      <CardActionArea>
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>
-              Budget Details
-            </Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <BudgetTable />
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-}
-
-function EventInfoCard() {
-  return (
-    <Card sx={{ width: "90%" }}>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image="https://shorturl.at/kotTU"
-          alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            <Box sx={{ fontWeight: 700, marginBottom: "1em" }}>
-              Event Infomation
-            </Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Event Name</Box>
-              <Box sx={{ width: "60%" }}>Naadagama</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Event Type</Box>
-              <Box sx={{ width: "60%" }}>Modern</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Age Limit</Box>
-              <Box sx={{ width: "60%" }}>None</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>No. of Sessions</Box>
-              <Box sx={{ width: "60%" }}>1</Box>
-            </Stack>
-            <Stack
-              sx={{ width: "100%", marginBottom: "1em" }}
-              direction="row"
-              spacing={4}
-            >
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Sponsors</Box>
-              <Box sx={{ width: "60%" }}>Sponsor01, Sponsor02</Box>
-            </Stack>
-
-            <Stack sx={{ width: "100%" }} direction="column" spacing={1}>
-              <Box sx={{ fontWeight: 600, width: "40%" }}>Description</Box>
-              <Box sx={{ width: "100%", textAlign: "justify" }}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima
-                itaque aliquid, maxime quia ab doloribus tenetur dolor,
-                similique molestiae modi nobis, porro eius vero animi ratione
-                odio laboriosam est asperiores!
-              </Box>
-            </Stack>
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
   );
 }
 
@@ -3349,431 +3790,6 @@ const EventsDisplay = (
     </CardContent>
   </React.Fragment>
 );
-
-// const eventCountries: readonly CountryType[] = [
-//   { code: "AD", label: "Andorra", phone: "376" },
-//   {
-//     code: "AE",
-//     label: "United Arab Emirates",
-//     phone: "971",
-//   },
-//   { code: "AF", label: "Afghanistan", phone: "93" },
-//   {
-//     code: "AG",
-//     label: "Antigua and Barbuda",
-//     phone: "1-268",
-//   },
-//   { code: "AI", label: "Anguilla", phone: "1-264" },
-//   { code: "AL", label: "Albania", phone: "355" },
-//   { code: "AM", label: "Armenia", phone: "374" },
-//   { code: "AO", label: "Angola", phone: "244" },
-//   { code: "AQ", label: "Antarctica", phone: "672" },
-//   { code: "AR", label: "Argentina", phone: "54" },
-//   { code: "AS", label: "American Samoa", phone: "1-684" },
-//   { code: "AT", label: "Austria", phone: "43" },
-//   {
-//     code: "AU",
-//     label: "Australia",
-//     phone: "61",
-//     suggested: true,
-//   },
-//   { code: "AW", label: "Aruba", phone: "297" },
-//   { code: "AX", label: "Alland Islands", phone: "358" },
-//   { code: "AZ", label: "Azerbaijan", phone: "994" },
-//   {
-//     code: "BA",
-//     label: "Bosnia and Herzegovina",
-//     phone: "387",
-//   },
-//   { code: "BB", label: "Barbados", phone: "1-246" },
-//   { code: "BD", label: "Bangladesh", phone: "880" },
-//   { code: "BE", label: "Belgium", phone: "32" },
-//   { code: "BF", label: "Burkina Faso", phone: "226" },
-//   { code: "BG", label: "Bulgaria", phone: "359" },
-//   { code: "BH", label: "Bahrain", phone: "973" },
-//   { code: "BI", label: "Burundi", phone: "257" },
-//   { code: "BJ", label: "Benin", phone: "229" },
-//   { code: "BL", label: "Saint Barthelemy", phone: "590" },
-//   { code: "BM", label: "Bermuda", phone: "1-441" },
-//   { code: "BN", label: "Brunei Darussalam", phone: "673" },
-//   { code: "BO", label: "Bolivia", phone: "591" },
-//   { code: "BR", label: "Brazil", phone: "55" },
-//   { code: "BS", label: "Bahamas", phone: "1-242" },
-//   { code: "BT", label: "Bhutan", phone: "975" },
-//   { code: "BV", label: "Bouvet Island", phone: "47" },
-//   { code: "BW", label: "Botswana", phone: "267" },
-//   { code: "BY", label: "Belarus", phone: "375" },
-//   { code: "BZ", label: "Belize", phone: "501" },
-//   {
-//     code: "CA",
-//     label: "Canada",
-//     phone: "1",
-//     suggested: true,
-//   },
-//   {
-//     code: "CC",
-//     label: "Cocos (Keeling) Islands",
-//     phone: "61",
-//   },
-//   {
-//     code: "CD",
-//     label: "Congo, Democratic Republic of the",
-//     phone: "243",
-//   },
-//   {
-//     code: "CF",
-//     label: "Central African Republic",
-//     phone: "236",
-//   },
-//   {
-//     code: "CG",
-//     label: "Congo, Republic of the",
-//     phone: "242",
-//   },
-//   { code: "CH", label: "Switzerland", phone: "41" },
-//   { code: "CI", label: "Cote d'Ivoire", phone: "225" },
-//   { code: "CK", label: "Cook Islands", phone: "682" },
-//   { code: "CL", label: "Chile", phone: "56" },
-//   { code: "CM", label: "Cameroon", phone: "237" },
-//   { code: "CN", label: "China", phone: "86" },
-//   { code: "CO", label: "Colombia", phone: "57" },
-//   { code: "CR", label: "Costa Rica", phone: "506" },
-//   { code: "CU", label: "Cuba", phone: "53" },
-//   { code: "CV", label: "Cape Verde", phone: "238" },
-//   { code: "CW", label: "Curacao", phone: "599" },
-//   { code: "CX", label: "Christmas Island", phone: "61" },
-//   { code: "CY", label: "Cyprus", phone: "357" },
-//   { code: "CZ", label: "Czech Republic", phone: "420" },
-//   {
-//     code: "DE",
-//     label: "Germany",
-//     phone: "49",
-//     suggested: true,
-//   },
-//   { code: "DJ", label: "Djibouti", phone: "253" },
-//   { code: "DK", label: "Denmark", phone: "45" },
-//   { code: "DM", label: "Dominica", phone: "1-767" },
-//   {
-//     code: "DO",
-//     label: "Dominican Republic",
-//     phone: "1-809",
-//   },
-//   { code: "DZ", label: "Algeria", phone: "213" },
-//   { code: "EC", label: "Ecuador", phone: "593" },
-//   { code: "EE", label: "Estonia", phone: "372" },
-//   { code: "EG", label: "Egypt", phone: "20" },
-//   { code: "EH", label: "Western Sahara", phone: "212" },
-//   { code: "ER", label: "Eritrea", phone: "291" },
-//   { code: "ES", label: "Spain", phone: "34" },
-//   { code: "ET", label: "Ethiopia", phone: "251" },
-//   { code: "FI", label: "Finland", phone: "358" },
-//   { code: "FJ", label: "Fiji", phone: "679" },
-//   {
-//     code: "FK",
-//     label: "Falkland Islands (Malvinas)",
-//     phone: "500",
-//   },
-//   {
-//     code: "FM",
-//     label: "Micronesia, Federated States of",
-//     phone: "691",
-//   },
-//   { code: "FO", label: "Faroe Islands", phone: "298" },
-//   {
-//     code: "FR",
-//     label: "France",
-//     phone: "33",
-//     suggested: true,
-//   },
-//   { code: "GA", label: "Gabon", phone: "241" },
-//   { code: "GB", label: "United Kingdom", phone: "44" },
-//   { code: "GD", label: "Grenada", phone: "1-473" },
-//   { code: "GE", label: "Georgia", phone: "995" },
-//   { code: "GF", label: "French Guiana", phone: "594" },
-//   { code: "GG", label: "Guernsey", phone: "44" },
-//   { code: "GH", label: "Ghana", phone: "233" },
-//   { code: "GI", label: "Gibraltar", phone: "350" },
-//   { code: "GL", label: "Greenland", phone: "299" },
-//   { code: "GM", label: "Gambia", phone: "220" },
-//   { code: "GN", label: "Guinea", phone: "224" },
-//   { code: "GP", label: "Guadeloupe", phone: "590" },
-//   { code: "GQ", label: "Equatorial Guinea", phone: "240" },
-//   { code: "GR", label: "Greece", phone: "30" },
-//   {
-//     code: "GS",
-//     label: "South Georgia and the South Sandwich Islands",
-//     phone: "500",
-//   },
-//   { code: "GT", label: "Guatemala", phone: "502" },
-//   { code: "GU", label: "Guam", phone: "1-671" },
-//   { code: "GW", label: "Guinea-Bissau", phone: "245" },
-//   { code: "GY", label: "Guyana", phone: "592" },
-//   { code: "HK", label: "Hong Kong", phone: "852" },
-//   {
-//     code: "HM",
-//     label: "Heard Island and McDonald Islands",
-//     phone: "672",
-//   },
-//   { code: "HN", label: "Honduras", phone: "504" },
-//   { code: "HR", label: "Croatia", phone: "385" },
-//   { code: "HT", label: "Haiti", phone: "509" },
-//   { code: "HU", label: "Hungary", phone: "36" },
-//   { code: "ID", label: "Indonesia", phone: "62" },
-//   { code: "IE", label: "Ireland", phone: "353" },
-//   { code: "IL", label: "Israel", phone: "972" },
-//   { code: "IM", label: "Isle of Man", phone: "44" },
-//   { code: "IN", label: "India", phone: "91" },
-//   {
-//     code: "IO",
-//     label: "British Indian Ocean Territory",
-//     phone: "246",
-//   },
-//   { code: "IQ", label: "Iraq", phone: "964" },
-//   {
-//     code: "IR",
-//     label: "Iran, Islamic Republic of",
-//     phone: "98",
-//   },
-//   { code: "IS", label: "Iceland", phone: "354" },
-//   { code: "IT", label: "Italy", phone: "39" },
-//   { code: "JE", label: "Jersey", phone: "44" },
-//   { code: "JM", label: "Jamaica", phone: "1-876" },
-//   { code: "JO", label: "Jordan", phone: "962" },
-//   {
-//     code: "JP",
-//     label: "Japan",
-//     phone: "81",
-//     suggested: true,
-//   },
-//   { code: "KE", label: "Kenya", phone: "254" },
-//   { code: "KG", label: "Kyrgyzstan", phone: "996" },
-//   { code: "KH", label: "Cambodia", phone: "855" },
-//   { code: "KI", label: "Kiribati", phone: "686" },
-//   { code: "KM", label: "Comoros", phone: "269" },
-//   {
-//     code: "KN",
-//     label: "Saint Kitts and Nevis",
-//     phone: "1-869",
-//   },
-//   {
-//     code: "KP",
-//     label: "Korea, Democratic People's Republic of",
-//     phone: "850",
-//   },
-//   { code: "KR", label: "Korea, Republic of", phone: "82" },
-//   { code: "KW", label: "Kuwait", phone: "965" },
-//   { code: "KY", label: "Cayman Islands", phone: "1-345" },
-//   { code: "KZ", label: "Kazakhstan", phone: "7" },
-//   {
-//     code: "LA",
-//     label: "Lao People's Democratic Republic",
-//     phone: "856",
-//   },
-//   { code: "LB", label: "Lebanon", phone: "961" },
-//   { code: "LC", label: "Saint Lucia", phone: "1-758" },
-//   { code: "LI", label: "Liechtenstein", phone: "423" },
-//   { code: "LK", label: "Sri Lanka", phone: "94" },
-//   { code: "LR", label: "Liberia", phone: "231" },
-//   { code: "LS", label: "Lesotho", phone: "266" },
-//   { code: "LT", label: "Lithuania", phone: "370" },
-//   { code: "LU", label: "Luxembourg", phone: "352" },
-//   { code: "LV", label: "Latvia", phone: "371" },
-//   { code: "LY", label: "Libya", phone: "218" },
-//   { code: "MA", label: "Morocco", phone: "212" },
-//   { code: "MC", label: "Monaco", phone: "377" },
-//   {
-//     code: "MD",
-//     label: "Moldova, Republic of",
-//     phone: "373",
-//   },
-//   { code: "ME", label: "Montenegro", phone: "382" },
-//   {
-//     code: "MF",
-//     label: "Saint Martin (French part)",
-//     phone: "590",
-//   },
-//   { code: "MG", label: "Madagascar", phone: "261" },
-//   { code: "MH", label: "Marshall Islands", phone: "692" },
-//   {
-//     code: "MK",
-//     label: "Macedonia, the Former Yugoslav Republic of",
-//     phone: "389",
-//   },
-//   { code: "ML", label: "Mali", phone: "223" },
-//   { code: "MM", label: "Myanmar", phone: "95" },
-//   { code: "MN", label: "Mongolia", phone: "976" },
-//   { code: "MO", label: "Macao", phone: "853" },
-//   {
-//     code: "MP",
-//     label: "Northern Mariana Islands",
-//     phone: "1-670",
-//   },
-//   { code: "MQ", label: "Martinique", phone: "596" },
-//   { code: "MR", label: "Mauritania", phone: "222" },
-//   { code: "MS", label: "Montserrat", phone: "1-664" },
-//   { code: "MT", label: "Malta", phone: "356" },
-//   { code: "MU", label: "Mauritius", phone: "230" },
-//   { code: "MV", label: "Maldives", phone: "960" },
-//   { code: "MW", label: "Malawi", phone: "265" },
-//   { code: "MX", label: "Mexico", phone: "52" },
-//   { code: "MY", label: "Malaysia", phone: "60" },
-//   { code: "MZ", label: "Mozambique", phone: "258" },
-//   { code: "NA", label: "Namibia", phone: "264" },
-//   { code: "NC", label: "New Caledonia", phone: "687" },
-//   { code: "NE", label: "Niger", phone: "227" },
-//   { code: "NF", label: "Norfolk Island", phone: "672" },
-//   { code: "NG", label: "Nigeria", phone: "234" },
-//   { code: "NI", label: "Nicaragua", phone: "505" },
-//   { code: "NL", label: "Netherlands", phone: "31" },
-//   { code: "NO", label: "Norway", phone: "47" },
-//   { code: "NP", label: "Nepal", phone: "977" },
-//   { code: "NR", label: "Nauru", phone: "674" },
-//   { code: "NU", label: "Niue", phone: "683" },
-//   { code: "NZ", label: "New Zealand", phone: "64" },
-//   { code: "OM", label: "Oman", phone: "968" },
-//   { code: "PA", label: "Panama", phone: "507" },
-//   { code: "PE", label: "Peru", phone: "51" },
-//   { code: "PF", label: "French Polynesia", phone: "689" },
-//   { code: "PG", label: "Papua New Guinea", phone: "675" },
-//   { code: "PH", label: "Philippines", phone: "63" },
-//   { code: "PK", label: "Pakistan", phone: "92" },
-//   { code: "PL", label: "Poland", phone: "48" },
-//   {
-//     code: "PM",
-//     label: "Saint Pierre and Miquelon",
-//     phone: "508",
-//   },
-//   { code: "PN", label: "Pitcairn", phone: "870" },
-//   { code: "PR", label: "Puerto Rico", phone: "1" },
-//   {
-//     code: "PS",
-//     label: "Palestine, State of",
-//     phone: "970",
-//   },
-//   { code: "PT", label: "Portugal", phone: "351" },
-//   { code: "PW", label: "Palau", phone: "680" },
-//   { code: "PY", label: "Paraguay", phone: "595" },
-//   { code: "QA", label: "Qatar", phone: "974" },
-//   { code: "RE", label: "Reunion", phone: "262" },
-//   { code: "RO", label: "Romania", phone: "40" },
-//   { code: "RS", label: "Serbia", phone: "381" },
-//   { code: "RU", label: "Russian Federation", phone: "7" },
-//   { code: "RW", label: "Rwanda", phone: "250" },
-//   { code: "SA", label: "Saudi Arabia", phone: "966" },
-//   { code: "SB", label: "Solomon Islands", phone: "677" },
-//   { code: "SC", label: "Seychelles", phone: "248" },
-//   { code: "SD", label: "Sudan", phone: "249" },
-//   { code: "SE", label: "Sweden", phone: "46" },
-//   { code: "SG", label: "Singapore", phone: "65" },
-//   { code: "SH", label: "Saint Helena", phone: "290" },
-//   { code: "SI", label: "Slovenia", phone: "386" },
-//   {
-//     code: "SJ",
-//     label: "Svalbard and Jan Mayen",
-//     phone: "47",
-//   },
-//   { code: "SK", label: "Slovakia", phone: "421" },
-//   { code: "SL", label: "Sierra Leone", phone: "232" },
-//   { code: "SM", label: "San Marino", phone: "378" },
-//   { code: "SN", label: "Senegal", phone: "221" },
-//   { code: "SO", label: "Somalia", phone: "252" },
-//   { code: "SR", label: "Suriname", phone: "597" },
-//   { code: "SS", label: "South Sudan", phone: "211" },
-//   {
-//     code: "ST",
-//     label: "Sao Tome and Principe",
-//     phone: "239",
-//   },
-//   { code: "SV", label: "El Salvador", phone: "503" },
-//   {
-//     code: "SX",
-//     label: "Sint Maarten (Dutch part)",
-//     phone: "1-721",
-//   },
-//   {
-//     code: "SY",
-//     label: "Syrian Arab Republic",
-//     phone: "963",
-//   },
-//   { code: "SZ", label: "Swaziland", phone: "268" },
-//   {
-//     code: "TC",
-//     label: "Turks and Caicos Islands",
-//     phone: "1-649",
-//   },
-//   { code: "TD", label: "Chad", phone: "235" },
-//   {
-//     code: "TF",
-//     label: "French Southern Territories",
-//     phone: "262",
-//   },
-//   { code: "TG", label: "Togo", phone: "228" },
-//   { code: "TH", label: "Thailand", phone: "66" },
-//   { code: "TJ", label: "Tajikistan", phone: "992" },
-//   { code: "TK", label: "Tokelau", phone: "690" },
-//   { code: "TL", label: "Timor-Leste", phone: "670" },
-//   { code: "TM", label: "Turkmenistan", phone: "993" },
-//   { code: "TN", label: "Tunisia", phone: "216" },
-//   { code: "TO", label: "Tonga", phone: "676" },
-//   { code: "TR", label: "Turkey", phone: "90" },
-//   {
-//     code: "TT",
-//     label: "Trinidad and Tobago",
-//     phone: "1-868",
-//   },
-//   { code: "TV", label: "Tuvalu", phone: "688" },
-//   {
-//     code: "TW",
-//     label: "Taiwan",
-//     phone: "886",
-//   },
-//   {
-//     code: "TZ",
-//     label: "United Republic of Tanzania",
-//     phone: "255",
-//   },
-//   { code: "UA", label: "Ukraine", phone: "380" },
-//   { code: "UG", label: "Uganda", phone: "256" },
-//   {
-//     code: "US",
-//     label: "United States",
-//     phone: "1",
-//     suggested: true,
-//   },
-//   { code: "UY", label: "Uruguay", phone: "598" },
-//   { code: "UZ", label: "Uzbekistan", phone: "998" },
-//   {
-//     code: "VA",
-//     label: "Holy See (Vatican City State)",
-//     phone: "379",
-//   },
-//   {
-//     code: "VC",
-//     label: "Saint Vincent and the Grenadines",
-//     phone: "1-784",
-//   },
-//   { code: "VE", label: "Venezuela", phone: "58" },
-//   {
-//     code: "VG",
-//     label: "British Virgin Islands",
-//     phone: "1-284",
-//   },
-//   {
-//     code: "VI",
-//     label: "US Virgin Islands",
-//     phone: "1-340",
-//   },
-//   { code: "VN", label: "Vietnam", phone: "84" },
-//   { code: "VU", label: "Vanuatu", phone: "678" },
-//   { code: "WF", label: "Wallis and Futuna", phone: "681" },
-//   { code: "WS", label: "Samoa", phone: "685" },
-//   { code: "XK", label: "Kosovo", phone: "383" },
-//   { code: "YE", label: "Yemen", phone: "967" },
-//   { code: "YT", label: "Mayotte", phone: "262" },
-//   { code: "ZA", label: "South Africa", phone: "27" },
-//   { code: "ZM", label: "Zambia", phone: "260" },
-//   { code: "ZW", label: "Zimbabwe", phone: "263" },
-// ];
 
 const eventCurrencies: readonly CountryCurrencyType[] = [
   { code: "AD", label: "Andorra", currency: "Euro (EUR)" },
