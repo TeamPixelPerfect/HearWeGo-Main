@@ -133,11 +133,12 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       ) : (
         <>
           <DialogTitle>Create Campaign</DialogTitle>
-          <DialogContent sx={{ height: "calc(100vh - 250px)" }}>
+          <DialogContent
+            sx={{ height: "calc(100vh - 250px)", overflow: "auto" }}
+          >
             <Typography variant="h6">{campaignName}</Typography>
             <Tabs value={tabValue} onChange={handleTabChange}>
               <Tab label="Tasks" />
-              Hide the "Posts" tab
               <Tab label="Posts" />
             </Tabs>
             {tabValue === 0 && (
@@ -151,8 +152,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
                   Add New Task
                 </Button>
                 {tasks.map((task, index) => (
-                    
-                  <ListItem key={task.id} disableGutters>
+                  <ListItem key={task.id}>
                     <ListItemIcon>
                       <TaskIcon />
                     </ListItemIcon>
