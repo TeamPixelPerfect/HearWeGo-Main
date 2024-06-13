@@ -41,6 +41,8 @@ import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { getEvents } from "@/app/services/EventServices";
+import { Event } from "@/app/constants/models";
 
 function ActionsMenu({ id, handleView, handleEdit, handleDelete }) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -74,6 +76,7 @@ function ActionsMenu({ id, handleView, handleEdit, handleDelete }) {
 }
 
 function EventDataGrid() {
+  
   const eventData = [
     {
       event_id: '1',
