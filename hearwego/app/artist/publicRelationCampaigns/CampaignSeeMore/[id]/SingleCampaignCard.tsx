@@ -27,13 +27,7 @@ import {
   DialogContentText,
   Snackbar,
 } from "@mui/material";
-import {
-  CheckBox,
-  Delete,
-  Task as TaskIcon,
-  Edit,
-  Add,
-} from "@mui/icons-material";
+import { Task as TaskIcon, Edit, Add, Save, Delete } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -68,7 +62,6 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   const theme = useTheme();
   const router = useRouter();
   const [open, setOpen] = useState(false); // State to handle dialog open/close
-  const [confirmClose, setConfirmClose] = useState(false); // State for confirmation dialog
   const [activeTab, setActiveTab] = useState(0); // State to handle active tab
   const [tasks, setTasks] = useState<Task[]>(initialTasks); // State to handle tasks
   const [originalTasks, setOriginalTasks] = useState<Task[]>([]); // State to handle original tasks
@@ -88,17 +81,12 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   };
 
   const handleClose = () => {
-    setConfirmClose(true); // Open confirmation dialog
-  };
-
-  const handleConfirmClose = () => {
-    setTasks(originalTasks); // Revert to original tasks
-    setConfirmClose(false); // Close confirmation dialog
-    setOpen(false); // Close the main dialog
-  };
-
-  const handleCancelClose = () => {
-    setConfirmClose(false); // Close confirmation dialog
+    if (status === "completed") {
+      setOpen(false); // Close the main dialog directly for completed campaigns
+    } else {
+      setTasks(originalTasks); // Revert to original tasks
+      setOpen(false); // Close the main dialog
+    }
   };
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -135,6 +123,8 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   };
 
   const handleAddTask = (values: { newTaskName: string }) => {
+    if (status === "completed") return; // Disable adding new tasks if status is completed
+
     const newTask: Task = {
       id: tasks.length ? Math.max(...tasks.map((task) => task.id)) + 1 : 1,
       name: values.newTaskName,
@@ -147,8 +137,13 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   const calculateProgress = (tasksList = tasks) => {
     const totalTasks = tasksList.length;
     const completedTasks = tasksList.filter((task) => task.completed).length;
-    const progress = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
-    setCompletedProgress(progress); // Update progress
+    const progress =
+      totalTasks === 0 ? 0 : ((completedTasks / totalTasks) * 100).toFixed(2);
+    setCompletedProgress(Number(progress)); // Update progress
+
+    if (Number(progress) === 100) {
+      status = "completed"; // Change status to completed if progress is 100%
+    }
   };
 
   const handleDone = () => {
@@ -183,7 +178,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
         style={{
           display: "flex",
           flexDirection: "column",
-          height: "100%",
+          height: "450px", // Set fixed height
           boxShadow: "0 2px 4px rgba(0,0,0,0.5)",
           width: "100%",
         }}
@@ -193,6 +188,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           src={image}
           alt={title}
           style={{
+            height: "180px", // Set fixed height for the image
             width: "100%",
             objectFit: "cover",
             borderTopLeftRadius: theme.shape.borderRadius,
@@ -228,7 +224,11 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               {description}
             </Typography>
             <Box sx={{ width: "100%", mt: theme.spacing(2) }}>
-              <LinearProgress variant="determinate" value={completedProgress} />
+              <LinearProgress
+                variant="determinate"
+                value={completedProgress}
+                style={{ height: 10, borderRadius: 5 }}
+              />
               <Typography
                 variant="body2"
                 component="p"
@@ -253,10 +253,18 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
         </Box>
       </Card>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle>
+          <Typography variant="h4" component="div" align="center">
+            {title}
+          </Typography>
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ width: "100%", mb: theme.spacing(2) }}>
-            <LinearProgress variant="determinate" value={completedProgress} />
+            <LinearProgress
+              variant="determinate"
+              value={completedProgress}
+              style={{ height: 10, borderRadius: 5 }}
+            />
             <Typography
               variant="body2"
               component="p"
@@ -301,7 +309,6 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                           fullWidth
                           value={editedTaskName}
                           onChange={(e) => setEditedTaskName(e.target.value)}
-                          onBlur={handleSaveEditTask}
                           autoFocus
                         />
                       ) : (
@@ -309,63 +316,77 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                       )}
                     </Box>
                     <ListItemSecondaryAction>
+                      {status !== "completed" && (
+                        <>
+                          <IconButton
+                            edge="end"
+                            onClick={() =>
+                              editingTaskId === task.id
+                                ? handleSaveEditTask()
+                                : handleEditTask(task.id)
+                            }
+                          >
+                            {editingTaskId === task.id ? <Save /> : <Edit />}
+                          </IconButton>
+                          <IconButton
+                            edge="end"
+                            onClick={() => handleDeleteTask(task.id)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </>
+                      )}
                       <IconButton
                         edge="end"
-                        onClick={() => handleToggleTaskCompletion(task.id)}
+                        onClick={() =>
+                          status !== "completed" &&
+                          handleToggleTaskCompletion(task.id)
+                        }
+                        disabled={status === "completed"}
                       >
                         <Checkbox checked={task.completed} />
-                      </IconButton>
-                      <IconButton
-                        edge="end"
-                        onClick={() => handleEditTask(task.id)}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        edge="end"
-                        onClick={() => handleDeleteTask(task.id)}
-                      >
-                        <Delete />
                       </IconButton>
                     </ListItemSecondaryAction>
                   </ListItem>
                 ))}
               </List>
-              <Formik
-                initialValues={{ newTaskName: "" }}
-                validationSchema={validationSchema}
-                onSubmit={(values, { resetForm }) => {
-                  handleAddTask(values);
-                  resetForm();
-                }}
-              >
-                {({ errors, touched }) => (
-                  <Form>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        mt: theme.spacing(2),
-                        alignItems: "center",
-                      }}
-                    >
-                      <Field
-                        as={TextField}
-                        name="newTaskName"
-                        fullWidth
-                        variant="outlined"
-                        placeholder="New task name"
-                        error={
-                          touched.newTaskName && Boolean(errors.newTaskName)
-                        }
-                        helperText={touched.newTaskName && errors.newTaskName}
-                      />
-                      <IconButton color="primary" type="submit">
-                        <Add />
-                      </IconButton>
-                    </Box>
-                  </Form>
-                )}
-              </Formik>
+              {status !== "completed" && (
+                <Formik
+                  initialValues={{ newTaskName: "" }}
+                  validationSchema={validationSchema}
+                  onSubmit={(values, { resetForm }) => {
+                    handleAddTask(values);
+                    resetForm();
+                  }}
+                >
+                  {({ errors, touched }) => (
+                    <Form>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          mt: theme.spacing(2),
+                          alignItems: "center",
+                        }}
+                      >
+                        <Field
+                          as={TextField}
+                          name="newTaskName"
+                          variant="outlined"
+                          placeholder="New task name"
+                          error={
+                            touched.newTaskName && Boolean(errors.newTaskName)
+                          }
+                          helperText={touched.newTaskName && errors.newTaskName}
+                          sx={{ flex: 1, mr: theme.spacing(2) }}
+                        />
+                        <IconButton color="primary" type="submit">
+                          <Add />
+                        </IconButton>
+                      </Box>
+                    </Form>
+                  )}
+                </Formik>
+              )}
             </Box>
           )}
           {activeTab === 1 && (
@@ -378,28 +399,20 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDone} color="primary">
-            Done
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={confirmClose} onClose={handleCancelClose}>
-        <DialogTitle>Are you sure you want to close?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Any unsaved changes will be lost. Do you still want to close?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmClose} color="primary">
-            Confirm
-          </Button>
+          {status === "completed" ? (
+            <Button onClick={handleClose} color="primary">
+              Close
+            </Button>
+          ) : (
+            <>
+              <Button onClick={handleDone} color="primary">
+                Done
+              </Button>
+              <Button onClick={handleClose} color="primary">
+                Close
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
       <Snackbar
