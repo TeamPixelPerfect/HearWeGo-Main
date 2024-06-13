@@ -32,7 +32,7 @@ interface HelpTicket {
 
 const AdminHelpPage: React.FC = () => {
   const theme = useTheme();
-  
+
   const [tabValue, setTabValue] = useState<number>(-1);
   const [page, setPage] = useState<number>(1);
   const [helpTickets, setHelpTickets] = useState<HelpTicket[]>([
@@ -61,6 +61,68 @@ const AdminHelpPage: React.FC = () => {
       status: "solved",
       solution: "Payment issue resolved.",
     },
+
+    {
+      id: 4,
+      title: "Issue with merchandise purchase",
+      senderName: "Sender Name 4",
+      senderId: 104,
+      description: "Description of the issue...",
+      status: "to_solve",
+    },
+
+    {
+      id: 5,
+      title: "Issue with account login",
+      senderName: "Sender Name 5",
+      senderId: 105,
+      description: "Description of the issue...",
+      status: "in_progress",
+    },
+    {
+      id: 6,
+      title: "Issue with payment",
+      senderName: "Sender Name 6",
+      senderId: 106,
+      description: "Description of the issue...",
+      status: "solved",
+      solution: "Payment issue resolved.",
+    },
+    {
+      id: 7,
+      title: "Issue with merchandise purchase",
+      senderName: "Sender Name 7",
+      senderId: 107,
+      description: "Description of the issue...",
+      status: "to_solve",
+    },
+    {
+      id: 8,
+      title: "Issue with account login",
+      senderName: "Sender Name 8",
+      senderId: 108,
+      description: "Description of the issue...",
+      status: "in_progress",
+    },
+    {
+      id: 9,
+      title: "Issue with payment",
+      senderName: "Sender Name 9",
+      senderId: 109,
+      description: "Description of the issue...",
+      status: "solved",
+      solution: "Payment issue resolved.",
+    },
+    {
+      id: 10,
+      title: "Issue with merchandise purchase",
+      senderName: "Sender Name 10",
+      senderId: 110,
+      description: "Description of the issue...",
+      status: "to_solve",
+    },
+
+    
   ]);
 
   const [selectedTicket, setSelectedTicket] = useState<HelpTicket | null>(null);
@@ -243,9 +305,11 @@ const AdminHelpPage: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: "30px",
+             
+              
             }}
           >
-            <Typography variant="h4">Help Center</Typography>
+            <Typography variant="h4" sx={{fontWeight: "bold"}}>Help Center</Typography>
           </Box>
           <TabsContainer value={tabValue} onChange={handleChange}>
             <Tab label="All" value={-1} />
@@ -254,7 +318,9 @@ const AdminHelpPage: React.FC = () => {
             <Tab label="Solved" value={2} />
           </TabsContainer>
 
-          <DataGridContainer>
+          <DataGridContainer 
+          sx={{
+           height:"100%"}}>
             <DataGrid
               rows={
                 tabValue === -1
@@ -276,14 +342,14 @@ const AdminHelpPage: React.FC = () => {
             />
           </DataGridContainer>
 
-          <PaginationContainer>
+          {/* <PaginationContainer>
             <Pagination
               count={Math.ceil(helpTickets.length / 5)}
               page={page}
               onChange={handlePageChange}
               color="secondary"
             />
-          </PaginationContainer>
+          </PaginationContainer> */}
         </CardContainer>
 
         <Dialog open={solutionDialogOpen} onClose={handleCloseSolutionDialog}>
@@ -323,57 +389,57 @@ const AdminHelpPage: React.FC = () => {
 
                 {selectedTicket.status === "solved" && (
                   <>
-                    <LabelTypography>Solution:</Label>
-                    <Typography>
-{selectedTicket.solution}
-</Typography>
-</>
-)}
-</>
-)}
-</DialogContentStyled>
-<DialogActions>
-<Button onClick={handleCloseSolutionDialog}>Cancel</Button>
-{selectedTicket?.status === "to_solve" && (
-<Button
-             onClick={handleAddSolution}
-             variant="contained"
-             color="primary"
-           >
-Submit Solution
-</Button>
-)}
-</DialogActions>
-</Dialog>
-{selectedTicket &&
-      showDetails &&
-      selectedTicket.status !== "to_solve" && (
-        <CardContainer sx={{ marginTop: "16px" }}>
-          <Typography variant="h5">Ticket Details</Typography>
-          <Box sx={{ marginBottom: "8px" }}>
-            <Typography>ID: {selectedTicket.id}</Typography>
-            <Typography>Title: {selectedTicket.title}</Typography>
-            <Typography>
-              Sender Name: {selectedTicket.senderName}
-            </Typography>
-            <Typography>Sender ID: {selectedTicket.senderId}</Typography>
-            <Typography>
-              Description: {selectedTicket.description}
-            </Typography>
-          </Box>
-          {selectedTicket.status === "solved" && (
-            <Typography>Solution: {selectedTicket.solution}</Typography>
+                    <LabelTypography>Solution:</LabelTypography>
+
+                    {selectedTicket.solution}
+                  </>
+                )}
+              </>
+            )}
+          </DialogContentStyled>
+          <DialogActions>
+            <Button onClick={handleCloseSolutionDialog}>Cancel</Button>
+            {selectedTicket?.status === "to_solve" && (
+              <Button
+                onClick={handleAddSolution}
+                variant="contained"
+                color="primary"
+              >
+                Submit Solution
+              </Button>
+            )}
+          </DialogActions>
+        </Dialog>
+        {selectedTicket &&
+          showDetails &&
+          selectedTicket.status !== "to_solve" && (
+            <CardContainer sx={{ marginTop: "16px" }}>
+              <Typography variant="h5">Ticket Details</Typography>
+              <Box sx={{ marginBottom: "8px" }}>
+                <Typography>ID: {selectedTicket.id}</Typography>
+                <Typography>Title: {selectedTicket.title}</Typography>
+                <Typography>
+                  Sender Name: {selectedTicket.senderName}
+                </Typography>
+                <Typography>Sender ID: {selectedTicket.senderId}</Typography>
+                <Typography>
+                  Description: {selectedTicket.description}
+                </Typography>
+              </Box>
+              {selectedTicket.status === "solved" && (
+                <Typography>Solution: {selectedTicket.solution}</Typography>
+              )}
+              <Button
+                onClick={handleCloseDetails}
+                variant="contained"
+                color="primary"
+              >
+                Close
+              </Button>
+            </CardContainer>
           )}
-          <Button
-            onClick={handleCloseDetails}
-            variant="contained"
-            color="primary"
-          >
-            Close
-          </Button>
-        </CardContainer>
-      )}
-  </Grid>
-</Grid>
-);
+      </Grid>
+    </Grid>
+  );
 };
+export default AdminHelpPage;
