@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -20,13 +20,13 @@ import {
   IconButton,
   TextField,
   Paper,
-} from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios'; 
-import Card from '@mui/material/Card';
-import Grid from '@mui/material/Grid';
+} from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
 
 // Define the structure of a press release
 interface PressRelease {
@@ -47,7 +47,7 @@ interface PRPost {
   description: string;
   artist: string;
   date: string;
-  imge : string;
+  image: string;
 }
 
 // Define the functional component AdminNewsUpdatesPage
@@ -57,34 +57,257 @@ const AdminNewsUpdatesPage = () => {
   const [page, setPage] = useState(1);
   const [pressReleases, setPressReleases] = useState<PressRelease[]>([]);
   const [prPosts, setPRPosts] = useState<PRPost[]>([]);
-  const [filterBy, setFilterBy] = useState('');
-  const [filterKeyword, setFilterKeyword] = useState('');
-  const [selectedItem, setSelectedItem] = useState<PressRelease | PRPost | null>(null);
+  const [filterBy, setFilterBy] = useState("");
+  const [filterKeyword, setFilterKeyword] = useState("");
+  const [selectedItem, setSelectedItem] = useState<
+    PressRelease | PRPost | null
+  >(null);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [emailRecipient, setEmailRecipient] = useState('');
-  const [deleteReason, setDeleteReason] = useState('');
+  const [emailRecipient, setEmailRecipient] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Simulate fetching press releases and PR posts on component mount
   useEffect(() => {
     const fetchPressReleases = async () => {
       const pressReleasesData: PressRelease[] = [
-        { id: 1, title: 'Press Release 1', description: 'Description of Press Release 1', artist: 'Artist A', venue: 'Venue A', date: '2024-06-01', logoImage: 'https://example.com/logo1.jpg', signatureImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s' },
-        { id: 2, title: 'Press Release 2', description: 'Description of Press Release 2', artist: 'Artist B', venue: 'Venue B', date: '2024-06-05', logoImage: 'https://example.com/logo2.jpg', signatureImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s' },
-        // Add more press releases as needed
+        {
+          id: 1,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          venue: "Central Park, New York",
+          date: "2024-06-01",
+          logoImage:
+            "https://www.centralparknyc.org/assets/images/music-logo-01.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 2,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          venue: "Art Institute of Chicago",
+          date: "2024-06-05",
+          logoImage: "https://www.artic.edu/assets/images/modern-art-logo.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 3,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          venue: "Central Park, New York",
+          date: "2024-06-01",
+          logoImage:
+            "https://www.centralparknyc.org/assets/images/music-logo-01.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 4,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          venue: "Art Institute of Chicago",
+          date: "2024-06-05",
+          logoImage: "https://www.artic.edu/assets/images/modern-art-logo.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 5,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          venue: "Central Park, New York",
+          date: "2024-06-01",
+          logoImage:
+            "https://www.centralparknyc.org/assets/images/music-logo-01.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 6,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          venue: "Art Institute of Chicago",
+          date: "2024-06-05",
+          logoImage: "https://www.artic.edu/assets/images/modern-art-logo.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 7,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          venue: "Central Park, New York",
+          date: "2024-06-01",
+          logoImage:
+            "https://www.centralparknyc.org/assets/images/music-logo-01.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 8,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          venue: "Art Institute of Chicago",
+          date: "2024-06-05",
+          logoImage: "https://www.artic.edu/assets/images/modern-art-logo.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 9,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          venue: "Central Park, New York",
+          date: "2024-06-01",
+          logoImage:
+            "https://www.centralparknyc.org/assets/images/music-logo-01.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
+        {
+          id: 10,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          venue: "Art Institute of Chicago",
+          date: "2024-06-05",
+          logoImage: "https://www.artic.edu/assets/images/modern-art-logo.jpg",
+          signatureImage:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s",
+        },
       ];
+
       setPressReleases(pressReleasesData);
     };
 
     const fetchPRPosts = async () => {
       const prPostsData: PRPost[] = [
-        { id: 1, title: 'PR Post 1', description: 'Description of PR Post 1', artist: 'Artist X', date: '2024-06-01',image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s'},
-        { id: 2, title: 'PR Post 2', description: 'Description of PR Post 2', artist: 'Artist Y', date: '2024-06-05',image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN-f1Q28jlyhcYuu_zWJp6oI1Fdb5RzEBkrA&s'  },
-        // Add more PR posts as needed
+        {
+          id: 1,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          date: "2024-06-01",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 2,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          date: "2024-06-05",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 3,
+          title: "Jazz Night: An Evening with Miles Davis Tribute Band",
+          description:
+            "Join us for a spectacular evening of jazz music as the Miles Davis Tribute Band takes the stage to perform some of the greatest hits of the legendary musician.",
+          artist: "Miles Davis Tribute Band",
+          date: "2024-06-10",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 4,
+          title: "Theatre Performance: Shakespeare in the Park",
+          description:
+            "Experience the magic of Shakespeare's plays performed live in an open-air setting. This season features a production of 'A Midsummer Night's Dream' with a modern twist.",
+          artist: "Shakespeare Company",
+          date: "2024-06-15",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 5,
+          title: "Rock Concert: The Rolling Stones Live",
+          description:
+            "Don't miss the legendary Rolling Stones as they rock the stage with their classic hits and electrifying performances. This is a concert event you won't want to miss.",
+          artist: "The Rolling Stones",
+          date: "2024-06-20",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 6,
+          title: "Live Concert: Symphony Under the Stars",
+          description:
+            "Experience an enchanting evening of classical music under the night sky. Join the renowned City Philharmonic Orchestra as they perform timeless symphonies in a beautiful outdoor setting.",
+          artist: "City Philharmonic Orchestra",
+          date: "2024-06-01",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 7,
+          title: "Art Exhibition: Modern Expressions",
+          description:
+            "Discover the latest trends in contemporary art at the Modern Expressions exhibition. Featuring works from emerging artists around the globe, this event is a must-visit for art enthusiasts.",
+          artist: "Various Artists",
+          date: "2024-06-05",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 8,
+          title: "Jazz Night: An Evening with Miles Davis Tribute Band",
+          description:
+            "Join us for a spectacular evening of jazz music as the Miles Davis Tribute Band takes the stage to perform some of the greatest hits of the legendary musician.",
+          artist: "Miles Davis Tribute Band",
+          date: "2024-06-10",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 9,
+          title: "Theatre Performance: Shakespeare in the Park",
+          description:
+            "Experience the magic of Shakespeare's plays performed live in an open-air setting. This season features a production of 'A Midsummer Night's Dream' with a modern twist.",
+          artist: "Shakespeare Company",
+          date: "2024-06-15",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
+        {
+          id: 10,
+          title: "Rock Concert: The Rolling Stones Live",
+          description:
+            "Don't miss the legendary Rolling Stones as they rock the stage with their classic hits and electrifying performances. This is a concert event you won't want to miss.",
+          artist: "The Rolling Stones",
+          date: "2024-06-20",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZeOA_LwLBYvEeQAM_lb7oDrD5KWoWR-kvVg&s",
+        },
       ];
+
       setPRPosts(prPostsData);
     };
 
@@ -93,7 +316,10 @@ const AdminNewsUpdatesPage = () => {
   }, []);
 
   // Function to handle pagination change
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     setPage(value);
   };
 
@@ -105,7 +331,7 @@ const AdminNewsUpdatesPage = () => {
   // Function to handle filter change
   const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setFilterBy(event.target.value as string);
-    setFilterKeyword('');
+    setFilterKeyword("");
   };
 
   // Function to handle keyword change for filtering
@@ -134,13 +360,15 @@ const AdminNewsUpdatesPage = () => {
     try {
       // Simulate deletion (replace with actual API call)
       if (tabValue === 0) {
-        const updatedList = pressReleases.filter(pr => pr.id !== deletingItemId);
+        const updatedList = pressReleases.filter(
+          (pr) => pr.id !== deletingItemId
+        );
         setPressReleases(updatedList);
       } else if (tabValue === 1) {
-        const updatedList = prPosts.filter(pr => pr.id !== deletingItemId);
+        const updatedList = prPosts.filter((pr) => pr.id !== deletingItemId);
         setPRPosts(updatedList);
       }
-      
+
       handleSnackbarOpen(`Deleted ${selectedItem?.title}`);
 
       // Construct email data
@@ -151,28 +379,28 @@ const AdminNewsUpdatesPage = () => {
       };
 
       // Replace with your actual email API endpoint and authentication headers
-      const apiUrl = 'https://api.your-email-service.com/send';
+      const apiUrl = "https://api.your-email-service.com/send";
       const response = await axios.post(apiUrl, emailData, {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer YOUR_API_KEY', // Replace with your API key or authentication method
+          "Content-Type": "application/json",
+          Authorization: "Bearer YOUR_API_KEY", // Replace with your API key or authentication method
         },
       });
 
       // Check response status and handle accordingly (this is a basic example)
       if (response.status === 200) {
-        console.log('Email sent successfully:', response.data);
+        console.log("Email sent successfully:", response.data);
       } else {
-        console.error('Failed to send email:', response.data);
+        console.error("Failed to send email:", response.data);
       }
     } catch (error) {
-      console.error('Error deleting item:', error);
+      console.error("Error deleting item:", error);
     } finally {
       // Reset state after deletion
       setOpenDeleteDialog(false);
       setDeletingItemId(null);
-      setDeleteReason('');
-      setEmailRecipient('');
+      setDeleteReason("");
+      setEmailRecipient("");
     }
   };
 
@@ -185,8 +413,8 @@ const AdminNewsUpdatesPage = () => {
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
     setDeletingItemId(null);
-    setDeleteReason('');
-    setEmailRecipient('');
+    setDeleteReason("");
+    setEmailRecipient("");
   };
 
   // Function to handle closing snackbar
@@ -201,21 +429,23 @@ const AdminNewsUpdatesPage = () => {
   };
 
   // Filter press releases based on keyword
-  const filteredPressReleases = pressReleases.filter((release) =>
-    release.title.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-    release.artist.toLowerCase().includes(filterKeyword.toLowerCase())
+  const filteredPressReleases = pressReleases.filter(
+    (release) =>
+      release.title.toLowerCase().includes(filterKeyword.toLowerCase()) ||
+      release.artist.toLowerCase().includes(filterKeyword.toLowerCase())
   );
 
   // Filter PR posts based on keyword
-  const filteredPRPosts = prPosts.filter((post) =>
-    post.title.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-    post.artist.toLowerCase().includes(filterKeyword.toLowerCase())
+  const filteredPRPosts = prPosts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(filterKeyword.toLowerCase()) ||
+      post.artist.toLowerCase().includes(filterKeyword.toLowerCase())
   );
 
   // Styles for the letter content in the view details dialog
   const letterStyles = {
-    padding: '2em',
-    lineHeight: '1.6',
+    padding: "2em",
+    lineHeight: "1.6",
   };
 
   // Render JSX content
@@ -226,57 +456,90 @@ const AdminNewsUpdatesPage = () => {
           width: "100%",
           minHeight: "100vh",
           // background: theme.palette.background.default,
-        }}>
+        }}
+      >
         <Container>
           <Typography variant="h4" gutterBottom sx={{ margin: "30px" }}>
             News and Updates
           </Typography>
-          <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={2} marginBottom={2}>
-          <Tabs value={tabValue} onChange={handleChangeTab}>
-            <Tab label="Press Releases" />
-            <Tab label="PR Posts" />
-          </Tabs>
-          <Box display="flex" alignItems="center" >
-            <FormControl variant="outlined" sx={{ minWidth: 180 }}>
-              <InputLabel>Filter By</InputLabel>
-              <Select value={filterBy} onChange={handleFilterChange} label="Filter By">
-                <MenuItem value="">All</MenuItem>
-                <MenuItem value="title">Title</MenuItem>
-                <MenuItem value="artist">Artist</MenuItem>
-              </Select>
-            </FormControl>
-            {filterBy && (
-              <TextField
-                label="Keyword"
-                value={filterKeyword}
-                onChange={handleKeywordChange}
-                variant="outlined"
-                size="small"
-                sx={{ marginLeft: '1em' }}
-              />
-            )}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            marginTop={2}
+            marginBottom={2}
+          >
+            <Tabs value={tabValue} onChange={handleChangeTab}>
+              <Tab label="Press Releases" />
+              <Tab label="PR Posts" />
+            </Tabs>
+            <Box display="flex" alignItems="center">
+              <FormControl variant="outlined" sx={{ minWidth: 180 }}>
+                <InputLabel>Filter By</InputLabel>
+                <Select
+                  value={filterBy}
+                  onChange={handleFilterChange}
+                  label="Filter By"
+                >
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="title">Title</MenuItem>
+                  <MenuItem value="artist">Artist</MenuItem>
+                </Select>
+              </FormControl>
+              {filterBy && (
+                <TextField
+                  label="Keyword"
+                  value={filterKeyword}
+                  onChange={handleKeywordChange}
+                  variant="outlined"
+                  size="small"
+                  sx={{ marginLeft: "1em" }}
+                />
+              )}
+            </Box>
           </Box>
-          </Box>
-          <div style={{ width: '100%', marginBottom: '1em',padding:"20px" }}>
+          <div style={{ width: "100%", marginBottom: "1em", padding: "20px" }}>
             {tabValue === 0 && (
               <DataGrid
                 rows={filteredPressReleases}
                 columns={[
-                  { field: 'id', headerName: 'ID', width: 60, sortable: true},
-                  { field: 'title', headerName: 'Title', width: 150, sortable: true },
-                  { field: 'description', headerName: 'Description', width: 350 },
-                  { field: 'artist', headerName: 'Artist', width: 150 },
-                  { field: 'date', headerName: 'Date', width: 150, sortable: true },
+                  { field: "id", headerName: "ID", width: 60, sortable: true },
                   {
-                    field: 'actions',
-                    headerName: 'Actions',
+                    field: "title",
+                    headerName: "Title",
+                    width: 150,
+                    sortable: true,
+                  },
+                  {
+                    field: "description",
+                    headerName: "Description",
+                    width: 350,
+                  },
+                  { field: "artist", headerName: "Artist", width: 150 },
+                  {
+                    field: "date",
+                    headerName: "Date",
+                    width: 150,
+                    sortable: true,
+                  },
+                  {
+                    field: "actions",
+                    headerName: "Actions",
                     width: 300,
                     renderCell: (params) => (
                       <>
-                        <Button size="small" onClick={() => handleViewDetails(params.row)}>
+                        <Button
+                          size="small"
+                          onClick={() => handleViewDetails(params.row)}
+                        >
                           View
                         </Button>
-                        <Button size="small" onClick={() => handleDelete(params.row)} startIcon={<DeleteIcon />} sx={{ color: 'red' }}>
+                        <Button
+                          size="small"
+                          onClick={() => handleDelete(params.row)}
+                          startIcon={<DeleteIcon />}
+                          sx={{ color: "red" }}
+                        >
                           Delete
                         </Button>
                       </>
@@ -291,21 +554,43 @@ const AdminNewsUpdatesPage = () => {
               <DataGrid
                 rows={filteredPRPosts}
                 columns={[
-                  { field: 'id', headerName: 'ID', width: 60, sortable: true },
-                  { field: 'title', headerName: 'Title', width: 150, sortable: true },
-                  { field: 'description', headerName: 'Description', width: 350 },
-                  { field: 'artist', headerName: 'Artist', width: 150 },
-                  { field: 'date', headerName: 'Date', width: 150, sortable: true },
+                  { field: "id", headerName: "ID", width: 60, sortable: true },
                   {
-                    field: 'actions',
-                    headerName: 'Actions',
+                    field: "title",
+                    headerName: "Title",
+                    width: 150,
+                    sortable: true,
+                  },
+                  {
+                    field: "description",
+                    headerName: "Description",
+                    width: 350,
+                  },
+                  { field: "artist", headerName: "Artist", width: 150 },
+                  {
+                    field: "date",
+                    headerName: "Date",
+                    width: 150,
+                    sortable: true,
+                  },
+                  {
+                    field: "actions",
+                    headerName: "Actions",
                     width: 300,
                     renderCell: (params) => (
                       <>
-                        <Button size="small" onClick={() => handleViewDetails(params.row)}>
+                        <Button
+                          size="small"
+                          onClick={() => handleViewDetails(params.row)}
+                        >
                           View
                         </Button>
-                        <Button size="small" onClick={() => handleDelete(params.row)} startIcon={<DeleteIcon />} sx={{ color: 'red' }}>
+                        <Button
+                          size="small"
+                          onClick={() => handleDelete(params.row)}
+                          startIcon={<DeleteIcon />}
+                          sx={{ color: "red" }}
+                        >
                           Delete
                         </Button>
                       </>
@@ -317,59 +602,92 @@ const AdminNewsUpdatesPage = () => {
               />
             )}
           </div>
-          <Dialog open={openViewDialog} onClose={handleCloseViewDialog} fullWidth maxWidth="md">
+          <Dialog
+            open={openViewDialog}
+            onClose={handleCloseViewDialog}
+            fullWidth
+            maxWidth="md"
+          >
             <DialogTitle>
               {selectedItem?.title}
-              <IconButton aria-label="close" onClick={handleCloseViewDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
+              <IconButton
+                aria-label="close"
+                onClick={handleCloseViewDialog}
+                sx={{ position: "absolute", right: 8, top: 8 }}
+              >
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
             <DialogContent>
               <Paper elevation={3} sx={letterStyles}>
-
                 <Typography variant="h6" gutterBottom>
                   {selectedItem?.title}
                 </Typography>
                 {(selectedItem as PRPost)?.image && (
-                  <img src={(selectedItem as PRPost).image} alt="Artist's Signature" style={{ marginTop: '1em', maxWidth: '100%' }} />
-
+                  <img
+                    src={(selectedItem as PRPost).image}
+                    alt="Artist's Signature"
+                    style={{ marginTop: "1em", maxWidth: "100%" }}
+                  />
                 )}
                 {selectedItem?.date && (
-                  <Typography variant="caption" color="textSecondary" sx={{ display: "flex" }}>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    sx={{ display: "flex" }}
+                  >
                     Date: {selectedItem?.date}
                   </Typography>
                 )}
                 {selectedItem?.artist && (
-                  <Typography variant="caption" color="textSecondary" sx={{ display: "flex" }}>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    sx={{ display: "flex" }}
+                  >
                     Artist: {selectedItem?.artist}
                   </Typography>
                 )}
                 {selectedItem?.venue && (
-                  <Typography variant="caption" color="textSecondary" sx={{ display: "flex" }}>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    sx={{ display: "flex" }}
+                  >
                     Venue: {selectedItem?.venue}
                   </Typography>
                 )}
-                <Typography variant="body1" sx={{ marginTop: '1em' }}>
+                <Typography variant="body1" sx={{ marginTop: "1em" }}>
                   {selectedItem?.description}
                 </Typography>
                 {selectedItem?.signatureImage && (
-                  <img src={selectedItem?.signatureImage} alt="Artist's Signature" style={{ marginTop: '1em', maxWidth: '100%' }} />
+                  <img
+                    src={selectedItem?.signatureImage}
+                    alt="Artist's Signature"
+                    style={{ marginTop: "1em", maxWidth: "100%" }}
+                  />
                 )}
-              
               </Paper>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseViewDialog}>
-                Close
-              </Button>
+              <Button onClick={handleCloseViewDialog}>Close</Button>
             </DialogActions>
           </Dialog>
 
           {/* Delete Confirmation Dialog */}
-          <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog} fullWidth maxWidth="md">
+          <Dialog
+            open={openDeleteDialog}
+            onClose={handleCloseDeleteDialog}
+            fullWidth
+            maxWidth="md"
+          >
             <DialogTitle>
               Confirm Deletion
-              <IconButton aria-label="close" onClick={handleCloseDeleteDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
+              <IconButton
+                aria-label="close"
+                onClick={handleCloseDeleteDialog}
+                sx={{ position: "absolute", right: 8, top: 8 }}
+              >
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
@@ -378,12 +696,13 @@ const AdminNewsUpdatesPage = () => {
                 Are you sure you want to delete "{selectedItem?.title}"?
               </Typography>
               {selectedItem?.artist && (
-                <Typography variant="body1" sx={{ marginTop: '1em' }}>
-                
-                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ marginTop: "1em" }}
+                ></Typography>
               )}
-                <Typography variant="body1" sx={{ marginTop: '1em' }}>
-                 To:
+              <Typography variant="body1" sx={{ marginTop: "1em" }}>
+                To:
               </Typography>
               <TextField
                 margin="dense"
@@ -405,12 +724,8 @@ const AdminNewsUpdatesPage = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseDeleteDialog} sx={{color:"primary.main"}}>
-                Cancel
-              </Button>
-              <Button onClick={confirmDelete} >
-                Send & Delete
-              </Button>
+              <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+              <Button onClick={confirmDelete}>Send & Delete</Button>
             </DialogActions>
           </Dialog>
 
@@ -420,7 +735,7 @@ const AdminNewsUpdatesPage = () => {
             autoHideDuration={6000}
             onClose={handleSnackbarClose}
             message={snackbarMessage}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           />
 
           {/* Pagination component */}
@@ -434,4 +749,3 @@ const AdminNewsUpdatesPage = () => {
 };
 
 export default AdminNewsUpdatesPage;
-
