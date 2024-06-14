@@ -87,9 +87,11 @@ const OrderPage: React.FC = () => {
   };
 
   const images = [
+    
     "https://m.media-amazon.com/images/I/91IM87eeuCL._CLa%7C2140%2C2000%7C81am2B0c2BL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png",
     "https://m.media-amazon.com/images/I/A13usaonutL._CLa%7C2140%2C2000%7C71INiT3PTcL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png",
-    "https://ae01.alicdn.com/kf/Hc2ed792f16564287a61257e59e2ed3d52.jpg_640x640q90.jpg"
+    "https://ae01.alicdn.com/kf/Hc2ed792f16564287a61257e59e2ed3d52.jpg_640x640q90.jpg",
+    "https://cdn.vectorstock.com/i/1000v/06/31/special-summer-sale-banner-for-advertisement-vector-19600631.jpg",
   ];
 
   const handleNextImage = () => {
@@ -177,7 +179,7 @@ const OrderPage: React.FC = () => {
           </Box>
           <Card style={{ width: "30%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "10px" }}>
             <CardContent>
-              <Typography variant="h6">15% discount!</Typography>
+              <Typography variant="h6">50% Discount!</Typography>
               <Typography variant="body2">This is a card on the right side, spanning the height between the header and the footer.</Typography>
               <Box style={{ position: "relative"}}>
                 <img

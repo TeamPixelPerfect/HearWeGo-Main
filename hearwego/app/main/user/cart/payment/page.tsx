@@ -205,16 +205,18 @@ const App: React.FC = () => {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <img src="https://m.media-amazon.com/images/I/A13usaonutL._CLa%7C2140%2C2000%7C71INiT3PTcL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png" alt="Fullset Black Chair & Sofa" style={{ width: '50px', marginRight: '10px' }} />
                 <Typography>Black music T-shirt</Typography>
+                <Typography style={{marginLeft:"38px"}}>x1</Typography>
               </Box>
-              <Typography>x1</Typography>
+             
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <img src="https://m.media-amazon.com/images/I/91IM87eeuCL._CLa%7C2140%2C2000%7C81am2B0c2BL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png" alt="Orange Cool Chair" style={{ width: '50px', marginRight: '10px' }} />
                 <Typography>music Premium T-Shirt</Typography>
+                <Typography style={{marginLeft:'10px'}}>x1</Typography>
+                </Box>
               </Box>
-              <Typography>x1</Typography>
-            </Box>
+           
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
               <Typography variant="h6">Total:</Typography>
               <Typography variant="h6">$240</Typography>
