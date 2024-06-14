@@ -42,7 +42,7 @@ interface CampaignCardProps {
   title: string;
   image: string;
   description: string;
-  status: "in_progress" | "completed" | "drafts";
+  status: "in_progress" | "completed";
   tasks?: Task[]; // Optional tasks array
 }
 
@@ -163,9 +163,6 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
       break;
     case "completed":
       statusLabel = "Completed";
-      break;
-    case "drafts":
-      statusLabel = "Drafts";
       break;
     default:
       statusLabel = "";

@@ -11,9 +11,12 @@ import {
   Grid,
   useTheme,
   useMediaQuery,
+  Container,
 } from "@mui/material";
 import CampaignCard from "./CampaignSeeMore/[id]/SingleCampaignCard"; // Ensure this is correctly imported
 import CreateCampaignPop from "./CreateCampaign/page"; // Ensure this is correctly imported
+import CreatePost from "./SchedulePost/page";
+import ScheduledPostCard from "./scheduledPostView/[id]/page"; // Ensure this is correctly imported
 
 const campaigns = [
   {
@@ -29,6 +32,18 @@ const campaigns = [
       { id: 2, name: "Task 2", completed: true },
       { id: 3, name: "Task 3", completed: false },
     ],
+    scheduledPosts: [
+      {
+        id: 1,
+        description: "Post 1 description for Campaign 1",
+        assignedCampaign: "Campaign 1",
+        image:
+          "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixid=M3wxMjA3fDB8MXxzZWFyY2h8NHx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["Facebook", "Twitter"],
+        date: "2023-06-21",
+        time: "14:00",
+      },
+    ],
   },
   {
     id: 2,
@@ -42,6 +57,18 @@ const campaigns = [
       { id: 3, name: "Task A", completed: true },
       { id: 4, name: "Task B", completed: true },
       { id: 5, name: "Task C", completed: true },
+    ],
+    scheduledPosts: [
+      {
+        id: 2,
+        description: "Post 1 description for Completed Campaign 1",
+        assignedCampaign: "Completed Campaign 1",
+        image:
+          "https://images.unsplash.com/photo-1518673741114-0169f29d57e8?ixid=M3wxMjA3fDB8MXxzZWFyY2h8OXx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["Instagram", "LinkedIn"],
+        date: "2023-07-10",
+        time: "10:30",
+      },
     ],
   },
   {
@@ -57,6 +84,18 @@ const campaigns = [
       { id: 7, name: "Task 5", completed: false },
       { id: 8, name: "Task 6", completed: true },
     ],
+    scheduledPosts: [
+      {
+        id: 3,
+        description: "Post 1 description for Campaign 2",
+        assignedCampaign: "Campaign 2",
+        image:
+          "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixid=M3wxMjA3fDB8MXxzZWFyY2h8NHx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["Facebook", "Twitter"],
+        date: "2023-06-22",
+        time: "15:00",
+      },
+    ],
   },
   {
     id: 4,
@@ -70,6 +109,18 @@ const campaigns = [
       { id: 9, name: "Task D", completed: true },
       { id: 10, name: "Task E", completed: true },
       { id: 11, name: "Task F", completed: true },
+    ],
+    scheduledPosts: [
+      {
+        id: 4,
+        description: "Post 1 description for Completed Campaign 2",
+        assignedCampaign: "Completed Campaign 2",
+        image:
+          "https://images.unsplash.com/photo-1518673741114-0169f29d57e8?ixid=M3wxMjA3fDB8MXxzZWFyY2h8OXx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["LinkedIn", "Instagram"],
+        date: "2023-07-11",
+        time: "11:00",
+      },
     ],
   },
   {
@@ -85,6 +136,18 @@ const campaigns = [
       { id: 13, name: "Task 8", completed: false },
       { id: 14, name: "Task 9", completed: false },
     ],
+    scheduledPosts: [
+      {
+        id: 5,
+        description: "Post 1 description for Campaign 3",
+        assignedCampaign: "Campaign 3",
+        image:
+          "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixid=M3wxMjA3fDB8MXxzZWFyY2h8NHx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["Facebook", "Twitter"],
+        date: "2023-06-23",
+        time: "16:00",
+      },
+    ],
   },
   {
     id: 6,
@@ -98,6 +161,18 @@ const campaigns = [
       { id: 15, name: "Task G", completed: true },
       { id: 16, name: "Task H", completed: true },
       { id: 17, name: "Task I", completed: true },
+    ],
+    scheduledPosts: [
+      {
+        id: 6,
+        description: "Post 1 description for Completed Campaign 3",
+        assignedCampaign: "Completed Campaign 3",
+        image:
+          "https://images.unsplash.com/photo-1518673741114-0169f29d57e8?ixid=M3wxMjA3fDB8MXxzZWFyY2h8OXx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["LinkedIn", "Instagram"],
+        date: "2023-07-12",
+        time: "12:00",
+      },
     ],
   },
   {
@@ -113,6 +188,18 @@ const campaigns = [
       { id: 19, name: "Task 11", completed: true },
       { id: 20, name: "Task 12", completed: false },
     ],
+    scheduledPosts: [
+      {
+        id: 7,
+        description: "Post 1 description for Campaign 4",
+        assignedCampaign: "Campaign 4",
+        image:
+          "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixid=M3wxMjA3fDB8MXxzZWFyY2h8NHx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["Facebook", "Twitter"],
+        date: "2023-06-24",
+        time: "17:00",
+      },
+    ],
   },
   {
     id: 8,
@@ -127,13 +214,27 @@ const campaigns = [
       { id: 22, name: "Task K", completed: true },
       { id: 23, name: "Task L", completed: true },
     ],
+    scheduledPosts: [
+      {
+        id: 8,
+        description: "Post 1 description for Completed Campaign 4",
+        assignedCampaign: "Completed Campaign 4",
+        image:
+          "https://images.unsplash.com/photo-1518673741114-0169f29d57e8?ixid=M3wxMjA3fDB8MXxzZWFyY2h8OXx8bmF0dXJlfGVufDB8fHx8fDE3MTgyMDk1MTR8MA&ixlib=rb-4.0.3",
+        socialMedias: ["LinkedIn", "Instagram"],
+        date: "2023-07-13",
+        time: "13:00",
+      },
+    ],
   },
 ];
 
 const Dashboard = () => {
   const [value, setValue] = useState(0);
   const [error, setError] = useState<Error | null>(null);
-  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [openCreateCampaignDialog, setOpenCreateCampaignDialog] =
+    useState(false);
+  const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -147,9 +248,9 @@ const Dashboard = () => {
     );
 
     return (
-      <Grid container spacing={3} maxWidth={"xxl"}>
+      <Grid container spacing={3}>
         {filteredCampaigns.map((campaign) => (
-          <Grid item xs={12} sm={8} md={3} key={campaign.id}>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={campaign.id}>
             <CampaignCard
               title={campaign.title}
               image={campaign.image}
@@ -157,6 +258,29 @@ const Dashboard = () => {
               completedProgress={campaign.completedProgress}
               status={campaign.status}
               tasks={campaign.tasks}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  };
+
+  const ScheduledPostsTabPanel = () => {
+    const scheduledPosts = campaigns.flatMap(
+      (campaign) => campaign.scheduledPosts || []
+    );
+
+    return (
+      <Grid container spacing={3}>
+        {scheduledPosts.map((post) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={post.id}>
+            <ScheduledPostCard
+              description={post.description}
+              assignedCampaign={post.assignedCampaign}
+              image={post.image}
+              socialMedias={post.socialMedias}
+              date={post.date}
+              time={post.time}
             />
           </Grid>
         ))}
@@ -182,7 +306,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div>
+      <Container maxWidth="xxl">
         <AppBar
           position="static"
           sx={{ bgcolor: "transparent", boxShadow: "none" }}
@@ -196,7 +320,7 @@ const Dashboard = () => {
             >
               <Tab label="In Progress" />
               <Tab label="Completed" />
-              <Tab label="Drafts" />
+              
               <Tab label="Scheduled Posts" />
             </Tabs>
             <Box sx={{ flexGrow: 1 }} />
@@ -204,11 +328,16 @@ const Dashboard = () => {
               variant="contained"
               color="primary"
               sx={{ ml: 2 }}
-              onClick={() => setOpenCreateDialog(true)}
+              onClick={() => setOpenCreateCampaignDialog(true)}
             >
               Create New Campaign
             </Button>
-            <Button variant="contained" color="primary" sx={{ ml: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ ml: 2 }}
+              onClick={() => setOpenCreatePostDialog(true)}
+            >
               Schedule New Post
             </Button>
           </Toolbar>
@@ -227,18 +356,20 @@ const Dashboard = () => {
             <TabPanel value={value} index={1}>
               <CampaignTabPanel status="completed" />
             </TabPanel>
+
             <TabPanel value={value} index={2}>
-              <CampaignTabPanel status="drafts" />
-            </TabPanel>
-            <TabPanel value={value} index={3}>
-              <CampaignTabPanel status="scheduled" />
+              <ScheduledPostsTabPanel />
             </TabPanel>
           </>
         )}
-      </div>
+      </Container>
       <CreateCampaignPop
-        open={openCreateDialog}
-        onClose={() => setOpenCreateDialog(false)}
+        open={openCreateCampaignDialog}
+        onClose={() => setOpenCreateCampaignDialog(false)}
+      />
+      <CreatePost
+        open={openCreatePostDialog}
+        onClose={() => setOpenCreatePostDialog(false)}
       />
     </>
   );
