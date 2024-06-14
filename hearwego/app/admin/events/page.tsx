@@ -44,6 +44,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { getEvents } from "@/app/services/EventServices";
 import { getAllEvents } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
+import { render } from "react-dom";
 
 function ActionsMenu({ id, handleView, handleEdit, handleDelete }) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -95,6 +96,7 @@ function EventDataGrid() {
 
   function createEventData(
     event_id: string,
+    event_img: string,
     event_name: string,
     event_type: string,
     age_from: number,
@@ -107,11 +109,12 @@ function EventDataGrid() {
     event_created_by: string,
     createdAt: string,
     updatedAt: string
-  ){return { event_id, event_name, event_type, age_from, age_to, no_of_sessions, sessions, sponsor, teams, event_status, event_created_by, createdAt, updatedAt };}
+  ){return { event_id, event_img, event_name, event_type, age_from, age_to, no_of_sessions, sessions, sponsor, teams, event_status, event_created_by, createdAt, updatedAt };}
 
   const eventRows = events.map((event) => 
     createEventData(
       event.event_id,
+      event.event_img,
       event.event_name,
       event.event_type,
       event.age_from,
@@ -129,11 +132,12 @@ function EventDataGrid() {
 
   const columns = [
     { field: "event_id", headerName: "Event ID", flex: 1 },
+    { field: "event_img", headerName: "Event Image", flex: 1, renderCell: (params) => (<img src={params.row.event_img} style={{ width: 50, height: 50 }} />)},
     { field: "event_name", headerName: "Event Name", flex: 2 },
     { field: "event_type", headerName: "Event Type", flex: 1 },
     { field: "age_from", headerName: "Age From", flex: 1 },
     { field: "age_to", headerName: "Age To", flex: 1 },
-    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1 },
+    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1, renderCell: (params) => (<span>{params.row.sessions.length}</span>)},
     { field: "sessions", headerName: "Sessions", flex: 2 },
     { field: "sponsor", headerName: "Sponsor", flex: 2 },
     { field: "teams", headerName: "Teams", flex: 2 },
