@@ -23,19 +23,25 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 const helpImages = {
-  payment: "https://media.istockphoto.com/id/531236924/photo/group-of-credit-cards-on-computer-keyboard.jpg?s=612x612&w=0&k=20&c=5iAuEH7ipVgVDI9TkgzTC8Xx0roMhvDlT79UzRiSzcE=",
-  account: "https://img.freepik.com/free-photo/young-woman-using-her-smartphone-city_23-2149375672.jpg",
-  store: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuI7N2ljGnhukDu0xusc95j4nslYA3huWmag&s",
+  payment:
+    "https://media.istockphoto.com/id/531236924/photo/group-of-credit-cards-on-computer-keyboard.jpg?s=612x612&w=0&k=20&c=5iAuEH7ipVgVDI9TkgzTC8Xx0roMhvDlT79UzRiSzcE=",
+  account:
+    "https://img.freepik.com/free-photo/young-woman-using-her-smartphone-city_23-2149375672.jpg",
+  store:
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuI7N2ljGnhukDu0xusc95j4nslYA3huWmag&s",
   club: "https://cdn.create.vista.com/api/media/small/443584156/stock-photo-silhouette-girl-raised-hands-enjoys-concert-music-show",
-  safetyAndPrivacy: "https://thumbs.dreamstime.com/b/data-protection-privacy-concept-gdpr-eu-cyber-security-network-business-man-protecting-his-personal-information-padlock-icon-117352204.jpg",
-  others: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScyOttwB3rOLrr6go7UFpPQidRL1vDvA_IZg&s",
+  safetyAndPrivacy:
+    "https://thumbs.dreamstime.com/b/data-protection-privacy-concept-gdpr-eu-cyber-security-network-business-man-protecting-his-personal-information-padlock-icon-117352204.jpg",
+  others:
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScyOttwB3rOLrr6go7UFpPQidRL1vDvA_IZg&s",
 };
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
-  email: Yup.string().email("Invalid email format").required("Email is required"),
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
   issue: Yup.string().required("Issue description is required"),
 });
-
 
 const helpSections = {
   payment: [
@@ -227,11 +233,11 @@ const Help: React.FC = () => {
     issue: "",
   });
   const [formModalOpen, setFormModalOpen] = useState<boolean>(false);
-  const [submissionModalOpen, setSubmissionModalOpen] = useState<boolean>(
-    false
-  );
+  const [submissionModalOpen, setSubmissionModalOpen] =
+    useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false); // Added for form submission loading indicator
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
 
   const handleSectionClick = (section: string) => {
     setSelectedSection(section);
@@ -242,22 +248,29 @@ const Help: React.FC = () => {
   const handleOpenFormModal = () => {
     setFormModalOpen(true);
     setSubmissionModalOpen(false);
+    setIsSubmitted(false);
   };
 
   const handleCloseFormModal = () => {
     setFormModalOpen(false);
-    setFormData({ name: "", email: "", issue: "" }); // Reset form data
+    formik.resetForm(); // Reset formik form state
+    setIsSubmitted(false); // Reset submission confirmation state
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true); // Start loading indicator
-    // Simulate form submission logic (replace with actual submission logic)
+  const handleSubmit = (values: {
+    name: string;
+    email: string;
+    issue: string;
+  }) => {
+    setLoading(true);
     setTimeout(() => {
-      setLoading(false); // Stop loading indicator
-      setFormModalOpen(false); // Close form modal
-      setSubmissionModalOpen(true); // Open submission confirmation modal
-    }, 1000); // Simulated delay of 1 second
+      setLoading(false);
+      setFormModalOpen(false);
+      setIsSubmitted(true); // Set submission confirmation state to true
+      setTimeout(() => {
+        setIsSubmitted(false); // Hide submission confirmation after some time (optional)
+      }, 3000); // Example: Hide after 3 seconds
+    }, 1000);
   };
 
   const handleCloseSubmissionModal = () => {
@@ -276,339 +289,384 @@ const Help: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredSections = Object.keys(helpSections).filter(section =>
+  const filteredSections = Object.keys(helpSections).filter((section) =>
     section.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  );
 
-    const formik = useFormik({
-      initialValues: {
-        name: "",
-        email: "",
-        issue: "",
-      },
-      validationSchema: validationSchema,
-      onSubmit: handleSubmit,
-    });
-    
-    return (
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      issue: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: handleSubmit,
+  });
+
+  return (
     <Grid container spacing={2}>
-    <Grid item xs={12}>
-    <Container>
-    <Box
-             display="flex"
-             justifyContent="center"
-             alignItems="center"
-             flexDirection="column"
-             mb={3}
-           >
-    <Box sx={{ height: "50%", marginTop: "5%" }}>
-    <Typography variant="subtitle1" component="div">
-    HearWeGo
-    </Typography>
-    <Typography
-            variant="h2"
-            component="div"
-            align="center"
-            fontWeight="bold"
-            style={{ flexGrow: 1 }}
+      <Grid item xs={12}>
+        <Container>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column"
+            mb={3}
           >
-            How can we help you?
-          </Typography>
-        </Box>
-      </Box>
+            <Box sx={{ height: "50%", marginTop: "5%" }}>
+              <Typography variant="subtitle1" component="div">
+                HearWeGo
+              </Typography>
+              <Typography
+                variant="h2"
+                component="div"
+                align="center"
+                fontWeight="bold"
+                style={{ flexGrow: 1 }}
+              >
+                How can we help you?
+              </Typography>
+            </Box>
+          </Box>
 
-      <Box
-        mb={3}
-        sx={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "60%",
-            borderRadius: "4px",
-          }}
-        >
-          <TextField
-            variant="outlined"
-            placeholder="Search for help..."
-            fullWidth
-            margin="normal"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon style={{ color: "gray" }} />
-                </InputAdornment>
-              ),
+          <Box
+            mb={3}
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
-        </Box>
-      </Box>
-
-      <Grid container spacing={3}>
-        {filteredSections.map((section) => (
-          <Grid item xs={12} sm={6} md={4} key={section}>
-            <Card
-              onClick={() => handleSectionClick(section)}
-              style={{
-                cursor: "pointer",
-                minHeight: "150px",
-                position: "relative",
-                borderRadius: "10px", // Ensure relative positioning for overlay
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "60%",
+                borderRadius: "4px",
               }}
             >
-              <CardMedia
-                component="img"
-                height="140"
-                image={helpImages[section]}
-                alt={section}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  filter: "brightness(0.4)",
+              <TextField
+                variant="outlined"
+                placeholder="Search for help..."
+                fullWidth
+                margin="normal"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon style={{ color: "gray" }} />
+                    </InputAdornment>
+                  ),
                 }}
               />
-              <CardContent
-                style={{
-                  position: "absolute",
-                  bottom: 50,
-                  left: 0,
-                  width: "100%",
-                  background: "rgba(0, 0, 0, 0.2)", // Semi-transparent background for readability
-                  // color: "#fff",
-                  padding: "8px",
+            </Box>
+          </Box>
+
+          <Grid container spacing={3}>
+            {filteredSections.map((section) => (
+              <Grid item xs={12} sm={6} md={4} key={section}>
+                <Card
+                  onClick={() => handleSectionClick(section)}
+                  style={{
+                    cursor: "pointer",
+                    minHeight: "150px",
+                    position: "relative",
+                    borderRadius: "10px", // Ensure relative positioning for overlay
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={helpImages[section]}
+                    alt={section}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      filter: "brightness(0.4)",
+                    }}
+                  />
+                  <CardContent
+                    style={{
+                      position: "absolute",
+                      bottom: 50,
+                      left: 0,
+                      width: "100%",
+                      background: "rgba(0, 0, 0, 0.2)", // Semi-transparent background for readability
+                      // color: "#fff",
+                      padding: "8px",
+                    }}
+                  >
+                    <Typography
+                      variant="h5"
+                      style={{ textAlign: "center", color: "white" }}
+                    >
+                      {section.charAt(0).toUpperCase() + section.slice(1)} Help
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box mt={3} mb={3}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              sx={{ marginTop: "50px", marginBottom: "20px" }}
+            >
+              Quick Help
+            </Typography>
+            {quickHelp.map((faq, index) => (
+              <Accordion
+                key={index}
+                elevation={0}
+                square={true}
+                sx={{ margin: "10px" }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={`panel${index + 1}-content`}
+                  id={`panel${index + 1}-header`}
+                >
+                  <Typography>{faq.question}</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ marginLeft: "10px" }}>
+                  <Typography>{faq.answer}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Box>
+
+          <Modal
+            open={selectedSection !== null}
+            onClose={() => setSelectedSection(null)}
+            aria-labelledby="help-modal-title"
+            aria-describedby="help-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "80%",
+                maxWidth: 600,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 4,
+              }}
+            >
+              {selectedSection && (
+                <>
+                  <Typography
+                    id="help-modal-title"
+                    variant="h5"
+                    gutterBottom
+                    sx={{ marginTop: "10px" }}
+                  >
+                    {selectedSection.charAt(0).toUpperCase() +
+                      selectedSection.slice(1)}{" "}
+                    Help
+                  </Typography>
+                  {helpSections[
+                    selectedSection as keyof typeof helpSections
+                  ].map((faq, index) => (
+                    <Accordion
+                      key={index}
+                      elevation={0}
+                      square={true}
+                      sx={{ marginTop: "10px" }}
+                    >
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                      >
+                        <Typography>{faq.question}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails sx={{ marginLeft: "10px" }}>
+                        <Typography>{faq.answer}</Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                  <Box mt={3}>
+                    <Typography variant="h6" sx={{ marginTop: "20px" }}>
+                      Can't find what you're looking for?
+                    </Typography>
+                    <Button
+                      onClick={handleOpenFormModal}
+                      variant="contained"
+                      color="primary"
+                      style={{
+                        marginTop: "10px",
+                        marginLeft: "70%",
+                        textTransform: "none",
+                      }}
+                    >
+                      Submit Your Issue
+                    </Button>
+                  </Box>
+                </>
+              )}
+            </Box>
+          </Modal>
+
+          <Modal
+            open={formModalOpen}
+            onClose={handleCloseFormModal}
+            aria-labelledby="issue-form-modal-title"
+            aria-describedby="issue-form-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 4,
+              }}
+            >
+              <Typography id="issue-form-modal-title" variant="h5" gutterBottom>
+                Submit Your Issue
+              </Typography>
+              <form onSubmit={formik.handleSubmit} noValidate>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  id="name"
+                  name="name"
+                  label="Name"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  error={formik.touched.name && Boolean(formik.errors.name)}
+                  helperText={formik.touched.name && formik.errors.name}
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  id="email"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  // fullWidth
+                  id="issue"
+                  name="issue"
+                  label="Describe your issue"
+                  multiline
+                  rows={4}
+                  value={formik.values.issue}
+                  onChange={formik.handleChange}
+                  error={formik.touched.issue && Boolean(formik.errors.issue)}
+                  helperText={formik.touched.issue && formik.errors.issue}
+                  sx={{width:"100%"}}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: 2,
+                  }}
+                >
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    disabled={loading} // Disable button when submitting
+                  >
+                    {loading && (
+                      <CircularProgress size={24} style={{ marginRight: 8 }} />
+                    )}{" "}
+                    {/* Show loading indicator */}
+                    Submit
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleCloseFormModal}
+                    variant="outlined"
+                    color="secondary"
+                    style={{ marginLeft: 10 }}
+                    disabled={loading} // Disable button when submitting
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </form>
+            </Box>
+          </Modal>
+
+          <Modal
+            open={isSubmitted}
+            onClose={() => setIsSubmitted(false)}
+            aria-labelledby="submission-confirmation-modal-title"
+            aria-describedby="submission-confirmation-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 4,
+              }}
+            >
+              <Typography variant="h5" id="submission-modal-title" gutterBottom>
+                Submission Confirmation
+              </Typography>
+              <Typography
+                id="submission-modal-description"
+                variant="body1"
+                sx={{ marginTop: "5px", color: "grey" }}
+              >
+                Your issue has been submitted. We will respond as soon as
+                possible.
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: 2,
                 }}
               >
-                <Typography variant="h5" style={{ textAlign: "center", color: "white" }}>
-                  {section.charAt(0).toUpperCase() + section.slice(1)} Help
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Box mt={3} mb={3}>
-        <Typography variant="h5" gutterBottom sx={{ marginTop: "50px", marginBottom: "20px" }}>
-          Quick Help
-        </Typography>
-        {quickHelp.map((faq, index) => (
-          <Accordion key={index} elevation={0} square={true} sx={{ margin: "10px" }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls={`panel${index + 1}-content`}
-              id={`panel${index + 1}-header`}
-            >
-              <Typography>{faq.question}</Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{ marginLeft: "10px" }}>
-              <Typography>{faq.answer}</Typography>
-            </AccordionDetails>
-          </Accordion>
-        ))}
-      </Box>
-
-      <Modal
-        open={selectedSection !== null}
-        onClose={() => setSelectedSection(null)}
-        aria-labelledby="help-modal-title"
-        aria-describedby="help-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "80%",
-            maxWidth: 600,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
-          }}
-        >
-          {selectedSection && (
-            <>
-              <Typography id="help-modal-title" variant="h5" gutterBottom sx={{ marginTop: "10px" }}>
-                {selectedSection.charAt(0).toUpperCase() +
-                  selectedSection.slice(1)}{" "}
-                Help
-              </Typography>
-              {helpSections[
-                selectedSection as keyof typeof helpSections
-              ].map((faq, index) => (
-                <Accordion key={index} elevation={0} square={true} sx={{ marginTop: "10px" }}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                  >
-                    <Typography>{faq.question}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ marginLeft: "10px" }}>
-                    <Typography>{faq.answer}</Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-              <Box mt={3}>
-                <Typography variant="h6" sx={{ marginTop: "20px" }}>
-                  Can't find what you're looking for?
-                </Typography>
                 <Button
-                  onClick={handleOpenFormModal}
+                  onClick={() => setIsSubmitted(false)}
                   variant="contained"
                   color="primary"
-                  style={{ marginTop: "10px", marginLeft: "70%", textTransform: "none" }}
                 >
-                  Submit Your Issue
+                  Close
                 </Button>
               </Box>
-            </>
-          )}
-        </Box>
-      </Modal>
-
-      <Modal
-        open={formModalOpen}
-        onClose={handleCloseFormModal}
-        aria-labelledby="issue-form-modal-title"
-        aria-describedby="issue-form-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
-          }}
-        >
-          <Typography id="issue-form-modal-title" variant="h5" gutterBottom>
-            Submit Your Issue
-          </Typography>
-          <form onSubmit={formik.handleSubmit} noValidate>
-            <TextField
-               variant="outlined"
-               margin="normal"
-               fullWidth
-               id="name"
-               name="name"
-               label="Name"
-               value={formik.values.name}
-               onChange={formik.handleChange}
-               error={formik.touched.name && Boolean(formik.errors.name)}
-               helperText={formik.touched.name && formik.errors.name}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="email"
-              name="email"
-              label="Email"
-              type="email"
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
-            />
-            <TextField
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            id="issue"
-            name="issue"
-            label="Describe your issue"
-            multiline
-            rows={4}
-            value={formik.values.issue}
-            onChange={formik.handleChange}
-            error={formik.touched.issue && Boolean(formik.errors.issue)}
-            helperText={formik.touched.issue && formik.errors.issue}
-            />
-            <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loading} // Disable button when submitting
-              >
-                {loading && <CircularProgress size={24} style={{ marginRight: 8 }} />}{" "}
-                {/* Show loading indicator */}
-                Submit
-              </Button>
-              <Button
-                 type="button"
-                onClick={handleCloseFormModal}
-                variant="outlined"
-                color="secondary"
-                style={{ marginLeft: 10 }}
-                disabled={loading} // Disable button when submitting
-              >
-                Cancel
-              </Button>
             </Box>
-            </form>
-          </Box>
-
-      </Modal>
-
-      <Modal
-        open={submissionModalOpen}
-        onClose={handleCloseSubmissionModal}
-        aria-labelledby="submission-modal-title"
-        aria-describedby="submission-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 4,
-          }}
-        >
-          <Typography variant="h5" id="submission-modal-title" gutterBottom>
-            Submission Confirmation
-          </Typography>
-          <Typography id="submission-modal-description" variant="body1" sx={{ marginTop: "5px", color: "grey" }}>
-            Your issue has been submitted. We will respond as soon as possible.
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
-            <Button
-              onClick={handleCloseSubmissionModal}
-              variant="contained"
-              color="primary"
-            >
-              Close
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-    </Container>
-  </Grid>
-</Grid>
-);
+          </Modal>
+        </Container>
+      </Grid>
+    </Grid>
+  );
 };
 export default Help;
