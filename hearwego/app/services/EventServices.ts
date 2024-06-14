@@ -27,6 +27,8 @@ export const getEvents = async (
   }
 };
 
+
+
 export const getAllEvents = async (): Promise<Event[]> => {
   const res = await fetch(`${base_url}/EventsManager/events`, {
     method: "GET",
@@ -44,19 +46,45 @@ export const getAllEvents = async (): Promise<Event[]> => {
   }
 };
 
+export const getEventById = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events?event_id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+};
+
 export const getEvent = async (id: string) => {
-  const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (res.ok) {
-    const event = await res.json();
-    return event;
-  } else {
-    const error = await res.json();
-    throw new Error(error.message);
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; // Rethrow the error to handle it in the calling function
   }
 };
 

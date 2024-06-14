@@ -210,7 +210,7 @@ function EventDataGrid() {
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick= {()=> {router.push(`/app/admin/events/${params.row.event_id}`)}}
+            onClick= {()=> {router.push(`/admin/events/${params.row.event_id}`)}}
           >
             <FaEye />
           </IconButton>
