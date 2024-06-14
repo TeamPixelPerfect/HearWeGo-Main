@@ -14,10 +14,28 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  CardMedia,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InputAdornment from "@mui/material/InputAdornment";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
+const helpImages = {
+  payment: "https://media.istockphoto.com/id/531236924/photo/group-of-credit-cards-on-computer-keyboard.jpg?s=612x612&w=0&k=20&c=5iAuEH7ipVgVDI9TkgzTC8Xx0roMhvDlT79UzRiSzcE=",
+  account: "https://img.freepik.com/free-photo/young-woman-using-her-smartphone-city_23-2149375672.jpg",
+  store: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuI7N2ljGnhukDu0xusc95j4nslYA3huWmag&s",
+  club: "https://cdn.create.vista.com/api/media/small/443584156/stock-photo-silhouette-girl-raised-hands-enjoys-concert-music-show",
+  safetyAndPrivacy: "https://thumbs.dreamstime.com/b/data-protection-privacy-concept-gdpr-eu-cyber-security-network-business-man-protecting-his-personal-information-padlock-icon-117352204.jpg",
+  others: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScyOttwB3rOLrr6go7UFpPQidRL1vDvA_IZg&s",
+};
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email format").required("Email is required"),
+  issue: Yup.string().required("Issue description is required"),
+});
+
 
 const helpSections = {
   payment: [
@@ -213,6 +231,7 @@ const Help: React.FC = () => {
     false
   );
   const [loading, setLoading] = useState<boolean>(false); // Added for form submission loading indicator
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleSectionClick = (section: string) => {
     setSelectedSection(section);
@@ -253,21 +272,40 @@ const Help: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  return (
-    <Container>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        flexDirection="column"
-        mb={3}
-      >
-        <Box sx={{ height: "50%", marginTop: "10%" }}>
-          <Typography variant="subtitle1" component="div">
-            HearWeGo
-          </Typography>
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
-          <Typography
+  const filteredSections = Object.keys(helpSections).filter(section =>
+    section.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const formik = useFormik({
+      initialValues: {
+        name: "",
+        email: "",
+        issue: "",
+      },
+      validationSchema: validationSchema,
+      onSubmit: handleSubmit,
+    });
+    
+    return (
+    <Grid container spacing={2}>
+    <Grid item xs={12}>
+    <Container>
+    <Box
+             display="flex"
+             justifyContent="center"
+             alignItems="center"
+             flexDirection="column"
+             mb={3}
+           >
+    <Box sx={{ height: "50%", marginTop: "5%" }}>
+    <Typography variant="subtitle1" component="div">
+    HearWeGo
+    </Typography>
+    <Typography
             variant="h2"
             component="div"
             align="center"
@@ -302,6 +340,8 @@ const Help: React.FC = () => {
             placeholder="Search for help..."
             fullWidth
             margin="normal"
+            value={searchTerm}
+            onChange={handleSearchChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -313,24 +353,45 @@ const Help: React.FC = () => {
         </Box>
       </Box>
 
-     
-
       <Grid container spacing={3}>
-        {Object.keys(helpSections).map((section) => (
+        {filteredSections.map((section) => (
           <Grid item xs={12} sm={6} md={4} key={section}>
             <Card
               onClick={() => handleSectionClick(section)}
               style={{
                 cursor: "pointer",
                 minHeight: "150px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "16px",
+                position: "relative",
+                borderRadius: "10px", // Ensure relative positioning for overlay
               }}
             >
-              <CardContent>
-                <Typography variant="h6">
+              <CardMedia
+                component="img"
+                height="140"
+                image={helpImages[section]}
+                alt={section}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  filter: "brightness(0.4)",
+                }}
+              />
+              <CardContent
+                style={{
+                  position: "absolute",
+                  bottom: 50,
+                  left: 0,
+                  width: "100%",
+                  background: "rgba(0, 0, 0, 0.2)", // Semi-transparent background for readability
+                  // color: "#fff",
+                  padding: "8px",
+                }}
+              >
+                <Typography variant="h5" style={{ textAlign: "center", color: "white" }}>
                   {section.charAt(0).toUpperCase() + section.slice(1)} Help
                 </Typography>
               </CardContent>
@@ -340,11 +401,11 @@ const Help: React.FC = () => {
       </Grid>
 
       <Box mt={3} mb={3}>
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h5" gutterBottom sx={{ marginTop: "50px", marginBottom: "20px" }}>
           Quick Help
         </Typography>
         {quickHelp.map((faq, index) => (
-          <Accordion key={index} elevation={0} square={true}>
+          <Accordion key={index} elevation={0} square={true} sx={{ margin: "10px" }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls={`panel${index + 1}-content`}
@@ -352,7 +413,7 @@ const Help: React.FC = () => {
             >
               <Typography>{faq.question}</Typography>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails sx={{ marginLeft: "10px" }}>
               <Typography>{faq.answer}</Typography>
             </AccordionDetails>
           </Accordion>
@@ -381,7 +442,7 @@ const Help: React.FC = () => {
         >
           {selectedSection && (
             <>
-              <Typography id="help-modal-title" variant="h5" gutterBottom>
+              <Typography id="help-modal-title" variant="h5" gutterBottom sx={{ marginTop: "10px" }}>
                 {selectedSection.charAt(0).toUpperCase() +
                   selectedSection.slice(1)}{" "}
                 Help
@@ -389,7 +450,7 @@ const Help: React.FC = () => {
               {helpSections[
                 selectedSection as keyof typeof helpSections
               ].map((faq, index) => (
-                <Accordion key={index} elevation={0} square={true}>
+                <Accordion key={index} elevation={0} square={true} sx={{ marginTop: "10px" }}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
@@ -397,20 +458,20 @@ const Help: React.FC = () => {
                   >
                     <Typography>{faq.question}</Typography>
                   </AccordionSummary>
-                  <AccordionDetails>
+                  <AccordionDetails sx={{ marginLeft: "10px" }}>
                     <Typography>{faq.answer}</Typography>
                   </AccordionDetails>
                 </Accordion>
               ))}
               <Box mt={3}>
-                <Typography variant="h6">
+                <Typography variant="h6" sx={{ marginTop: "20px" }}>
                   Can't find what you're looking for?
                 </Typography>
                 <Button
                   onClick={handleOpenFormModal}
                   variant="contained"
                   color="primary"
-                  style={{ marginTop: "10px" }}
+                  style={{ marginTop: "10px", marginLeft: "70%", textTransform: "none" }}
                 >
                   Submit Your Issue
                 </Button>
@@ -442,42 +503,45 @@ const Help: React.FC = () => {
           <Typography id="issue-form-modal-title" variant="h5" gutterBottom>
             Submit Your Issue
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate>
+          <form onSubmit={formik.handleSubmit} noValidate>
             <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="name"
-              label="Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
+               variant="outlined"
+               margin="normal"
+               fullWidth
+               id="name"
+               name="name"
+               label="Name"
+               value={formik.values.name}
+               onChange={formik.handleChange}
+               error={formik.touched.name && Boolean(formik.errors.name)}
+               helperText={formik.touched.name && formik.errors.name}
             />
             <TextField
               variant="outlined"
               margin="normal"
-              required
               fullWidth
               id="email"
-              label="Email"
               name="email"
+              label="Email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
             <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="issue"
-              label="Describe your issue"
-              name="issue"
-              multiline
-              rows={4}
-              value={formData.issue}
-              onChange={handleChange}
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            id="issue"
+            name="issue"
+            label="Describe your issue"
+            multiline
+            rows={4}
+            value={formik.values.issue}
+            onChange={formik.handleChange}
+            error={formik.touched.issue && Boolean(formik.errors.issue)}
+            helperText={formik.touched.issue && formik.errors.issue}
             />
             <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
               <Button
@@ -491,6 +555,7 @@ const Help: React.FC = () => {
                 Submit
               </Button>
               <Button
+                 type="button"
                 onClick={handleCloseFormModal}
                 variant="outlined"
                 color="secondary"
@@ -500,8 +565,9 @@ const Help: React.FC = () => {
                 Cancel
               </Button>
             </Box>
+            </form>
           </Box>
-        </Box>
+
       </Modal>
 
       <Modal
@@ -526,7 +592,7 @@ const Help: React.FC = () => {
           <Typography variant="h5" id="submission-modal-title" gutterBottom>
             Submission Confirmation
           </Typography>
-          <Typography id="submission-modal-description" variant="body1">
+          <Typography id="submission-modal-description" variant="body1" sx={{ marginTop: "5px", color: "grey" }}>
             Your issue has been submitted. We will respond as soon as possible.
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
@@ -541,7 +607,8 @@ const Help: React.FC = () => {
         </Box>
       </Modal>
     </Container>
-  );
+  </Grid>
+</Grid>
+);
 };
-
 export default Help;
