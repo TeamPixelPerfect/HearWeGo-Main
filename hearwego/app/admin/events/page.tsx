@@ -7,13 +7,22 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Chip,
   Grid,
   IconButton,
   Menu,
   MenuItem,
+  Modal,
   Pagination,
+  Paper,
   Stack,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Tabs,
   Typography,
   duration,
@@ -45,52 +54,71 @@ import { getEvents } from "@/app/services/EventServices";
 import { getAllEvents } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
 import { render } from "react-dom";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { getEvent } from "@/app/services/EventServices";
+import { Artist } from "@/app/constants/models";
+import Link from 'next/link';
+// import router, { Router } from "next/router";
 
-function ActionsMenu({ id, handleView, handleEdit, handleDelete }) {
-  const [anchorEl, setAnchorEl] = useState(null);
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+};
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+const EventDetailsModal = ({ open, onClose, eventId }) => {
+  const router = useRouter();
+  const [singleEvent, setSingleEvent] = useState<Event>();
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  useEffect(() => {
+    getEvent(eventId).then((events) => {
+      console.log("Event Single......",events);
+      setSingleEvent(events);
+    });
+  }
+  , []);
 
   return (
-    <div>
-      <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
-        <MoreVertIcon />
-      </IconButton>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={() => { handleView(id); handleClose(); }}>View</MenuItem>
-        <MenuItem onClick={() => { handleEdit(id); handleClose(); }}>Edit</MenuItem>
-        <MenuItem onClick={() => { handleDelete(id); handleClose(); }}>Delete</MenuItem>
-      </Menu>
-    </div>
+    <Modal
+      open={open}
+      onClose={onClose}
+      aria-labelledby="event-details-title"
+      aria-describedby="event-details-description"
+    >
+      <Box sx={style}>
+        <Typography>{eventId}</Typography>
+        
+      </Box>
+    </Modal>
   );
-}
+};
 
-let i = 1;
 
 function EventDataGrid() {
-
+  const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
 
   const [events, setEvents] = useState<Event[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [eventId, setEventId] = useState("")
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getAllEvents().then((events) => {
       console.log("Events......",events);
       setEvents(events.data);
     });
-    // console.log("Events......",events);
+
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
+    });
   }
   , []);
 
@@ -101,15 +129,12 @@ function EventDataGrid() {
     event_type: string,
     age_from: number,
     age_to: number,
-    no_of_sessions: number,
     sessions: any,
-    sponsor: any,
-    teams: any,
     event_status: string,
     event_created_by: string,
     createdAt: string,
     updatedAt: string
-  ){return { event_id, event_img, event_name, event_type, age_from, age_to, no_of_sessions, sessions, sponsor, teams, event_status, event_created_by, createdAt, updatedAt };}
+  ){return { event_id, event_img, event_name, event_type, age_from, age_to, no_of_sessions: sessions.length, sessions, event_status, event_created_by, createdAt, updatedAt };}
 
   const eventRows = events.map((event) => 
     createEventData(
@@ -119,16 +144,18 @@ function EventDataGrid() {
       event.event_type,
       event.age_from,
       event.age_to,
-      event.no_of_sessions,
       event.sessions,
-      event.sponsor,
-      event.teams,
       event.event_status,
       event.event_created_by,
       event.createdAt,
       event.updatedAt
     )
   );
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
 
   const columns = [
     { field: "event_id", headerName: "Event ID", flex: 1 },
@@ -137,12 +164,37 @@ function EventDataGrid() {
     { field: "event_type", headerName: "Event Type", flex: 1 },
     { field: "age_from", headerName: "Age From", flex: 1 },
     { field: "age_to", headerName: "Age To", flex: 1 },
-    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1, renderCell: (params) => (<span>{params.row.sessions.length}</span>)},
-    { field: "sessions", headerName: "Sessions", flex: 2 },
-    { field: "sponsor", headerName: "Sponsor", flex: 2 },
-    { field: "teams", headerName: "Teams", flex: 2 },
-    { field: "event_status", headerName: "Event Status", flex: 1 },
-    { field: "event_created_by", headerName: "Created By", flex: 1 },
+    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1},
+    {
+      field: "event_status",
+      headerName: "Event Status",
+      flex: 1,
+      renderCell: (params) => {
+        const status = params.row.event_status;
+        let chipColor;
+        switch (status) {
+          case "private":
+            chipColor = "primary";
+            break;
+          case "public":
+            chipColor = "success";
+            break;
+          case "blocked":
+            chipColor = "error";
+            break;
+          default:
+            chipColor = "default";
+        }
+        return <Chip label={status.charAt(0).toUpperCase() + status.slice(1)} color={chipColor} />;
+      }
+    },
+    { field: "event_created_by", headerName: "Artist ID", flex: 1 },
+    {
+      field: "ArtistName",
+      headerName: "Artist Name",
+      flex: 2,
+      valueGetter: (params) => getArtistName(params.row.event_created_by),
+    },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     { field: "updatedAt", headerName: "Updated At", flex: 1 },
     {
@@ -154,15 +206,15 @@ function EventDataGrid() {
           <IconButton color="primary" sx={{ fontSize: "16px" }}>
             <FaEdit />
           </IconButton>
+          {/* <Link href={`/app/admin/events/${params.row.event_id}`}> */}
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick={() => {
-              // router.push(`/admin/events/${params.row.event_id}`);
-            }}
+            onClick= {()=> {router.push(`/app/admin/events/${params.row.event_id}`)}}
           >
             <FaEye />
           </IconButton>
+          {/* </Link> */}
           <IconButton color="error" sx={{ fontSize: "16px" }}>
             <MdDelete />
           </IconButton>
@@ -173,8 +225,7 @@ function EventDataGrid() {
 
 
   const handleView = (id) => {
-    // Logic to view an event
-    alert(`View event with ID: ${id}`);
+    setIsModalOpen(true);
   };
 
   const handleEdit = (id) => {
@@ -188,6 +239,11 @@ function EventDataGrid() {
     alert(`Delete event with ID: ${id}`);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
   return (
     <div style={{ height: 600, width: '100%' }}>
       <DataGrid
@@ -198,6 +254,7 @@ function EventDataGrid() {
         components={{ Toolbar: GridToolbar }}
         getRowId={(row) => row.event_id}  // Specify the custom id field
       />
+      <EventDetailsModal open={isModalOpen} onClose={handleCloseModal} eventId={eventId} />
     </div>
   );
 }

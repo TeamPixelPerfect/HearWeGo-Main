@@ -44,6 +44,21 @@ export const getAllEvents = async (): Promise<Event[]> => {
   }
 };
 
+export const getEvent = async (id: string) => {
+  const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const event = await res.json();
+    return event;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
 
 export const addEvent = async (token: string, data: any) => {
   console.log("Sending event data:", data); 
