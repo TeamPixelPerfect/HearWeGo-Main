@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const helpSections = {
   payment: [
@@ -123,6 +124,33 @@ const helpSections = {
         "Club settings can be managed in the Club Settings section of your account.",
     },
   ],
+  safetyAndPrivacy: [
+    {
+      question: "How to protect my personal information?",
+      answer:
+        "Ensure your account password is strong and enable two-factor authentication for added security.",
+    },
+    {
+      question: "What should I do if I suspect a data breach?",
+      answer:
+        "Immediately change your password and contact our support team for further assistance.",
+    },
+    {
+      question: "How is my data used?",
+      answer:
+        "Your data is used in accordance with our Privacy Policy, which you can review on our website.",
+    },
+    {
+      question: "How to update my privacy settings?",
+      answer:
+        "You can update your privacy settings in the Account Settings section.",
+    },
+    {
+      question: "How to report a privacy concern?",
+      answer:
+        "Report any privacy concerns to our support team through the Contact Us form.",
+    },
+  ],
   others: [
     {
       question: "How to contact support?",
@@ -151,6 +179,24 @@ const helpSections = {
   ],
 };
 
+const quickHelp = [
+  {
+    question: "How to reset my password?",
+    answer:
+      'Go to the login page and click on "Forgot Password" to reset your password.',
+  },
+  {
+    question: "How to track my order?",
+    answer:
+      "You can track your order in the Order History section of your account.",
+  },
+  {
+    question: "How to update my payment method?",
+    answer:
+      "You can update your payment method in the Account Settings section.",
+  },
+];
+
 const Help: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
@@ -173,6 +219,7 @@ const Help: React.FC = () => {
     setFormModalOpen(false); // Close form modal if open
     setSubmissionModalOpen(false); // Close submission modal if open
   };
+
   const handleOpenFormModal = () => {
     setFormModalOpen(true);
     setSubmissionModalOpen(false);
@@ -193,6 +240,7 @@ const Help: React.FC = () => {
       setSubmissionModalOpen(true); // Open submission confirmation modal
     }, 1000); // Simulated delay of 1 second
   };
+
   const handleCloseSubmissionModal = () => {
     setSubmissionModalOpen(false);
     setSelectedSection(null); // Reset selected section
@@ -207,18 +255,66 @@ const Help: React.FC = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        How Can I Help You?
-      </Typography>
-      <Box display="flex" alignItems="center" mb={3}>
-        <SearchIcon />
-        <TextField
-          variant="outlined"
-          placeholder="Search for help..."
-          fullWidth
-          margin="normal"
-        />
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        flexDirection="column"
+        mb={3}
+      >
+        <Box sx={{ height: "50%", marginTop: "10%" }}>
+          <Typography variant="subtitle1" component="div">
+            HearWeGo
+          </Typography>
+
+          <Typography
+            variant="h2"
+            component="div"
+            align="center"
+            fontWeight="bold"
+            style={{ flexGrow: 1 }}
+          >
+            How can we help you?
+          </Typography>
+        </Box>
       </Box>
+
+      <Box
+        mb={3}
+        sx={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "60%",
+            borderRadius: "4px",
+          }}
+        >
+          <TextField
+            variant="outlined"
+            placeholder="Search for help..."
+            fullWidth
+            margin="normal"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon style={{ color: "gray" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+      </Box>
+
+     
+
       <Grid container spacing={3}>
         {Object.keys(helpSections).map((section) => (
           <Grid item xs={12} sm={6} md={4} key={section}>
@@ -242,6 +338,27 @@ const Help: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+
+      <Box mt={3} mb={3}>
+        <Typography variant="h5" gutterBottom>
+          Quick Help
+        </Typography>
+        {quickHelp.map((faq, index) => (
+          <Accordion key={index} elevation={0} square={true}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`panel${index + 1}-content`}
+              id={`panel${index + 1}-header`}
+            >
+              <Typography>{faq.question}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>{faq.answer}</Typography>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Box>
+
       <Modal
         open={selectedSection !== null}
         onClose={() => setSelectedSection(null)}
@@ -302,6 +419,7 @@ const Help: React.FC = () => {
           )}
         </Box>
       </Modal>
+
       <Modal
         open={formModalOpen}
         onClose={handleCloseFormModal}
@@ -361,14 +479,15 @@ const Help: React.FC = () => {
               value={formData.issue}
               onChange={handleChange}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
                 color="primary"
                 disabled={loading} // Disable button when submitting
               >
-                {loading && <CircularProgress size={24} style={{ marginRight: 8 }} />} {/* Show loading indicator */}
+                {loading && <CircularProgress size={24} style={{ marginRight: 8 }} />}{" "}
+                {/* Show loading indicator */}
                 Submit
               </Button>
               <Button
@@ -384,6 +503,7 @@ const Help: React.FC = () => {
           </Box>
         </Box>
       </Modal>
+
       <Modal
         open={submissionModalOpen}
         onClose={handleCloseSubmissionModal}
@@ -409,7 +529,7 @@ const Help: React.FC = () => {
           <Typography id="submission-modal-description" variant="body1">
             Your issue has been submitted. We will respond as soon as possible.
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
             <Button
               onClick={handleCloseSubmissionModal}
               variant="contained"
@@ -425,4 +545,3 @@ const Help: React.FC = () => {
 };
 
 export default Help;
-
