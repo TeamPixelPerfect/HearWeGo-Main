@@ -65,6 +65,13 @@ const AdminSingleEventPage = () => {
     },
   ];
 
+  const teamColumns: GridColDef[] = [
+    { field: "team_type", headerName: "Type", width: 150 },
+    { field: "team_name", headerName: "Name", width: 150 },
+    { field: "contact", headerName: "Contact", width: 150 },
+    { field: "email", headerName: "Email", width: 150 },
+  ];
+
   const artist = useAppSelector((state) => state.artist.user);
 
   return (
@@ -205,28 +212,55 @@ const AdminSingleEventPage = () => {
                 </Box>
               </Box>
 
-              <Typography
-            variant="h4"
-            sx={{
-              fontSize: "24px",
-              fontWeight: "500",
-              color: theme.palette.mode === "dark" ? "#fff" : "#000",
-              marginBottom: 2,
-            }}
-          >
-            Event Sessions
-          </Typography>
+              <Box sx={{ width: "100%", marginBottom: 2 }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontSize: "24px",
+                    fontWeight: "500",
+                    color: theme.palette.mode === "dark" ? "#fff" : "#000",
+                    marginBottom: 2,
+                  }}
+                >
+                  Event Sessions
+                </Typography>
 
-          <Divider sx={{marginBottom: 2}}></Divider>
+                <Divider sx={{ marginBottom: 2 }}></Divider>
 
-              <DataGrid
-                rows={event.sessions || []}
-                columns={sessionColumns}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
-                components={{ Toolbar: GridToolbar }}
-                getRowId={(row) => row.session_id}
-              />
+                <DataGrid
+                  rows={event.sessions || []}
+                  columns={sessionColumns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5]}
+                  components={{ Toolbar: GridToolbar }}
+                  getRowId={(row) => row.session_id}
+                />
+              </Box>
+
+              <Box sx={{ width: "100%", marginBottom: 2 }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontSize: "24px",
+                    fontWeight: "500",
+                    color: theme.palette.mode === "dark" ? "#fff" : "#000",
+                    marginBottom: 2,
+                  }}
+                >
+                  Teams
+                </Typography>
+
+                <Divider sx={{ marginBottom: 2 }}></Divider>
+
+                <DataGrid
+                  rows={event.teams.map((team, index) => ({ ...team, id: `${team.team_name}-${index}` })) || []}
+                  columns={teamColumns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5]}
+                  components={{ Toolbar: GridToolbar }}
+                  getRowId={(row) => row.id}
+                />
+              </Box>
             </Box>
           ))}
         </Box>
@@ -238,7 +272,6 @@ const AdminSingleEventPage = () => {
             marginBottom: 2,
           }}
         >
-
           <div style={{ height: 400, width: "100%" }}></div>
         </Box>
         <Divider></Divider>
