@@ -1,11 +1,9 @@
-"use client";
 import React, { useState } from "react";
 import {
   Typography,
   Paper,
   IconButton,
   TextField,
-  Avatar,
   List,
   ListItem,
   ListItemText,
@@ -13,7 +11,6 @@ import {
   Divider,
 } from "@mui/material";
 import {
-  Edit as EditIcon,
   Delete as DeleteIcon,
   Send as SendIcon,
   Reply as ReplyIcon,
@@ -45,7 +42,11 @@ type Props = {
     commentId: number,
     updatedContent: string
   ) => void;
-  onDeleteComment: (postId: number, commentId: number) => void;
+  onDeleteComment: (
+    postId: number,
+    commentId: number,
+    replyId?: number
+  ) => void; // Update the type of onDeleteComment
 };
 
 const SinglePost: React.FC<Props> = ({
@@ -56,64 +57,21 @@ const SinglePost: React.FC<Props> = ({
   onEditComment,
   onDeleteComment,
 }) => {
-  const [editMode, setEditMode] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(post.title);
-  const [editedContent, setEditedContent] = useState(post.content);
   const [newComment, setNewComment] = useState("");
-  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
-  const [editingCommentContent, setEditingCommentContent] = useState("");
   const [replyingCommentId, setReplyingCommentId] = useState<number | null>(
     null
   );
   const [replyContent, setReplyContent] = useState("");
 
-  const handleEditPost = () => setEditMode(true);
-
-  const handleSavePost = () => {
-    const updatedPost = {
-      ...post,
-      title: editedTitle,
-      content: editedContent,
-    };
-    onEditPost(post.id, updatedPost);
-    setEditMode(false);
-  };
-
-  const handleCancelEdit = () => {
-    setEditedTitle(post.title);
-    setEditedContent(post.content);
-    setEditMode(false);
-  };
-
-  const handleDeletePost = () => onDeletePost(post.id);
-
-  const handleAddComment = () => {
-    const comment: Comment = {
-      id: Date.now(),
-      user: "Artist", // Replace with actual artist info
-      content: newComment,
-      isArtist: true,
-      replies: [],
-    };
-    onAddComment(post.id, comment);
-    setNewComment("");
-  };
-
-  const handleEditComment = (comment: Comment) => {
-    setEditingCommentId(comment.id);
-    setEditingCommentContent(comment.content);
-  };
-
-  const handleSaveComment = () => {
-    if (editingCommentId !== null) {
-      onEditComment(post.id, editingCommentId, editingCommentContent);
-      setEditingCommentId(null);
-      setEditingCommentContent("");
+  const handleDeleteComment = (commentId: number, replyId?: number) => {
+    if (replyId !== undefined) {
+      // Delete reply comment
+      onDeleteComment(post.id, commentId, replyId);
+    } else {
+      // Delete top-level comment
+      onDeleteComment(post.id, commentId);
     }
   };
-
-  const handleDeleteComment = (commentId: number) =>
-    onDeleteComment(post.id, commentId);
 
   const handleReplyToComment = (commentId: number) =>
     setReplyingCommentId(commentId);
@@ -139,61 +97,34 @@ const SinglePost: React.FC<Props> = ({
     }
   };
 
+  const handleAddComment = () => {
+    const comment: Comment = {
+      id: Date.now(),
+      user: "Artist", // Replace with actual artist info
+      content: newComment,
+      isArtist: true,
+      replies: [],
+    };
+    onAddComment(post.id, comment);
+    setNewComment("");
+  };
+
   return (
     <Paper sx={{ p: 2, marginBottom: 2 }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <div style={{ flex: 1 }}>
-          {editMode ? (
-            <>
-              <TextField
-                fullWidth
-                value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value)}
-                variant="standard"
-                margin="dense"
-                label="Title"
-              />
-              <TextField
-                fullWidth
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                variant="standard"
-                margin="dense"
-                label="Content"
-                multiline
-                rows={4}
-              />
-            </>
-          ) : (
-            <>
-              <Typography variant="h6" component="div" gutterBottom>
-                {post.title}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {post.content}
-              </Typography>
-            </>
-          )}
-        </div>
-        <div>
-          <IconButton onClick={editMode ? handleCancelEdit : handleEditPost}>
-            <EditIcon />
-          </IconButton>
-          {editMode ? (
-            <IconButton onClick={handleSavePost}>
-              <SendIcon />
-            </IconButton>
-          ) : (
-            <IconButton onClick={handleDeletePost}>
-              <DeleteIcon />
-            </IconButton>
-          )}
-        </div>
-      </div>
+      <Typography variant="h6" component="div" gutterBottom>
+        {post.title}
+      </Typography>
+      <Typography variant="body1" gutterBottom>
+        {post.content}
+      </Typography>
 
       {post.image && (
         <div style={{ textAlign: "center", marginTop: 16, marginBottom: 16 }}>
-          <img src={post.image} alt={post.title} style={{ maxWidth: "100%" }} />
+          <img
+            src={post.image}
+            alt={post.title}
+            style={{ maxWidth: "70%", minWidth: "70%" }}
+          />
         </div>
       )}
 
@@ -208,34 +139,10 @@ const SinglePost: React.FC<Props> = ({
             <ListItem>
               <ListItemText
                 primary={comment.user}
-                secondary={
-                  editingCommentId === comment.id ? (
-                    <TextField
-                      fullWidth
-                      value={editingCommentContent}
-                      onChange={(e) => setEditingCommentContent(e.target.value)}
-                      variant="standard"
-                      margin="dense"
-                    />
-                  ) : (
-                    comment.content
-                  )
-                }
+                secondary={comment.content}
               />
               <ListItemSecondaryAction>
-                {comment.isArtist ? (
-                  <>
-                    {editingCommentId === comment.id ? (
-                      <IconButton onClick={handleSaveComment}>
-                        <SendIcon />
-                      </IconButton>
-                    ) : (
-                      <IconButton onClick={() => handleEditComment(comment)}>
-                        <EditIcon />
-                      </IconButton>
-                    )}
-                  </>
-                ) : (
+                {!comment.isArtist && (
                   <IconButton onClick={() => handleReplyToComment(comment.id)}>
                     <ReplyIcon />
                   </IconButton>
@@ -253,20 +160,9 @@ const SinglePost: React.FC<Props> = ({
                     secondary={reply.content}
                   />
                   <ListItemSecondaryAction>
-                    {reply.isArtist && (
-                      <>
-                        {editingCommentId === reply.id ? (
-                          <IconButton onClick={handleSaveComment}>
-                            <SendIcon />
-                          </IconButton>
-                        ) : (
-                          <IconButton onClick={() => handleEditComment(reply)}>
-                            <EditIcon />
-                          </IconButton>
-                        )}
-                      </>
-                    )}
-                    <IconButton onClick={() => handleDeleteComment(reply.id)}>
+                    <IconButton
+                      onClick={() => handleDeleteComment(comment.id, reply.id)}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </ListItemSecondaryAction>

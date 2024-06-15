@@ -27,7 +27,7 @@ const ArtistPage: React.FC = () => {
       title: "First Post",
       content: "Content of the first post.",
       image:
-        "https://c.ndtvimg.com/2023-03/ts9dtkq8_selfies-from-the-past_625x300_21_March_23.jpg", // Use the provided image path
+        "https://res.heraldm.com/content/image/2022/12/01/20221201000743_0.jpg",
       comments: [
         { id: 1, user: "User A", content: "First comment" },
         { id: 2, user: "User B", content: "Second comment" },
@@ -38,7 +38,7 @@ const ArtistPage: React.FC = () => {
       title: "Second Post with Image",
       content: "Content of the second post.",
       image:
-        "https://www.popsci.com/wp-content/uploads/2023/09/07/robot_with_bob_ross.jpg", // Example image URL
+        "https://www.billboard.com/wp-content/uploads/2021/06/maroon-5-superbowl-2019-billboard-1548-1623086440.jpg",
       comments: [
         { id: 3, user: "User C", content: "Third comment" },
         { id: 4, user: "User D", content: "Fourth comment" },
@@ -119,7 +119,7 @@ const ArtistPage: React.FC = () => {
       id: posts.length + 1,
       title: newPostTitle,
       content: newPostContent,
-      image: "/mnt/data/image.png", // Example image URL
+      image: "/mnt/data/image.png",
       comments: [],
     };
     setPosts([...posts, newPost]);
@@ -127,7 +127,7 @@ const ArtistPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="lg">
       <Typography variant="h4" component="h1" gutterBottom>
         Artist Page
       </Typography>
