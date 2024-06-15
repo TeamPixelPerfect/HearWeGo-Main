@@ -33,7 +33,7 @@ export const LeftSide = styled(Box)({
 
 export const ArtistInfo = styled(Box)({
   // marginBottom: "2rem",
-marginTop: "20px",
+  marginTop: "20px",
   textAlign: "center",
   color: "white",
   // backgroundColor: "red",
@@ -79,7 +79,6 @@ export const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-
 export const StatBox = styled(Box)({
   textAlign: "center",
   // paddingLeft: "1.5rem",
@@ -94,7 +93,7 @@ export const StatBox = styled(Box)({
 export const StatsRow = styled(Box)({
   display: "flex",
   justifyContent: "center",
-  margin:"20px",
+  margin: "20px",
   flexWrap: "wrap",
   // backgroundColor: "yellow",
 });
@@ -129,7 +128,6 @@ export const CustomTab = styled(Tab)(({ theme }) => ({
   },
 }));
 
-
 export const RightSide = styled(Box)({
   backgroundColor: "#3B0764",
   minWidth: "450px",
@@ -143,7 +141,6 @@ export const RightSide = styled(Box)({
     maxWidth: "100%",
   },
 });
-
 
 export const TopFansContainer = styled(Box)({
   marginTop: "20px",
@@ -171,7 +168,6 @@ export const FanItem = styled(Box)({
     fontSize: "0.8rem",
   },
 });
-
 
 export const FanInfo = styled(Box)({
   marginLeft: "1.5rem",
