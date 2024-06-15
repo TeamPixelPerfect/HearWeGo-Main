@@ -1,284 +1,185 @@
 "use client";
-import Paper from "@mui/material/Paper";
-import { styled } from "@mui/material/styles";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
+import styled from "@emotion/styled";
+import { Box } from "@mui/system";
 import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import { Stack } from "@mui/material";
-import TextField from "@mui/material/TextField";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Badge from "@mui/material/Badge";
 
-export const SearchBarPaper = styled(Paper)(({ theme }) => ({
+export const Root = styled(Box)({
   display: "flex",
-  width: "60%",
-  backgroundColor: theme.palette.background.default,
-  position: "relative",
-}));
-
-export const CoverBackgroundCard = styled(Card)(({ theme }) => ({
-  width: "100%",
-  maxHeight: "80vh",
-  //padding: "5px",
-  backgroundColor: theme.palette.background.default,
-  boxShadow: "0px 14px 80px rgba(34, 35, 58, 0.2)",
-}));
-
-export const CoverCardMedia = styled(CardMedia)(({ theme }) => ({
-  width: "100%",
-  //height: "2500px",
+  flexDirection: "row", 
+  minHeight: "100hv",
   
-}));
+});
 
-export const ProfilePicAvatar = styled(Avatar)(({ theme }) => ({
-  width: "180px",
-  height: "180px",
-  border: "4px solid #D8B4FE",
-  borderColor: theme.palette.background.default,
-}));
-
-export const ProfilePicDiv = styled("div")(({ theme }) => ({
-  position: "relative",
-  bottom: "100px",
-  left: "20px",
-}));
-
-export const ArtistDetailBox = styled(Box)(({ theme }) => ({
-  position: "relative",
-  bottom: "100px",
-  width: "100%",
-  padding: "0 2em",
+export const LeftSide  = styled(Box)({
+  backgroundColor: "#4338CA",
+  width: "100%", // Take up full width of the container
+  padding: "1rem",
   display: "flex",
+  flexDirection: "column",
   justifyContent: "space-between",
-  alignItems: "baseline",
+  minHeight: "100vh", // Ensure right side stretches to full height
+  "@media (min-width: 600px)": {
+    maxWidth: "350px", // Set maximum width for right side, subtracting sidebar width
+  },
+});
+
+export const ArtistInfo = styled(Box)({
+  marginBottom: "2rem",
+  marginTop: "1rem",
+  textAlign: "center",
+  color:"white" // Center align text
+});
+
+export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
+  width: "100px", // Initial size, adjust as needed
+  height: "100px", // Initial size, adjust as needed
+  marginTop: "10px", // Center the avatar horizontally
+  maxWidth: "20vw", // Maximum width based on viewport width
+  maxHeight: "20vw", // Maximum height based on viewport width
+  "@media (min-width: 600px)": {
+    width: "150px", // Increase size for larger screens if needed
+    height: "150px",
+    maxWidth: "15vw", // Adjusted maximum width for larger screens
+    maxHeight: "15vw",
+    border: "1.5px solid white", // Add border around avatar	
+  },
 }));
 
-export const ArtistNameBox = styled(Box)(({ theme }) => ({
+export const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    right: "15%", // Adjust this value to horizontally center the badge
+    top: "85%", // Adjust this value to vertically center the badge
+    width: "3rem",
+    height: "3rem",
+    borderRadius: "50%", // This makes the badge circular
+    backgroundColor: "black", // Customize with your desired color
+    color: "white", // Text color of the badge
+    fontSize: "0.75rem", // Adjust font size as needed
+    fontWeight: "bold", // Adjust font weight as needed
+    padding: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+}));
+
+export const StatBox = styled(Box)({
+  textAlign: "center",
+  paddingLeft: "1.5rem",
+  paddingRight: "1.5rem",
+  paddingBottom: "0rem",
+  paddingTop: "0rem",
+  color: "white",
+});
+
+export const StatsRow = styled(Box)({
+  display: "flex",
+  justifyContent: "center", // Center items horizontally
+  flexWrap: "wrap", // Allow items to wrap on smaller screens
+  // margin: "1rem 0",
+});
+
+export const VerticalTabs = styled(Tabs)({
   width: "100%",
-  color: theme.palette.text.primary,
-  fontSize: "24px",
-  fontWeight: "bold",
-  letterSpacing: "0.5px",
-  marginTop: "5px",
-  justifyContent: "left",
-  display: "flex",
-  //   marginBottom: "1em !important"
-}));
+});
 
-export const NoOfFollowersBox = styled(Box)(({ theme }) => ({
-  fontSize: "16px",
-  color: theme.palette.text.primary,
-  fontWeight: "500px",
-}));
-
-export const JoinClubButton = styled(Button)(({ theme }) => ({
-  width: "120px",
-  fontSize: "16px",
-  color: "#fff",
-  backgroundColor: theme.palette.primary.main,
-  textTransform: "capitalize",
-}));
-
-export const ChatButton = styled(Button)(({ theme }) => ({
-  width: "120px",
-  fontSize: "16px",
-  color: "#fff",
-  backgroundColor: theme.palette.secondary.main,
-  textTransform: "capitalize",
-}));
-
-// export const NavigationBox = styled(Box)(({ theme }) => ({
-//   width: "100%",
-//   marginTop: 2,
-//   justifyContent:'center'
- 
-// }));
-
-export const PostCard = styled(Card)(({ theme }) => ({
-  maxWidth: 1000,
-  height: 800,
-  width: 800,
-  padding: "1em",
-  boxShadow: "0 0 20px 0 rgba(0,0,0,0.12)",
-  transition: "0.3s",
-  backgroundColor: theme.palette.background.default,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-}));
-
-export const PostPublishAvatar = styled(Avatar)(({ theme }) => ({
-  width: 70,
-  height: 70,
-  border: "4px solid #D8B4FE",
-  borderColor: theme.palette.background.default,
-}));
-
-export const PublisherNameBox = styled(Box)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: 18,
-  fontWeight: "bold",
-  //letterSpacing: "0.5px",
-  //   marginTop: -5,
-  marginLeft: 18,
-  marginBottom: "0 !important",
-  marginTop: "0 !important",
-}));
-
-export const PublishedDateBox = styled(Box)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: 12,
-  fontWeight: 300,
-  //   fontWeight: "bold",
-  //   letterSpacing: "0.5px",
-  marginLeft: 18,
-}));
-
-export const DescriptionBox = styled(Box)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: 16,
-  margin: "0 1em",
-  marginTop: "0 !important",
-}));
-
-export const PostImageCard = styled(CardMedia)(({ theme }) => ({
-  width: 700,
-  height: 700,
-  margin: "2em 0 1em 0",
+export const CustomTab = styled(Tab)(({ theme }) => ({
   borderRadius: "10px",
-  backgroundColor: "rgba(0, 0, 0, 0.08)",
+  marginBottom: "1rem",
+  backgroundColor: "white",
+  color: "black",
+  "&.Mui-selected": {
+    backgroundColor: "black",
+    color: "white",
+  },
+  "@media (max-width: 600px)": {
+    fontSize: "0.8rem", // Adjust font size for smaller screens
+    // padding: "0.5rem", // Reduce padding for smaller screens
+  },
 }));
 
-export const NoOfLikesBox = styled(Box)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: 12,
-  fontWeight: "bold",
-  letterSpacing: "0.5px",
-}));
-
-export const NoOfCommentsBox = styled(Box)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: 12,
-  fontWeight: "bold",
-  letterSpacing: "0.5px",
-}));
-
-export const PostFeed = styled(Stack)(({ theme }) => ({
+export const RightSide = styled(Box)({
+  backgroundColor: "#3B0764", // Adjust background color for the right side
+  width: "100%", // Take up full width of the container
+  padding: "1rem",
   display: "flex",
   flexDirection: "column",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  padding: "1em 0",
-}));
+  justifyContent: "space-between",
+  minHeight: "100vh", // Ensure right side stretches to full height
+  "@media (min-width: 600px)": {
+    maxWidth: "350px", // Set maximum width for right side, subtracting sidebar width
+  },
+});
 
-export const PostReactionBar = styled(Stack)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  color: theme.palette.text.primary,
-  background: "magenta",
-}));
+export const TopFansContainer = styled(Box)({
+  // marginTop: '2rem',
+  padding: '1rem',
+  backgroundColor: '#f5f5f5',
+  borderRadius: '15px',
+  color: 'black',
+});
 
-export const FindMorebutton = styled(Button)(({ theme }) => ({
-  alignItems: "center",
-  color: theme.palette.text.primary,
-  textTransform: "initial",
-}));
+export const FanItem = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '1rem',
+  marginTop: '1rem',
+  backgroundColor: '#fff',
+  padding: '0.2rem',
+  borderRadius: '8px',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+ 
+});
 
-export const PhotosCard = styled(Card)(({ theme }) => ({
- // maxWidth: 1000,
-  height: 800,
-  width: 800,
-  margin: "2em 0 1em 0",
-  //padding: "0.5em",
-  boxShadow: "0 0 20px 0 rgba(0,0,0,0.12)",
-  transition: "0.3s",
-  backgroundColor: theme.palette.background.default,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  
-}));
+export const FanInfo = styled(Box)({
+  marginLeft: '1.5rem',
+  display: 'flex',
+  flexDirection: 'column',
+});
 
-//Styles for AD Fan club
+export const FanName = styled(Box)({
+  fontWeight: "bold",
+});
 
-export const BorderBox = styled(Box)(({ theme }) => ({
-  maxWidth :'100%',
-  height: 'auto',
-  borderRadius: "30px",
-  padding: "15px 8px 8px 8px",
-  backgroundColor: "#E0E7FF",
-}));
-export const CreatePostPopup = styled("div")(({ theme }) => ({
-  position: "relative",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "50%",
-  height: "97%",
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: theme.palette.background.default,
-  borderRadius: "10px",
-  // overflow:'scroll'
-}));
-
-export const CreateContestPopup = styled("div")(({ theme }) => ({
-  position: "relative",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "50%",
-  height: "95%",
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-  backgroundColor: "#ffff",
-  borderRadius: "10px",
-}));
-
-      
+export const FanCountry = styled(Box)({
+  color: "gray",
+});
 
 
-export const ArtistDetail = styled(Box)(({ theme }) => ({
-  width: "100%",
-  height: "10%",
-  padding: "5px",
-  marginTop: "10px",
-  position: "relative",
-  display: "flex",
-  justifyContent: "flex-start",
-  alignItems: "center",
-}));
+export const RecommendedArtistsContainer = styled(Box)({
+marginTop: '2rem',
+  padding: '1rem',
+  backgroundColor: '#f5f5f5',
+  borderRadius: '15px',
+  color: 'black',
+});
 
+export const RecommendedArtistItem = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '1rem',
+  marginTop: '1rem',
+  backgroundColor: '#fff',
+  padding: '0.2rem',
+  borderRadius: '8px',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+ 
+});
 
-export const PostTextField = styled(TextField)(({ theme }) => ({
-  boxSizing: "initial",
-  minWidth: "95%",
-  border: "2px solid",
-  padding: "10px",
-  borderRadius: "4px",
-  marginTop:'5px',
-  color: "primary",
-  display: "flex",
-  justifyContent: "center",
+export const RecommendedArtistInfo = styled(Box)({
+  marginLeft: '1.5rem',
+  display: 'flex',
+  flexDirection: 'column',
+});
 
-}));
+export const RecommendedArtistName = styled(Box)({
+  fontWeight: "bold",
+});
 
-export const SubmitButton = styled(Button)(({ theme }) => ({
-  width: "100px",
-  fontSize: "14px",
-  color: "#fff",
-  backgroundColor: theme.palette.primary.main,
-  textTransform: "capitalize",
-}));
-
-export const CancleButton = styled(Button)(({ theme }) => ({
-  width: "100px",
-  fontSize: "14px",
-  color: "#370660",
-  backgroundColor: 'white',
-  textTransform: "capitalize",
-  border: "1px solid",
-}));
-
-
-
+export const RecommendedArtistsFollowers = styled(Box)({
+  color: "gray",
+});
 
