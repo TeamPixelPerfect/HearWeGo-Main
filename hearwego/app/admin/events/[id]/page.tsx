@@ -19,12 +19,13 @@ import { getEvents } from "@/app/services/EventServices";
 import { getEventById } from "@/app/services/EventServices";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { Artist } from "@/app/constants/models";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 
 const AdminSingleEventPage = () => {
   const theme = useTheme();
   const [filter, setFilter] = useState("event_id");
-  const { id } = useParams(); 
-  
+  const { id } = useParams();
+
   const [artists, setArtists] = useState<Artist[]>([]);
   const [singleEvent, setSingleEvent] = useState<Event[]>([]);
 
@@ -35,15 +36,34 @@ const AdminSingleEventPage = () => {
     });
 
     getAllArtists().then((artists) => {
-      console.log("Artists......",artists);
+      console.log("Artists......", artists);
       setArtists(artists.data);
     });
   }, []);
 
   const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
   };
+
+  const sessionColumns: GridColDef[] = [
+    { field: "session_id", headerName: "ID", width: 90 },
+    { field: "session_name", headerName: "Session Name", width: 150 },
+    { field: "session_date", headerName: "Date", width: 150 },
+    { field: "session_time", headerName: "Time", width: 150 },
+    { field: "duration", headerName: "Duration", width: 150 },
+    { field: "venue", headerName: "Venue", width: 150 },
+    {
+      field: "artists",
+      headerName: "Artists",
+      width: 200,
+    },
+    {
+      field: "session_special_notice",
+      headerName: "Special Notice",
+      width: 250,
+    },
+  ];
 
   const artist = useAppSelector((state) => state.artist.user);
 
@@ -71,119 +91,157 @@ const AdminSingleEventPage = () => {
         <Divider></Divider>
         <Box sx={{ padding: "2em" }}>
           {singleEvent.map((event) => (
-            <Box sx={{ width: "100%", display: "flex" }}>
-              <Box
-                sx={{
-                  width: "50%",
-                  padding: 2,
-                  display: "flex",
-                  // justifyContent: "center",
-                }}
-              >
-                <CardMedia
-                  image={event.event_img}
-                  sx={{ width: 250, height: 250, borderRadius: 2 }}
-                />
+            <Box sx={{ width: "100%" }}>
+              <Box sx={{ width: "100%", display: "flex", marginBottom: 2 }}>
+                <Box
+                  sx={{
+                    width: "50%",
+                    padding: 2,
+                    display: "flex",
+                    // justifyContent: "center",
+                  }}
+                >
+                  <CardMedia
+                    image={event.event_img}
+                    sx={{ width: 250, height: 250, borderRadius: 2 }}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    width: "50%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Event Name</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.event_name}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Event Type</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.event_type}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Age Limits</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.age_from} - {event.age_to}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">No. of Sessions</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.sessions?.length}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Status</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.event_status}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Created At</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.createdAt}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Updated At</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.updatedAt}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ width: "100%", display: "flex" }}>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="h6">Created By</Typography>
+                    </Box>
+                    <Box sx={{ width: "50%" }}>
+                      <Typography variant="subtitle1">
+                        {event.event_created_by} -{" "}
+                        {getArtistName(event.event_created_by)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
-              <Box
-                sx={{
-                  width: "50%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Event Name</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.event_name}
-                    </Typography>
-                  </Box>
-                </Box>
 
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Event Type</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.event_type}
-                    </Typography>
-                  </Box>
-                </Box>
+              <Typography
+            variant="h4"
+            sx={{
+              fontSize: "24px",
+              fontWeight: "500",
+              color: theme.palette.mode === "dark" ? "#fff" : "#000",
+              marginBottom: 2,
+            }}
+          >
+            Event Sessions
+          </Typography>
 
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Age Limits</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.age_from} - {event.age_to}
-                    </Typography>
-                  </Box>
-                </Box>
+          <Divider sx={{marginBottom: 2}}></Divider>
 
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">No. of Sessions</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.sessions?.length}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Status</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.event_status}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Created At</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.createdAt}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Updated At</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.updatedAt}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ width: "100%", display: "flex" }}>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="h6">Created By</Typography>
-                  </Box>
-                  <Box sx={{ width: "50%" }}>
-                    <Typography variant="subtitle1">
-                      {event.event_created_by} - {getArtistName(event.event_created_by)}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
+              <DataGrid
+                rows={event.sessions || []}
+                columns={sessionColumns}
+                pageSize={5}
+                rowsPerPageOptions={[5]}
+                components={{ Toolbar: GridToolbar }}
+                getRowId={(row) => row.session_id}
+              />
             </Box>
           ))}
         </Box>
+
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            marginBottom: 2,
+          }}
+        >
+
+          <div style={{ height: 400, width: "100%" }}></div>
+        </Box>
+        <Divider></Divider>
       </Card>
     </Grid>
   );
