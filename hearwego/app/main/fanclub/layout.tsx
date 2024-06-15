@@ -16,6 +16,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SearchIcon from '@mui/icons-material/Search';
+import Icon from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
 
 import {
   Root,
@@ -129,7 +131,9 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
 
   return (
     <>
+   
       <Root>
+        
        
             <LeftSide>
               <ArtistInfo>
@@ -176,36 +180,33 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
       
 
             <Box
-      sx={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-      }}
-    >
-      <TextField
-        label="Search"
-        variant="outlined"
-        onChange={handleSearchInputChange}
-        sx={{
-          width: '50%',
-          margin: '10px',
-          borderRadius: '20px', // Adjusted border radius
-          '& .MuiOutlinedInput-adornedStart': {
-            paddingLeft: '10px', // Padding for icon
-          },
-          '& .MuiInputBase-input': {
-            // Adjust input text alignment
-            paddingTop: '14px', // Match padding to vertically center with icon
-            paddingBottom: '14px',
-          },
-        }}
-        InputProps={{
-          startAdornment: (
-            <SearchIcon sx={{ color: 'action.active', marginLeft: '8px' }} />
-          ),
-        }}
-      />
-    </Box>
+            mb={3}
+            sx={{
+              width: "100%",
+              display: "flex",
+            //   alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "40px",
+            }}
+          >
+         
+              <TextField
+                variant="outlined"
+                placeholder="Search"
+                margin="normal"
+              
+              InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon style={{ color: "gray" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ 
+                    display: "flex", width: "60%"}}
+              />
+            </Box>
+
         <RightSide>
           <Box>
             <TopFansContainer>
@@ -305,7 +306,8 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
             </RecommendedArtistsContainer>
           </Box>
         </RightSide>
-     </Root>
+       
+        </Root>
     </>
   );
 };
