@@ -49,6 +49,7 @@
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.8",
     "swiper": "^11.1.4",
+    "uuid": "^10.0.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

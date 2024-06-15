@@ -1,4 +1,5 @@
 import { base_url } from "../constants/keys";
+import { Budget } from "../constants/models";
 
 export const getEvents = async (
   token: String,
@@ -145,6 +146,23 @@ export const addBudget = async (token: string, data: any) => {
   } else {
     const error = await res.json();
     console.error("Error response:", error); 
+    throw new Error(error.message);
+  }
+};
+
+export const getAllBudgets = async (): Promise<Budget[]> => {
+  const res = await fetch(`${base_url}/EventsManager/budget`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const budgets = await res.json();
+    return budgets;
+  } else {
+    const error = await res.json();
     throw new Error(error.message);
   }
 };

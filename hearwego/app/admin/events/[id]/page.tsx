@@ -319,29 +319,30 @@ const AdminSingleEventPage = () => {
             width: "100%",
             display: "flex",
             marginBottom: 2,
+            padding: 4,
+            justifyContent: "end"
           }}
         >
-          <div style={{ height: 400, width: "100%" }}>
+          <div style={{ width: "100%", padding: 2, display: "flex", justifyContent: "end" }}>
             <Stack direction="row" spacing={2}>
-              <Button variant="outlined" startIcon={<DeleteIcon />}>
+              <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
                 Delete
               </Button>
-              <Button variant="outlined" startIcon={<BlockIcon />}>
+              <Button variant="outlined" color="error" startIcon={<BlockIcon />}>
                 Block
               </Button>
-              <Button variant="outlined" startIcon={<EditIcon />}>
+              <Button variant="outlined" color="secondary" startIcon={<EditIcon />}>
                 Update
               </Button>
-              <Button variant="contained" endIcon={<LocalActivityIcon />}>
+              <Button variant="contained" color="primary" endIcon={<LocalActivityIcon />}>
                 Tickets
               </Button>
-              <Button variant="contained" endIcon={<PaidIcon />}>
+              <Button variant="contained" color="primary" endIcon={<PaidIcon />}>
                 Budget
               </Button>
             </Stack>
           </div>
         </Box>
-        <Divider></Divider>
       </Card>
     </Grid>
   );

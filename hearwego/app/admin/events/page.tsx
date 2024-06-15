@@ -71,34 +71,6 @@ const style = {
   p: 4,
 };
 
-const EventDetailsModal = ({ open, onClose, eventId }) => {
-  const router = useRouter();
-  const [singleEvent, setSingleEvent] = useState<Event>();
-
-  useEffect(() => {
-    getEvent(eventId).then((events) => {
-      console.log("Event Single......",events);
-      setSingleEvent(events);
-    });
-  }
-  , []);
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="event-details-title"
-      aria-describedby="event-details-description"
-    >
-      <Box sx={style}>
-        <Typography>{eventId}</Typography>
-        
-      </Box>
-    </Modal>
-  );
-};
-
-
 function EventDataGrid() {
   const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
@@ -254,7 +226,6 @@ function EventDataGrid() {
         components={{ Toolbar: GridToolbar }}
         getRowId={(row) => row.event_id}  // Specify the custom id field
       />
-      <EventDetailsModal open={isModalOpen} onClose={handleCloseModal} eventId={eventId} />
     </div>
   );
 }
