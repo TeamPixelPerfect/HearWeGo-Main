@@ -9,48 +9,55 @@ import Badge from "@mui/material/Badge";
 export const Root = styled(Box)({
   display: "flex",
   flexDirection: "row",
-  minHeight: "100vh", // Adjusted to cover the full viewport height
-  overflow: "hidden", // Ensure no overflow issues affect layout
+  minHeight: "100vh",
+  overflow: "hidden",
+  "@media (max-width: 960px)": {
+    flexDirection: "column",
+  },
 });
 
-  export const LeftSide = styled(Box)({
-    backgroundColor: "#4338CA",
-  width: "100%", // Take up full width of the container
-  minWidth: "250px", // Fixed minimum width to prevent resizing
-  maxWidth: "350px", // Set maximum width for larger screens
+export const LeftSide = styled(Box)({
+  backgroundColor: "#4338CA",
+  width: "100%",
+  minWidth: "250px",
+  maxWidth: "350px",
   padding: "1rem",
   display: "flex",
   flexDirection: "column",
   justifyContent: "space-between",
+  "@media (max-width: 960px)": {
+    minWidth: "100px",
+    maxWidth: "100%",
+  },
 });
+
 export const ArtistInfo = styled(Box)({
   // marginBottom: "2rem",
-  // marginTop: "1rem",
+marginTop: "20px",
   textAlign: "center",
   color: "white",
   // backgroundColor: "red",
   // padding: "15px",
 });
-
 export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
-  width: "100px",
-  height: "100px",
-  // marginTop: "10px",
-  maxWidth: "20vw", // Maximum width based on viewport width
-  maxHeight: "20vw", // Maximum height based on viewport width
+  width: "150px",
+  height: "150px",
+  maxWidth: "20vw",
+  maxHeight: "20vw",
   "@media (min-width: 600px)": {
-    width: "150px",
-    height: "150px",
-    maxWidth: "15vw", // Adjusted maximum width for larger screens
+    maxWidth: "15vw",
     maxHeight: "15vw",
-    border: "1.5px solid white",
+  },
+  "@media (max-width: 600px)": {
+    width: "100px",
+    height: "100px",
   },
 }));
 
 export const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    right: "15%", // Adjusted for horizontal centering
-    top: "85%", // Adjusted for vertical centering
+    right: "15%",
+    top: "85%",
     width: "3rem",
     height: "3rem",
     borderRadius: "50%",
@@ -58,13 +65,20 @@ export const StyledBadge = styled(Badge)(({ theme }) => ({
     color: "white",
     fontSize: "0.75rem",
     fontWeight: "bold",
-    // padding: 10,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    
+  },
+  "@media (max-width: 600px)": {
+    "& .MuiBadge-badge": {
+      right: "5%",
+      top: "5%",
+      width: "2rem",
+      height: "2rem",
+    },
   },
 }));
+
 
 export const StatBox = styled(Box)({
   textAlign: "center",
@@ -74,13 +88,13 @@ export const StatBox = styled(Box)({
   // paddingTop: "0rem",
   color: "white",
   // backgroundColor: "black",
-  margin: "15px",
+  margin: "12px",
 });
 
 export const StatsRow = styled(Box)({
   display: "flex",
   justifyContent: "center",
-  margin:"10px",
+  margin:"20px",
   flexWrap: "wrap",
   // backgroundColor: "yellow",
 });
@@ -88,13 +102,22 @@ export const StatsRow = styled(Box)({
 export const VerticalTabs = styled(Tabs)({
   width: "100%",
   display: "flex",
-  // backgroundColor: "red",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  textAlign: "center",
+  alignItems: "center",
+  marginTop: "10px",
+  // backgroundColor: "yellow",
 });
 
 export const CustomTab = styled(Tab)(({ theme }) => ({
   borderRadius: "10px",
   marginBottom: "15px",
   backgroundColor: "white",
+  display: "flex",
+  justifyContent: "space-between",
+  textAlign: "center",
+  alignItems: "center",
   color: "black",
   "&.Mui-selected": {
     backgroundColor: "black",
@@ -102,42 +125,56 @@ export const CustomTab = styled(Tab)(({ theme }) => ({
   },
   "@media (max-width: 600px)": {
     fontSize: "0.8rem",
+    padding: "10px",
   },
 }));
 
+
 export const RightSide = styled(Box)({
   backgroundColor: "#3B0764",
-  width: "100%",
-  // padding: "1rem",
+  minWidth: "450px",
+  maxWidth: "550px",
+  padding: "1rem",
   display: "flex",
   flexDirection: "column",
   justifyContent: "space-between",
-  flexGrow: 1, // Ensure RightSide takes remaining space
-  "@media (min-width: 600px)": {
-    maxWidth: "calc(100% - 350px)", // Adjusted to account for sidebar width
+  "@media (max-width: 960px)": {
+    minWidth: "250px",
+    maxWidth: "100%",
   },
 });
 
+
 export const TopFansContainer = styled(Box)({
-  // padding: "1rem",
+  marginTop: "20px",
+  padding: "1rem",
   backgroundColor: "#f5f5f5",
   borderRadius: "15px",
   color: "black",
+  marginBottom: "1rem",
+  "@media (max-width: 600px)": {
+    padding: "0.5rem",
+    marginTop: "10px",
+  },
 });
-
 export const FanItem = styled(Box)({
   display: "flex",
   alignItems: "center",
-  // marginBottom: "1rem",
-  // marginTop: "1rem",
+  marginBottom: "1rem",
+  marginTop: "1rem",
   backgroundColor: "#fff",
-  // padding: "0.2rem",
+  padding: "0.5rem",
   borderRadius: "8px",
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  "@media (max-width: 600px)": {
+    padding: "0.3rem",
+    fontSize: "0.8rem",
+  },
 });
 
+
 export const FanInfo = styled(Box)({
-  // marginLeft: "1.5rem",
+  marginLeft: "1.5rem",
   display: "flex",
   flexDirection: "column",
 });
@@ -151,11 +188,16 @@ export const FanCountry = styled(Box)({
 });
 
 export const RecommendedArtistsContainer = styled(Box)({
-  // marginTop: "2rem",
-  // padding: "1rem",
+  marginTop: "2rem",
+  padding: "1rem",
   backgroundColor: "#f5f5f5",
   borderRadius: "15px",
   color: "black",
+  marginBottom: "1rem",
+  "@media (max-width: 600px)": {
+    padding: "0.5rem",
+    marginTop: "10px",
+  },
 });
 
 export const RecommendedArtistItem = styled(Box)({
@@ -164,13 +206,17 @@ export const RecommendedArtistItem = styled(Box)({
   marginBottom: "1rem",
   marginTop: "1rem",
   backgroundColor: "#fff",
-  // padding: "0.2rem",
+  padding: "0.5rem",
   borderRadius: "8px",
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  "@media (max-width: 600px)": {
+    padding: "0.3rem",
+    fontSize: "0.8rem",
+  },
 });
 
 export const RecommendedArtistInfo = styled(Box)({
-  // marginLeft: "1.5rem",
+  marginLeft: "1.5rem",
   display: "flex",
   flexDirection: "column",
 });

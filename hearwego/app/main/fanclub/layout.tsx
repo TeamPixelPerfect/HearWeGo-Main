@@ -15,9 +15,11 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 import Icon from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
+import Tabs from "@mui/material/Tabs";
+import Link from "@mui/material/Link";
 
 import {
   Root,
@@ -40,7 +42,6 @@ import {
   RecommendedArtistInfo,
   RecommendedArtistsFollowers,
   RecommendedArtistName,
-
 } from "../../styles/fanclub.styles";
 
 const topFans = [
@@ -75,19 +76,20 @@ const recommendedArtists = [
   { name: "Artist 1", followers: "1200 followers", avatar: "url_to_image1" },
   { name: "Artist 2", followers: "1200 followers", avatar: "url_to_image2" },
   { name: "Artist 3", followers: "1200 followers", avatar: "url_to_image3" },
-    { name: "Artist 4", followers: "1200 followers", avatar: "url_to_image4" },
-    { name: "Artist 5", followers: "1200 followers", avatar: "url_to_image5" },
-    { name: "Artist 6", followers: "1200 followers", avatar: "url_to_image6" },
-    { name: "Artist 7", followers: "1200 followers", avatar: "url_to_image7" },
-    { name: "Artist 8", followers: "1200 followers", avatar: "url_to_image8" },
-    { name: "Artist 9", followers: "1200 followers", avatar: "url_to_image9" },
-    { name: "Artist 10", followers: "1200 followers", avatar: "url_to_image10" },
+  { name: "Artist 4", followers: "1200 followers", avatar: "url_to_image4" },
+  { name: "Artist 5", followers: "1200 followers", avatar: "url_to_image5" },
+  { name: "Artist 6", followers: "1200 followers", avatar: "url_to_image6" },
+  { name: "Artist 7", followers: "1200 followers", avatar: "url_to_image7" },
+  { name: "Artist 8", followers: "1200 followers", avatar: "url_to_image8" },
+  { name: "Artist 9", followers: "1200 followers", avatar: "url_to_image9" },
+  { name: "Artist 10", followers: "1200 followers", avatar: "url_to_image10" },
 ];
 
 const FanClubPage: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const [showMoreFan, setShowMoreFan] = useState(false);
-    const [showMoreRecommendedArtist, setShowMoreRecommendedArtist] = useState(false);
+  const [showMoreRecommendedArtist, setShowMoreRecommendedArtist] =
+    useState(false);
   const initialTopFans = topFans.slice(0, 3);
   const remainingFans = topFans.slice(3);
   const initialRecommendedArtists = recommendedArtists.slice(0, 3);
@@ -110,14 +112,16 @@ const FanClubPage: React.FC = () => {
   const toggleShowMoreFan = () => {
     setShowMoreFan(!showMoreFan);
     setIconRotation(!iconRotation);
-};
+  };
 
-const toggleShowMoreArtists = () => {
+  const toggleShowMoreArtists = () => {
     setShowMoreRecommendedArtist(!showMoreRecommendedArtist);
     setIconRotation(!iconRotation);
-};
+  };
 
-const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const inputValue = event.target.value.toLowerCase();
     // Implement your search logic here
     // Example: Filter topFans based on fan name containing input value
@@ -127,36 +131,33 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
     console.log(filteredFans);
     // Update state or perform other operations with filtered data
   };
-  
-
 
   return (
     <>
-   
       <Root>
-        
-       
-            <LeftSide>
-
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    // padding: "1rem",
-                    textAlign: "center",
-                    color: "white",
-                    // backgroundColor: "green",
-                    // justifyContent: "space-between",    
-                }}>
-              <Box sx={{
+        <LeftSide>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              // padding: "1rem",
+              textAlign: "center",
+              color: "white",
+              // backgroundColor: "green",
+              // justifyContent: "space-between",
+            }}
+          >
+            <Box
+              sx={{
                 // padding: "1rem",
                 textAlign: "center",
                 flexDirection: "column",
                 color: "white",
                 // backgroundColor: "green",
-                justifyContent: "space-between",    
-              
-              }}>
+                justifyContent: "space-between",
+              }}
+            >
               <ArtistInfo>
                 <Typography variant="h5">{artistName}</Typography>
                 <Typography variant="subtitle1" sx={{ fontStyle: "italic" }}>
@@ -183,155 +184,188 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
                   <Typography variant="body2">News</Typography>
                 </StatBox>
               </StatsRow>
-              </Box> 
-
-              {/* Vertical Tabs */}
-              <Box mt={2}>
-                <VerticalTabs
-                  orientation="vertical"
-                  value={tabValue}
-                  onChange={handleTabChange}
-                >
-                  <CustomTab label="Feed" />
-                  <CustomTab label="News" />
-                  <CustomTab label="Events" />
-                  <CustomTab label="Photos" />
-                  <CustomTab label="Videos" />
-                </VerticalTabs>
-              </Box>
-              </Box>
-            </LeftSide>
-      
-
-            <Box
-            mb={3}
-            sx={{
-              width: "100%",
-              display: "flex",
-            //   alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "40px",
-            }}
-          >
-         
-              <TextField
-                variant="outlined"
-                placeholder="Search"
-                margin="normal"
-              
-              InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon style={{ color: "gray" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{ 
-                    display: "flex", width: "60%"}}
-              />
             </Box>
 
-        <RightSide>
-          <Box>
-            <TopFansContainer>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
+            {/* Vertical Tabs */}
+            
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                // backgroundColor: "red",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                textAlign: "center",
+                alignItems: "center",
+              }}
+            >
+              <VerticalTabs
+                orientation="vertical"
+                value={tabValue}
+                onChange={handleTabChange}
               >
-                <Typography variant="h6" style={{ flexGrow: 1 }}>
-                  Top Fans
-                </Typography>
-                <ExpandMoreIcon
-                  style={{
-                    cursor: "pointer",
-                    transform: iconRotation ? "rotate(180deg)" : "rotate(0deg)",
-                  }}
-                  onClick={toggleShowMoreFan}
-                />
-              </Box>
-              {initialTopFans.map((fan, index) => (
-                <FanItem key={index}>
-                  <Avatar
-                    alt={fan.name}
-                    src={fan.avatar}
-                    sx={{ marginLeft: "0.5rem" }}
+                <CustomTab label="Feed" />a
+
+                <CustomTab label="News" />
+
+                <CustomTab label="Events" />
+                <CustomTab label="Photos" />
+                <CustomTab label="Videos" />
+              </VerticalTabs>
+
+            </Box>
+          </Box>
+        </LeftSide>
+
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            height: "20%",
+            justifyContent: "center",
+
+            // backgroundColor: "yellow",
+          }}
+        >
+          <TextField
+            variant="outlined"
+            placeholder="Search"
+            margin="normal"
+            select={false}
+            sx={{ display: "flex", width: "60%" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon style={{ color: "gray" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
+        <RightSide>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box>
+              <TopFansContainer>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography
+                    variant="h5"
+                    style={{ flexGrow: 1, fontWeight: "bold" }}
+                  >
+                    Top Fans
+                  </Typography>
+                  <ExpandMoreIcon
+                    style={{
+                      cursor: "pointer",
+                      transform: iconRotation
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                    }}
+                    onClick={toggleShowMoreFan}
                   />
-                  <FanInfo>
-                    <FanName>{fan.name}</FanName>
-                    <FanCountry>{fan.country}</FanCountry>
-                  </FanInfo>
-                </FanItem>
-              ))}
-              {showMoreFan &&
-                remainingFans.map((fan, index) => (
+                </Box>
+                {initialTopFans.map((fan, index) => (
                   <FanItem key={index}>
-                    <Avatar alt={fan.name} src={fan.avatar} />
+                    <Avatar
+                      alt={fan.name}
+                      src={fan.avatar}
+                      sx={{ marginLeft: "0.5rem" }}
+                    />
                     <FanInfo>
                       <FanName>{fan.name}</FanName>
                       <FanCountry>{fan.country}</FanCountry>
                     </FanInfo>
                   </FanItem>
                 ))}
-              {!showMoreFan && remainingFans.length > 0 && (
-                <Typography></Typography>
-              )}
-            </TopFansContainer>
-          </Box>
+                {showMoreFan &&
+                  remainingFans.map((fan, index) => (
+                    <FanItem key={index}>
+                      <Avatar alt={fan.name} src={fan.avatar} />
+                      <FanInfo>
+                        <FanName>{fan.name}</FanName>
+                        <FanCountry>{fan.country}</FanCountry>
+                      </FanInfo>
+                    </FanItem>
+                  ))}
+                {!showMoreFan && remainingFans.length > 0 && (
+                  <Typography></Typography>
+                )}
+              </TopFansContainer>
+            </Box>
 
-          <Box>
-            <RecommendedArtistsContainer>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="h6" style={{ flexGrow: 1 }}>
-                  Recommended Artists
-                </Typography>
-                <ExpandMoreIcon
-                  style={{
-                    cursor: "pointer",
-                    transform: iconRotation ? "rotate(180deg)" : "rotate(0deg)",
-                  }}
-                  onClick={toggleShowMoreArtists}
-                />
-              </Box>
-              {initialRecommendedArtists.map((artist, index) => (
-                <RecommendedArtistItem key={index}>
-                  <Avatar
-                    alt={artist.name}
-                    src={artist.avatar}
-                    sx={{ marginLeft: "0.5rem" }}
+            <Box>
+              <RecommendedArtistsContainer>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography
+                    variant="h5"
+                    style={{ flexGrow: 1, fontWeight: "bold" }}
+                  >
+                    Recommended Artists
+                  </Typography>
+                  <ExpandMoreIcon
+                    style={{
+                      cursor: "pointer",
+                      transform: iconRotation
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                    }}
+                    onClick={toggleShowMoreArtists}
                   />
-                  <RecommendedArtistInfo>
-                    <RecommendedArtistName>{artist.name}</RecommendedArtistName>
-                    <RecommendedArtistsFollowers>
-                      {artist.followers}
-                    </RecommendedArtistsFollowers>
-                  </RecommendedArtistInfo>
-                </RecommendedArtistItem>
-              ))}
-              {showMoreRecommendedArtist &&
-                remainingRecommendedArtists.map((artist, index) => (
+                </Box>
+                {initialRecommendedArtists.map((artist, index) => (
                   <RecommendedArtistItem key={index}>
-                    <Avatar alt={artist.name} src={artist.avatar} />
+                    <Avatar
+                      alt={artist.name}
+                      src={artist.avatar}
+                      sx={{ marginLeft: "0.5rem" }}
+                    />
                     <RecommendedArtistInfo>
-                      <RecommendedArtistName>{artist.name}</RecommendedArtistName>
+                      <RecommendedArtistName>
+                        {artist.name}
+                      </RecommendedArtistName>
                       <RecommendedArtistsFollowers>
-                      {artist.followers}
-                    </RecommendedArtistsFollowers>
+                        {artist.followers}
+                      </RecommendedArtistsFollowers>
                     </RecommendedArtistInfo>
-                    </RecommendedArtistItem>
+                  </RecommendedArtistItem>
                 ))}
-              {!showMoreRecommendedArtist && remainingRecommendedArtists.length > 0 && (
-                <Typography></Typography>
-              )}
-            </RecommendedArtistsContainer>
+                {showMoreRecommendedArtist &&
+                  remainingRecommendedArtists.map((artist, index) => (
+                    <RecommendedArtistItem key={index}>
+                      <Avatar alt={artist.name} src={artist.avatar} />
+                      <RecommendedArtistInfo>
+                        <RecommendedArtistName>
+                          {artist.name}
+                        </RecommendedArtistName>
+                        <RecommendedArtistsFollowers>
+                          {artist.followers}
+                        </RecommendedArtistsFollowers>
+                      </RecommendedArtistInfo>
+                    </RecommendedArtistItem>
+                  ))}
+                {!showMoreRecommendedArtist &&
+                  remainingRecommendedArtists.length > 0 && (
+                    <Typography></Typography>
+                  )}
+              </RecommendedArtistsContainer>
+            </Box>
           </Box>
         </RightSide>
-       
-        </Root>
+      </Root>
     </>
   );
 };
