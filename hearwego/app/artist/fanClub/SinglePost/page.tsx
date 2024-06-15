@@ -67,9 +67,7 @@ const SinglePost: React.FC<Props> = ({
   );
   const [replyContent, setReplyContent] = useState("");
 
-  const handleEditPost = () => {
-    setEditMode(true);
-  };
+  const handleEditPost = () => setEditMode(true);
 
   const handleSavePost = () => {
     const updatedPost = {
@@ -87,9 +85,7 @@ const SinglePost: React.FC<Props> = ({
     setEditMode(false);
   };
 
-  const handleDeletePost = () => {
-    onDeletePost(post.id);
-  };
+  const handleDeletePost = () => onDeletePost(post.id);
 
   const handleAddComment = () => {
     const comment: Comment = {
@@ -116,19 +112,17 @@ const SinglePost: React.FC<Props> = ({
     }
   };
 
-  const handleDeleteComment = (commentId: number) => {
+  const handleDeleteComment = (commentId: number) =>
     onDeleteComment(post.id, commentId);
-  };
 
-  const handleReplyToComment = (commentId: number) => {
+  const handleReplyToComment = (commentId: number) =>
     setReplyingCommentId(commentId);
-  };
 
   const handleSendReply = () => {
     if (replyingCommentId !== null) {
       const reply: Comment = {
         id: Date.now(),
-        user: "Artist", // Assuming "Artist" is the user's name
+        user: "Artist",
         content: replyContent,
         isArtist: true,
       };
@@ -148,13 +142,6 @@ const SinglePost: React.FC<Props> = ({
   return (
     <Paper sx={{ p: 2, marginBottom: 2 }}>
       <div style={{ display: "flex", alignItems: "center" }}>
-        {post.image && (
-          <Avatar
-            variant="rounded"
-            src={post.image}
-            sx={{ width: 500, height: 100, marginRight: 2 }}
-          />
-        )}
         <div style={{ flex: 1 }}>
           {editMode ? (
             <>
@@ -203,6 +190,12 @@ const SinglePost: React.FC<Props> = ({
           )}
         </div>
       </div>
+
+      {post.image && (
+        <div style={{ textAlign: "center", marginTop: 16, marginBottom: 16 }}>
+          <img src={post.image} alt={post.title} style={{ maxWidth: "100%" }} />
+        </div>
+      )}
 
       <Divider sx={{ my: 2 }} />
 

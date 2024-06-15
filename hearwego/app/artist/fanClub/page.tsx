@@ -16,7 +16,7 @@ import {
 import { Add as AddIcon } from "@mui/icons-material";
 import SinglePost from "./SinglePost/page";
 
-const ArtistPage = () => {
+const ArtistPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"post" | "news" | null>(null);
   const [newPostTitle, setNewPostTitle] = useState("");
@@ -26,7 +26,8 @@ const ArtistPage = () => {
       id: 1,
       title: "First Post",
       content: "Content of the first post.",
-      image: "/mnt/data/image.png", // Use the provided image path
+      image:
+        "https://c.ndtvimg.com/2023-03/ts9dtkq8_selfies-from-the-past_625x300_21_March_23.jpg", // Use the provided image path
       comments: [
         { id: 1, user: "User A", content: "First comment" },
         { id: 2, user: "User B", content: "Second comment" },
@@ -36,7 +37,8 @@ const ArtistPage = () => {
       id: 2,
       title: "Second Post with Image",
       content: "Content of the second post.",
-      image: "/mnt/data/image.png", // Example image URL
+      image:
+        "https://www.popsci.com/wp-content/uploads/2023/09/07/robot_with_bob_ross.jpg", // Example image URL
       comments: [
         { id: 3, user: "User C", content: "Third comment" },
         { id: 4, user: "User D", content: "Fourth comment" },
