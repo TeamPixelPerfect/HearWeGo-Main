@@ -183,27 +183,6 @@ export interface Event {
   description?: string;
   event_status?: string;
   event_created_by?: string;
-  event_tickets?: [
-    {
-      ticket_catagory: string;
-      ticket_img: string;
-      ticket_currency: string;
-      auto_ticket_type: string;
-      auto_ticket_price: number;
-      auto_tickets_count: number;
-      manual_ticket_location: string;
-      special_notice: string;
-      sesson_id: number;
-    }
-  ];
-  event_budget?: [
-    {
-      budget_title: string;
-      session: string;
-      budget_type: string;
-      amount: number;
-    }
-  ];
 }
 
 export interface PRPost {
@@ -222,13 +201,37 @@ export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
   ticket_img?: string;
-  ticket_currency?: string;
-  auto_ticket_type?: string;
-  auto_ticket_price?: number;
-  auto_tickets_count?: number;
-  manual_ticket_location?: string;
-  special_notice?: string;
-  sesson_id?: number;
+  auto_ticket_details?: [
+    {
+      ticket_currency: string;
+      ticket_img: string;
+      ticket_type: string;
+      ticket_price: string;
+      ticket_count: string;
+      ticket_session: string;
+    }
+  ];
+  manual_ticket_details?: [
+    {
+      ticket_location: string;
+      ticket_session: string;
+    }
+  ];
+  ticket_description?: string;
+  event_id?: string;
+}
+
+export interface Budget {
+  budget_id?: string;
+  budget_currency?: string;
+  budget_details?: [
+    {
+      budget_title: string;
+      budget_type: string;
+      budget_session: string;
+      budget_amount: number;
+    }
+  ];
   event_id?: string;
 }
 
