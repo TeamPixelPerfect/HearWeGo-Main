@@ -11,7 +11,14 @@ import {
   Pagination,
   CardMedia,
   Divider,
+  Button,
+  Stack,
 } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import BlockIcon from '@mui/icons-material/Block';
+import EditIcon from '@mui/icons-material/Edit';
+import LocalActivityIcon from '@mui/icons-material/LocalActivity';
+import PaidIcon from '@mui/icons-material/Paid';
 import { getEvent } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
@@ -260,7 +267,12 @@ const AdminSingleEventPage = () => {
                 <Divider sx={{ marginBottom: 2 }}></Divider>
 
                 <DataGrid
-                  rows={event.teams.map((team, index) => ({ ...team, id: `${team.team_name}-${index}` })) || []}
+                  rows={
+                    event.teams.map((team, index) => ({
+                      ...team,
+                      id: `${team.team_name}-${index}`,
+                    })) || []
+                  }
                   columns={teamColumns}
                   pageSize={5}
                   rowsPerPageOptions={[5]}
@@ -285,7 +297,12 @@ const AdminSingleEventPage = () => {
                 <Divider sx={{ marginBottom: 2 }}></Divider>
 
                 <DataGrid
-                  rows={event.teams.map((team, index) => ({ ...team, id: `${team.team_name}-${index}` })) || []}
+                  rows={
+                    event.teams.map((team, index) => ({
+                      ...team,
+                      id: `${team.team_name}-${index}`,
+                    })) || []
+                  }
                   columns={teamColumns}
                   pageSize={5}
                   rowsPerPageOptions={[5]}
@@ -304,7 +321,25 @@ const AdminSingleEventPage = () => {
             marginBottom: 2,
           }}
         >
-          <div style={{ height: 400, width: "100%" }}></div>
+          <div style={{ height: 400, width: "100%" }}>
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" startIcon={<DeleteIcon />}>
+                Delete
+              </Button>
+              <Button variant="outlined" startIcon={<BlockIcon />}>
+                Block
+              </Button>
+              <Button variant="outlined" startIcon={<EditIcon />}>
+                Update
+              </Button>
+              <Button variant="contained" endIcon={<LocalActivityIcon />}>
+                Tickets
+              </Button>
+              <Button variant="contained" endIcon={<PaidIcon />}>
+                Budget
+              </Button>
+            </Stack>
+          </div>
         </Box>
         <Divider></Divider>
       </Card>
