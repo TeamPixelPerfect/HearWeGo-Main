@@ -10,31 +10,32 @@ export const Root = styled(Box)({
   display: "flex",
   flexDirection: "row",
   minHeight: "100vh", // Adjusted to cover the full viewport height
+  overflow: "hidden", // Ensure no overflow issues affect layout
 });
 
-export const LeftSide = styled(Box)({
-  backgroundColor: "#4338CA",
+  export const LeftSide = styled(Box)({
+    backgroundColor: "#4338CA",
   width: "100%", // Take up full width of the container
+  minWidth: "250px", // Fixed minimum width to prevent resizing
+  maxWidth: "350px", // Set maximum width for larger screens
   padding: "1rem",
   display: "flex",
   flexDirection: "column",
   justifyContent: "space-between",
-  "@media (min-width: 600px)": {
-    maxWidth: "350px", // Set maximum width for larger screens
-  },
 });
-
 export const ArtistInfo = styled(Box)({
-  marginBottom: "2rem",
-  marginTop: "1rem",
+  // marginBottom: "2rem",
+  // marginTop: "1rem",
   textAlign: "center",
   color: "white",
+  // backgroundColor: "red",
+  // padding: "15px",
 });
 
 export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
   width: "100px",
   height: "100px",
-  marginTop: "10px",
+  // marginTop: "10px",
   maxWidth: "20vw", // Maximum width based on viewport width
   maxHeight: "20vw", // Maximum height based on viewport width
   "@media (min-width: 600px)": {
@@ -57,35 +58,42 @@ export const StyledBadge = styled(Badge)(({ theme }) => ({
     color: "white",
     fontSize: "0.75rem",
     fontWeight: "bold",
-    padding: 10,
+    // padding: 10,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    
   },
 }));
 
 export const StatBox = styled(Box)({
   textAlign: "center",
-  paddingLeft: "1.5rem",
-  paddingRight: "1.5rem",
-  paddingBottom: "0rem",
-  paddingTop: "0rem",
+  // paddingLeft: "1.5rem",
+  // paddingRight: "1.5rem",
+  // paddingBottom: "0rem",
+  // paddingTop: "0rem",
   color: "white",
+  // backgroundColor: "black",
+  margin: "15px",
 });
 
 export const StatsRow = styled(Box)({
   display: "flex",
   justifyContent: "center",
+  margin:"10px",
   flexWrap: "wrap",
+  // backgroundColor: "yellow",
 });
 
 export const VerticalTabs = styled(Tabs)({
   width: "100%",
+  display: "flex",
+  // backgroundColor: "red",
 });
 
 export const CustomTab = styled(Tab)(({ theme }) => ({
   borderRadius: "10px",
-  marginBottom: "1rem",
+  marginBottom: "15px",
   backgroundColor: "white",
   color: "black",
   "&.Mui-selected": {
@@ -100,17 +108,18 @@ export const CustomTab = styled(Tab)(({ theme }) => ({
 export const RightSide = styled(Box)({
   backgroundColor: "#3B0764",
   width: "100%",
-  padding: "1rem",
+  // padding: "1rem",
   display: "flex",
   flexDirection: "column",
   justifyContent: "space-between",
+  flexGrow: 1, // Ensure RightSide takes remaining space
   "@media (min-width: 600px)": {
-    maxWidth: "400px", // Adjusted to account for sidebar width
+    maxWidth: "calc(100% - 350px)", // Adjusted to account for sidebar width
   },
 });
 
 export const TopFansContainer = styled(Box)({
-  padding: "1rem",
+  // padding: "1rem",
   backgroundColor: "#f5f5f5",
   borderRadius: "15px",
   color: "black",
@@ -119,16 +128,16 @@ export const TopFansContainer = styled(Box)({
 export const FanItem = styled(Box)({
   display: "flex",
   alignItems: "center",
-  marginBottom: "1rem",
-  marginTop: "1rem",
+  // marginBottom: "1rem",
+  // marginTop: "1rem",
   backgroundColor: "#fff",
-  padding: "0.2rem",
+  // padding: "0.2rem",
   borderRadius: "8px",
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
 });
 
 export const FanInfo = styled(Box)({
-  marginLeft: "1.5rem",
+  // marginLeft: "1.5rem",
   display: "flex",
   flexDirection: "column",
 });
@@ -142,8 +151,8 @@ export const FanCountry = styled(Box)({
 });
 
 export const RecommendedArtistsContainer = styled(Box)({
-  marginTop: "2rem",
-  padding: "1rem",
+  // marginTop: "2rem",
+  // padding: "1rem",
   backgroundColor: "#f5f5f5",
   borderRadius: "15px",
   color: "black",
@@ -155,13 +164,13 @@ export const RecommendedArtistItem = styled(Box)({
   marginBottom: "1rem",
   marginTop: "1rem",
   backgroundColor: "#fff",
-  padding: "0.2rem",
+  // padding: "0.2rem",
   borderRadius: "8px",
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
 });
 
 export const RecommendedArtistInfo = styled(Box)({
-  marginLeft: "1.5rem",
+  // marginLeft: "1.5rem",
   display: "flex",
   flexDirection: "column",
 });

@@ -127,6 +127,7 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
     console.log(filteredFans);
     // Update state or perform other operations with filtered data
   };
+  
 
 
   return (
@@ -136,6 +137,26 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
         
        
             <LeftSide>
+
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    // padding: "1rem",
+                    textAlign: "center",
+                    color: "white",
+                    // backgroundColor: "green",
+                    // justifyContent: "space-between",    
+                }}>
+              <Box sx={{
+                // padding: "1rem",
+                textAlign: "center",
+                flexDirection: "column",
+                color: "white",
+                // backgroundColor: "green",
+                justifyContent: "space-between",    
+              
+              }}>
               <ArtistInfo>
                 <Typography variant="h5">{artistName}</Typography>
                 <Typography variant="subtitle1" sx={{ fontStyle: "italic" }}>
@@ -145,6 +166,7 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
                   <ProfileAvatar src={profileImageUrl} alt={artistName} />
                 </StyledBadge>
               </ArtistInfo>
+
               <StatsRow>
                 <StatBox>
                   <Typography variant="h6">{postsCount}</Typography>
@@ -161,6 +183,7 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
                   <Typography variant="body2">News</Typography>
                 </StatBox>
               </StatsRow>
+              </Box> 
 
               {/* Vertical Tabs */}
               <Box mt={2}>
@@ -175,6 +198,7 @@ const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => 
                   <CustomTab label="Photos" />
                   <CustomTab label="Videos" />
                 </VerticalTabs>
+              </Box>
               </Box>
             </LeftSide>
       
