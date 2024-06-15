@@ -72,6 +72,13 @@ const AdminSingleEventPage = () => {
     { field: "email", headerName: "Email", width: 150 },
   ];
 
+  const sponsorColumns: GridColDef[] = [
+    { field: "sponsor_type", headerName: "Type", width: 150 },
+    { field: "sponsor_name", headerName: "Name", width: 150 },
+    { field: "sponsor_contact", headerName: "Contact", width: 150 },
+    { field: "sponsor_email", headerName: "Email", width: 150 },
+  ];
+
   const artist = useAppSelector((state) => state.artist.user);
 
   return (
@@ -248,6 +255,31 @@ const AdminSingleEventPage = () => {
                   }}
                 >
                   Teams
+                </Typography>
+
+                <Divider sx={{ marginBottom: 2 }}></Divider>
+
+                <DataGrid
+                  rows={event.teams.map((team, index) => ({ ...team, id: `${team.team_name}-${index}` })) || []}
+                  columns={teamColumns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5]}
+                  components={{ Toolbar: GridToolbar }}
+                  getRowId={(row) => row.id}
+                />
+              </Box>
+
+              <Box sx={{ width: "100%", marginBottom: 2 }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontSize: "24px",
+                    fontWeight: "500",
+                    color: theme.palette.mode === "dark" ? "#fff" : "#000",
+                    marginBottom: 2,
+                  }}
+                >
+                  Sponsors
                 </Typography>
 
                 <Divider sx={{ marginBottom: 2 }}></Divider>
