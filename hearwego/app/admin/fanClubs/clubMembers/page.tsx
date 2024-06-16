@@ -43,43 +43,51 @@ import { FanClub } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { Artist } from "@/app/constants/models";
 import { getFanClubs } from "@/app/services/FanClubServices";
+import { getClubMembers } from "@/app/services/FanClubServices";
+import { ClubMember } from "@/app/constants/models";
+import { getAllUsers } from "@/app/services/UserServices";
+import { User } from "@/app/constants/models";
+import router from "next/router";
 // import { DataGrid } from "@mui/x-data-grid";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { get } from "http";
 
 function FanClubsDataGrid() {
-  const router = useRouter();
+    const router = useRouter();
+    const [clubMembers, setClubMembers] = useState<ClubMember[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
   const [fanClubs, setFanClubs] = useState<FanClub[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getFanClubs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((fanClubs) => {
-      console.log("Fan Clubs......",fanClubs);
-      setFanClubs(fanClubs.data);
+    getClubMembers().then((clubMembers) => {
+      console.log("Club Members......",clubMembers);
+      setClubMembers(clubMembers.data);
     });
 
-    getAllArtists().then((artists) => {
-      console.log("Artists......",artists);
-      setArtists(artists.data);
+    getAllUsers().then((users) => {
+      console.log("Users......",users);
+      setUsers(users.data);
     });
   }
   , []);
 
-  function createFanClubData(
+  function createClubMemberData(
+    memberId: string,
+    userId: string,
+    topMember: boolean,
     clubId: string,
-    artistId: string,
-    coverImage_URL: string,
-    visibility: boolean,
     createdAt: string,
     updatedAt: string
-  ){return {clubId, artistId, coverImage_URL, visibility, createdAt, updatedAt};}
+  ){return {memberId, userId, topMember, clubId, createdAt, updatedAt};}
 
-  const fcRows = fanClubs.map((fc) => {
-    return createFanClubData(fc.clubId, fc.artistId, fc.coverImage_URL, fc.visibility, fc.createdAt, fc.updatedAt);
+  const cmRows = clubMembers.map((fc) => {
+    return createClubMemberData(fc.memberId, fc.userId, fc.topMember, fc.clubId, fc.createdAt, fc.updatedAt);
   });
 
-  const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
+  const getUserImg = (userId) => {
+    const user = users.find(user => user.userId === userId);
+    return user ? user.profilePicture : 'https://hwgbucket.s3.ap-south-1.amazonaws.com/images/profile.png';
   };
 
   const columns = [
@@ -122,7 +130,7 @@ function FanClubsDataGrid() {
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick= {()=> {router.push(`/admin/events/${params.row.event_id}`)}}
+            onClick= {()=> {router.push(`/admin/fanClubs/clubMembers`)}}
           >
             <FaEye />
           </IconButton>
@@ -137,7 +145,7 @@ function FanClubsDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={fcRows}
+        rows={cmRows}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
@@ -195,7 +203,7 @@ const AdminUserPage = () => {
               color: theme.palette.mode === "dark" ? "#fff" : "#000",
             }}
           >
-            Artist Fan Clubs
+            Fan Club Members
           </Typography>
           <Stack direction="row" spacing={2}>
           <Button
@@ -206,9 +214,9 @@ const AdminUserPage = () => {
               border: "1px solid #000",
               color: "#000",
             }}
-            onClick={() => {router.push(`/admin/fanClubs/clubMembers`)}}
+            onClick= {()=> {router.push(`/admin/fanClubs`)}}
           >
-            Club Members
+            Fan Clubs
             </Button>
             <Button
             variant="outlined"

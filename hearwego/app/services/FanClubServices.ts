@@ -36,3 +36,20 @@ export const getAllFanClubs = async (): Promise<FanClub[]> => {
       throw new Error(error.message);
     }
   };
+
+  export const getClubMembers = async (): Promise<FanClub[]> => {
+    const res = await fetch(`${base_url}/FanClubManager/clubMembers`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  
+    if (res.ok) {
+      const cm = await res.json();
+      return cm;
+    } else {
+      const error = await res.json();
+      throw new Error(error.message);
+    }
+  };

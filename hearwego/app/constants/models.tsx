@@ -254,3 +254,11 @@ export interface FanClub {
   coverImage_URL?: string;
   visibility?: boolean;
 }
+
+
+export interface ClubMember {
+  memberId?: string;
+  userId?: string;
+  topMember?: boolean;
+  clubId?: string;
+}
