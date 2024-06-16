@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Container, Grid, Card, CardContent, Typography, CardActions, Button, TextField, Avatar, Box, IconButton, Paper } from '@mui/material';
 import { deepPurple } from '@mui/material/colors'; // Importing color for Avatar
 import { Favorite as FavoriteIcon, Comment as CommentIcon, Reply as ReplyIcon } from '@mui/icons-material'; // Importing icons for like, comment, and reply
+import { on } from 'events';
 
 // Dummy data for posts
 const initialPosts = [
@@ -22,22 +23,7 @@ const initialPosts = [
         commenterImageUrl: 'https://randomuser.me/api/portraits/women/11.jpg',
         commentTime:  new Date().toISOString(),
         commentText: 'Great news! Looking forward to it.',
-        replies: [
-          {
-            id: 1,
-            replierName: 'John',
-            replierImageUrl: 'https://randomuser.me/api/portraits/men/12.jpg',
-            replyTime:  new Date().toISOString(),
-            replyText: 'Thanks, Alice!'
-          },
-          {
-            id: 2,
-            replierName: 'Mary',
-            replierImageUrl: 'https://randomuser.me/api/portraits/women/13.jpg',
-            replyTime:  new Date().toISOString(),
-            replyText: 'Can\'t wait!'
-          }
-        ]
+        replies: []
       }
     ]
   },
@@ -89,6 +75,9 @@ const NewsPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [replyingTo, setReplyingTo] = useState<{ postId: number; commentId: number } | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [newComment, setNewComment] = useState('');
+  const [showComments, setShowComments] = useState(false);
+
 
   const handleLike = (postId: number) => {
     setPosts(prevPosts =>
@@ -107,6 +96,7 @@ const NewsPage: React.FC = () => {
       commentText,
       replies: []
     };
+
 
     setPosts(prevPosts =>
       prevPosts.map(post =>
@@ -257,7 +247,7 @@ const NewsPage: React.FC = () => {
                           <Button
                             variant="contained"
                             size="small"
-                            sx={{ mt: 1 }}
+                            // sx={{ mt: 1 }}
                             onClick={handleReply}
                           >
                             Reply
