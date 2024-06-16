@@ -141,6 +141,7 @@ function FanClubsDataGrid() {
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
+        components={{ Toolbar: GridToolbar }}
         getRowId={(row) => row.clubId}
         // checkboxSelection
         // disableSelectionOnClick
@@ -212,22 +213,6 @@ const AdminUserPage = () => {
         <ADTabBox>
             <FanClubsDataGrid />
         </ADTabBox>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "2em 0",
-          }}
-        >
-          <Pagination
-            count={10}
-            page={page}
-            onChange={handlePageChange}
-            color="secondary"
-          />
-        </Box>
       </Card>
     </Grid>
   );
