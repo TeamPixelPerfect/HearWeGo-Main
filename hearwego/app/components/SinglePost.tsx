@@ -21,6 +21,7 @@ import {
   ThumbUp as ThumbUpIcon,
   Comment as CommentIcon,
 } from "@mui/icons-material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 type Comment = {
   id: number;
@@ -169,10 +170,12 @@ const SinglePost: React.FC<Props> = ({
       <Divider sx={{ my: 2 }} />
 
       <Button
-        startIcon={<ThumbUpIcon />}
+        startIcon={<FavoriteIcon />}
         onClick={handleLikePost}
         disabled={liked}
+      
       >
+      
         Like ({likes})
       </Button>
       <Button startIcon={<CommentIcon />} onClick={handleShowComments}>
