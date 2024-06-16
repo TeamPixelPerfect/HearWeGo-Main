@@ -247,3 +247,10 @@ export interface PRPost {
   SocialMedias ?: string[];
   
 }
+
+export interface FanClub {
+  clubId?: string;
+  artistId?: string;
+  coverImage_URL?: string;
+  visibility?: boolean;
+}

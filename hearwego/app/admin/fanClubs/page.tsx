@@ -7,6 +7,7 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Chip,
   Grid,
   IconButton,
   Pagination,
@@ -37,6 +38,114 @@ import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
 import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
+import { getAllFanClubs } from "@/app/services/FanClubServices";
+import { FanClub } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { Artist } from "@/app/constants/models";
+import router from "next/router";
+// import { DataGrid } from "@mui/x-data-grid";
+import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
+
+function FanClubsDataGrid() {
+  const [fanClubs, setFanClubs] = useState<FanClub[]>([]);
+  const [artsts, setArtists] = useState<Artist[]>([]);
+
+  useEffect(() => {
+    getAllFanClubs().then((fc) => {
+      console.log("FanClubs......",fc);
+      setFanClubs(fc.data);
+    });
+
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
+    });
+  }
+  , []);
+
+  function createFanClubData(
+    clubId: string,
+    artistId: string,
+    coverImage_URL: string,
+    visibility: boolean,
+    createdAt: string,
+    updatedAt: string
+  ){return {clubId, artistId, coverImage_URL, visibility, createdAt, updatedAt};}
+
+  const fcRows = fanClubs.map((fc) => {
+    return createFanClubData(fc.clubId, fc.artistId, fc.coverImage_URL, fc.visibility, fc.createdAt, fc.updatedAt);
+  });
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
+
+  const columns = [
+    { field: "clubId", headerName: "Club ID", flex: 1 },
+    { field: "coverImage_URL", headerName: "Cover Image", flex: 1, renderCell: (params) => (<img src={params.row.coverImage_URL} style={{ width: 50, height: 50 }} />)},
+    { field: "artistId", headerName: "Artist ID", flex: 2 },
+    { field: "artist_name", headerName: "Artist Name", flex: 1, valueGetter: (params) => getArtistName(params.row.artistId), },
+    {
+      field: "visibility",
+      headerName: "Visibility",
+      flex: 1,
+      renderCell: (params) => {
+        const status = params.row.visibility;
+        let chipColor;
+        switch (status) {
+          case true:
+            chipColor = "success";
+            break;
+          case false:
+            chipColor = "error";
+            break;
+          default:
+            chipColor = "default";
+        }
+        return <Chip label={status.charAt(0).toUpperCase() + status.slice(1)} color={chipColor} />;
+      }
+    },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
+    { field: "updatedAt", headerName: "Updated At", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 2,
+      renderCell: (params) => (
+        <ButtonGroup>
+          <IconButton color="primary" sx={{ fontSize: "16px" }}>
+            <FaEdit />
+          </IconButton>
+          {/* <Link href={`/app/admin/events/${params.row.event_id}`}> */}
+          <IconButton
+            color="secondary"
+            sx={{ fontSize: "16px" }}
+            onClick= {()=> {router.push(`/admin/events/${params.row.event_id}`)}}
+          >
+            <FaEye />
+          </IconButton>
+          <IconButton color="error" sx={{ fontSize: "16px" }}>
+            <MdDelete />
+          </IconButton>
+        </ButtonGroup>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{ height: 400, width: "100%" }}>
+      <DataGrid
+        rows={fcRows}
+        columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5]}
+        // checkboxSelection
+        // disableSelectionOnClick
+      />
+    </div>
+  );
+}
 
 const AdminUserPage = () => {
   const theme = useTheme();
@@ -98,7 +207,9 @@ const AdminUserPage = () => {
             Create fan club
           </Button>
         </Box>
-        <ADTabBox></ADTabBox>
+        <ADTabBox>
+            <FanClubsDataGrid />
+        </ADTabBox>
         <Box
           sx={{
             width: "100%",
