@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import {
   Typography,
@@ -10,6 +11,8 @@ import {
   ListItemSecondaryAction,
   Divider,
   Button,
+  Avatar,
+  Box,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -23,6 +26,8 @@ type Comment = {
   id: number;
   user: string;
   content: string;
+  profilePicture: string;
+  timestamp: string;
   isArtist?: boolean;
   replies?: Comment[];
 };
@@ -32,6 +37,9 @@ type Post = {
   title: string;
   content: string;
   image?: string;
+  profilePicture: string;
+  user: string;
+  timestamp: string;
   comments: Comment[];
 };
 
@@ -103,6 +111,8 @@ const SinglePost: React.FC<Props> = ({
         id: Date.now(),
         user: "Artist",
         content: replyContent,
+        profilePicture: "path/to/artist/profile/picture.jpg", // Replace with actual path
+        timestamp: new Date().toISOString(),
         isArtist: true,
       };
 
@@ -124,6 +134,8 @@ const SinglePost: React.FC<Props> = ({
         id: Date.now(),
         user: "Maroon5", // Replace with actual user info
         content: newComment,
+        profilePicture: "path/to/user/profile/picture.jpg", // Replace with actual path
+        timestamp: new Date().toISOString(),
         isArtist: true,
         replies: [],
       };
@@ -146,10 +158,26 @@ const SinglePost: React.FC<Props> = ({
   };
 
   return (
-    <Paper sx={{ p: 2, marginBottom: 2 }}>
-      <Typography variant="h6" component="div" gutterBottom>
-        {post.title}
-      </Typography>
+    <Paper sx={{ p: 2, marginBottom: 2, borderRadius: "10px" }}>
+      <Box display="flex" alignItems="center" mb={2}>
+        <Avatar
+          alt="Poster Profile Picture"
+          src={post.profilePicture}
+          sx={{ marginRight: 2 }}
+        />
+        <Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+            {post.user}
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
+            {new Date(post.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Typography>
+        </Box>
+      </Box>
+
       <Typography variant="body1" gutterBottom>
         {post.content}
       </Typography>
@@ -188,8 +216,18 @@ const SinglePost: React.FC<Props> = ({
             {post.comments.map((comment) => (
               <div key={comment.id}>
                 <ListItem>
+                  <Avatar
+                    alt={comment.user}
+                    src={comment.profilePicture}
+                    sx={{ marginRight: 2 }}
+                  />
                   <ListItemText
-                    primary={comment.user}
+                    primary={`${comment.user} - ${new Date(
+                      comment.timestamp
+                    ).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })} ago`}
                     secondary={comment.content}
                   />
                   <ListItemSecondaryAction>
@@ -208,8 +246,18 @@ const SinglePost: React.FC<Props> = ({
                 {comment.replies &&
                   comment.replies.map((reply) => (
                     <ListItem key={reply.id} sx={{ pl: 4 }}>
+                      <Avatar
+                        alt={reply.user}
+                        src={reply.profilePicture}
+                        sx={{ marginRight: 2 }}
+                      />
                       <ListItemText
-                        primary={reply.user}
+                        primary={`${reply.user} - ${new Date(
+                          reply.timestamp
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} ago`}
                         secondary={reply.content}
                       />
                       <ListItemSecondaryAction>
