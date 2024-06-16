@@ -42,18 +42,19 @@ import { getAllFanClubs } from "@/app/services/FanClubServices";
 import { FanClub } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { Artist } from "@/app/constants/models";
+import { getFanClubs } from "@/app/services/FanClubServices";
 import router from "next/router";
 // import { DataGrid } from "@mui/x-data-grid";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 function FanClubsDataGrid() {
   const [fanClubs, setFanClubs] = useState<FanClub[]>([]);
-  const [artsts, setArtists] = useState<Artist[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getAllFanClubs().then((fc) => {
-      console.log("FanClubs......",fc);
-      setFanClubs(fc.data);
+    getFanClubs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((fanClubs) => {
+      console.log("Fan Clubs......",fanClubs);
+      setFanClubs(fanClubs.data);
     });
 
     getAllArtists().then((artists) => {
@@ -103,7 +104,7 @@ function FanClubsDataGrid() {
           default:
             chipColor = "default";
         }
-        return <Chip label={status.charAt(0).toUpperCase() + status.slice(1)} color={chipColor} />;
+        return <Chip label={status.toString().charAt(0).toUpperCase() + status.toString().slice(1)} color={chipColor} />;
       }
     },
     { field: "createdAt", headerName: "Created At", flex: 1 },
@@ -140,6 +141,7 @@ function FanClubsDataGrid() {
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
+        getRowId={(row) => row.clubId}
         // checkboxSelection
         // disableSelectionOnClick
       />
