@@ -262,3 +262,12 @@ export interface ClubMember {
   topMember?: boolean;
   clubId?: string;
 }
+
+export interface ClubPost {
+  postId?: string;
+  postType?: string;
+  postDescription?: string;
+  postpublisher?: string;
+  postImage_URL?: string;
+  clubId?: string;
+}

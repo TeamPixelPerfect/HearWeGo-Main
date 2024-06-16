@@ -47,6 +47,8 @@ import { getClubMembers } from "@/app/services/FanClubServices";
 import { ClubMember } from "@/app/constants/models";
 import { getAllUsers } from "@/app/services/UserServices";
 import { User } from "@/app/constants/models";
+import { getClubPosts } from "@/app/services/FanClubServices";
+import { ClubPost } from "@/app/constants/models";
 import router from "next/router";
 // import { DataGrid } from "@mui/x-data-grid";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -54,67 +56,51 @@ import { get } from "http";
 
 function FanClubsDataGrid() {
     const router = useRouter();
+    const [clubPosts, setClubPosts] = useState<ClubPost[]>([]);
     const [clubMembers, setClubMembers] = useState<ClubMember[]>([]);
     const [users, setUsers] = useState<User[]>([]);
-  const [fanClubs, setFanClubs] = useState<FanClub[]>([]);
-  const [artists, setArtists] = useState<Artist[]>([]);
+    const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getClubMembers("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((clubMembers) => {
-      console.log("Club Members......",clubMembers);
-      setClubMembers(clubMembers.data);
+    getClubPosts("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((posts) => {
+      console.log("Club Posts......",posts);
+      setClubPosts(posts);
     });
 
     getAllUsers().then((users) => {
       console.log("Users......",users);
       setUsers(users.data);
     });
+
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
+    });
   }
   , []);
 
-  function createClubMemberData(
-    memberId: string,
-    userId: string,
-    topMember: boolean,
+  function createClubPostData(
+    postId: string,
+    postType: string,
+    postDescription: string,
+    postpublisher: string,
+    postImage_URL: string,
     clubId: string,
     createdAt: string,
     updatedAt: string
-  ){return {memberId, userId, topMember, clubId, createdAt, updatedAt};}
+  ){return {postId, postType, postDescription, postpublisher, postImage_URL, clubId, createdAt, updatedAt};}
 
-  const cmRows = clubMembers.map((fc) => {
-    return createClubMemberData(fc.memberId, fc.userId, fc.topMember, fc.clubId, fc.createdAt, fc.updatedAt);
+  const postRows = clubPosts.map((fc) => {
+    return createClubPostData(fc.postId, fc.postType, fc.postDescription, fc.postpublisher, fc.postImage_URL, fc.clubId, fc.createdAt, fc.updatedAt);
   });
 
-  const getUserImg = (userId) => {
-    const user = users.find(user => user.userId === userId);
-    return user ? user.profilePicture : 'https://hwgbucket.s3.ap-south-1.amazonaws.com/images/profile.png';
-  };
-
   const columns = [
-    { field: "memberId", headerName: "Member ID", flex: 1 },
-    { field: "profile_img", headerName: "Profile", flex: 1, renderCell: (params) => (<img src={getUserImg(params.row.userId)} style={{ width: 50, height: 50 }} />)},
-    { field: "userId", headerName: "User ID", flex: 2 },
+    { field: "postId", headerName: "Post ID", flex: 1 },
+    { field: "postImage_URL", headerName: "Profile", flex: 1, renderCell: (params) => (<img src={params.row.postImage_URL} style={{ width: 50, height: 50 }} />)},
+    { field: "postType", headerName: "Type", flex: 2 },
+    { field: "postDescription", headerName: "Description", flex: 2 },
+    { field: "postpublisher", headerName: "Publisher ID", flex: 2 },
     { field: "clubId", headerName: "Club ID", flex: 1 },
-    {
-      field: "topMember",
-      headerName: "Top Member",
-      flex: 1,
-      renderCell: (params) => {
-        const status = params.row.topMember;
-        let chipColor;
-        switch (status) {
-          case true:
-            chipColor = "success";
-            break;
-          case false:
-            chipColor = "error";
-            break;
-          default:
-            chipColor = "default";
-        }
-        return <Chip label={status.toString().charAt(0).toUpperCase() + status.toString().slice(1)} color={chipColor} />;
-      }
-    },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     { field: "updatedAt", headerName: "Updated At", flex: 1 },
     {
@@ -145,7 +131,7 @@ function FanClubsDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={cmRows}
+        rows={postRows}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
@@ -203,7 +189,7 @@ const AdminUserPage = () => {
               color: theme.palette.mode === "dark" ? "#fff" : "#000",
             }}
           >
-            Fan Club Members
+            Fan Club Posts
           </Typography>
           <Stack direction="row" spacing={2}>
           <Button
@@ -226,9 +212,9 @@ const AdminUserPage = () => {
               border: "1px solid #000",
               color: "#000",
             }}
-            onClick={() => {router.push(`/admin/fanClubs/clubPosts`)}}
+            onClick={() => {router.push(`/admin/clubMembers`)}}
           >
-            Posts
+            Club Members
             </Button>
             <Button
             variant="outlined"

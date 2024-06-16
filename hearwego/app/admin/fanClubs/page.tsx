@@ -218,7 +218,7 @@ const AdminUserPage = () => {
               border: "1px solid #000",
               color: "#000",
             }}
-            onClick={() => {}}
+            onClick={() => {router.push(`/admin/fanClubs/clubPosts`)}}
           >
             Posts
             </Button>
