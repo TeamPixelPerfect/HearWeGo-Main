@@ -1,5 +1,5 @@
 import { base_url } from "../constants/keys";
-import { FanClub } from "../constants/models";
+import { ClubMember, FanClub } from "../constants/models";
 // import { FanClub } from "../constants/models";
 
 export const getAllFanClubs = async (): Promise<FanClub[]> => {
@@ -37,10 +37,11 @@ export const getAllFanClubs = async (): Promise<FanClub[]> => {
     }
   };
 
-  export const getClubMembers = async (): Promise<FanClub[]> => {
+  export const getClubMembers = async (token: string): Promise<ClubMember[]> => {
     const res = await fetch(`${base_url}/FanClubManager/clubMembers`, {
       method: "GET",
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });

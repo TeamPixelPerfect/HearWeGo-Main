@@ -60,7 +60,7 @@ function FanClubsDataGrid() {
   const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getClubMembers().then((clubMembers) => {
+    getClubMembers("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((clubMembers) => {
       console.log("Club Members......",clubMembers);
       setClubMembers(clubMembers.data);
     });
@@ -93,8 +93,8 @@ function FanClubsDataGrid() {
   const columns = [
     { field: "memberId", headerName: "Member ID", flex: 1 },
     { field: "profile_img", headerName: "Profile", flex: 1, renderCell: (params) => (<img src={getUserImg(params.row.userId)} style={{ width: 50, height: 50 }} />)},
-    { field: "usertId", headerName: "User ID", flex: 2 },
-    { field: "clubId", headerName: "Club ID", flex: 1, valueGetter: (params) => getArtistName(params.row.artistId), },
+    { field: "userId", headerName: "User ID", flex: 2 },
+    { field: "clubId", headerName: "Club ID", flex: 1 },
     {
       field: "topMember",
       headerName: "Top Member",
