@@ -65,8 +65,7 @@ const SinglePost: React.FC<Props> = ({
   onDeletePost,
   onEditPost,
   onAddComment,
-  onEditComment,
-  onDeleteComment,
+
 }) => {
   const [newComment, setNewComment] = useState("");
   const [replyingCommentId, setReplyingCommentId] = useState<number | null>(
@@ -77,29 +76,7 @@ const SinglePost: React.FC<Props> = ({
   const [likes, setLikes] = useState<number>(10); // Dummy data for likes count
   const [liked, setLiked] = useState<boolean>(false); // Track if post is liked
 
-  const handleDeleteComment = (commentId: number, replyId?: number) => {
-    if (replyId !== undefined) {
-      // Delete only the reply
-      const updatedComments = post.comments.map((comment) => {
-        if (comment.id === commentId && comment.replies) {
-          const updatedReplies = comment.replies.filter(
-            (reply) => reply.id !== replyId
-          );
-          return { ...comment, replies: updatedReplies };
-        }
-        return comment;
-      });
-
-      onEditPost(post.id, { ...post, comments: updatedComments });
-    } else {
-      // Delete the entire comment
-      const updatedComments = post.comments.filter(
-        (comment) => comment.id !== commentId
-      );
-      onEditPost(post.id, { ...post, comments: updatedComments });
-    }
-  };
-
+  
   const handleReplyToComment = (commentId: number) => {
     setReplyingCommentId(commentId);
     setReplyContent("");
@@ -232,9 +209,7 @@ const SinglePost: React.FC<Props> = ({
                         <ReplyIcon />
                       </IconButton>
                     )}
-                    <IconButton onClick={() => handleDeleteComment(comment.id)}>
-                      <DeleteIcon />
-                    </IconButton>
+                   
                   </ListItemSecondaryAction>
                 </ListItem>
                 {comment.replies &&
@@ -252,13 +227,7 @@ const SinglePost: React.FC<Props> = ({
                         secondary={reply.content}
                       />
                       <ListItemSecondaryAction>
-                        <IconButton
-                          onClick={() =>
-                            handleDeleteComment(comment.id, reply.id)
-                          }
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                     
                       </ListItemSecondaryAction>
                     </ListItem>
                   ))}

@@ -27,25 +27,25 @@ const ArtistPage: React.FC = () => {
     {
       id: 1,
       title: "First Post",
-      content: "Content of the first post.",
+      content: "Exciting news about the upcoming album!",
       image:
         "https://res.heraldm.com/content/image/2022/12/01/20221201000743_0.jpg",
-      profilePicture: "path/to/artist/profile/picture1.jgp", // Dummy path
-      user: "Artist A",
+      profilePicture: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTHnaJf7dVGS4_YJ7OwOyWC7F7yia--3nJSR7LULSGIS2VpiYFo", // Dummy path
+      user: "The Rembrandts",
       timestamp: new Date().toISOString(),
       comments: [
         {
           id: 1,
-          user: "User A",
-          content: "First comment",
-          profilePicture: "path/to/user/profile/picture1.jpg", // Dummy path
+          user: "Alice",
+          content: "Great news! Looking forward to it.",
+          profilePicture: "https://randomuser.me/api/portraits/women/11.jpg", // Dummy path
           timestamp: new Date().toISOString(),
         },
         {
           id: 2,
-          user: "User B",
-          content: "Second comment",
-          profilePicture: "path/to/user/profile/picture2.jpg", // Dummy path
+          user: "John",
+          content: "Tour dates and locations revealed!",
+          profilePicture: "https://randomuser.me/api/portraits/women/13.jpg", // Dummy path
           timestamp: new Date().toISOString(),
         },
       ],
@@ -56,8 +56,8 @@ const ArtistPage: React.FC = () => {
       content: "Content of the second post.",
       image:
         "https://www.billboard.com/wp-content/uploads/2021/06/maroon-5-superbowl-2019-billboard-1548-1623086440.jpg",
-      profilePicture: "path/to/artist/profile/picture2.jpg", // Dummy path
-      user: "Artist B",
+      profilePicture: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTHnaJf7dVGS4_YJ7OwOyWC7F7yia--3nJSR7LULSGIS2VpiYFo", // Dummy path
+      user: "The Rembrandts",
       timestamp: new Date().toISOString(),
       comments: [
         {
@@ -114,52 +114,9 @@ const ArtistPage: React.FC = () => {
     setPosts(updatedPosts);
   };
 
-  const handleEditComment = (
-    postId: number,
-    commentId: number,
-    updatedContent: string
-  ) => {
-    const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
-        const updatedComments = post.comments.map((comment) =>
-          comment.id === commentId
-            ? { ...comment, content: updatedContent }
-            : comment
-        );
-        return { ...post, comments: updatedComments };
-      }
-      return post;
-    });
-    setPosts(updatedPosts);
-  };
+ 
 
-  const handleDeleteComment = (postId: number, commentId: number) => {
-    const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
-        const updatedComments = post.comments.filter(
-          (comment) => comment.id !== commentId
-        );
-        return { ...post, comments: updatedComments };
-      }
-      return post;
-    });
-    setPosts(updatedPosts);
-  };
-
-  const handleCreatePost = () => {
-    const newPost = {
-      id: posts.length + 1,
-      title: newPostTitle,
-      content: newPostContent,
-      image: "/mnt/data/image.png",
-      profilePicture: "path/to/new/artist/profile/picture.jpg", // Dummy path
-      user: "New Artist",
-      timestamp: new Date().toISOString(),
-      comments: [],
-    };
-    setPosts([...posts, newPost]);
-    handleDialogClose();
-  };
+  
 
   return (
     <Container maxWidth="lg">
@@ -183,8 +140,7 @@ const ArtistPage: React.FC = () => {
               onDeletePost={handleDeletePost}
               onEditPost={handleEditPost}
               onAddComment={handleAddComment}
-              onEditComment={handleEditComment}
-              onDeleteComment={handleDeleteComment}
+            
             />
           </Grid>
         ))}

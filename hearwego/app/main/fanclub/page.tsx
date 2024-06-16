@@ -45,6 +45,7 @@ import EventsPage from "./events/page";
 import PhotosPage from "./photos/page";
 import VideosPage from "./videos/page";
 
+
 const topFans = [
   {
     name: "Chandler Bing",
@@ -119,7 +120,7 @@ const FanClubPage: React.FC = () => {
   const artistName = "The Rembrandts";
   const artistGenre = "Rock | Duo";
   const fanCount = "97K+ Fans"; // Example fan count
-  const profileImageUrl = "data:image/jpeg;base64,..."; // Replace with actual profile image URL
+  const profileImageUrl = "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTHnaJf7dVGS4_YJ7OwOyWC7F7yia--3nJSR7LULSGIS2VpiYFo"; // Replace with actual profile image URL
   const postsCount = 100; // Example posts count
   const eventsCount = 35; // Example events count
   const newsCount = 20; // Example news count
