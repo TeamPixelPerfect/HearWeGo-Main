@@ -91,16 +91,16 @@ function FanClubsDataGrid() {
   };
 
   const columns = [
-    { field: "clubId", headerName: "Club ID", flex: 1 },
-    { field: "coverImage_URL", headerName: "Cover Image", flex: 1, renderCell: (params) => (<img src={params.row.coverImage_URL} style={{ width: 50, height: 50 }} />)},
-    { field: "artistId", headerName: "Artist ID", flex: 2 },
-    { field: "artist_name", headerName: "Artist Name", flex: 1, valueGetter: (params) => getArtistName(params.row.artistId), },
+    { field: "memberId", headerName: "Member ID", flex: 1 },
+    { field: "profile_img", headerName: "Profile", flex: 1, renderCell: (params) => (<img src={getUserImg(params.row.userId)} style={{ width: 50, height: 50 }} />)},
+    { field: "usertId", headerName: "User ID", flex: 2 },
+    { field: "clubId", headerName: "Club ID", flex: 1, valueGetter: (params) => getArtistName(params.row.artistId), },
     {
-      field: "visibility",
-      headerName: "Visibility",
+      field: "topMember",
+      headerName: "Top Member",
       flex: 1,
       renderCell: (params) => {
-        const status = params.row.visibility;
+        const status = params.row.topMember;
         let chipColor;
         switch (status) {
           case true:
