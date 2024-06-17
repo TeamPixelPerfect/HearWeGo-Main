@@ -47,74 +47,90 @@ import { getClubMembers } from "@/app/services/FanClubServices";
 import { ClubMember } from "@/app/constants/models";
 import { getAllUsers } from "@/app/services/UserServices";
 import { User } from "@/app/constants/models";
+import { getClubPosts } from "@/app/services/FanClubServices";
+import { ClubPost } from "@/app/constants/models";
+import { getComments } from "@/app/services/FanClubServices";
+import { Comment } from "@/app/constants/models";
 import router from "next/router";
 // import { DataGrid } from "@mui/x-data-grid";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { get } from "http";
 
 function FanClubsDataGrid() {
-    const router = useRouter();
-    const [clubMembers, setClubMembers] = useState<ClubMember[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
-  const [fanClubs, setFanClubs] = useState<FanClub[]>([]);
+  const router = useRouter();
+  const [clubComments, setClubComments] = useState<Comment[]>([]);
+  const [clubPosts, setClubPosts] = useState<ClubPost[]>([]);
+  const [clubMembers, setClubMembers] = useState<ClubMember[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getClubMembers("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((clubMembers) => {
-      console.log("Club Members......",clubMembers);
-      setClubMembers(clubMembers.data);
+    getComments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((comments) => {
+        console.log("Club Comments......", comments);
+        setClubComments(comments);
+        });
+
+    getClubPosts(
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w"
+    ).then((posts) => {
+      console.log("Club Posts......", posts);
+      setClubPosts(posts);
     });
 
     getAllUsers().then((users) => {
-      console.log("Users......",users);
+      console.log("Users......", users);
       setUsers(users.data);
     });
-  }
-  , []);
 
-  function createClubMemberData(
-    memberId: string,
-    userId: string,
-    topMember: boolean,
-    clubId: string,
+    getAllArtists().then((artists) => {
+      console.log("Artists......", artists);
+      setArtists(artists.data);
+    });
+  }, []);
+
+  function createCommentData(
+    commentId: string,
+    commenter: string,
+    commentBody: string,
+    postId: string,
     createdAt: string,
     updatedAt: string
-  ){return {memberId, userId, topMember, clubId, createdAt, updatedAt};}
+  ) {
+    return {
+      commentId,
+      commenter,
+      commentBody,
+      postId,
+      createdAt,
+      updatedAt,
+    };
+  }
 
-  const cmRows = clubMembers.map((fc) => {
-    return createClubMemberData(fc.memberId, fc.userId, fc.topMember, fc.clubId, fc.createdAt, fc.updatedAt);
+  const cmRows = clubComments.map((fc) => {
+    return createCommentData(
+      fc.commentId,
+        fc.commenter,
+        fc.commentBody,
+        fc.postId,
+      fc.createdAt,
+      fc.updatedAt
+    );
   });
 
-  const getUserImg = (userId) => {
-    const user = users.find(user => user.userId === userId);
-    return user ? user.profilePicture : 'https://hwgbucket.s3.ap-south-1.amazonaws.com/images/profile.png';
-  };
-
   const columns = [
-    { field: "memberId", headerName: "Member ID", flex: 1 },
-    { field: "profile_img", headerName: "Profile", flex: 1, renderCell: (params) => (<img src={getUserImg(params.row.userId)} style={{ width: 50, height: 50 }} />)},
-    { field: "userId", headerName: "User ID", flex: 2 },
-    { field: "clubId", headerName: "Club ID", flex: 1 },
+    { field: "commentId", headerName: "Comment ID", flex: 1 },
     {
-      field: "topMember",
-      headerName: "Top Member",
+      field: "postImage_URL",
+      headerName: "Profile",
       flex: 1,
-      renderCell: (params) => {
-        const status = params.row.topMember;
-        let chipColor;
-        switch (status) {
-          case true:
-            chipColor = "success";
-            break;
-          case false:
-            chipColor = "error";
-            break;
-          default:
-            chipColor = "default";
-        }
-        return <Chip label={status.toString().charAt(0).toUpperCase() + status.toString().slice(1)} color={chipColor} />;
-      }
+      renderCell: (params) => (
+        <img src={params.row.postImage_URL} style={{ width: 50, height: 50 }} />
+      ),
     },
+    { field: "postType", headerName: "Type", flex: 2 },
+    { field: "postDescription", headerName: "Description", flex: 2 },
+    { field: "postpublisher", headerName: "Publisher ID", flex: 2 },
+    { field: "clubId", headerName: "Club ID", flex: 1 },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     { field: "updatedAt", headerName: "Updated At", flex: 1 },
     {
@@ -130,7 +146,9 @@ function FanClubsDataGrid() {
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick= {()=> {router.push(`/admin/fanClubs/clubMembers`)}}
+            onClick={() => {
+              router.push(`/admin/fanClubs/clubMembers`);
+            }}
           >
             <FaEye />
           </IconButton>
@@ -145,7 +163,7 @@ function FanClubsDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={cmRows}
+        rows={postRows}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
@@ -203,75 +221,79 @@ const AdminUserPage = () => {
               color: theme.palette.mode === "dark" ? "#fff" : "#000",
             }}
           >
-            Fan Club Members
+            Fan Club Comments
           </Typography>
           <Stack direction="row" spacing={2}>
-          <Button
-            variant="outlined"
-            sx={{
-              textTransform: "capitalize",
-              // background: "#000",
-              border: "1px solid #000",
-              color: "#000",
-            }}
-            onClick= {()=> {router.push(`/admin/fanClubs`)}}
-          >
-            Fan Clubs
+            <Button
+              variant="outlined"
+              sx={{
+                textTransform: "capitalize",
+                // background: "#000",
+                border: "1px solid #000",
+                color: "#000",
+              }}
+              onClick={() => {
+                router.push(`/admin/fanClubs`);
+              }}
+            >
+              Fan Clubs
             </Button>
             <Button
-            variant="outlined"
-            sx={{
-              textTransform: "capitalize",
-              // background: "#000",
-              border: "1px solid #000",
-              color: "#000",
-            }}
-            onClick={() => {router.push(`/admin/fanClubs/clubPosts`)}}
-          >
-            Posts
+              variant="outlined"
+              sx={{
+                textTransform: "capitalize",
+                // background: "#000",
+                border: "1px solid #000",
+                color: "#000",
+              }}
+              onClick={() => {
+                router.push(`/admin/clubMembers`);
+              }}
+            >
+              Club Members
             </Button>
             <Button
-            variant="outlined"
-            sx={{
-              textTransform: "capitalize",
-              // background: "#000",
-              border: "1px solid #000",
-              color: "#000",
-            }}
-            onClick={() => {router.push(`/admin/fanClubs/clubComments`)}}
-          >
-            Comments
+              variant="outlined"
+              sx={{
+                textTransform: "capitalize",
+                // background: "#000",
+                border: "1px solid #000",
+                color: "#000",
+              }}
+              onClick={() => {}}
+            >
+              Reacts
             </Button>
             <Button
-            variant="outlined"
-            sx={{
-              textTransform: "capitalize",
-              // background: "#000",
-              border: "1px solid #000",
-              color: "#000",
-            }}
-            onClick={() => {}}
-          >
-            Reacts
+              variant="outlined"
+              sx={{
+                textTransform: "capitalize",
+                // background: "#000",
+                border: "1px solid #000",
+                color: "#000",
+              }}
+              onClick={() => {
+                router.push(`/admin/fanClubs/clubPosts`);
+              }}
+            >
+              Posts
             </Button>
-          <Button
-            variant="contained"
-            startIcon={<IoAddOutline />}
-            sx={{
-              textTransform: "capitalize",
-              background: "#000",
-              color: "#fff",
-            }}
-            onClick={() => {}}
-          >
-            Create fan club
-          </Button>
-
+            <Button
+              variant="contained"
+              startIcon={<IoAddOutline />}
+              sx={{
+                textTransform: "capitalize",
+                background: "#000",
+                color: "#fff",
+              }}
+              onClick={() => {}}
+            >
+              Create fan club
+            </Button>
           </Stack>
-          
         </Box>
         <ADTabBox>
-            <FanClubsDataGrid />
+          <FanClubsDataGrid />
         </ADTabBox>
       </Card>
     </Grid>

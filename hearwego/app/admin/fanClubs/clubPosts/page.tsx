@@ -228,6 +228,18 @@ const AdminUserPage = () => {
           >
             Reacts
             </Button>
+            <Button
+            variant="outlined"
+            sx={{
+              textTransform: "capitalize",
+              // background: "#000",
+              border: "1px solid #000",
+              color: "#000",
+            }}
+            onClick={() => {router.push(`/admin/fanClubs/clubComments`)}}
+          >
+            Comments
+            </Button>
           <Button
             variant="contained"
             startIcon={<IoAddOutline />}

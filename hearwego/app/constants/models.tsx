@@ -271,3 +271,10 @@ export interface ClubPost {
   postImage_URL?: string;
   clubId?: string;
 }
+
+export interface Comment {
+  commentId?: string;
+  commenter?: string;
+  commentBody?: string;
+  postId?: string;
+}
