@@ -6,13 +6,18 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
 const App: React.FC = () => {
   const [shippingAddress, setShippingAddress] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-  const [tempAddress, setTempAddress] = useState<string>('');
+  const [addressLine1, setAddressLine1] = useState<string>('');
+  const [addressLine2, setAddressLine2] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [country, setCountry] = useState<string>('');
+  const [postalCode, setPostalCode] = useState<string>('');
   const [shippingMethod, setShippingMethod] = useState<string | null>(null);
 
   const handleAddShippingAddress = () => {
@@ -24,7 +29,8 @@ const App: React.FC = () => {
   };
 
   const handleSaveAddress = () => {
-    setShippingAddress(tempAddress);
+    const fullAddress = `${addressLine1}, ${addressLine2}, ${city}, ${country}, ${postalCode}`;
+    setShippingAddress(fullAddress);
     setAddressDialogOpen(false);
   };
 
@@ -51,7 +57,6 @@ const App: React.FC = () => {
 
   return (
     <>
-    
       <h1 style={{ marginLeft: '40px' }}>
         <ArrowBackIosNewIcon sx={{ marginRight: '10px' }} />
         Shopping Cart
@@ -177,13 +182,49 @@ const App: React.FC = () => {
             <TextField
               autoFocus
               margin="dense"
-              id="address"
-              label="Shipping Address"
+              id="address-line1"
+              label="Address Line 1"
               type="text"
               fullWidth
               variant="standard"
-              value={tempAddress}
-              onChange={(e) => setTempAddress(e.target.value)} />
+              value={addressLine1}
+              onChange={(e) => setAddressLine1(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="address-line2"
+              label="Address Line 2"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={addressLine2}
+              onChange={(e) => setAddressLine2(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="city"
+              label="City"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={city}
+              onChange={(e) => setCity(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="country"
+              label="Country"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="postal-code"
+              label="Postal Code"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseAddressDialog}>Cancel</Button>
