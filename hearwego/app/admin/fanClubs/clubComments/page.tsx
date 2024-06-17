@@ -65,10 +65,12 @@ function FanClubsDataGrid() {
   const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getComments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((comments) => {
-        console.log("Club Comments......", comments);
-        setClubComments(comments);
-        });
+    getComments(
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w"
+    ).then((comments) => {
+      console.log("Club Comments......", comments);
+      setClubComments(comments);
+    });
 
     getClubPosts(
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w"
@@ -87,6 +89,23 @@ function FanClubsDataGrid() {
       setArtists(artists.data);
     });
   }, []);
+
+  const getPostImg = (postId) => {
+    const post = clubPosts.find((post) => post.postId === postId);
+    return post
+      ? post.postImage_URL
+      : "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/profile.png";
+  };
+
+  const getPostPublisher = (postId) => {
+    const post = clubPosts.find((post) => post.postId === postId);
+    return post ? post.postpublisher : "-";
+  };
+
+  const getPostClub = (postId) => {
+    const post = clubPosts.find((post) => post.postId === postId);
+    return post ? post.clubId : "-";
+  };
 
   function createCommentData(
     commentId: string,
@@ -109,9 +128,9 @@ function FanClubsDataGrid() {
   const cmRows = clubComments.map((fc) => {
     return createCommentData(
       fc.commentId,
-        fc.commenter,
-        fc.commentBody,
-        fc.postId,
+      fc.commenter,
+      fc.commentBody,
+      fc.postId,
       fc.createdAt,
       fc.updatedAt
     );
@@ -120,17 +139,31 @@ function FanClubsDataGrid() {
   const columns = [
     { field: "commentId", headerName: "Comment ID", flex: 1 },
     {
-      field: "postImage_URL",
-      headerName: "Profile",
+      field: "postImage",
+      headerName: "Post Image",
       flex: 1,
       renderCell: (params) => (
-        <img src={params.row.postImage_URL} style={{ width: 50, height: 50 }} />
+        <img
+          src={getPostImg(params.row.postId)}
+          style={{ width: 50, height: 50 }}
+        />
       ),
     },
-    { field: "postType", headerName: "Type", flex: 2 },
-    { field: "postDescription", headerName: "Description", flex: 2 },
-    { field: "postpublisher", headerName: "Publisher ID", flex: 2 },
-    { field: "clubId", headerName: "Club ID", flex: 1 },
+    { field: "commenter", headerName: "Commenter", flex: 2 },
+    { field: "commentBody", headerName: "Comment", flex: 2 },
+    { field: "postId", headerName: "Post ID", flex: 2 },
+    {
+      field: "postPublisher",
+      headerName: "Publisher ID",
+      flex: 2,
+      valueGetter: (params) => getPostPublisher(params.row.postId),
+    },
+    {
+      field: "clubId",
+      headerName: "Club ID",
+      flex: 1,
+      valueGetter: (params) => getPostClub(params.row.postId),
+    },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     { field: "updatedAt", headerName: "Updated At", flex: 1 },
     {
@@ -163,12 +196,12 @@ function FanClubsDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={postRows}
+        rows={cmRows}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
         components={{ Toolbar: GridToolbar }}
-        getRowId={(row) => row.clubId}
+        getRowId={(row) => row.commentId}
         // checkboxSelection
         // disableSelectionOnClick
       />
