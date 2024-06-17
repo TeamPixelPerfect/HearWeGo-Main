@@ -1,279 +1,241 @@
 "use client";
-import React, { useState } from 'react';
-import { Typography, Container, IconButton } from '@mui/material';
-import { styled } from '@mui/system';
-import Masonry from 'react-masonry-css';
-import Box from '@mui/material/Box';
-import CloseIcon from '@mui/icons-material/Close';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import Grid from '@mui/material/Grid';
+import React, { useState } from "react";
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  makeStyles,
+} from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
-const RootContainer = styled(Container)({
-  flexGrow: 1,
-  padding: '20px',
-  textAlign: 'left',
-  borderRadius: '10px',
-  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-  border: '0.5px solid #f0f0f0',
-  color: 'black',
-  marginTop: '20px',
-});
+// Define the photo data structure
+interface Photo {
+  id: number;
+  imageUrl: string;
+  artistName: string;
+  uploadDate: string;
+  likes: number;
+}
 
-const MasonryGrid = styled(Masonry)({
-  display: 'flex',
-  marginLeft: '-30px',
-  marginTop: '10px',
-  width: 'auto',
-  '& > div': {
-    paddingLeft: '20px', // gutter size
-    backgroundClip: 'padding-box',
-  },
-});
-
-const ImageCard = styled('div')({
-  position: 'relative',
-  marginBottom: '20px',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-  '& img': {
-    width: '100%',
-    display: 'block',
-    borderRadius: '8px',
-    transition: 'transform 0.3s ease',
-  },
-  '&:hover img': {
-    transform: 'scale(1.05)',
-  },
-  '&:hover .overlay': {
-    opacity: 1,
-  },
-  '& .overlay': {
-    position: 'absolute',
-    bottom: '0',
-    left: '0',
-    right: '0',
-    background: 'rgba(0, 0, 0, 0.5)',
-    color: '#fff',
-    padding: '10px',
-    opacity: 0,
-    transition: 'opacity 0.3s ease',
-  },
-});
-
-const EnlargedImageContainer = styled('div')({
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  
-  // zIndex: 999,
-});
-
-const EnlargedImageWrapper = styled('div')({
-  maxWidth: '90%',
-  maxHeight: '90%',
-  width: '600px',
-  height: '600px',
-  borderRadius: '4px',
-  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-  overflow: 'hidden',
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
-
-const EnlargedImage = styled('img')({
-  width: '100%',
-  height: 'auto',
-});
-
-const CloseButton = styled(IconButton)({
-  position: 'absolute',
-  top: '10px',
-  right: '10px',
-  color: '#fff',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  '&:hover': {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-});
-
-const PhotoInfo = styled('div')({
-  position: 'absolute',
-  bottom: '40px',
-  left: '20px',
-  display: 'flex',
-  flexDirection: 'column',
-  color: '#fff',
-
-});
-
-const PhotoTitle = styled(Typography)({
-  marginBottom: '5px',
-  fontWeight: 'bold',
-});
-
-const PhotoDetails = styled(Typography)({
-  fontSize: '24px',
-});
-
-const LikeButton = styled(IconButton)({
-  position: 'absolute',
-  bottom: '10px',
-  right: '10px',
-  color: '#fff',
-
-});
-
-const LikeCount = styled(Typography)({
-  marginLeft: '5px',
-});
-
-const photos = [
-  { 
-    title: 'Photo 1',
-    url: 'https://i.ytimg.com/vi/aa5rRRnK1-g/maxresdefault.jpg' ,
-    artist: 'Jane Smith',
-    uploadedDate: '2022-11-20'
+// Sample photo data
+const photos: Photo[] = [
+  {
+    id: 1,
+    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7tdedQP9dpCU6QEytN3ORZT9ayULlOl8XRw&s",
+    artistName: "Artist One",
+    uploadDate: "June 1, 2024",
+    likes: 10,
   },
   {
-    title: 'Photo 2',
-    url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJ9bqFoVHe3j5XZIS-7byR68c8CepiTd-zsg&s',
-    artist: 'John Doe',
-    uploadedDate: '2022-11-21'
+    id: 2,
+    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBxrPuw3DNMapIeylq5oPXHbQVczeBRfwa_vZcForopRp3xzG2vHria0lrHlLo8wThGSc&usqp=CAU",
+    artistName: "Artist Two",
+    uploadDate: "June 5, 2024",
+    likes: 7,
   },
   {
-    title: 'Photo 3',
-    url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc0uU5oxJivp2cT3bUKsblq9tHZ1ek515wbA&s',
-    artist: 'Alice Johnson',
-    uploadedDate: '2022-11-22'
+    id: 3,
+    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiNarhLD1XCOOSLnyGeudCdyAx44fCdS_3cvXF0Mahhy1Zv9h_YUNPgFzSKY3avv5o6HI&usqp=CAU",
+    artistName: "Artist Three",
+    uploadDate: "June 10, 2024",
+    likes: 5,
   },
-  {
-    title: 'Photo 4',
-    url: 'https://images.fineartamerica.com/images/artworkimages/mediumlarge/2/the-rembrandts-perform-in-los-angeles-jim-steinfeldt.jpg',
-    artist: 'Bob Brown',
-    uploadedDate: '2022-11-23'
-  },
-  {
-    title: 'Photo 5',
-    url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb_ngOqUzVqG-UhIuS70EEwfFcZwyHX6fU1g&s',
-    artist: 'Eve Green',
-    uploadedDate: '2022-11-24'
-  },
-  {
-    title: 'Photo 6',
-    url: 'https://i.ytimg.com/vi/aa5rRRnK1-g/maxresdefault.jpg',
-    artist: 'Eve Green',
-    uploadedDate: '2022-11-24'
-  },
-  {
-    title: 'Photo 7',
-    url: 'https://live.staticflickr.com/4045/4649380056_5c4a776777_z.jpg',
-    artist: 'Eve Green',
-    uploadedDate: '2022-11-24'
-  },
-  {
-    title: 'Photo 8',
-    url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLGhiIH_1abUNcVyEDof7ZRPGrMDy3A6Zdlw&s',
-    artist: 'Eve Green',
-    uploadedDate: '2022-11-24'
-  },
-  {
-    title: 'Photo 9',
-    url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFa7GyUjL7A4GHdAPXUW8PjInMYda6djUnCA&s',
-    artist: 'Eve Green',
-    uploadedDate: '2022-11-24'
-  },
-  {
-    title: 'Photo 10',
-    url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMipB6sSzARwG04pMNDcFra1PpAwMov_7B2hkzh1Dl6kogSab6bMSLWScv-u7z-mIhNqw&usqp=CAU',
-    artist: 'Eve Green',
-    uploadedDate: '2022-11-24'
-  },
-
-
-  
-   
 ];
 
-const PhotoGallery: React.FC = () => {
-  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
-  const [likes, setLikes] = useState<number[]>(new Array(photos.length).fill(0));
-  const [liked, setLiked] = useState<boolean[]>(new Array(photos.length).fill(false));
+// Define the theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#1976d2",
+    },
+    secondary: {
+      main: "#dc004e",
+    },
+    background: {
+      default: "#f7f7f7",
+    },
+  },
+  typography: {
+    fontFamily: "'Roboto', sans-serif",
+    h4: {
+      fontWeight: 700,
+      fontSize: "2.5rem",
+      marginBottom: "1.5rem",
+    },
+    h6: {
+      fontWeight: 600,
+    },
+    body2: {
+      fontSize: "0.9rem",
+    },
+  },
+});
 
-  const openModal = (index: number) => {
-    setSelectedPhoto(index);
+const PhotoPage: React.FC = () => {
+  const [photoList, setPhotoList] = useState<Photo[]>(photos);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+
+  // Function to handle like button click
+  const handleLike = (id: number) => {
+    const updatedPhotos = photoList.map((photo) =>
+      photo.id === id ? { ...photo, likes: photo.likes + 1 } : photo
+    );
+    setPhotoList(updatedPhotos);
   };
 
-  const closeModal = () => {
+  // Function to open dialog and display selected photo
+  const handlePhotoClick = (photo: Photo) => {
+    setSelectedPhoto(photo);
+    setDialogOpen(true);
+  };
+
+  // Function to close dialog
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
     setSelectedPhoto(null);
   };
 
-  const toggleLike = (index: number) => {
-    const updatedLiked = [...liked];
-    updatedLiked[index] = !updatedLiked[index];
-    setLiked(updatedLiked);
-
-    const updatedLikes = [...likes];
-    updatedLikes[index] = updatedLiked[index] ? likes[index] + 1 : likes[index] - 1;
-    setLikes(updatedLikes);
-  };
-
   return (
-    <Box >
-      <Typography variant="h4" component="h1" sx={{fontWeight:"bold",marginLeft:"60px"}}>
-        Photos
-      </Typography>
-   
-    
-
-      <RootContainer>
-        <MasonryGrid
-          breakpointCols={{
-            default: 3,
-            1100: 3,
-            700: 2,
-            500: 1,
-          }}
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
-        >
-          {photos.map((photo, index) => (
-            <ImageCard key={index} onClick={() => openModal(index)}>
-              <img src={photo.url} alt={photo.title} />
-            </ImageCard>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div style={{ padding: "20px" }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+          Photos
+        </Typography>
+        <Grid container spacing={3}>
+          {photoList.map((photo) => (
+            <Grid key={photo.id} item xs={12} sm={6} md={4}>
+              <Card
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "100%",
+                  transition: "transform 0.3s ease",
+                  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    transform: "scale(1.03)",
+                    boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                  },
+                }}
+                elevation={3}
+              >
+                <CardMedia
+                  style={{
+                    height: 0,
+                    paddingTop: "56.25%", // 16:9
+                    position: "relative",
+                  }}
+                  image={photo.imageUrl}
+                  title={`Photo by ${photo.artistName}`}
+                  onClick={() => handlePhotoClick(photo)}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "rgba(0, 0, 0, 0.6)",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      opacity: 0,
+                      transition: "opacity 0.3s ease",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ color: "#fff", textAlign: "center", padding: "8px" }}
+                    >
+                      {photo.artistName}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#fff", textAlign: "center" }}
+                    >
+                      Uploaded on {photo.uploadDate}
+                    </Typography>
+                  </div>
+                </CardMedia>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {photo.artistName}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Uploaded on {photo.uploadDate}
+                  </Typography>
+                </CardContent>
+                <CardActions
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "8px 16px",
+                    backgroundColor: theme.palette.background.default,
+                  }}
+                >
+                  <IconButton onClick={() => handleLike(photo.id)}>
+                    <FavoriteIcon color="primary" />
+                  </IconButton>
+                  <Typography variant="body2" color="textSecondary">
+                    {photo.likes} Likes
+                  </Typography>
+                </CardActions>
+              </Card>
+            </Grid>
           ))}
-        </MasonryGrid>
-        {selectedPhoto !== null && (
-          <EnlargedImageContainer>
-            <EnlargedImageWrapper>
-              <EnlargedImage src={photos[selectedPhoto].url} alt={photos[selectedPhoto].title} />
-              <CloseButton onClick={closeModal}>
-                <CloseIcon />
-              </CloseButton>
-              <PhotoInfo >
-                <PhotoDetails>{` ${photos[selectedPhoto].artist}`}</PhotoDetails>
-                <PhotoDetails>{`${photos[selectedPhoto].uploadedDate}`}</PhotoDetails>
-              </PhotoInfo>
-              <LikeButton onClick={() => toggleLike(selectedPhoto)} sx={{ margin: "20px" }}>
-                {liked[selectedPhoto] ? <FavoriteIcon color="secondary" sx={{size:"20px"}}/> : <FavoriteBorderIcon />}
-              </LikeButton>
-              <LikeCount>{likes[selectedPhoto]}</LikeCount>
-            </EnlargedImageWrapper>
-          </EnlargedImageContainer>
-        )}
-      </RootContainer>
-  </Box>
+        </Grid>
+
+        {/* Dialog for displaying selected photo */}
+        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg">
+          {selectedPhoto && (
+            <>
+              <DialogTitle>{selectedPhoto.artistName}</DialogTitle>
+              <DialogContent sx={{width:"600px",height:"600px"}}>
+                <img
+                  src={selectedPhoto.imageUrl}
+                  alt={`Photo by ${selectedPhoto.artistName}`}
+                  style={{ width: "100%", height: "auto", maxWidth: "100%" }}
+                />
+                <Typography variant="body2" color="textSecondary">
+                   {selectedPhoto.uploadDate}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {selectedPhoto.likes} Likes
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDialog} color="primary">
+                  Close
+                </Button>
+              </DialogActions>
+            </>
+          )}
+        </Dialog>
+      </div>
+    </ThemeProvider>
   );
 };
 
-export default PhotoGallery;
+export default PhotoPage;
+
+
