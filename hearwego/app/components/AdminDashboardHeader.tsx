@@ -97,6 +97,11 @@ const AdminDashboardHeader = () => {
             // height: "50%",
             // border: "1px solid #969696",
             borderRadius: "50px",
+            border:
+              theme.palette.mode === "light"
+                ? "1px solid rgba(0, 0, 0, 0.12)"
+                : "1px solid rgba(255, 255, 255, 0.12)",
+            boxShadow: "none",
           }}
         >
           <InputBase

@@ -146,7 +146,7 @@ const ArtistAlbums = () => {
         sx={{
           width: "100%",
           minHeight: "100vh",
-          background: theme.palette.background.default,
+          // background: theme.palette.background.default,
         }}
       >
         <Box

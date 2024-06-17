@@ -39,9 +39,8 @@ const ArtistDashboardSideNav = () => {
 
   return (
     <ArtistDashboardSideNavContainer>
-      <Box sx={{ marginBottom: "3em" }}></Box>
       <Box
-        sx={{ cursor: "pointer", marginBottom: "1em" }}
+        sx={{ cursor: "pointer", p: "2em" }}
         onClick={() => {
           Router.push("/admin");
         }}
@@ -60,23 +59,17 @@ const ArtistDashboardSideNav = () => {
           </IconButton>
         )}
       </Box>
-      <Box>
-        <Box
-          sx={
-            matches
-              ? { padding: "1em 0", width: "auto" }
-              : { padding: "1em 0", width: "100%" }
-          }
-        >
-          {adminSideMenuOpts.map((opt) => {
-            return (
-              <ADNavItemGroup
-                groupLabel={opt.groupLabel}
-                items={opt.items}
-              ></ADNavItemGroup>
-            );
-          })}
-        </Box>
+      <Box
+        sx={{ overflowY: "scroll", maxHeight: "85vh", scrollbarWidth: "10px" }}
+      >
+        {adminSideMenuOpts.map((opt) => {
+          return (
+            <ADNavItemGroup
+              groupLabel={opt.groupLabel}
+              items={opt.items}
+            ></ADNavItemGroup>
+          );
+        })}
         <ADNavItemGroupBox>
           <ADNavItemBox sx={{ marginBottom: "2em" }}>
             <Link
