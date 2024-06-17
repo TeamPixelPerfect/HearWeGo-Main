@@ -1,4 +1,5 @@
 import { base_url } from "../constants/keys";
+import { Budget } from "../constants/models";
 
 export const getEvents = async (
   token: String,
@@ -24,6 +25,67 @@ export const getEvents = async (
   } else {
     const error = await res.json();
     throw new Error(error.message);
+  }
+};
+
+
+
+export const getAllEvents = async (): Promise<Event[]> => {
+  const res = await fetch(`${base_url}/EventsManager/events`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const events = await res.json();
+    return events;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getEventById = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events?event_id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+};
+
+export const getEvent = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; // Rethrow the error to handle it in the calling function
   }
 };
 
@@ -84,6 +146,23 @@ export const addBudget = async (token: string, data: any) => {
   } else {
     const error = await res.json();
     console.error("Error response:", error); 
+    throw new Error(error.message);
+  }
+};
+
+export const getAllBudgets = async (): Promise<Budget[]> => {
+  const res = await fetch(`${base_url}/EventsManager/budget`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const budgets = await res.json();
+    return budgets;
+  } else {
+    const error = await res.json();
     throw new Error(error.message);
   }
 };

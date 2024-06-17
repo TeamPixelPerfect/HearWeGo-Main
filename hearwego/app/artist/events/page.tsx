@@ -191,7 +191,7 @@ function EventArea() {
       getEvents(artist?.token, page, limit, filter, createdArtist ).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
-      });
+      }); 
     }
   }, [artist, page]);
 
