@@ -1,31 +1,31 @@
 import { Height } from "@mui/icons-material";
-import { Box, Select, TextField, styled } from "@mui/material";
+import { Box, Card, Select, TextField, styled } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 
-export const AuthContainer = styled("div")(({ theme }) => ({
-  width: "70vw",
+export const AuthContainer = styled(Card)(({ theme }) => ({
+  width: "60vw",
   minWidth: "400px",
   height: "fit-content",
-  padding: "80px 40px",
-  minHeight: "600px",
-  background: "rgba(0,0,0,0.8)",
+  // padding: "80px 40px",
+  // minHeight: "600px",
+  // background: theme.palette.background.paper,
   margin: "100px auto",
   borderRadius: "10px",
   overflow: "hidden",
 }));
 
 export const AuthTextField = styled(TextField)(({ theme }) => ({
-  background: "rgba(255,255,255,0.1)",
+  // background: "rgba(255,255,255,0.1)",
   margin: "10px 0",
   width: "40%",
   minWidth: "300px",
   boxSizing: "border-box",
-  color: "#fff",
+  color: theme.palette.text.primary,
   borderRadius: "10px",
 }));
 
 export const AuthDatePicker = styled(DatePicker)(({ theme }) => ({
-  background: "rgba(255,255,255,0.1)",
+  // background: "rgba(255,255,255,0.1)",
   margin: "10px 0",
   width: "40%",
   minWidth: "300px",
@@ -70,12 +70,15 @@ export const AuthCheckBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   width: "120px",
   height: "120px",
-  border: "1px solid #fff",
+  border: "1px solid #4338ca",
+  // borderColor: theme.palette.primary.main,
   borderRadius: "10px",
-  background: "rgba(255,255,255,0.1)",
+  background: "#c7d2fe",
+  color: "#4338ca",
   cursor: "pointer",
+  boxShadow: "1px 1px 5px rgba(0,0,0,0.2)",
   ":hover": {
-    background: "rgba(255,255,255,0.3)",
+    background: "#a5b4fc",
   },
 }));
 
@@ -86,12 +89,14 @@ export const AuthGenreBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   width: "100px",
   height: "100px",
-  border: "1px solid #fff",
+  border: "1px solid #4338ca",
+  // borderColor: theme.palette.primary.main,
   borderRadius: "50%",
-  background: "rgba(255,255,255,0.1)",
+  background: "#c7d2fe",
+  color: "#4338ca",
   cursor: "pointer",
   ":hover": {
-    background: "rgba(255,255,255,0.3)",
+    background: "#a5b4fc",
   },
 }));
 
@@ -99,10 +104,12 @@ export const AuthOTPDigitBox = styled("input")(({ theme }) => ({
   width: "50px !important",
   height: "60px",
   textAlign: "center",
-  background: "rgba(255,255,255,0.1)",
+  background:
+    theme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
   border: "1px solid #fff",
+  borderColor: theme.palette.text.primary,
   borderRadius: "10px",
-  color: "#fff",
+  color: theme.palette.text.primary,
   fontSize: "24px",
 }));
 

@@ -60,16 +60,18 @@ interface SongPreviewProps {
   songData: Song;
 }
 
+
+//function to play the song
 function ClickPlay({ songUrl }: ClickPlayProps) {
   const { toggle, playing } = useAudio({ url: songUrl });
 
   return (
     <>
+      {/* change the play icon and play the song*/}
       {!playing ? (
         <IconButton sx={{ color: "text.primary", fontSize: 36 }}>
           <PlayCircleIcon
             sx={{ color: "text.secondary", fontSize: 54 }}
-            //   sx={{ width: "30%", height: "auto" }}
             onClick={toggle}
           />
         </IconButton>
@@ -77,25 +79,23 @@ function ClickPlay({ songUrl }: ClickPlayProps) {
         <IconButton sx={{ color: "text.primary", fontSize: 36 }}>
           <PauseCircleIcon
             sx={{ color: "text.secondary", fontSize: 54 }}
-            //   sx={{ width: "30%", height: "auto" }}
             onClick={toggle}
           />
         </IconButton>
-        // <PauseCircleIcon
-        //   sx={{ width: "30%", height: "auto" }}
-        //   onClick={togglePlay}
-        // />
+
       )}
     </>
   );
 }
 
+//single song preview
 function SongPreview({ songData }: SongPreviewProps) {
   const artist = useAppSelector((state) => state.artist.user?.user);
 
   const matches = useMediaQuery("(min-width:540px)");
 
   return (
+    //song details
     <Paper
       elevation={3}
       sx={{
@@ -129,11 +129,10 @@ function SongPreview({ songData }: SongPreviewProps) {
           }}
         >
           <ClickPlay songUrl={songData.song_track} />
-
-          {/* <PlayCircleIcon sx={{ width: "30%", height: "auto" }} /> */}
         </Box>
       </SongPreviewSong>
 
+      
       <SongPreviewDetails>
         <Typography sx={{ fontSize: 12 }} color="text.secondary" gutterBottom>
           ISRC: {songData?.isrc && songData?.isrc}
@@ -145,7 +144,8 @@ function SongPreview({ songData }: SongPreviewProps) {
           {songData?.artist?.map((artist) => artist.artist_name).join(",")} -{" "}
           {songData.album_title ? songData.album_title : "Single"}
         </Typography>
-
+          
+        {/* genre display */}
         <Stack
           direction="row"
           spacing={1}
@@ -179,6 +179,7 @@ function SongPreview({ songData }: SongPreviewProps) {
           })}
         </Stack>
 
+          {/* privacy chip */}
         <Chip
           icon={
             songData?.privacy_status === "private" ? (
@@ -190,6 +191,7 @@ function SongPreview({ songData }: SongPreviewProps) {
           sx={{ marginBottom: "1em" }}
           label={songData?.privacy_status}
         />
+
 
         <Alert
           variant="filled"
@@ -225,6 +227,8 @@ function SongPreview({ songData }: SongPreviewProps) {
           >
             Share your Track
           </Typography>
+
+          {/* social media buttons */}
           <Stack
             direction="row"
             spacing={1}
@@ -268,6 +272,7 @@ function SongPreview({ songData }: SongPreviewProps) {
               width: "100%"
             }}
           >
+            {/* link copy area */}
             <Box sx={{ display: "flex", alignItems: "center" }}>
               https://www.hearwego.com/wq23s
             </Box>
@@ -281,6 +286,7 @@ function SongPreview({ songData }: SongPreviewProps) {
   );
 }
 
+//song details area
 const SongDetails = ({ params: { id } }: Props) => {
   const theme = useTheme();
   const artist = useAppSelector((state) => state.artist.user);
@@ -299,6 +305,7 @@ const SongDetails = ({ params: { id } }: Props) => {
   if (!songDetails) return <div>Loading...</div>;
 
   return (
+    //song details
     <Grid container sx={{ width: "100%", margin: 0 }}>
       <Card sx={{ width: "100%", minHeight: "100vh", background: theme.palette.background.default }}>
         <Box
@@ -321,8 +328,8 @@ const SongDetails = ({ params: { id } }: Props) => {
             <Typography
               variant="h4"
               sx={{
-                fontSize: "20px",
-                fontWeight: "500",
+                fontSize: "24px",
+                fontWeight: "700",
                 color: theme.palette.secondary.main,
               }}
             >

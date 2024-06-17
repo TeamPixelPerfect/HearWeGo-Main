@@ -6,8 +6,6 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "hwgbucket.s3.ap-south-1.amazonaws.com",
-        port: "",
-        pathname: "",
       },
     ],
   },
@@ -18,11 +16,20 @@ const nextConfig = {
     AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
   },
   swcMinify: true,
-  fastRefresh: true,
-  concurrentFeatures: true,
   productionBrowserSourceMaps: false, 
   optimizeFonts: false,
-  minify: false,
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

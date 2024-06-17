@@ -15,12 +15,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { CardMedia, Stack } from "@mui/material";
-import { Router } from "next/router";
+
+// Function to create data for the table
 function createData1(name1: string, calories1: number) {
   return { name1, calories1 };
 }
-
+// Data for the table
 const rows1 = [createData1("Gold", 159), createData1("Silver", 237)];
+
+//Styling for table cells
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -31,6 +34,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+// Styling for table rows
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
@@ -39,6 +43,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {},
 }));
 
+// Function to create data for the main table
 function createData(
   name: string,
   calories: string,
@@ -50,10 +55,13 @@ function createData(
   return { name, calories, fat, carbs, protein, seatNoTo };
 }
 
+// Data for the main table
 const rows = [
   createData("Gold", "LKR 2000", 100, "A", 1, 100),
   createData("Silver", "LKR 1000", 200, "B", 1, 200),
 ];
+
+// Bull JSX element for visual separation
 const bull = (
   <Box
     component="span"
@@ -63,10 +71,13 @@ const bull = (
   </Box>
 );
 
+// Functional component for the page
 const page = () => {
   return (
     <div>
       <h1 style={{ marginLeft: "20px", color: "#4338CA" }}>Tickets</h1>
+
+      {/* Main content */}
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Card sx={{ border: "solid", borderRadius: "20px" }}>
@@ -74,6 +85,8 @@ const page = () => {
               <Typography sx={{ fontSize: 24 }} color="#4338CA" gutterBottom>
                 Ticket Information
               </Typography>
+
+              {/* Ticket Details */}
               <Box sx={{ display: "flex", width: "100%" }}>
                 <Box sx={{ display: "flex", width: "35%" }}>
                   <Box
@@ -165,7 +178,8 @@ const page = () => {
                   </Box>
                 </Box>
               </Box>
-
+             
+              {/* Table for Tickets */}
               <Box sx={{ marginTop: "30px" }}>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -190,6 +204,8 @@ const page = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
+
+                       {/* Mapping through data to create table rows */}
                       {rows.map((row) => (
                         <StyledTableRow key={row.name}>
                           <StyledTableCell component="th" scope="row">
@@ -227,6 +243,9 @@ const page = () => {
                   odio{" "}
                 </p>
               </Box>
+
+
+              {/*Ticket Preview*/}
               <Typography sx={{ fontSize: 24 }} color="#4338CA" gutterBottom>
                 Ticket Preview
               </Typography>
@@ -264,6 +283,7 @@ const page = () => {
                             sx={{
                               display: "flex",
                               flexDirection: "column",
+                              color:'white',
                               width: "50%",
                               justifyContent: "space-evenly",
                               marginLeft: "20px",
@@ -355,6 +375,7 @@ const page = () => {
                         <Box
                           sx={{
                             display: "flex",
+                            color:'white',
                             flexDirection: "column",
                             justifyContent: "space-evenly",
                           }}
@@ -434,6 +455,8 @@ const page = () => {
           </Card>
         </Box>
 
+        
+         {/*Ticket Preview*/}
         <Card
           sx={{
             minWidth: 275,

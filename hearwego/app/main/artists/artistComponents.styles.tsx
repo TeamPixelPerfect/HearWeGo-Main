@@ -15,11 +15,13 @@ import { InputLabel, Select, MenuItem } from "@mui/material";
 import Card from "@mui/material/Card";
 import { TableCell, TableRow } from "@mui/material";
 
+//created the interface for the options in the select component
 interface Option {
   value: string;
   label: string;
 }
 
+//created the interface for the custom select component
 interface CustomSelectProps {
   labelId: string;
   id: string;
@@ -30,12 +32,15 @@ interface CustomSelectProps {
   placeholder?: string;
 }
 
+//created the interface for the artist card component
 interface ArtistCardProps {
-  name: string;
-  Genre: string;
-  img_url: string;
+  name: String;
+  Genre: String;
+  img_url: String;
+  id?: string;
 }
 
+//created the interface for the trending row component
 interface tableRow {
   LinkPage: string;
   Rank: {
@@ -43,7 +48,7 @@ interface tableRow {
     rank_img: string;
   };
   Artist: {
-    name: string;
+    name: String;
     img_url: string;
   };
   Latest_song: {
@@ -58,6 +63,8 @@ interface tableRow {
   popularity: string;
   country_img: string;
 }
+
+//created the custom select component
 export const CustomSelect: React.FC<CustomSelectProps> = ({
   labelId,
   id,
@@ -96,6 +103,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   );
 };
 
+//created the styled component for the main div
 export const Maindiv = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   width: "100%",
@@ -104,6 +112,7 @@ export const Maindiv = styled("div")(({ theme }) => ({
   paddingRight: "10px",
 }));
 
+//created the styled component for the search paper
 export const SearchPaper = styled(Paper)(({ theme }) => ({
   component: "form",
   p: "2px 4px",
@@ -115,13 +124,16 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   height: "100%",
 }));
 
+//created the artist card component where the details of the artist are displayed
 export const ArtistCard: React.FC<ArtistCardProps> = ({
   name,
   Genre,
   img_url,
+  id,
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   return (
+    //created the card component for the artist
     <Card
       sx={{
         position: "relative",
@@ -129,15 +141,17 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
         height: "230px",
         marginBottom: 0,
         borderRadius: "30px",
-        transition: "transform 0.2s ease-in-out", // Add transition for smooth hover effect
+        transition: "transform 0.2s ease-in-out",
         transform: isHovered ? "scale(1.10)" : "scale(1)",
         marginRight: "20px",
         marginTop: "20px",
       }}
-      onMouseEnter={() => setIsHovered(true)} // Set isHovered to true when mouse enters
-      onMouseLeave={() => setIsHovered(false)} // Set isHovered to false when mouse leaves
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href="/main/artists/SingleArtistPage">
+      {/*created the link component for the artist card*/}
+      <Link href={"/main/artists/" + id}>
+        {/*created the card action area for the artist card*/}
         <CardActionArea
           style={{
             backgroundImage: `url(${img_url})`,
@@ -145,8 +159,10 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
             backgroundPosition: "center",
             height: "100%",
             width: "100%",
+            textTransform: "capitalize",
           }}
         >
+          {/*created the card actions for the artist card*/}
           <Box
             sx={{
               marginTop: "70%",
@@ -156,10 +172,12 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
               textAlign: "right",
             }}
           >
-            <Typography gutterBottom variant="h6" component="div">
+            <Typography variant="h6" color="white" component="div">
               {name}
             </Typography>
-            <Typography variant="body1">{Genre}</Typography>
+            <Typography variant="body1" color="white">
+              {Genre}
+            </Typography>
           </Box>
         </CardActionArea>
       </Link>
@@ -167,6 +185,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
   );
 };
 
+//A single row in the trending table
 export const TrendingRow: React.FC<tableRow> = ({
   LinkPage,
   Rank,
@@ -180,6 +199,7 @@ export const TrendingRow: React.FC<tableRow> = ({
   return (
     <TableRow>
       <TableCell align="center">
+        {/*created the stack component for the trending row*/}
         <Stack
           direction={"row"}
           spacing={4}
@@ -202,7 +222,7 @@ export const TrendingRow: React.FC<tableRow> = ({
           <Stack
             direction={"row"}
             spacing={2}
-            sx={{ justifyContent: "center", alignItems: "center" }}
+            sx={{ justifyContent: "center", alignItems: "left " }}
           >
             <div
               style={{
@@ -211,6 +231,7 @@ export const TrendingRow: React.FC<tableRow> = ({
                 backgroundPosition: "center",
                 width: "25px",
                 height: "25px",
+                alignItems: "left",
               }}
             ></div>
             <div>{Artist.name}</div>

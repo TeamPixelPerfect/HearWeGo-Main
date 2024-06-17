@@ -78,6 +78,7 @@ export const GenreBox = styled(Box)(({ theme }) => ({
   fontWeight: "semi-bol",
   color: "Blue",
   textAlign: "center",
+  textTransform: "capitalize",
   //backgroundColor:'red'
 }));
 

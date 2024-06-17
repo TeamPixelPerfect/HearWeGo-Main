@@ -68,6 +68,7 @@ export interface BankDetails {
 
 export interface Artist {
   user: {
+    _id?: string;
     artist_id?: string;
     email: String;
     password: String;
@@ -96,6 +97,12 @@ export interface Artist {
 }
 
 export interface Song {
+  image: string | undefined;
+  title: ReactNode;
+  created: ReactNode;
+  status: any;
+  listenedBy: ReactNode;
+  album: ReactNode;
   song_id?: string;
   song_title?: string;
   album_title?: string;
@@ -112,7 +119,7 @@ export interface Song {
   release_date?: string;
   song_status?: string;
   privacy_status?: string;
-  language?: string[] ;
+  language?: string[];
   record_label?: string;
   song_writers?: { artist_id: string; artist_name: string }[];
   composer?: { artist_id: string; artist_name: string }[];
@@ -143,40 +150,106 @@ export interface Album {
   song?: string[];
 }
 
-export interface Event{
+export interface Event {
   event_id?: string;
-      event_img?: string;
-      event_name?: string;
-      event_type?: string;
-      age_from?: number;
-      age_to?: number;
-      no_of_sessions?: number;
-      sessions?: [
-        {
-          session_id: string,
-          session_name: string,
-          session_date: string,
-          session_time: string,
-          duration: string,
-          venue: string,
-          artists: [
-            {
-              artist_id: string,
-              artist_name: string
-            }
-          ],
-          session_special_notice: string
-        }
-      ];
-      sponsor?: string[];
-      teams?: [
-        {
-          team_type: string,
-          team_name: string,
-          contact_name: string,
-          contact: string,
-          email: string
-        }
-      ];
-      description?: string;
+  event_img?: string;
+  event_name?: string;
+  event_type?: string;
+  age_from?: number;
+  age_to?: number;
+  no_of_sessions?: number;
+  sessions?: [
+    {
+      session_id: number;
+      session_name: string;
+      session_date: string;
+      session_time: string;
+      duration: string;
+      venue: string;
+      artists: string[];
+      session_special_notice: string;
+    }
+  ];
+  sponsor?: [
+    {
+      sponsor_type: string;
+      sponsor_name: string;
+      sponsor_contact: string;
+      sponsor_email: string;
+    }
+  ];
+  teams?: [
+    {
+      team_type: string;
+      team_name: string;
+      contact: string;
+      email: string;
+    }
+  ];
+  description?: string;
+  event_status?: string;
+  event_created_by?: string;
+}
+
+export interface PRPost {
+  PrPostID: string;
+  ArtistName: string;
+  post_img: string;
+  post_social_media?: string;
+  schedule_date: string;
+  Description: string;
+  Scheduled_Date: string;
+  Scheduled_Time: string;
+  SocialMedias ?: string[];
+}
+
+export interface Ticket {
+  ticket_id?: string;
+  ticket_catagory?: string;
+  ticket_img?: string;
+  auto_ticket_details?: [
+    {
+      ticket_currency: string;
+      ticket_img: string;
+      ticket_type: string;
+      ticket_price: string;
+      ticket_count: string;
+      ticket_session: string;
+    }
+  ];
+  manual_ticket_details?: [
+    {
+      ticket_location: string;
+      ticket_session: string;
+    }
+  ];
+  ticket_description?: string;
+  event_id?: string;
+}
+
+export interface Budget {
+  budget_id?: string;
+  budget_currency?: string;
+  budget_details?: [
+    {
+      budget_title: string;
+      budget_type: string;
+      budget_session: string;
+      budget_amount: number;
+    }
+  ];
+  event_id?: string;
+}
+
+export interface PRPost {
+  PrPostID: string;
+  ArtistName: string;
+  post_img: string;
+  post_social_media?: string;
+  schedule_date: string;
+  Description: string;
+  Scheduled_Date: string;
+  Scheduled_Time: string;
+  SocialMedias ?: string[];
+  
 }

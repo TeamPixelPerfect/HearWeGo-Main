@@ -2,7 +2,7 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
+
 import CardContent from "@mui/material/CardContent";
 import { Button, IconButton, Stack, useTheme } from "@mui/material";
 import Typography from "@mui/material/Typography";
@@ -14,32 +14,26 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { CardMedia } from "@mui/material";
-import { Router } from "next/router";
+
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
+
 import DialogActions from "@mui/material/DialogActions";
 
 import CloseIcon from "@mui/icons-material/Close";
 
-import { useState } from "react";
-import {
-  Autocomplete,
-  FilledInput,
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Autocomplete } from "@mui/material";
 
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-const genres = ["Gold", "Browns", "Silver",];
+
+// @const genres - List of available genres.
+const genres = ["Gold", "Browns", "Silver"];
+
+//@const seat - List of available seat types.
 const seat = ["A", "B", "C", "D"];
 
+//Styled component for customized Dialog.
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -48,6 +42,8 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(1),
   },
 }));
+
+//Styled component for customized TableCell.
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -59,6 +55,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+//Styled component for customized TableRow.
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
@@ -67,6 +65,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {},
 }));
 
+// Function to create table row data
 function createData(
   name: string,
   calories: string,
@@ -78,10 +77,13 @@ function createData(
   return { name, calories, fat, carbs, protein, seatNoTo };
 }
 
+// Array of ticket data rows
 const rows = [
   createData("Gold", "LKR 2000", 100, "A", 1, 100),
   createData("Silver", "LKR 1000", 200, "B", 1, 200),
 ];
+
+//Bullet icon component.
 const bull = (
   <Box
     component="span"
@@ -90,6 +92,11 @@ const bull = (
     •
   </Box>
 );
+
+/**
+ * @function page - Main functional component for the page.
+ * @returns {JSX.Element} - JSX element representing the page.
+ */
 const page = () => {
   const [userDetails, setUserDetails] = React.useState({
     country: "",
@@ -104,12 +111,18 @@ const page = () => {
     setOpen(false);
   };
 
+  /**
+   * @returns {JSX.Element} - JSX element representing the page.
+   */
+
   return (
     <div>
+      {/* Heading */}
       <div style={{ display: "flex", justifyContent: "center" }}>
         {" "}
         <h1 style={{ color: "#4338CA" }}>Edit Ticket Details</h1>
       </div>
+
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Card sx={{ border: "solid", borderRadius: "20px", width: "1200px" }}>
@@ -133,6 +146,9 @@ const page = () => {
                     }}
                   ></Box>
                 </Box>
+
+                {/* Ticket details text */}
+
                 <Box
                   sx={{
                     display: "flex",
@@ -209,6 +225,7 @@ const page = () => {
                 </Box>
               </Box>
 
+              {/* Table for Tickets */}
               <Box sx={{ display: "flex", marginTop: "30px" }}>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -232,6 +249,7 @@ const page = () => {
                         </StyledTableCell>
                       </TableRow>
                     </TableHead>
+                    {/* Mapping through data to create table rows */}
                     <TableBody>
                       {rows.map((row) => (
                         <StyledTableRow key={row.name}>
@@ -271,7 +289,12 @@ const page = () => {
                       aria-labelledby="customized-dialog-title"
                       open={open}
                     >
-                      <Box sx={{ backgroundColor: theme.palette.background.default, padding: "20px" }}>
+                      <Box
+                        sx={{
+                          backgroundColor: theme.palette.background.default,
+                          padding: "20px",
+                        }}
+                      >
                         <DialogTitle
                           sx={{ m: 0, color: "white", p: 2 }}
                           id="customized-dialog-title"
@@ -460,7 +483,7 @@ const page = () => {
         <Box
           component="form"
           sx={{
-            "& .MuiTextField-root": { m: 1, width: "130ch" },
+            "& .MuiTextField-root": { m: 1, width: "100%" },
             marginLeft: "25px",
           }}
           noValidate
@@ -471,7 +494,7 @@ const page = () => {
               id="filled-multiline-flexible"
               label=""
               multiline
-              maxRows={10}
+              rows={10}
               variant="filled"
             />
           </div>

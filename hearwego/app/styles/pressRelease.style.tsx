@@ -11,6 +11,7 @@ import LinearProgress, {
   linearProgressClasses,
 } from "@mui/material/LinearProgress";
 
+//created the styled component for a single tab item
 export const TabItem = muiStyled(Tab)(({ theme }) => ({
   minHeight: 53,
   minWidth: 80,
@@ -31,6 +32,7 @@ export const TabItem = muiStyled(Tab)(({ theme }) => ({
   },
 }));
 
+//created the styled component for the tab container
 export const BorderBox = muiStyled("div")(({ theme }) => ({
   width: "100%",
   height: "100%",
@@ -38,6 +40,7 @@ export const BorderBox = muiStyled("div")(({ theme }) => ({
   backgroundColor: "#E0E7FF",
 }));
 
+//created the styled component for the tab container
 export const TabsNav = muiStyled(Box)(({ theme }) => ({
   width: "100%",
   boxShadow: "inset 0 -1px 0 0 #E6ECF0",
@@ -49,6 +52,7 @@ export const TabsNav = muiStyled(Box)(({ theme }) => ({
   display: "inline-block",
 }));
 
+//created the styled component for the single campaign
 export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
@@ -62,6 +66,7 @@ export const SingleCampaign = muiStyled(Card)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
 }));
 
+//created the styled component for the campaign media
 export const CampaignMedia = muiStyled(CardMedia)(({ theme }) => ({
   width: "60%", // Adjust this width as needed
   height: "300px",
@@ -69,6 +74,7 @@ export const CampaignMedia = muiStyled(CardMedia)(({ theme }) => ({
   backgroundColor: "black",
 }));
 
+//Created the styled component for the campaign content
 export const CampaignContent = muiStyled(CardContent)(({ theme }) => ({
   width: "50%",
   padding: "16px",
@@ -76,6 +82,7 @@ export const CampaignContent = muiStyled(CardContent)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
+//Created the styled component for the
 export const CreateCampaignPopup = muiStyled("div")(({ theme }) => ({
   position: "relative",
   top: "50%",
@@ -97,17 +104,17 @@ export const NameBox = styled(Box)(({ theme }) => ({
   padding: "5px",
 }));
 
+//created the styled component for the Post schedule
 export const PostSchedulePopup = muiStyled(Box)(({ theme }) => ({
   position: "relative",
-  top: "50%",
-  left: "53%",
-  transform: "translate(-50%, -50%)",
-  width: "30%",
-  height: "fit-content",
+  width: "27%",
+  minHeight: "70%",
+  maxHeight: "70%",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
   padding: "1em",
   borderRadius: "10px",
   background: theme.palette.background.default,
+  overflowY: "auto",
 }));
 
 export const ArtistDetail = muiStyled(Box)(({ theme }) => ({
@@ -140,6 +147,7 @@ export const PostContextBox = muiStyled(Box)(({ theme }) => ({
   height: "40%",
 }));
 
+//Created the styled component for the linear progress bar
 export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
   height: "20px",
   borderRadius: 5,
@@ -157,11 +165,11 @@ export const BorderLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
 }));
 
 export const PostForPopup = muiStyled(Box)(({ theme }) => ({
-  width: "50%",
+  width: "100%",
   height: "200px",
   backgroundImage: "url('https://source.unsplash.com/random')",
-  backgroundRepeat:"no-repeat",
-  backgroundSize:"cover",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "cover",
   display: "flex",
   alignItems: "flex-end",
   borderRadius: "10px",

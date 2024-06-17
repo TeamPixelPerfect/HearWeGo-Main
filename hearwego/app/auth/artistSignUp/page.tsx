@@ -17,8 +17,14 @@ import {
   Typography,
   TextField,
   InputAdornment,
+  useTheme,
+  useMediaQuery,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
@@ -45,13 +51,25 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import PublicIcon from "@mui/icons-material/Public";
-import { GiPartyPopper } from "react-icons/gi";
-import { TypeSpecimenOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-import { countCommas, countNonEmptyItems } from "@/app/constants/functions";
+import {
+  countCommas,
+  countNonEmptyItems,
+  isNumeric,
+} from "@/app/constants/functions";
+import Logo from "@/app/components/Logo";
+import { useAppSelector } from "@/lib/hooks";
+import ErrorIcon from "@mui/icons-material/Error";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/bootstrap.css";
+import { handleArtistRegister } from "@/app/services/AuthServices";
 
 const ArtistSignUp = () => {
   const router = useRouter();
+  const theme = useTheme();
+
+  const matches = useMediaQuery("(max-width:960px)");
+  const artist = useAppSelector((state) => state.artist.user);
 
   // Sign up stage
   const [step, setStep] = useState<number>(0);
@@ -104,21 +122,26 @@ const ArtistSignUp = () => {
     musicGenres: [""],
     artistProfession: [""],
     mobileNumber: "",
-    country: "",
+    gender: "",
+    country: "LK",
     birthDate: "",
     verificationDocuments: [""],
     artistCovers: [""],
-    artistBio: "",
     email: "",
     password: "",
     confirmPassword: "",
+    mobileVerified: false,
+  });
+
+  // Artist Profile Customization Details
+  const [artistCustomization, setArtistCustomization] = useState({
+    artistBio: "",
     profilePicture: "",
-    socialMediaLinks: {
-      facebook: "",
-      twitter: "",
-      instagram: "",
-    },
-    webUrl: "",
+    artistCovers: ["", "", ""],
+  });
+
+  // Artist Bank Details
+  const [artistBankDetails, setArtistBankDetails] = useState({
     bankDetails: {
       accountName: "",
       accountNumber: "",
@@ -126,7 +149,16 @@ const ArtistSignUp = () => {
       bankBranch: "",
       country: "",
     },
-    mobileVerified: false,
+  });
+
+  // Artist Social Media Details
+  const [artistSocialMediaDetails, setArtistSocialMediaDetails] = useState({
+    socialMediaLinks: {
+      facebook: "",
+      twitter: "",
+      instagram: "",
+    },
+    webUrl: "",
   });
 
   // Error Handling for Inputs
@@ -145,6 +177,9 @@ const ArtistSignUp = () => {
   const [otpError, setOtpError] = useState(false);
   const [bioError, setBioError] = useState(false);
   const [profilePicError, setProfilePicError] = useState(false);
+  const [coverPhotoError, setCoverPhotoError] = useState(false);
+  const [birthDateError, setBirthDateError] = useState(false);
+  const [genderError, setGenderError] = useState(false);
 
   // Increment Sign up stage (Next button)
   const incrementStep = (step: number) => {
@@ -257,37 +292,68 @@ const ArtistSignUp = () => {
   };
 
   const handleStageSix = () => {
+    const errors = [false, false, false, false, false, false];
+
     if (artistDetails.email === "") {
       setEmailError(true);
-      return;
+      errors[0] = true;
     }
     if (artistDetails.password === "") {
       setPasswordError(true);
-      return;
+      errors[1] = true;
     }
     if (artistDetails.confirmPassword === "") {
       setConfirmPasswordError(true);
-      return;
+      errors[2] = true;
     }
     if (artistDetails.mobileNumber === "") {
       setMobileNumberError(true);
-      return;
+      errors[3] = true;
     }
     if (selectedCountry === "") {
       setArtistDetails({ ...artistDetails, country: selectedCountry });
       setCountryError(true);
-      return;
+      errors[4] = true;
     }
     if (artistDetails.password !== artistDetails.confirmPassword) {
       setPasswordMismatchError(true);
-      return;
+      errors[5] = true;
     }
+
+    if (errors.includes(true)) return;
+
     setEmailError(false);
     setPasswordError(false);
     setConfirmPasswordError(false);
     setMobileNumberError(false);
     setCountryError(false);
     setPasswordMismatchError(false);
+
+    incrementStep(1);
+  };
+
+  const handleStageSixPartTwo = () => {
+    const errors = [false, false, false];
+
+    if (artistDetails.birthDate === "") {
+      setBirthDateError(true);
+      errors[0] = true;
+    }
+
+    if (!selectedCountry) {
+      setCountryError(true);
+      errors[1] = true;
+    }
+
+    if (!artistDetails.gender) {
+      setGenderError(true);
+      errors[2] = true;
+    }
+
+    if (errors.includes(true)) return;
+
+    setArtistDetails({ ...artistDetails, country: selectedCountry });
+
     incrementStep(1);
   };
 
@@ -298,7 +364,15 @@ const ArtistSignUp = () => {
     }
     setArtistDetails({ ...artistDetails, verificationDocuments: verDoc });
     setVerificationDocumentError(false);
-    incrementStep(1);
+
+    console.log("Artist Details:::", artistDetails);
+
+    handleArtistRegister(artistDetails).then((res) => {
+      if (res) {
+        console.log("Artist Registered Successfully! " + res);
+        incrementStep(1);
+      }
+    });
   };
 
   const handleOtpStage = () => {
@@ -316,20 +390,37 @@ const ArtistSignUp = () => {
   };
 
   const handleCustomizeStage = () => {
-    if (artistDetails.artistBio === "") {
+    const errors = [false, false, false];
+
+    if (artistCustomization.artistBio === "") {
       setBioError(true);
-      return;
+      errors[0] = true;
     }
     if (!profilePicture) {
       setProfilePicError(true);
-      return;
+      errors[1] = true;
     }
-    setArtistDetails({
-      ...artistDetails,
-      artistBio: artistDetails.profilePicture,
+    if (!coverPhoto1 || !coverPhoto2 || !coverPhoto3) {
+      setCoverPhotoError(true);
+      errors[2] = true;
+    }
+
+    setArtistCustomization({
+      ...artistCustomization,
+      profilePicture: profilePicture,
     });
+
+    setArtistCustomization({
+      ...artistCustomization,
+      artistCovers: [coverPhoto1, coverPhoto2, coverPhoto3],
+    });
+
+    if (errors.includes(true)) return;
+
     setBioError(false);
     setProfilePicError(false);
+    setCoverPhotoError(false);
+
     incrementStep(1);
   };
 
@@ -348,12 +439,12 @@ const ArtistSignUp = () => {
     if (commaCount === countNonEmptyItems(aliasList)) {
       aliasList.forEach((alias) => {
         console.log(alias);
-        if(!artistDetails.otherAliases.includes(alias)) {
+        if (!artistDetails.otherAliases.includes(alias)) {
           setArtistDetails({
             ...artistDetails,
             otherAliases: [...artistDetails.otherAliases, alias],
           });
-        };
+        }
       });
     }
   };
@@ -401,34 +492,35 @@ const ArtistSignUp = () => {
     );
   };
 
+  useEffect(() => {
+    const index = window.location.pathname.split("/")[-1];
+    if (isNumeric(index)) {
+      setStep(parseInt(index));
+    }
+  }, []);
+
   return (
     <AuthContainer>
-      {/* <Stack sx={{ width: "100%", padding: "12px" }}>
-        <CloseIcon
-          sx={{
-            color: "rgba(255,255,255,0.4)",
-            fontSize: "2rem",
-            cursor: "pointer",
-            alignSelf: "flex-end",
-          }}
-        />
-      </Stack> */}
       <Box
         sx={{
           width: "100%",
           height: "100%",
+          maxHeight: "1250px",
           display: "flex",
+          alignItems: "center",
           flexWrap: "nowrap",
+          padding: "40px 0",
           transform: `translateX(-${step * 100}%)`,
           transition: "transform 0.5s ease-in-out",
         }}
       >
+        {/* Welcome Screen */}
         <Box
           id="as-step-1"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -436,10 +528,23 @@ const ArtistSignUp = () => {
             // background: "magenta",
           }}
         >
-          <Typography variant="h4" sx={{ color: "#fff", fontWeight: "700" }}>
+          <Logo
+            img_url={
+              theme.palette.mode === "dark"
+                ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo(white).png"
+                : "https://hwgbucket.s3.ap-south-1.amazonaws.com/hwgLogo.png"
+            }
+          />
+          <Typography
+            variant="h4"
+            sx={{ marginTop: "50px", fontWeight: "700" }}
+          >
             Welcome
           </Typography>
-          <Typography variant="h5" sx={{ color: "#A5B4FC" }}>
+          <Typography
+            variant="h5"
+            sx={{ color: "#A5B4FC", textAlign: "center" }}
+          >
             You’re going to join HearWeGo as an Artist!
           </Typography>
           <Button
@@ -456,19 +561,21 @@ const ArtistSignUp = () => {
           >
             Get Started
           </Button>
-          <Typography variant="body1" sx={{ color: "#fff", marginTop: "40px" }}>
+          <Typography variant="body1" sx={{ marginTop: "40px" }}>
             Already have an account?{" "}
             <Link href="/auth/artistSignIn" style={{ color: "#C084FC" }}>
               Sign in
             </Link>
           </Typography>
         </Box>
+
+        {/* Artist Name */}
         <Box
           id="as-step-2"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -477,8 +584,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -498,7 +605,8 @@ const ArtistSignUp = () => {
                 artistName: e.target.value,
               });
             }}
-            inputRef={(input) => input && artistNameError && input.focus()}
+            helperText={artistNameError ? "Artist name is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
             style={{ boxSizing: "initial" }}
           />
           <AuthTextField
@@ -515,7 +623,7 @@ const ArtistSignUp = () => {
             label="Other Alias(es)"
             variant="outlined"
             onChange={(e) => {
-              handleAddAlias(e.target.value)
+              handleAddAlias(e.target.value);
             }}
             style={{ boxSizing: "initial" }}
           />
@@ -558,6 +666,8 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Type */}
         <Box
           id="as-step-3"
           sx={{
@@ -572,8 +682,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -596,7 +706,9 @@ const ArtistSignUp = () => {
             <AuthCheckBox
               id="solo"
               style={
-                checkType("solo") && { background: "rgba(255,255,255,0.4" }
+                checkType("solo") && {
+                  background: "#a5b4fc",
+                }
               }
               onClick={() => handleArtistTypeSelect("solo")}
             >
@@ -608,20 +720,22 @@ const ArtistSignUp = () => {
               >
                 <CheckCircleIcon
                   style={{
+                    color: "#4338ca",
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                Solo
-              </Typography>
-              <FaPerson style={{ fontSize: "40px", color: "#fff" }} />
+              <Typography variant="subtitle1">Solo</Typography>
+              <FaPerson style={{ color: "#4338ca", fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="duo"
-              style={checkType("duo") && { background: "rgba(255,255,255,0.4" }}
+              style={
+                checkType("duo") && {
+                  background: "#a5b4fc",
+                }
+              }
               onClick={() => handleArtistTypeSelect("duo")}
             >
               <Stack
@@ -632,21 +746,21 @@ const ArtistSignUp = () => {
               >
                 <CheckCircleIcon
                   style={{
+                    color: "#4338ca",
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                Duo
-              </Typography>
-              <MdOutlineGroup style={{ fontSize: "40px", color: "#fff" }} />
+              <Typography variant="subtitle1">Duo</Typography>
+              <MdOutlineGroup style={{ color: "#4338ca", fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="group"
               style={
-                checkType("group") && { background: "rgba(255,255,255,0.4" }
+                checkType("group") && {
+                  background: "#a5b4fc",
+                }
               }
               onClick={() => handleArtistTypeSelect("group")}
             >
@@ -660,16 +774,14 @@ const ArtistSignUp = () => {
               >
                 <CheckCircleIcon
                   style={{
+                    color: "#4338ca",
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                Group
-              </Typography>
-              <MdGroups style={{ fontSize: "40px", color: "#fff" }} />
+              <Typography variant="subtitle1">Group</Typography>
+              <MdGroups style={{ color: "#4338ca", fontSize: "40px" }} />
             </AuthCheckBox>
           </Box>
 
@@ -709,12 +821,14 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Music Genre */}
         <Box
           id="as-step-4"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -723,8 +837,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               // marginBottom: "10px",
@@ -733,7 +847,7 @@ const ArtistSignUp = () => {
             What is your music genre?
           </Typography>
 
-          <Typography variant="subtitle1" sx={{ color: "#fff", marginTop: 0 }}>
+          <Typography variant="subtitle1" sx={{ marginTop: 0 }}>
             Choose up to 3*
           </Typography>
 
@@ -755,16 +869,14 @@ const ArtistSignUp = () => {
                     key={genre}
                     style={
                       checkGenre(genre) && {
-                        background: "rgba(255,255,255,0.4",
+                        background: "#a5b4fc",
                       }
                     }
                     onClick={() => {
                       handleGenreSelect(genre);
                     }}
                   >
-                    <Typography variant="subtitle1" sx={{ color: "#fff" }}>
-                      {genre}
-                    </Typography>
+                    <Typography variant="subtitle1">{genre}</Typography>
                   </AuthGenreBox>
                 );
               })}
@@ -806,6 +918,8 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Profession */}
         <Box
           id="as-step-5"
           sx={{
@@ -820,8 +934,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -845,7 +959,7 @@ const ArtistSignUp = () => {
               id="performer"
               style={
                 checkProfession("performer") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:"#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("performer")}
@@ -861,24 +975,20 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Performer
               </Typography>
-              <IoMdMicrophone style={{ fontSize: "40px", color: "#fff" }} />
+              <IoMdMicrophone style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="producer"
               style={
                 checkProfession("producer") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:"#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("producer")}
@@ -894,24 +1004,20 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Producer
               </Typography>
-              <FaCompactDisc style={{ fontSize: "40px", color: "#fff" }} />
+              <FaCompactDisc style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="songwriter"
               style={
                 checkProfession("songwriter") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:"#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("songwriter")}
@@ -927,24 +1033,23 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Songwriter
               </Typography>
-              <FaPenNib style={{ fontSize: "40px", color: "#fff" }} />
+              <FaPenNib style={{ fontSize: "40px" }} />
             </AuthCheckBox>
             <AuthCheckBox
               id="instrumentalist"
               style={
                 checkProfession("instrumentalist") && {
-                  background: "rgba(255,255,255,0.4",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(0,0,0,0.4)",
                 }
               }
               onClick={() => handleProfessionSelect("instrumentalist")}
@@ -960,18 +1065,14 @@ const ArtistSignUp = () => {
                 <CheckCircleIcon
                   style={{
                     fontSize: "25px",
-                    color: "#fff",
                     marginLeft: "8px",
                   }}
                 />
               </Stack>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "#fff", marginBottom: "10px" }}
-              >
+              <Typography variant="subtitle1" sx={{ marginBottom: "10px" }}>
                 Instrumentalist
               </Typography>
-              <GiGuitar style={{ fontSize: "40px", color: "#fff" }} />
+              <GiGuitar style={{ fontSize: "40px" }} />
             </AuthCheckBox>
           </Box>
 
@@ -1011,6 +1112,8 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Artist Details */}
         <Box
           id="as-step-6"
           sx={{
@@ -1025,8 +1128,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "20px",
@@ -1045,7 +1148,8 @@ const ArtistSignUp = () => {
             onChange={(e) => {
               setArtistDetails({ ...artistDetails, email: e.target.value });
             }}
-            inputRef={(input) => input && emailError && input.focus()}
+            helperText={emailError ? "Email is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="password"
@@ -1058,7 +1162,8 @@ const ArtistSignUp = () => {
             onChange={(e) => {
               setArtistDetails({ ...artistDetails, password: e.target.value });
             }}
-            inputRef={(input) => input && passwordError && input.focus()}
+            helperText={passwordError ? "Password is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
             id="confirm-password"
@@ -1074,88 +1179,31 @@ const ArtistSignUp = () => {
                 confirmPassword: e.target.value,
               });
             }}
-            inputRef={(input) =>
-              input &&
-              (confirmPasswordError || passwordMismatchError) &&
-              input.focus()
+            helperText={
+              confirmPasswordError
+                ? "Please confirm your password"
+                : passwordMismatchError
+                ? "Passwords do not match"
+                : ""
             }
+            FormHelperTextProps={{ style: { color: "red" } }}
           />
 
           <Stack
             direction="row"
             sx={{
-              width: "40%",
               alignItems: "center",
               justifyContent: "center",
+              mt: "8px",
             }}
           >
-            <FormControl sx={{ m: 1, minWidth: 80 }}>
-              <InputLabel id="demo-simple-select-autowidth-label">
-                <ReactCountryFlag
-                  countryCode={selectedCountry}
-                  svg
-                  style={{
-                    width: "1.5em",
-                    height: "1.5em",
-                    marginRight: "8px",
-                  }}
-                  title={selectedCountry}
-                />
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-autowidth-label"
-                id="country"
-                value={artistDetails.country}
-                onChange={handleCountryChange}
-                // autoWidth
-                label="Country"
-                color={countryError ? "error" : "primary"}
-                sx={{
-                  background: "rgba(255,255,255,0.1)",
-                  borderRadius: "10px",
-                  margin: "0",
-                }}
-                defaultValue={selectedCountry}
-                inputRef={(input) => input && countryError && input.focus()}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {countries.map((country) => {
-                  return (
-                    <MenuItem value={country}>
-                      <ReactCountryFlag
-                        key={country}
-                        countryCode={country}
-                        svg
-                        style={{
-                          width: "1.5em",
-                          height: "1.5em",
-                          marginRight: "8px",
-                        }}
-                        title={country}
-                      />
-                      {country}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-            <AuthTextField
-              id="phone"
-              label="Mobile Number*"
-              variant="outlined"
-              type="number"
-              color={mobileNumberError ? "error" : "primary"}
-              style={{ boxSizing: "initial", width: "100%" }}
-              defaultValue={artistDetails.mobileNumber}
-              onChange={(e) => {
-                setArtistDetails({
-                  ...artistDetails,
-                  mobileNumber: e.target.value,
-                });
+            <PhoneInput
+              enableSearch={true}
+              country={"lk"}
+              value={artistDetails?.mobileNumber}
+              onChange={(phone) => {
+                setArtistDetails({ ...artistDetails, mobileNumber: phone });
               }}
-              inputRef={(input) => input && mobileNumberError && input.focus()}
             />
           </Stack>
 
@@ -1191,6 +1239,165 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Additional Artist Details */}
+        <Box
+          id="as-step-15"
+          sx={{
+            flex: "0 0 auto",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            variant="h5"
+            color="secondary"
+            sx={{
+              fontWeight: "700",
+              textAlign: "center",
+              marginBottom: "20px",
+            }}
+          >
+            We just need a few more details
+          </Typography>
+          <AuthTextField
+            id="birth-date"
+            label="Birthdate*"
+            variant="outlined"
+            type="date"
+            color={emailError ? "error" : "primary"}
+            style={{ boxSizing: "initial" }}
+            defaultValue={
+              artistDetails?.birthDate ? artistDetails.birthDate : 0
+            }
+            onChange={(e) => {
+              setArtistDetails({ ...artistDetails, birthDate: e.target.value });
+            }}
+            helperText={birthDateError ? "Birthdate is required" : ""}
+            FormHelperTextProps={{ style: { color: "red" } }}
+          />
+          <FormControl
+            sx={{ m: 1, minWidth: 80, marginBottom: "30px", width: "40%" }}
+          >
+            <InputLabel id="demo-simple-select-autowidth-label">
+              <ReactCountryFlag
+                countryCode={selectedCountry}
+                svg
+                style={{
+                  width: "1.5em",
+                  height: "1.5em",
+                  marginRight: "8px",
+                }}
+                title={selectedCountry}
+              />
+              {selectedCountry}
+            </InputLabel>
+            <Select
+              labelId="country-label"
+              id="country"
+              value={artistDetails.country}
+              onChange={handleCountryChange}
+              // autoWidth
+              label="Country"
+              sx={{
+                background: "rgba(255,255,255,0.1)",
+                borderRadius: "10px",
+                margin: "0",
+              }}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {countries.map((country) => {
+                return (
+                  <MenuItem value={country}>
+                    <ReactCountryFlag
+                      key={country}
+                      countryCode={country}
+                      svg
+                      style={{
+                        width: "1.5em",
+                        height: "1.5em",
+                        marginRight: "8px",
+                      }}
+                      title={country}
+                    />
+                    {country}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <Typography color="error" sx={{ fontSize: "12px" }}>
+            {countryError && "Country is required!"}
+          </Typography>
+
+          <FormControl>
+            <FormLabel id="gender-label">Gender</FormLabel>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              defaultValue="female"
+              name="radio-buttons-group"
+              onChange={(e) => {
+                setArtistDetails({ ...artistDetails, gender: e.target.value });
+              }}
+              sx={{ display: "flex", flexDirection: "row" }}
+            >
+              <FormControlLabel
+                value="female"
+                control={<Radio />}
+                label="Female"
+              />
+              <FormControlLabel value="male" control={<Radio />} label="Male" />
+              <FormControlLabel
+                value="other"
+                control={<Radio />}
+                label="Other"
+              />
+            </RadioGroup>
+          </FormControl>
+          <Typography color="error" sx={{ fontSize: "12px" }}>
+            {genderError && "Gender is required!"}
+          </Typography>
+
+          <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
+            <Button
+              size="large"
+              variant="contained"
+              color="secondary"
+              startIcon={<ArrowCircleLeftIcon />}
+              sx={{
+                marginTop: "30px",
+                textTransform: "capitalize",
+                padding: "8px 32px",
+                background: "#787878",
+              }}
+              onClick={() => decrementStep(1)}
+            >
+              Back
+            </Button>
+            <Button
+              size="large"
+              variant="contained"
+              color="secondary"
+              endIcon={<ArrowCircleRightIcon />}
+              sx={{
+                marginTop: "30px",
+                textTransform: "capitalize",
+                padding: "8px 32px",
+              }}
+              onClick={handleStageSixPartTwo}
+            >
+              Next
+            </Button>
+          </Stack>
+        </Box>
+
+        {/* Identity Verification */}
         <Box
           id="as-step-7"
           sx={{
@@ -1205,8 +1412,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               // marginBottom: "0px",
@@ -1229,7 +1436,7 @@ const ArtistSignUp = () => {
             fileTypes="NIC,Passport,Driving License,"
             fileExtensions="PDF,PNG,JPEG"
             isCircular={false}
-            width="50%"
+            width={matches ? "80%" : "50%"}
             height="300px"
             file={verDoc}
             setFile={setVerDoc}
@@ -1238,7 +1445,10 @@ const ArtistSignUp = () => {
             shape="rect"
           />
 
-          <Typography color="error" sx={{ marginTop: "1em" }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ marginTop: "1em", fontSize: "12px", color: "red" }}
+          >
             {verificationDocumentError &&
               "Verification documents are required!"}
           </Typography>
@@ -1275,12 +1485,14 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Request Pending */}
         <Box
           id="as-step-8"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1289,8 +1501,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1304,7 +1516,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1323,17 +1534,14 @@ const ArtistSignUp = () => {
               width: "70%",
             }}
           >
-            <CheckCircleIcon
+            <ErrorIcon
               sx={{ fontSize: "4rem", color: "#6366F1", marginRight: "10px" }}
             />
             <Stack>
-              <Typography
-                variant="h5"
-                sx={{ color: "#fff", fontWeight: "600" }}
-              >
+              <Typography variant="h5" sx={{ fontWeight: "600" }}>
                 Successfully Submitted Request!
               </Typography>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
+              <Typography variant="subtitle1">
                 Current Status:{" "}
                 <span style={{ fontWeight: "300" }}>
                   <em>Pending</em>
@@ -1363,6 +1571,7 @@ const ArtistSignUp = () => {
               variant="contained"
               color="secondary"
               endIcon={<ArrowCircleRightIcon />}
+              disabled={artist?.user?.isAdminApproved ? false : true}
               sx={{
                 marginTop: "30px",
                 textTransform: "capitalize",
@@ -1374,12 +1583,14 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Request Appproved */}
         <Box
           id="as-step-9"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1388,8 +1599,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1403,7 +1614,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1426,13 +1636,10 @@ const ArtistSignUp = () => {
               sx={{ fontSize: "4rem", color: "#6366F1", marginRight: "10px" }}
             />
             <Stack>
-              <Typography
-                variant="h5"
-                sx={{ color: "#fff", fontWeight: "600" }}
-              >
+              <Typography variant="h5" sx={{ fontWeight: "600" }}>
                 Successfully Submitted Request!
               </Typography>
-              <Typography variant="subtitle1" sx={{ color: "#fff" }}>
+              <Typography variant="subtitle1">
                 Current Status:{" "}
                 <span style={{ fontWeight: "300" }}>
                   <em>Verified</em>
@@ -1473,12 +1680,14 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Mobile Number Verification */}
         <Box
           id="as-step-10"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1487,8 +1696,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "5px",
@@ -1502,7 +1711,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "14px",
             }}
           >
@@ -1522,7 +1730,7 @@ const ArtistSignUp = () => {
             />
           </Box>
 
-          <Typography color="error">
+          <Typography sx={{ marginTop: "1em", color: "red", fontSize: "12px" }}>
             {otpError && "Please enter the 4-digit OTP code!"}
           </Typography>
 
@@ -1558,12 +1766,14 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Customize Profile */}
         <Box
           id="as-step-11"
           sx={{
             flex: "0 0 auto",
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1572,8 +1782,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "5px",
@@ -1594,7 +1804,7 @@ const ArtistSignUp = () => {
           >
             <Stack
               spacing={2}
-              direction="row"
+              direction={matches ? "column" : "row"}
               sx={{
                 justifyContent: "center",
                 alignItems: "center",
@@ -1610,8 +1820,8 @@ const ArtistSignUp = () => {
                 rows={6}
                 style={{ boxSizing: "initial" }}
                 onChange={(e) => {
-                  setArtistDetails({
-                    ...artistDetails,
+                  setArtistCustomization({
+                    ...artistCustomization,
                     artistBio: e.target.value,
                   });
                 }}
@@ -1631,59 +1841,12 @@ const ArtistSignUp = () => {
                 />
               </Box>
             </Stack>
-            <Stack
-              spacing={1}
-              direction="row"
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <DropFile
-                fileTypes="Cover Photo"
-                fileExtensions="PNG,JPEG,WEBP"
-                isCircular={false}
-                width="32.5%"
-                height="170px"
-                file={coverPhoto1}
-                setFile={setCoverPhoto1}
-                aspectX={16}
-                aspectY={9}
-                shape="rect"
-              />
-              <DropFile
-                fileTypes="Cover Photo"
-                fileExtensions="PNG,JPEG,WEBP"
-                isCircular={false}
-                width="32.5%"
-                height="170px"
-                file={coverPhoto2}
-                setFile={setCoverPhoto2}
-                aspectX={16}
-                aspectY={9}
-                shape="rect"
-              />
-              <DropFile
-                fileTypes="Cover Photo"
-                fileExtensions="PNG,JPEG,WEBP"
-                isCircular={false}
-                width="32.5%"
-                height="170px"
-                file={coverPhoto3}
-                setFile={setCoverPhoto3}
-                aspectX={16}
-                aspectY={9}
-                shape="rect"
-              />
-            </Stack>
           </Box>
 
-          <Typography color="error" sx={{ marginTop: "1em" }}>
+          <Typography sx={{ marginTop: "1em", color: "red", fontSize: "12px" }}>
             {bioError && "Artists bio is required!"}
           </Typography>
-          <Typography color="error">
+          <Typography sx={{ marginTop: "8px", color: "red", fontSize: "12px" }}>
             {profilePicError && "Please upload a profile picture!"}
           </Typography>
 
@@ -1719,6 +1882,8 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Social Media Details */}
         <Box
           id="as-step-12"
           sx={{
@@ -1733,8 +1898,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1748,7 +1913,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1759,49 +1923,86 @@ const ArtistSignUp = () => {
 
           <AuthSocialInputBox sx={{ marginTop: "30px" }}>
             <AuthSocialIcon>
-              <FacebookIcon sx={{ color: "#fff" }} />
+              <FacebookIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="fb-url"
               label="Facebook Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.socialMediaLinks.facebook}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  socialMediaLinks: {
+                    ...artistSocialMediaDetails.socialMediaLinks,
+                    facebook: e.target.value,
+                  },
+                });
+              }}
             />
           </AuthSocialInputBox>
 
           <AuthSocialInputBox>
             <AuthSocialIcon>
-              <InstagramIcon sx={{ color: "#fff" }} />
+              <InstagramIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="insta-url"
               label="Instagram Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.socialMediaLinks.instagram}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  socialMediaLinks: {
+                    ...artistSocialMediaDetails.socialMediaLinks,
+                    instagram: e.target.value,
+                  },
+                });
+              }}
             />
           </AuthSocialInputBox>
 
           <AuthSocialInputBox>
             <AuthSocialIcon>
-              <XIcon sx={{ color: "#fff" }} />
+              <XIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="twitter-url"
               label="X(Twitter) Profile URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.socialMediaLinks.twitter}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  socialMediaLinks: {
+                    ...artistSocialMediaDetails.socialMediaLinks,
+                    twitter: e.target.value,
+                  },
+                });
+              }}
             />
           </AuthSocialInputBox>
 
           <AuthSocialInputBox sx={{ marginBottom: "30px" }}>
             <AuthSocialIcon>
-              <PublicIcon sx={{ color: "#fff" }} />
+              <PublicIcon />
             </AuthSocialIcon>
             <AuthSocialTextField
               id="website-url"
               label="Website URL"
               variant="outlined"
               style={{ boxSizing: "initial" }}
+              value={artistSocialMediaDetails.webUrl}
+              onChange={(e) => {
+                setArtistSocialMediaDetails({
+                  ...artistSocialMediaDetails,
+                  webUrl: e.target.value,
+                });
+              }}
             />
           </AuthSocialInputBox>
 
@@ -1851,6 +2052,8 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Payment Details */}
         <Box
           id="as-step-13"
           sx={{
@@ -1865,8 +2068,8 @@ const ArtistSignUp = () => {
         >
           <Typography
             variant="h5"
+            color="secondary"
             sx={{
-              color: "#fff",
               fontWeight: "700",
               textAlign: "center",
               marginBottom: "10px",
@@ -1880,7 +2083,6 @@ const ArtistSignUp = () => {
             sx={{
               textAlign: "center",
               width: "80%",
-              color: "#fff",
               fontSize: "12px",
             }}
           >
@@ -1894,6 +2096,16 @@ const ArtistSignUp = () => {
             label="Bank Account Name"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.accountName}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  accountName: e.target.value,
+                },
+              });
+            }}
           />
 
           <AuthTextField
@@ -1901,6 +2113,16 @@ const ArtistSignUp = () => {
             label="Bank Account Number"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.accountNumber}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  accountNumber: e.target.value,
+                },
+              });
+            }}
           />
 
           <AuthTextField
@@ -1908,6 +2130,16 @@ const ArtistSignUp = () => {
             label="Bank"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.bankName}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  bankName: e.target.value,
+                },
+              });
+            }}
           />
 
           <AuthTextField
@@ -1915,29 +2147,37 @@ const ArtistSignUp = () => {
             label="Bank Branch"
             variant="outlined"
             style={{ boxSizing: "initial" }}
+            value={artistBankDetails.bankDetails.bankBranch}
+            onChange={(e) => {
+              setArtistBankDetails({
+                ...artistBankDetails,
+                bankDetails: {
+                  ...artistBankDetails.bankDetails,
+                  bankBranch: e.target.value,
+                },
+              });
+            }}
           />
 
           <FormControl
             sx={{ m: 1, minWidth: 80, marginBottom: "30px", width: "40%" }}
           >
             <InputLabel id="demo-simple-select-autowidth-label">
-              <ReactCountryFlag
-                countryCode={selectedCountry}
-                svg
-                style={{
-                  width: "1.5em",
-                  height: "1.5em",
-                  marginRight: "8px",
-                }}
-                title={selectedCountry}
-              />
-              {selectedCountry}
+              Country
             </InputLabel>
             <Select
               labelId="demo-simple-select-autowidth-label"
               id="country"
-              value={artistDetails.country}
-              onChange={handleCountryChange}
+              value={artistBankDetails.bankDetails.country}
+              onChange={(e) => {
+                setArtistBankDetails({
+                  ...artistBankDetails,
+                  bankDetails: {
+                    ...artistBankDetails.bankDetails,
+                    country: e.target.value,
+                  },
+                });
+              }}
               // autoWidth
               label="Country"
               sx={{
@@ -2016,6 +2256,8 @@ const ArtistSignUp = () => {
             </Button>
           </Stack>
         </Box>
+
+        {/* Greeting  */}
         <Box
           id="as-step-14"
           sx={{
@@ -2037,13 +2279,9 @@ const ArtistSignUp = () => {
               width: "70%",
             }}
           >
-            <GiPartyPopper
-              style={{
-                fontSize: "100px",
-                color: "#6366F1",
-                marginRight: "30px",
-              }}
-            />
+            <Box sx={{ mr: "8px" }}>
+              <img width="180px" src="/imgs/happy.png" alt="happy" />
+            </Box>
             <Stack
               sx={{
                 display: "flex",
@@ -2051,13 +2289,10 @@ const ArtistSignUp = () => {
                 alignItems: "flex-start",
               }}
             >
-              <Typography
-                variant="h4"
-                sx={{ color: "#fff", fontWeight: "600" }}
-              >
+              <Typography variant="h4" sx={{ fontWeight: "600" }}>
                 Congratulations!
               </Typography>
-              <Typography variant="h6" sx={{ color: "#fff" }}>
+              <Typography variant="h6">
                 Now You Can Enjoy Our Exclusive Artist Services
               </Typography>
               <Button

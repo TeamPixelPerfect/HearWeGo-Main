@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import react, { useContext } from "react";
+import react, { useContext, useState } from "react";
 import {
   HeaderBox,
   SearchArea,
@@ -25,26 +25,40 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../styles/CustomeTheme";
 import { FaBars } from "react-icons/fa";
-import { useMediaQuery } from "@mui/material";
+import { Stack, useMediaQuery } from "@mui/material";
 import { useAppSelector } from "@/lib/hooks";
+import ADPersistentDrawerLeft from "./ADMobileDrawer";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { useRouter } from "next/navigation";
 
 const ArtistDashboardHeader = () => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
 
+  const router = useRouter();
+
   const artist = useAppSelector((state) => state.artist.user);
 
   const matches = useMediaQuery("(max-width:960px)");
+  const [open, setOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
   return (
     <HeaderBox>
+      {matches ? (
+        <ADPersistentDrawerLeft open={open} setOpen={setOpen} />
+      ) : null}
+
       {matches ? (
         <HitPredictorIco>
           <Box sx={{ "& > :not(style)": { m: 1 } }}>
             <HitPredictorBtn
               color="primary"
               aria-label="add"
-              onClick={() => console.log("clicked")}
+              onClick={handleDrawerOpen}
             >
               <FaBars />
             </HitPredictorBtn>
@@ -81,6 +95,11 @@ const ArtistDashboardHeader = () => {
             // height: "50%",
             // border: "1px solid #969696",
             borderRadius: "50px",
+            border:
+              theme.palette.mode === "light"
+                ? "1px solid rgba(0, 0, 0, 0.12)"
+                : "1px solid rgba(255, 255, 255, 0.12)",
+            boxShadow: "none",
           }}
         >
           <InputBase
@@ -96,22 +115,37 @@ const ArtistDashboardHeader = () => {
 
       <HitPredictorIco>
         <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <HitPredictorBtn color="secondary" aria-label="add">
+          <HitPredictorBtn
+            color="secondary"
+            aria-label="add"
+            onClick={() => {
+              router.push("/main/predictor");
+            }}
+          >
             <CellTowerIcon />
           </HitPredictorBtn>
         </Box>
       </HitPredictorIco>
 
       <ProfileArea>
-        <ProfileDetailArea elevation={0}>
-          <Avatar
-            src={artist?.user.profilePicture}
-          />
-          <ArtistDetail>
-            <ArtistName>{artist?.user.artistName}</ArtistName>
-            <ArtistGenre>{artist?.user.musicGenres[0]} | {artist?.user.artistType}</ArtistGenre>
-          </ArtistDetail>
-        </ProfileDetailArea>
+        {!matches && (
+          <ProfileDetailArea elevation={0}>
+            <IconButton>
+              <ArrowDropDownIcon sx={{ fontSize: "32px" }} />
+            </IconButton>
+            <Stack direction="row" sx={{ alignItems: "center" }}>
+              <ArtistName>{artist?.user.artistName}</ArtistName>
+              <Avatar src={artist?.user.profilePicture} />
+            </Stack>
+            {/* <ArtistDetail> */}
+
+            {/* <ArtistGenre>
+              {artist?.user.musicGenres[0]} | {artist?.user.artistType}
+            </ArtistGenre> */}
+            {/* </ArtistDetail> */}
+          </ProfileDetailArea>
+        )}
+        {matches && <Avatar src={artist?.user.profilePicture} />}
       </ProfileArea>
     </HeaderBox>
   );

@@ -108,16 +108,22 @@ const Language = [
 ];
 
 const AddSongData = () => {
+  //reads the global song file 
   const songTrack = useAppSelector((state) => state.song.song_track);
+  //reads the artist details from global
   const artist = useAppSelector((state) => state.artist.user);
   const Router = useRouter();
 
-  if (songTrack === "") {
-    Router.push("add");
-  }
+  //if song trck not present
+  useEffect(() => {
+    if (songTrack === "") {
+      Router.push("add");
+    }
+  }, [])
 
   const theme = useTheme();
 
+  // useState for song details
   const [songData, setSongData] = useState<Song>({
     song_title: "",
     song_genre: [],
@@ -143,6 +149,7 @@ const AddSongData = () => {
   const [songFile, setSongFile] = useState("");
   const [value, setValue] = React.useState(0);
 
+  //useSatates for song details inputs
   const [titleError, setTitleError] = useState(false);
   const [genreError, setGenreError] = useState(false);
   const [coverError, setCoverError] = useState(false);
@@ -155,10 +162,12 @@ const AddSongData = () => {
 
   const [checks, setChecks] = useState([false, false, false]);
 
+  //usetate for song detail upload
   const [uploading, setUploading] = useState(false);
 
   const dispatch = useAppDispatch();
 
+  //switch between tags
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -186,6 +195,7 @@ const AddSongData = () => {
       false,
     ];
 
+    //check the values of the inputs
     if (songData.song_title === "") {
       setTitleError(true);
       errors[0] = true;
@@ -261,6 +271,7 @@ const AddSongData = () => {
     setReleaseDateError(false);
     setLanguageError(false);
 
+    //upload all details
     setUploading(true);
     addSong(artist ? artist.token : "", songData).then((res) => {
       console.log("Response:::", res);
@@ -279,8 +290,8 @@ const AddSongData = () => {
               <Typography
                 variant="h4"
                 sx={{
-                  fontSize: "20px",
-                  fontWeight: "500",
+                  fontSize: "24px",
+                  fontWeight: "700",
                   color: theme.palette.secondary.main,
                   padding: "1em",
                 }}
@@ -298,6 +309,8 @@ const AddSongData = () => {
                   <Tab label="Metadata" {...a11yProps(1)} />
                 </Tabs>
               </Box>
+
+              {/* basic song details */}
               <div>
                 <CustomTabPanel value={value} index={0}>
                   <Box sx={{ width: "100%", display: "flex" }}>
@@ -361,6 +374,7 @@ const AddSongData = () => {
                           },
                         }}
                       >
+                        {/* input for the genres */}
                         <Autocomplete
                           multiple
                           disablePortal
@@ -396,6 +410,7 @@ const AddSongData = () => {
                           },
                         }}
                       >
+                        {/* tags input */}
                         <Autocomplete
                           multiple
                           disablePortal
@@ -529,6 +544,7 @@ const AddSongData = () => {
   );
 };
 
+//props for the song metadata
 interface songMetaDataProps {
   songData: Song;
   setSongData: React.Dispatch<React.SetStateAction<Song>>;
@@ -542,6 +558,7 @@ interface songMetaDataProps {
   setChecks: React.Dispatch<React.SetStateAction<boolean[]>>;
 }
 
+//song metadata form
 function SongMetaData({
   songData,
   setSongData,
@@ -554,6 +571,7 @@ function SongMetaData({
   checks,
   setChecks,
 }: songMetaDataProps) {
+  // contain music check box
   const handleContainMusic = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       setSongData((data) => {
@@ -579,8 +597,7 @@ function SongMetaData({
         <Grid
           container
           rowSpacing={1}
-          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-          // sx={{ marginLeft: "1em" }}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }} 
         >
           <Grid xs={6}>
             <FormGroup>
