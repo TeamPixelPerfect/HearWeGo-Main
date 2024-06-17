@@ -1,8 +1,8 @@
 "use client";
 // ArtistProfilePage.tsx
 import React, { useState } from 'react';
-import { Grid, Card, CardContent, Avatar, Typography, Container, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Grid, Card, CardContent, Avatar, Typography, Container, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 // Dummy data
 const dummyFans = [
@@ -27,156 +27,96 @@ interface Fan {
 }
 
 interface ArtistProfileProps {
-  initialCoverPhoto: string;
-  initialProfilePhoto: string;
-  initialArtistName: string;
-  initialFollowersCount: number;
-  initialBiography: string;
-  initialAlbums: string[];
+  coverPhoto: string;
+  profilePhoto: string;
+  artistName: string;
+  followersCount: number;
+  biography: string;
+  albums: string[];
   fans: Fan[];
 }
 
 const ArtistProfilePage: React.FC<ArtistProfileProps> = ({
-  initialCoverPhoto,
-  initialProfilePhoto,
-  initialArtistName,
-  initialFollowersCount,
-  initialBiography,
-  initialAlbums,
+  coverPhoto: initialCoverPhoto,
+  profilePhoto,
+  artistName,
+  followersCount,
+  biography,
+  albums,
   fans = dummyFans,
 }) => {
   const [coverPhoto, setCoverPhoto] = useState(initialCoverPhoto);
-  const [profilePhoto, setProfilePhoto] = useState(initialProfilePhoto);
-  const [artistName, setArtistName] = useState(initialArtistName);
-  const [followersCount, setFollowersCount] = useState(initialFollowersCount);
-  const [biography, setBiography] = useState(initialBiography);
-  const [albums, setAlbums] = useState(initialAlbums);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle editing mode
+  const [showAllFansDialog, setShowAllFansDialog] = useState(false);
+  const [selectedFan, setSelectedFan] = useState<Fan | null>(null);
+
+  const toggleShowAllFansDialog = () => {
+    setShowAllFansDialog(!showAllFansDialog);
+  };
+
+  const handleFanClick = (fan: Fan) => {
+    setSelectedFan(fan);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedFan(null);
+  };
 
   const handleCoverPhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCoverPhoto(event.target.value);
-  };
-
-  const handleProfilePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setProfilePhoto(event.target.value);
-  };
-
-  const handleArtistNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setArtistName(event.target.value);
-  };
-
-  const handleFollowersCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFollowersCount(Number(event.target.value));
-  };
-
-  const handleBiographyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBiography(event.target.value);
-  };
-
-  const handleAlbumsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedAlbums = event.target.value.split(',');
-    setAlbums(updatedAlbums);
-  };
-
-  const handleSaveChanges = () => {
-    // Here you can implement logic to save changes, e.g., send API request
-    console.log({
-      coverPhoto,
-      profilePhoto,
-      artistName,
-      followersCount,
-      biography,
-      albums,
-    });
-    // Replace the console.log with your actual save logic
-
-    setIsEditing(false); // Exit editing mode after saving
-  };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
+    if (event.target.files && event.target.files[0]) {
+      const newCoverPhoto = URL.createObjectURL(event.target.files[0]);
+      setCoverPhoto(newCoverPhoto);
+    }
   };
 
   return (
     <Container maxWidth="md">
       {/* Cover Photo */}
-      <div style={{ backgroundImage: `url(${coverPhoto})`, height: '300px', backgroundSize: 'cover', backgroundPosition: 'center', marginBottom: '20px' }}>
+      <div style={{ position: 'relative', marginBottom: '20px' }}>
+        <div style={{ backgroundImage: `url(${coverPhoto})`, height: '300px', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <input
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="cover-photo-upload"
+            type="file"
+            onChange={handleCoverPhotoChange}
+          />
+          <label htmlFor="cover-photo-upload" style={{ position: 'absolute', top: '10px', right: '10px' }}>
+            <IconButton color="primary" aria-label="upload picture" component="span">
+              <PhotoCamera />
+            </IconButton>
+          </label>
+        </div>
         {/* Profile Photo and Artist Info */}
         <Container style={{ position: 'relative', paddingTop: '100px', textAlign: 'center', color: 'white' }}>
           <Avatar alt={artistName} src={profilePhoto} style={{ width: '150px', height: '150px', border: '4px solid white', borderRadius: '50%', position: 'absolute', bottom: '-75px', left: '50%', transform: 'translateX(-50%)' }} />
-          <Typography variant="h4" gutterBottom>
-            {isEditing ? (
-              <TextField
-                fullWidth
-                value={artistName}
-                onChange={handleArtistNameChange}
-                variant="outlined"
-              />
-            ) : (
-              artistName
-            )}
-          </Typography>
+          <Typography variant="h4" gutterBottom>{artistName}</Typography>
           <Typography variant="subtitle1" gutterBottom>{followersCount} Followers</Typography>
-          {isEditing ? (
-            <TextField
-              fullWidth
-              type="number"
-              value={followersCount}
-              onChange={handleFollowersCountChange}
-              variant="outlined"
-            />
-          ) : null}
         </Container>
-        {!isEditing && (
-          <IconButton aria-label="Edit artist details" onClick={handleEditClick} style={{ position: 'absolute', top: '10px', right: '10px', color: 'white' }}>
-            <EditIcon />
-          </IconButton>
-        )}
       </div>
 
       {/* Artist Details */}
       <section style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Typography variant="h5" gutterBottom>Biography</Typography>
-        {isEditing ? (
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            value={biography}
-            onChange={handleBiographyChange}
-            variant="outlined"
-          />
-        ) : (
-          <Typography variant="body1">{biography}</Typography>
-        )}
+        <Typography variant="body1">{biography}</Typography>
       </section>
 
       <section style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Typography variant="h5" gutterBottom>Albums</Typography>
-        {isEditing ? (
-          <TextField
-            fullWidth
-            value={albums.join(',')}
-            onChange={handleAlbumsChange}
-            variant="outlined"
-          />
-        ) : (
-          <ul>
-            {albums.map((album, index) => (
-              <li key={index}>{album}</li>
-            ))}
-          </ul>
-        )}
+        <ul>
+          {albums.map((album, index) => (
+            <li key={index}>{album}</li>
+          ))}
+        </ul>
       </section>
 
       {/* Fans Section */}
       <section style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Typography variant="h5" gutterBottom>Fans</Typography>
         <Grid container spacing={2}>
-          {fans.slice(0, 10).map((fan, index) => (
+          {fans.slice(0, 10).map((fan) => (
             <Grid item key={fan.id} xs={6} sm={3} md={2}>
               <Card>
-                <Avatar alt={fan.name} src={fan.profilePicture} style={{ width: '70px', height: '70px', margin: 'auto', marginTop: '10px' }} />
+                <Avatar alt={fan.name} src={fan.profilePicture} style={{ width: '70px', height: '70px', margin: 'auto', marginTop: '10px' }} onClick={() => handleFanClick(fan)} />
                 <CardContent>
                   <Typography variant="body2" align="center">{fan.name}</Typography>
                 </CardContent>
@@ -190,48 +130,49 @@ const ArtistProfilePage: React.FC<ArtistProfileProps> = ({
           </Button>
         )}
 
-        {/* Dialog for All Fans */}
-        <Dialog open={showAllFansDialog} onClose={toggleShowAllFansDialog} fullWidth maxWidth="sm">
-          <DialogTitle>All Fans</DialogTitle>
+        {/* Dialog for Selected Fan */}
+        <Dialog open={!!selectedFan} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+          <DialogTitle>{selectedFan?.name}</DialogTitle>
           <DialogContent>
-            <Grid container spacing={2}>
-              {fans.map((fan, index) => (
-                <Grid item key={fan.id} xs={6} sm={3} md={2}>
-                  <Card>
-                    <Avatar alt={fan.name} src={fan.profilePicture} style={{ width: '70px', height: '70px', margin: 'auto', marginTop: '10px' }} />
-                    <CardContent>
-                      <Typography variant="body2" align="center">{fan.name}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+            <Avatar alt={selectedFan?.name} src={selectedFan?.profilePicture} style={{ width: '150px', height: '150px', margin: 'auto', marginBottom: '20px' }} />
+            <Typography variant="body1" align="center">{selectedFan?.name}</Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={toggleShowAllFansDialog} color="primary">
+            <Button onClick={handleCloseDialog} color="primary">
               Close
             </Button>
           </DialogActions>
         </Dialog>
       </section>
-
-      {/* Edit Section */}
-      {isEditing && (
-        <section style={{ marginTop: '40px', marginBottom: '40px' }}>
-          <Button variant="contained" color="primary" onClick={handleSaveChanges}>
-            Save Changes
-          </Button>
-        </section>
-      )}
     </Container>
   );
 };
 
-export default ArtistProfilePage;
+// Example usage
+const ExampleArtistProfile: React.FC = () => {
+  const artistProfile = {
+    coverPhoto: 'https://via.placeholder.com/1200x300',
+    profilePhoto: 'https://via.placeholder.com/150',
+    artistName: 'Sample Artist',
+    followersCount: 1000,
+    biography: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula leo quis magna iaculis convallis.',
+    albums: ['Album 1', 'Album 2', 'Album 3'],
+  };
 
+  return (
+    <ArtistProfilePage
+      coverPhoto={artistProfile.coverPhoto}
+      profilePhoto={artistProfile.profilePhoto}
+      artistName={artistProfile.artistName}
+      followersCount={artistProfile.followersCount}
+      biography={artistProfile.biography}
+      albums={artistProfile.albums}
+      fans={dummyFans} // Replace with actual fan data
+    />
+  );
+};
 
-
-
+export default ExampleArtistProfile;
 
 
 
