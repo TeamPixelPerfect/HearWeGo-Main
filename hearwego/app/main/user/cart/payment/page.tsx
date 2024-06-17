@@ -6,13 +6,18 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
 const App: React.FC = () => {
   const [shippingAddress, setShippingAddress] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-  const [tempAddress, setTempAddress] = useState<string>('');
+  const [addressLine1, setAddressLine1] = useState<string>('');
+  const [addressLine2, setAddressLine2] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [country, setCountry] = useState<string>('');
+  const [postalCode, setPostalCode] = useState<string>('');
   const [shippingMethod, setShippingMethod] = useState<string | null>(null);
 
   const handleAddShippingAddress = () => {
@@ -24,7 +29,8 @@ const App: React.FC = () => {
   };
 
   const handleSaveAddress = () => {
-    setShippingAddress(tempAddress);
+    const fullAddress = `${addressLine1}, ${addressLine2}, ${city}, ${country}, ${postalCode}`;
+    setShippingAddress(fullAddress);
     setAddressDialogOpen(false);
   };
 
@@ -51,7 +57,6 @@ const App: React.FC = () => {
 
   return (
     <>
-    
       <h1 style={{ marginLeft: '40px' }}>
         <ArrowBackIosNewIcon sx={{ marginRight: '10px' }} />
         Shopping Cart
@@ -177,13 +182,49 @@ const App: React.FC = () => {
             <TextField
               autoFocus
               margin="dense"
-              id="address"
-              label="Shipping Address"
+              id="address-line1"
+              label="Address Line 1"
               type="text"
               fullWidth
               variant="standard"
-              value={tempAddress}
-              onChange={(e) => setTempAddress(e.target.value)} />
+              value={addressLine1}
+              onChange={(e) => setAddressLine1(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="address-line2"
+              label="Address Line 2"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={addressLine2}
+              onChange={(e) => setAddressLine2(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="city"
+              label="City"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={city}
+              onChange={(e) => setCity(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="country"
+              label="Country"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)} />
+            <TextField
+              margin="dense"
+              id="postal-code"
+              label="Postal Code"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseAddressDialog}>Cancel</Button>
@@ -205,16 +246,18 @@ const App: React.FC = () => {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <img src="https://m.media-amazon.com/images/I/A13usaonutL._CLa%7C2140%2C2000%7C71INiT3PTcL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png" alt="Fullset Black Chair & Sofa" style={{ width: '50px', marginRight: '10px' }} />
                 <Typography>Black music T-shirt</Typography>
+                <Typography style={{marginLeft:"38px"}}>x1</Typography>
               </Box>
-              <Typography>x1</Typography>
+             
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <img src="https://m.media-amazon.com/images/I/91IM87eeuCL._CLa%7C2140%2C2000%7C81am2B0c2BL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png" alt="Orange Cool Chair" style={{ width: '50px', marginRight: '10px' }} />
                 <Typography>music Premium T-Shirt</Typography>
+                <Typography style={{marginLeft:'10px'}}>x1</Typography>
+                </Box>
               </Box>
-              <Typography>x1</Typography>
-            </Box>
+           
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
               <Typography variant="h6">Total:</Typography>
               <Typography variant="h6">$240</Typography>
