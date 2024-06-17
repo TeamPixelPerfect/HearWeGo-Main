@@ -13,6 +13,8 @@ import {
   Box,
   IconButton,
   Paper,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import {
@@ -20,9 +22,9 @@ import {
   Comment as CommentIcon,
   Reply as ReplyIcon,
   AddComment as AddCommentIcon,
+  MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-// Dummy data for posts
 const initialPosts = [
   {
     id: 1,
@@ -99,11 +101,15 @@ const NewsPage: React.FC = () => {
     commentId: number;
   } | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [likedPosts, setLikedPosts] = useState<number[]>([]); // Array to store liked post IDs
+  const [likedPosts, setLikedPosts] = useState<number[]>([]);
+  const [editingPost, setEditingPost] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
   const handleLike = (postId: number) => {
     if (likedPosts.includes(postId)) {
-      // User has already liked the post, so unlike it
       setLikedPosts(likedPosts.filter((id) => id !== postId));
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
@@ -111,7 +117,6 @@ const NewsPage: React.FC = () => {
         )
       );
     } else {
-      // User is liking the post for the first time
       setLikedPosts([...likedPosts, postId]);
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
@@ -122,17 +127,15 @@ const NewsPage: React.FC = () => {
   };
 
   const handleComment = (postId: number, commentText: string) => {
-    if (!commentText.trim()) return; // Prevent adding empty comments
-
+    if (!commentText.trim()) return;
     const newComment: Comment = {
       id: getNextCommentId(postId),
-      commenterName: "User", // Replace with actual commenter's name
+      commenterName: "User",
       commenterImageUrl: "https://randomuser.me/api/portraits/men/10.jpg",
       commentTime: new Date().toISOString(),
       commentText,
       replies: [],
     };
-
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === postId
@@ -144,17 +147,14 @@ const NewsPage: React.FC = () => {
 
   const handleReply = () => {
     if (!replyingTo || !replyText.trim()) return;
-
     const { postId, commentId } = replyingTo;
-
     const newReply: Reply = {
       id: getNextReplyId(postId, commentId),
-      replierName: "User", // Replace with actual replier's name
+      replierName: "User",
       replierImageUrl: "https://randomuser.me/api/portraits/women/12.jpg",
       replyTime: new Date().toISOString(),
       replyText,
     };
-
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === postId
@@ -169,7 +169,6 @@ const NewsPage: React.FC = () => {
           : post
       )
     );
-
     setReplyingTo(null);
     setReplyText("");
   };
@@ -196,20 +195,59 @@ const NewsPage: React.FC = () => {
   const getNextCommentId = (postId: number) => {
     const post = posts.find((post) => post.id === postId);
     if (!post) return 1;
-
     return post.comments.length + 1;
   };
 
   const getNextReplyId = (postId: number, commentId: number) => {
     const post = posts.find((post) => post.id === postId);
     if (!post) return 1;
-
     const comment = post.comments.find((comment) => comment.id === commentId);
     if (!comment) return 1;
-
     return comment.replies.length + 1;
   };
 
+  const handleEditPost = (postId: number) => {
+    const post = posts.find((post) => post.id === postId);
+    if (post) {
+      setEditingPost(postId);
+      setEditTitle(post.title);
+      setEditContent(post.content);
+      setAnchorEl(null);
+    }
+  };
+
+  const handleSaveEditPost = () => {
+    if (editingPost !== null) {
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === editingPost
+            ? { ...post, title: editTitle, content: editContent }
+            : post
+        )
+      );
+      setEditingPost(null);
+      setEditTitle("");
+      setEditContent("");
+    }
+  };
+
+  const handleDeletePost = (postId: number) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    setAnchorEl(null);
+  };
+
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    postId: number
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedPostId(postId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedPostId(null);
+  };
   return (
     <Container>
       <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
@@ -239,12 +277,48 @@ const NewsPage: React.FC = () => {
                 </Grid>
               </CardContent>
               <CardContent>
-                <Typography variant="h5" color="text.secondary">
-                  {post.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {post.content}
-                </Typography>
+                {editingPost === post.id ? (
+                  <Box>
+                    <TextField
+                      fullWidth
+                      label="Edit Title"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Edit Content"
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      sx={{ mb: 2 }}
+                      multiline
+                      rows={4}
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveEditPost}
+                      sx={{ mr: 2 }}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setEditingPost(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                ) : (
+                  <>
+                    <Typography variant="h5" color="text.secondary">
+                      {post.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {post.content}
+                    </Typography>
+                  </>
+                )}
               </CardContent>
               <Box position="relative">
                 <img
@@ -284,6 +358,29 @@ const NewsPage: React.FC = () => {
                 >
                   Comments ({post.comments.length})
                 </Button>
+                <Box sx={{ marginLeft: "auto" }}>
+                  <IconButton
+                    aria-label="more"
+                    aria-controls={`post-menu-${post.id}`}
+                    aria-haspopup="true"
+                    onClick={(event) => handleMenuOpen(event, post.id)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    id={`post-menu-${post.id}`}
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl) && selectedPostId === post.id}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem onClick={() => handleEditPost(post.id)}>
+                      Edit
+                    </MenuItem>
+                    <MenuItem onClick={() => handleDeletePost(post.id)}>
+                      Delete
+                    </MenuItem>
+                  </Menu>
+                </Box>
               </CardActions>
               {post.showComments && (
                 <CardContent sx={{ height: "225px", overflow: "auto" }}>
@@ -304,76 +401,80 @@ const NewsPage: React.FC = () => {
                             {new Date(comment.commentTime).toLocaleString()}
                           </Typography>
                         </Grid>
-                      </Grid>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        {comment.commentText}
-                      </Typography>
-                      {comment.replies.map((reply) => (
-                        <Paper
-                          key={reply.id}
-                          elevation={1}
-                          sx={{ p: 2, mt: 1, ml: 3 }}
-                        >
-                          <Grid container alignItems="center" spacing={2}>
-                            <Grid item>
-                              <Avatar
-                                src={reply.replierImageUrl}
-                                alt={reply.replierName}
-                              />
-                            </Grid>
-                            <Grid item>
-                              <Typography variant="subtitle2">
-                                {reply.replierName}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {new Date(reply.replyTime).toLocaleString()}
-                              </Typography>
-                            </Grid>
-                          </Grid>
+                        <Grid item xs={12}>
                           <Typography variant="body2" sx={{ mt: 1 }}>
-                            {reply.replyText}
+                            {comment.commentText}
                           </Typography>
-                        </Paper>
-                      ))}
-                      {replyingTo?.postId === post.id &&
-                        replyingTo.commentId === comment.id && (
-                          <Box sx={{ mt: 2, ml: 2 }}>
-                            <TextField
-                              fullWidth
-                              variant="outlined"
-                              placeholder={`Replying to ${comment.commenterName}`}
-                              value={replyText}
-                              onChange={(e) => setReplyText(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  handleReply();
-                                }
-                              }}
-                            />
-                            <Button
-                              variant="contained"
-                              size="small"
-                              onClick={handleReply}
-                              sx={{ mt: 1 }}
+                          {comment.replies.map((reply) => (
+                            <Paper
+                              key={reply.id}
+                              elevation={1}
+                              sx={{ p: 2, mt: 1, ml: 3 }}
                             >
-                              Reply
-                            </Button>
-                          </Box>
-                        )}
-                      {!replyingTo && (
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleReplyButtonClick(post.id, comment.id)
-                          }
-                          sx={{ ml: 2, mt: 1 }}
-                        >
-                          <ReplyIcon />
-                        </IconButton>
-                      )}
+                              <Grid container alignItems="center" spacing={2}>
+                                <Grid item>
+                                  <Avatar
+                                    src={reply.replierImageUrl}
+                                    alt={reply.replierName}
+                                  />
+                                </Grid>
+                                <Grid item>
+                                  <Typography variant="subtitle2">
+                                    {reply.replierName}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {new Date(reply.replyTime).toLocaleString()}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                  <Typography variant="body2" sx={{ mt: 1 }}>
+                                    {reply.replyText}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </Paper>
+                          ))}
+                          {replyingTo?.postId === post.id &&
+                            replyingTo.commentId === comment.id && (
+                              <Box sx={{ mt: 2, ml: 2 }}>
+                                <TextField
+                                  fullWidth
+                                  variant="outlined"
+                                  placeholder={`Replying to ${comment.commenterName}`}
+                                  value={replyText}
+                                  onChange={(e) => setReplyText(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      handleReply();
+                                    }
+                                  }}
+                                />
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  onClick={handleReply}
+                                  sx={{ mt: 1 }}
+                                >
+                                  Reply
+                                </Button>
+                              </Box>
+                            )}
+                          {!replyingTo && (
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                handleReplyButtonClick(post.id, comment.id)
+                              }
+                              sx={{ ml: 2, mt: 1 }}
+                            >
+                              <ReplyIcon />
+                            </IconButton>
+                          )}
+                        </Grid>
+                      </Grid>
                     </Paper>
                   ))}
                   <TextField

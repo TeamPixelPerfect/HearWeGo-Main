@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from "react";
 import {
   Typography,
@@ -13,6 +12,8 @@ import {
   Button,
   Avatar,
   Box,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -20,7 +21,10 @@ import {
   Reply as ReplyIcon,
   ThumbUp as ThumbUpIcon,
   Comment as CommentIcon,
+  MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
+import { Formik, Field } from "formik";
+import * as Yup from "yup";
 
 type Comment = {
   id: number;
@@ -76,6 +80,7 @@ const SinglePost: React.FC<Props> = ({
   const [showComments, setShowComments] = useState(false);
   const [likes, setLikes] = useState<number>(10); // Dummy data for likes count
   const [liked, setLiked] = useState<boolean>(false); // Track if post is liked
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleDeleteComment = (commentId: number, replyId?: number) => {
     if (replyId !== undefined) {
@@ -157,25 +162,66 @@ const SinglePost: React.FC<Props> = ({
     // Optionally, handle already liked state (if needed)
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditPost = () => {
+    // Implement edit post functionality
+    // For demonstration, log a message
+    console.log(`Editing post with ID ${post.id}`);
+    handleMenuClose();
+  };
+
+  const handleDeletePost = () => {
+    // Implement delete post functionality
+    // For demonstration, call onDeletePost with post.id
+    onDeletePost(post.id);
+    handleMenuClose();
+  };
+
   return (
     <Paper sx={{ p: 2, marginBottom: 2, borderRadius: "10px" }}>
-      <Box display="flex" alignItems="center" mb={2}>
-        <Avatar
-          alt="Poster Profile Picture"
-          src={post.profilePicture}
-          sx={{ marginRight: 2 }}
-        />
-        <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-            {post.user}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            {new Date(post.timestamp).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Typography>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={2}
+      >
+        <Box display="flex" alignItems="center">
+          <Avatar
+            alt="Poster Profile Picture"
+            src={post.profilePicture}
+            sx={{ marginRight: 2 }}
+          />
+          <div>
+            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+              {post.user}
+            </Typography>
+            <Typography variant="caption" color="textSecondary">
+              {new Date(post.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </Typography>
+          </div>
         </Box>
+
+        <IconButton onClick={handleMenuOpen}>
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem onClick={handleEditPost}>Edit</MenuItem>
+          <MenuItem onClick={handleDeletePost}>Delete</MenuItem>
+        </Menu>
       </Box>
 
       <Typography variant="body1" gutterBottom>
@@ -288,19 +334,41 @@ const SinglePost: React.FC<Props> = ({
                 )}
               </div>
             ))}
-            <ListItem>
-              <TextField
+            <Formik
+              initialValues={{ comment: "" }}
+              validationSchema={Yup.object({
+                comment: Yup.string().required("Comment is required"),
+              })}
+              onSubmit={(values, { setSubmitting }) => {
+                setNewComment(values.comment);
+                handleAddComment();
+                setSubmitting(false);
+              }}
+            >
+              <Field
+                as={TextField}
+                name="comment"
+                label="Add a comment"
+                variant="outlined"
                 fullWidth
                 value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                variant="standard"
-                margin="dense"
-                label="Add a comment"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setNewComment(e.target.value)}
+                onKeyDown={(e: { key: string }) => {
+                  if (e.key === "Enter") {
+                    handleAddComment();
+                  }
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton onClick={handleAddComment} edge="end">
+                      <SendIcon />
+                    </IconButton>
+                  ),
+                }}
               />
-              <IconButton onClick={handleAddComment}>
-                <SendIcon />
-              </IconButton>
-            </ListItem>
+            </Formik>
           </List>
         </>
       )}

@@ -21,12 +21,15 @@ import {
   CardContent,
   Fab,
 } from "@mui/material";
+import * as Yup from "yup";
+import { Formik, Form, Field } from "formik";
 import { Add as AddIcon } from "@mui/icons-material";
 import FeedTab from "./FeedTab";
 import PhotosTab from "./PhotosTab";
 import VideosTab from "./VideosTab";
 import DropFile from "../../components/DropFile";
 import NewsPage from "./NewsTab";
+import EventsTab from "./EventsTab";
 
 const dummyData: Post[] = [
   {
@@ -333,13 +336,16 @@ export type Post = {
   timestamp: string;
 };
 
+const validationSchema = Yup.object().shape({
+  title: Yup.string().required("Title is required"),
+  content: Yup.string().required("Content is required"),
+  image: Yup.mixed().nullable().required("Image is required"),
+  video: Yup.mixed().nullable().required("Video is required"),
+});
+
 const ArtistPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"post" | "news" | null>(null);
-  const [newPostTitle, setNewPostTitle] = useState("");
-  const [newPostContent, setNewPostContent] = useState("");
-  const [newPostImage, setNewPostImage] = useState<File | null>(null);
-  const [newPostVideo, setNewPostVideo] = useState<File | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>(dummyData);
   const [tabValue, setTabValue] = useState(0);
@@ -355,10 +361,6 @@ const ArtistPage: React.FC = () => {
 
   const handleDialogClose = () => {
     setDialogOpen(false);
-    setNewPostTitle("");
-    setNewPostContent("");
-    setNewPostImage(null);
-    setNewPostVideo(null);
   };
 
   const handleDeletePost = (postId: number) => {
@@ -386,53 +388,44 @@ const ArtistPage: React.FC = () => {
     setPosts(updatedPosts);
   };
 
-  const handleEditComment = (
-    postId: number,
-    commentId: number,
-    updatedContent: string
-  ) => {
-    const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
-        const updatedComments = post.comments.map((comment) =>
-          comment.id === commentId
-            ? { ...comment, content: updatedContent }
-            : comment
-        );
-        return { ...post, comments: updatedComments };
-      }
-      return post;
-    });
-    setPosts(updatedPosts);
-  };
+  const handleCreatePost = async (values: {
+    title: string;
+    content: string;
+    image: File | null;
+    video: File | null;
+  }) => {
+    try {
+      // Validate form values against the schema
+      await validationSchema.validate(values, { abortEarly: false });
 
-  const handleDeleteComment = (postId: number, commentId: number) => {
-    const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
-        const updatedComments = post.comments.filter(
-          (comment) => comment.id !== commentId
-        );
-        return { ...post, comments: updatedComments };
+      // If validation succeeds, create a new post
+      const newPost: Post = {
+        id: posts.length + 1,
+        title: values.title,
+        content: values.content,
+        image: values.image ? URL.createObjectURL(values.image) : undefined,
+        video: values.video ? URL.createObjectURL(values.video) : undefined,
+        likes: 0,
+        comments: [],
+        user: "New Artist", // Dummy user
+        profilePicture: "path/to/artist/profile/picture.jpg", // Dummy path
+        timestamp: new Date().toISOString(),
+      };
+      setPosts([...posts, newPost]);
+      handleDialogClose();
+    } catch (error) {
+      // Handle validation errors
+      if (error instanceof Yup.ValidationError) {
+        const errorMessages = {};
+        error.inner.forEach((err) => {
+          errorMessages[err.path] = err.message;
+        });
+        console.log("Validation errors:", errorMessages);
+        // Optionally, you can set state to display error messages
+        // This could be done with a state variable like errorMessage
+        // errorMessage could then be displayed in the form
       }
-      return post;
-    });
-    setPosts(updatedPosts);
-  };
-
-  const handleCreatePost = () => {
-    const newPost: Post = {
-      id: posts.length + 1,
-      title: newPostTitle,
-      content: newPostContent,
-      image: newPostImage ? URL.createObjectURL(newPostImage) : undefined,
-      video: newPostVideo ? URL.createObjectURL(newPostVideo) : undefined,
-      likes: 0,
-      comments: [],
-      user: "New Artist", // Dummy user
-      profilePicture: "path/to/artist/profile/picture.jpg", // Dummy path
-      timestamp: new Date().toISOString(),
-    };
-    setPosts([...posts, newPost]);
-    handleDialogClose();
+    }
   };
 
   const handleCardClick = (post: Post) => {
@@ -468,8 +461,16 @@ const ArtistPage: React.FC = () => {
           onDeletePost={handleDeletePost}
           onEditPost={handleEditPost}
           onAddComment={handleAddComment}
-          onEditComment={handleEditComment}
-          onDeleteComment={handleDeleteComment}
+          onEditComment={function (
+            postId: number,
+            commentId: number,
+            updatedContent: string
+          ): void {
+            throw new Error("Function not implemented.");
+          }}
+          onDeleteComment={function (postId: number, commentId: number): void {
+            throw new Error("Function not implemented.");
+          }}
         />
       </Box>
 
@@ -486,9 +487,7 @@ const ArtistPage: React.FC = () => {
       </Box>
 
       <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
-        <Typography variant="h6" component="div" sx={{ mb: 2 }}>
-          Events
-        </Typography>
+        <EventsTab />
       </Box>
 
       {tabValue === 0 || tabValue === 3 ? (
@@ -517,62 +516,91 @@ const ArtistPage: React.FC = () => {
           Create New {dialogType === "post" ? "Post" : "News"}
         </DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            fullWidth
-            variant="standard"
-            value={newPostTitle}
-            onChange={(e) => setNewPostTitle(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Content"
-            fullWidth
-            variant="standard"
-            multiline
-            rows={4}
-            value={newPostContent}
-            onChange={(e) => setNewPostContent(e.target.value)}
-          />
-          {dialogType === "post" && (
-            <>
-              <DropFile
-                fileTypes="Image"
-                fileExtensions="JPEG,PNG,WEBP,SVG"
-                isCircular={false}
-                width="100%"
-                height="200px"
-                file={newPostImage}
-                setFile={(file) => setNewPostImage(file)}
-                aspectX={1}
-                aspectY={1}
-                shape="rect"
-                error={false}
-              />
-              <DropFile
-                fileTypes="Video"
-                fileExtensions="MP4,AVI,MOV"
-                isCircular={false}
-                width="100%"
-                height="200px"
-                file={newPostVideo}
-                setFile={(file) => setNewPostVideo(file)}
-                aspectX={1}
-                aspectY={1}
-                shape="rect"
-                error={false}
-              />
-            </>
-          )}
+          <Formik
+            initialValues={{ title: "", content: "", image: null, video: null }}
+            validationSchema={validationSchema}
+            onSubmit={(values, { setSubmitting }) => {
+              handleCreatePost(values);
+              setSubmitting(false);
+            }}
+          >
+            {({
+              values,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+              errors,
+              touched,
+            }) => (
+              <Form onSubmit={handleSubmit}>
+                <Field
+                  as={TextField}
+                  autoFocus
+                  margin="dense"
+                  name="title"
+                  label="Title"
+                  fullWidth
+                  variant="standard"
+                  error={touched.title && Boolean(errors.title)}
+                  helperText={touched.title && errors.title}
+                />
+                <Field
+                  as={TextField}
+                  margin="dense"
+                  name="content"
+                  label="Content"
+                  fullWidth
+                  variant="standard"
+                  multiline
+                  rows={4}
+                  error={touched.content && Boolean(errors.content)}
+                  helperText={touched.content && errors.content}
+                />
+                {dialogType === "post" && (
+                  <>
+                    <DropFile
+                      fileTypes="Image"
+                      fileExtensions="JPEG,PNG,WEBP,SVG"
+                      isCircular={false}
+                      width="100%"
+                      height="200px"
+                      file={null}
+                      setFile={(file) => setFieldValue("image", file)}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                      error={touched.image && Boolean(errors.image)}
+                      helperText={touched.image && errors.image}
+                    />
+                    <DropFile
+                      fileTypes="Video"
+                      fileExtensions="MP4,AVI,MOV"
+                      isCircular={false}
+                      width="100%"
+                      height="200px"
+                      file={null}
+                      setFile={(file) => setFieldValue("video", file)}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                      error={touched.video && Boolean(errors.video)}
+                      helperText={touched.video && errors.video}
+                    />
+                  </>
+                )}
+                <DialogActions>
+                  <Button onClick={handleDialogClose} disabled={isSubmitting}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" color="primary" disabled={isSubmitting}>
+                    Create
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleCreatePost} color="primary">
-            Create
-          </Button>
-        </DialogActions>
       </Dialog>
 
       <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
@@ -589,7 +617,8 @@ const ArtistPage: React.FC = () => {
             {selectedPost?.image && (
               <CardMedia
                 component="img"
-                height="200"
+                height="500"
+                sx={{ width: "600px" }}
                 image={selectedPost?.image}
                 alt={selectedPost?.title}
               />
@@ -597,7 +626,8 @@ const ArtistPage: React.FC = () => {
             {selectedPost?.video && (
               <CardMedia
                 component="video"
-                height="200"
+                height="500"
+                sx={{ width: "600px" }}
                 src={selectedPost?.video}
                 controls
               />
