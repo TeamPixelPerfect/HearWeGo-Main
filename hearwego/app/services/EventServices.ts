@@ -2,7 +2,6 @@ import { base_url } from "../constants/keys";
 import { Budget } from "../constants/models";
 
 export const getEvents = async (
-  token: String,
   page?: number,
   limit?: number,
   filter_by?: string,
@@ -13,7 +12,6 @@ export const getEvents = async (
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     }
