@@ -247,3 +247,34 @@ export interface PRPost {
   SocialMedias ?: string[];
   
 }
+
+export interface FanClub {
+  clubId?: string;
+  artistId?: string;
+  coverImage_URL?: string;
+  visibility?: boolean;
+}
+
+
+export interface ClubMember {
+  memberId?: string;
+  userId?: string;
+  topMember?: boolean;
+  clubId?: string;
+}
+
+export interface ClubPost {
+  postId?: string;
+  postType?: string;
+  postDescription?: string;
+  postpublisher?: string;
+  postImage_URL?: string;
+  clubId?: string;
+}
+
+export interface Comment {
+  commentId?: string;
+  commenter?: string;
+  commentBody?: string;
+  postId?: string;
+}

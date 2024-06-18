@@ -43,18 +43,33 @@ import { FanClub } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { Artist } from "@/app/constants/models";
 import { getFanClubs } from "@/app/services/FanClubServices";
+import { getClubMembers } from "@/app/services/FanClubServices";
+import { ClubMember } from "@/app/constants/models";
+import { getAllUsers } from "@/app/services/UserServices";
+import { User } from "@/app/constants/models";
+import { getClubPosts } from "@/app/services/FanClubServices";
+import { ClubPost } from "@/app/constants/models";
+import router from "next/router";
 // import { DataGrid } from "@mui/x-data-grid";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { get } from "http";
 
 function FanClubsDataGrid() {
-  const router = useRouter();
-  const [fanClubs, setFanClubs] = useState<FanClub[]>([]);
-  const [artists, setArtists] = useState<Artist[]>([]);
+    const router = useRouter();
+    const [clubPosts, setClubPosts] = useState<ClubPost[]>([]);
+    const [clubMembers, setClubMembers] = useState<ClubMember[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getFanClubs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((fanClubs) => {
-      console.log("Fan Clubs......",fanClubs);
-      setFanClubs(fanClubs.data);
+    getClubPosts("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((posts) => {
+      console.log("Club Posts......",posts);
+      setClubPosts(posts);
+    });
+
+    getAllUsers().then((users) => {
+      console.log("Users......",users);
+      setUsers(users.data);
     });
 
     getAllArtists().then((artists) => {
@@ -64,49 +79,28 @@ function FanClubsDataGrid() {
   }
   , []);
 
-  function createFanClubData(
+  function createClubPostData(
+    postId: string,
+    postType: string,
+    postDescription: string,
+    postpublisher: string,
+    postImage_URL: string,
     clubId: string,
-    artistId: string,
-    coverImage_URL: string,
-    visibility: boolean,
     createdAt: string,
     updatedAt: string
-  ){return {clubId, artistId, coverImage_URL, visibility, createdAt, updatedAt};}
+  ){return {postId, postType, postDescription, postpublisher, postImage_URL, clubId, createdAt, updatedAt};}
 
-  const fcRows = fanClubs.map((fc) => {
-    return createFanClubData(fc.clubId, fc.artistId, fc.coverImage_URL, fc.visibility, fc.createdAt, fc.updatedAt);
+  const postRows = clubPosts.map((fc) => {
+    return createClubPostData(fc.postId, fc.postType, fc.postDescription, fc.postpublisher, fc.postImage_URL, fc.clubId, fc.createdAt, fc.updatedAt);
   });
 
-  const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
-  };
-
   const columns = [
+    { field: "postId", headerName: "Post ID", flex: 1 },
+    { field: "postImage_URL", headerName: "Profile", flex: 1, renderCell: (params) => (<img src={params.row.postImage_URL} style={{ width: 50, height: 50 }} />)},
+    { field: "postType", headerName: "Type", flex: 2 },
+    { field: "postDescription", headerName: "Description", flex: 2 },
+    { field: "postpublisher", headerName: "Publisher ID", flex: 2 },
     { field: "clubId", headerName: "Club ID", flex: 1 },
-    { field: "coverImage_URL", headerName: "Cover Image", flex: 1, renderCell: (params) => (<img src={params.row.coverImage_URL} style={{ width: 50, height: 50 }} />)},
-    { field: "artistId", headerName: "Artist ID", flex: 2 },
-    { field: "artist_name", headerName: "Artist Name", flex: 1, valueGetter: (params) => getArtistName(params.row.artistId), },
-    {
-      field: "visibility",
-      headerName: "Visibility",
-      flex: 1,
-      renderCell: (params) => {
-        const status = params.row.visibility;
-        let chipColor;
-        switch (status) {
-          case true:
-            chipColor = "success";
-            break;
-          case false:
-            chipColor = "error";
-            break;
-          default:
-            chipColor = "default";
-        }
-        return <Chip label={status.toString().charAt(0).toUpperCase() + status.toString().slice(1)} color={chipColor} />;
-      }
-    },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     { field: "updatedAt", headerName: "Updated At", flex: 1 },
     {
@@ -122,7 +116,7 @@ function FanClubsDataGrid() {
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick= {()=> {router.push(`/admin/events/${params.row.event_id}`)}}
+            onClick= {()=> {router.push(`/admin/fanClubs/clubMembers`)}}
           >
             <FaEye />
           </IconButton>
@@ -137,7 +131,7 @@ function FanClubsDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={fcRows}
+        rows={postRows}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
@@ -195,7 +189,7 @@ const AdminUserPage = () => {
               color: theme.palette.mode === "dark" ? "#fff" : "#000",
             }}
           >
-            Artist Fan Clubs
+            Fan Club Posts
           </Typography>
           <Stack direction="row" spacing={2}>
           <Button
@@ -206,9 +200,9 @@ const AdminUserPage = () => {
               border: "1px solid #000",
               color: "#000",
             }}
-            onClick={() => {router.push(`/admin/fanClubs/clubMembers`)}}
+            onClick= {()=> {router.push(`/admin/fanClubs`)}}
           >
-            Club Members
+            Fan Clubs
             </Button>
             <Button
             variant="outlined"
@@ -218,9 +212,9 @@ const AdminUserPage = () => {
               border: "1px solid #000",
               color: "#000",
             }}
-            onClick={() => {router.push(`/admin/fanClubs/clubPosts`)}}
+            onClick={() => {router.push(`/admin/clubMembers`)}}
           >
-            Posts
+            Club Members
             </Button>
             <Button
             variant="outlined"
@@ -234,7 +228,6 @@ const AdminUserPage = () => {
           >
             Reacts
             </Button>
-
             <Button
             variant="outlined"
             sx={{
