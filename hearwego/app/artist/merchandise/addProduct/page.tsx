@@ -153,6 +153,7 @@ const AddProduct = ({
                             {errors.logoFile}
                           </Typography>
                         )}
+                        
                         <DropFile
                           fileTypes="Additional Product Image"
                           fileExtensions="JPEG,PNG,WEBP,SVG"
