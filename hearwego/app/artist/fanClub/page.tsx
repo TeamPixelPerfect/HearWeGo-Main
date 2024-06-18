@@ -1,35 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Typography,
-  IconButton,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Container,
   Paper,
-  Button,
-  Tab,
   Tabs,
+  Tab,
   Box,
+  Container,
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
   Card,
-  CardMedia,
   CardHeader,
   Avatar,
+  CardMedia,
   CardContent,
-  Fab,
 } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { Add as AddIcon } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import DropFile from "@/app/components/DropFile";
+import EventsTab from "./EventsTab";
 import FeedTab from "./FeedTab";
+import NewsPage from "./NewsTab";
 import PhotosTab from "./PhotosTab";
 import VideosTab from "./VideosTab";
-import DropFile from "../../components/DropFile";
-import NewsPage from "./NewsTab";
-import EventsTab from "./EventsTab";
 
 const dummyData: Post[] = [
   {
@@ -339,8 +339,16 @@ export type Post = {
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   content: Yup.string().required("Content is required"),
-  image: Yup.mixed().nullable().required("Image is required"),
-  video: Yup.mixed().nullable().required("Video is required"),
+  image: Yup.mixed()
+    .nullable()
+    .test("image", "Image is required", (value, context) => {
+      return value || context.parent.video; // Check if either image or video is provided
+    }),
+  video: Yup.mixed()
+    .nullable()
+    .test("video", "Video is required", (value, context) => {
+      return value || context.parent.image; // Check if either video or image is provided
+    }),
 });
 
 const ArtistPage: React.FC = () => {
@@ -349,6 +357,7 @@ const ArtistPage: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>(dummyData);
   const [tabValue, setTabValue] = useState(0);
+  const router = useRouter();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -395,10 +404,7 @@ const ArtistPage: React.FC = () => {
     video: File | null;
   }) => {
     try {
-      // Validate form values against the schema
       await validationSchema.validate(values, { abortEarly: false });
-
-      // If validation succeeds, create a new post
       const newPost: Post = {
         id: posts.length + 1,
         title: values.title,
@@ -407,27 +413,22 @@ const ArtistPage: React.FC = () => {
         video: values.video ? URL.createObjectURL(values.video) : undefined,
         likes: 0,
         comments: [],
-        user: "New Artist", // Dummy user
-        profilePicture: "path/to/artist/profile/picture.jpg", // Dummy path
+        user: "New Artist",
+        profilePicture: "path/to/artist/profile/picture.jpg",
         timestamp: new Date().toISOString(),
       };
       setPosts([...posts, newPost]);
       handleDialogClose();
     } catch (error) {
-      // Handle validation errors
       if (error instanceof Yup.ValidationError) {
         const errorMessages = {};
         error.inner.forEach((err) => {
           errorMessages[err.path] = err.message;
         });
         console.log("Validation errors:", errorMessages);
-        // Optionally, you can set state to display error messages
-        // This could be done with a state variable like errorMessage
-        // errorMessage could then be displayed in the form
       }
     }
   };
-
   const handleCardClick = (post: Post) => {
     setSelectedPost(post);
   };
@@ -436,41 +437,53 @@ const ArtistPage: React.FC = () => {
     setSelectedPost(null);
   };
 
-  return (
-    <Container maxWidth="lg">
-      <Paper sx={{ p: 2, marginBottom: 2 }}>
-        <Typography variant="h5" component="div">
-          Artist Page
-        </Typography>
-        <Typography variant="body1" component="p" sx={{ mb: 2 }}>
-          This is a place where you can share your latest posts, updates, and
-          news with your audience.
-        </Typography>
-        <Tabs value={tabValue} onChange={handleTabChange} centered>
-          <Tab label="Feed" />
-          <Tab label="Photos" />
-          <Tab label="Videos" />
-          <Tab label="News" />
-          <Tab label="Events" />
-        </Tabs>
-      </Paper>
+  const handleProfileClick = () => {
+    router.push("/artist/fanClub/Profile"); // Replace with actual path to the artist's profile
+  };
 
+  return (
+    <Container maxWidth="xl">
+      <Paper
+        sx={{
+          p: 2,
+          marginBottom: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Box>
+          <Typography variant="h5" component="div">
+            Artist Page
+          </Typography>
+          <Typography variant="body1" component="p" sx={{ mb: 2 }}>
+            This is a place where you can share your latest posts, updates, and
+            news with your audience.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleProfileClick}
+        >
+          Go to Profile
+        </Button>
+      </Paper>
+      <Tabs value={tabValue} onChange={handleTabChange} centered>
+        <Tab label="Feed" />
+        <Tab label="Photos" />
+        <Tab label="Videos" />
+        <Tab label="News" />
+        <Tab label="Events" />
+      </Tabs>
       <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
         <FeedTab
           posts={posts}
           onDeletePost={handleDeletePost}
           onEditPost={handleEditPost}
           onAddComment={handleAddComment}
-          onEditComment={function (
-            postId: number,
-            commentId: number,
-            updatedContent: string
-          ): void {
-            throw new Error("Function not implemented.");
-          }}
-          onDeleteComment={function (postId: number, commentId: number): void {
-            throw new Error("Function not implemented.");
-          }}
+          onEditComment={() => {}}
+          onDeleteComment={() => {}}
         />
       </Box>
 
@@ -532,6 +545,7 @@ const ArtistPage: React.FC = () => {
               isSubmitting,
               errors,
               touched,
+              setFieldValue,
             }) => (
               <Form onSubmit={handleSubmit}>
                 <Field
@@ -551,50 +565,38 @@ const ArtistPage: React.FC = () => {
                   name="content"
                   label="Content"
                   fullWidth
-                  variant="standard"
                   multiline
                   rows={4}
+                  variant="standard"
                   error={touched.content && Boolean(errors.content)}
                   helperText={touched.content && errors.content}
                 />
-                {dialogType === "post" && (
-                  <>
-                    <DropFile
-                      fileTypes="Image"
-                      fileExtensions="JPEG,PNG,WEBP,SVG"
-                      isCircular={false}
-                      width="100%"
-                      height="200px"
-                      file={null}
-                      setFile={(file) => setFieldValue("image", file)}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                      error={touched.image && Boolean(errors.image)}
-                      helperText={touched.image && errors.image}
-                    />
-                    <DropFile
-                      fileTypes="Video"
-                      fileExtensions="MP4,AVI,MOV"
-                      isCircular={false}
-                      width="100%"
-                      height="200px"
-                      file={null}
-                      setFile={(file) => setFieldValue("video", file)}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                      error={touched.video && Boolean(errors.video)}
-                      helperText={touched.video && errors.video}
-                    />
-                  </>
+                <DropFile
+                  name="image"
+                  label="Image"
+                  onFileChange={(file) => setFieldValue("image", file)}
+                />
+                {touched.image && errors.image && (
+                  <Typography color="error" variant="body2">
+                    {errors.image}
+                  </Typography>
+                )}
+                <DropFile
+                  name="video"
+                  label="Video"
+                  onFileChange={(file) => setFieldValue("video", file)}
+                />
+                {touched.video && errors.video && (
+                  <Typography color="error" variant="body2">
+                    {errors.video}
+                  </Typography>
                 )}
                 <DialogActions>
-                  <Button onClick={handleDialogClose} disabled={isSubmitting}>
+                  <Button onClick={handleDialogClose} color="primary">
                     Cancel
                   </Button>
                   <Button type="submit" color="primary" disabled={isSubmitting}>
-                    Create
+                    {dialogType === "post" ? "Create Post" : "Create News"}
                   </Button>
                 </DialogActions>
               </Form>
@@ -603,75 +605,74 @@ const ArtistPage: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
-        <DialogTitle>{selectedPost?.title}</DialogTitle>
-        <DialogContent>
-          <Card>
-            <CardHeader
-              avatar={<Avatar src={selectedPost?.profilePicture} />}
-              title={selectedPost?.user}
-              subheader={new Date(
-                selectedPost?.timestamp || ""
-              ).toLocaleString()}
-            />
-            {selectedPost?.image && (
-              <CardMedia
-                component="img"
-                height="500"
-                sx={{ width: "600px" }}
-                image={selectedPost?.image}
-                alt={selectedPost?.title}
-              />
-            )}
-            {selectedPost?.video && (
-              <CardMedia
-                component="video"
-                height="500"
-                sx={{ width: "600px" }}
-                src={selectedPost?.video}
-                controls
-              />
-            )}
-            <CardContent>
-              <Typography variant="body2" color="textSecondary" component="p">
-                {selectedPost?.content}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Likes: {selectedPost?.likes}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Comments:
-              </Typography>
-              {selectedPost?.comments.map((comment) => (
-                <Box key={comment.id} sx={{ display: "flex", mb: 1 }}>
-                  <Avatar src={comment.profilePicture} sx={{ mr: 2 }} />
-                  <Box>
-                    <Typography variant="body2" component="p">
-                      {comment.user}
+      <Dialog open={selectedPost !== null} onClose={handleClosePostDialog}>
+        {selectedPost && (
+          <>
+            <DialogTitle>{selectedPost.title}</DialogTitle>
+            <DialogContent>
+              <Card>
+                <CardHeader
+                  avatar={
+                    <Avatar src={selectedPost.profilePicture} alt="User" />
+                  }
+                  title={selectedPost.user}
+                  subheader={new Date(selectedPost.timestamp).toLocaleString()}
+                />
+                {selectedPost.image && (
+                  <CardMedia
+                    component="img"
+                    image={selectedPost.image}
+                    alt="Post Image"
+                  />
+                )}
+                {selectedPost.video && (
+                  <CardMedia
+                    component="video"
+                    controls
+                    src={selectedPost.video}
+                  />
+                )}
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedPost.content}
+                  </Typography>
+                </CardContent>
+              </Card>
+              {selectedPost.comments.map((comment) => (
+                <Paper
+                  key={comment.id}
+                  elevation={1}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    mt: 1,
+                  }}
+                >
+                  <Avatar
+                    src={comment.profilePicture}
+                    alt={comment.user}
+                    sx={{ mr: 2 }}
+                  />
+                  <div>
+                    <Typography variant="body2">
+                      <strong>{comment.user}</strong>
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {comment.content}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
+                    <Typography variant="body2">{comment.content}</Typography>
+                    <Typography variant="caption" color="text.secondary">
                       {new Date(comment.timestamp).toLocaleString()}
                     </Typography>
-                  </Box>
-                </Box>
+                  </div>
+                </Paper>
               ))}
-            </CardContent>
-          </Card>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePostDialog}>Close</Button>
-        </DialogActions>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClosePostDialog} color="primary">
+                Close
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </Container>
   );
