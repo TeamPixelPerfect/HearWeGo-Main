@@ -14,6 +14,11 @@ import {
   Box,
   Menu,
   MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -26,45 +31,91 @@ import {
 import { Formik, Field } from "formik";
 import * as Yup from "yup";
 
-type Comment = {
-  id: number;
-  user: string;
-  content: string;
-  profilePicture: string;
-  timestamp: string;
-  isArtist?: boolean;
-  replies?: Comment[];
-};
+const CommentList = ({
+  comments,
+  handleReply,
+  handleDeleteComment,
+  replyingCommentId,
+  replyContent,
+  setReplyContent,
+  handleSendReply,
+}) => (
+  <List sx={{ maxHeight: 200, overflow: "auto" }}>
+    {comments.map((comment) => (
+      <div key={comment.id}>
+        <ListItem>
+          <Avatar
+            alt={comment.user}
+            src={comment.profilePicture}
+            sx={{ marginRight: 2 }}
+          />
+          <ListItemText
+            primary={`${comment.user} - ${new Date(
+              comment.timestamp
+            ).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })} ago`}
+            secondary={comment.content}
+          />
+          <ListItemSecondaryAction>
+            {!comment.isArtist && (
+              <IconButton onClick={() => handleReply(comment.id)}>
+                <ReplyIcon />
+              </IconButton>
+            )}
+            <IconButton onClick={() => handleDeleteComment(comment.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </ListItem>
+        {comment.replies &&
+          comment.replies.map((reply) => (
+            <ListItem key={reply.id} sx={{ pl: 4 }}>
+              <Avatar
+                alt={reply.user}
+                src={reply.profilePicture}
+                sx={{ marginRight: 2 }}
+              />
+              <ListItemText
+                primary={`${reply.user} - ${new Date(
+                  reply.timestamp
+                ).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })} ago`}
+                secondary={reply.content}
+              />
+              <ListItemSecondaryAction>
+                <IconButton
+                  onClick={() => handleDeleteComment(comment.id, reply.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        {replyingCommentId === comment.id && (
+          <ListItem sx={{ pl: 4 }}>
+            <TextField
+              fullWidth
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              variant="standard"
+              margin="dense"
+              label="Reply to comment"
+            />
+            <IconButton onClick={handleSendReply}>
+              <SendIcon />
+            </IconButton>
+          </ListItem>
+        )}
+      </div>
+    ))}
+  </List>
+);
 
-type Post = {
-  id: number;
-  title: string;
-  content: string;
-  image?: string;
-  profilePicture: string;
-  user: string;
-  timestamp: string;
-  comments: Comment[];
-};
-
-type Props = {
-  post: Post;
-  onDeletePost: (postId: number) => void;
-  onEditPost: (postId: number, updatedPost: Post) => void;
-  onAddComment: (postId: number, comment: Comment) => void;
-  onEditComment: (
-    postId: number,
-    commentId: number,
-    updatedContent: string
-  ) => void;
-  onDeleteComment: (
-    postId: number,
-    commentId: number,
-    replyId?: number
-  ) => void;
-};
-
-const SinglePost: React.FC<Props> = ({
+const SinglePost = ({
   post,
   onDeletePost,
   onEditPost,
@@ -81,29 +132,9 @@ const SinglePost: React.FC<Props> = ({
   const [likes, setLikes] = useState<number>(10); // Dummy data for likes count
   const [liked, setLiked] = useState<boolean>(false); // Track if post is liked
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const handleDeleteComment = (commentId: number, replyId?: number) => {
-    if (replyId !== undefined) {
-      // Delete only the reply
-      const updatedComments = post.comments.map((comment) => {
-        if (comment.id === commentId && comment.replies) {
-          const updatedReplies = comment.replies.filter(
-            (reply) => reply.id !== replyId
-          );
-          return { ...comment, replies: updatedReplies };
-        }
-        return comment;
-      });
-
-      onEditPost(post.id, { ...post, comments: updatedComments });
-    } else {
-      // Delete the entire comment
-      const updatedComments = post.comments.filter(
-        (comment) => comment.id !== commentId
-      );
-      onEditPost(post.id, { ...post, comments: updatedComments });
-    }
-  };
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editedContent, setEditedContent] = useState<string>(post.content);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const handleReplyToComment = (commentId: number) => {
     setReplyingCommentId(commentId);
@@ -171,17 +202,55 @@ const SinglePost: React.FC<Props> = ({
   };
 
   const handleEditPost = () => {
-    // Implement edit post functionality
-    // For demonstration, log a message
-    console.log(`Editing post with ID ${post.id}`);
+    setIsEditing(true);
     handleMenuClose();
   };
 
   const handleDeletePost = () => {
-    // Implement delete post functionality
-    // For demonstration, call onDeletePost with post.id
-    onDeletePost(post.id);
+    setOpenDialog(true);
     handleMenuClose();
+  };
+
+  const handleConfirmDelete = () => {
+    onDeletePost(post.id);
+    setOpenDialog(false);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDialog(false);
+  };
+
+  const handleSaveEdit = () => {
+    onEditPost(post.id, { ...post, content: editedContent });
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedContent(post.content);
+  };
+
+  const handleDeleteComment = (commentId: number, replyId?: number) => {
+    if (replyId !== undefined) {
+      // Delete only the reply
+      const updatedComments = post.comments.map((comment) => {
+        if (comment.id === commentId && comment.replies) {
+          const updatedReplies = comment.replies.filter(
+            (reply) => reply.id !== replyId
+          );
+          return { ...comment, replies: updatedReplies };
+        }
+        return comment;
+      });
+
+      onEditPost(post.id, { ...post, comments: updatedComments });
+    } else {
+      // Delete the entire comment
+      const updatedComments = post.comments.filter(
+        (comment) => comment.id !== commentId
+      );
+      onEditPost(post.id, { ...post, comments: updatedComments });
+    }
   };
 
   return (
@@ -224,9 +293,38 @@ const SinglePost: React.FC<Props> = ({
         </Menu>
       </Box>
 
-      <Typography variant="body1" gutterBottom>
-        {post.content}
-      </Typography>
+      {isEditing ? (
+        <>
+          <TextField
+            fullWidth
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            variant="outlined"
+            multiline
+            rows={4}
+            sx={{ mb: 2 }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveEdit}
+            sx={{ mr: 2 }}
+          >
+            Save
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleCancelEdit}
+          >
+            Cancel
+          </Button>
+        </>
+      ) : (
+        <Typography variant="body1" gutterBottom>
+          {post.content}
+        </Typography>
+      )}
 
       {post.image && (
         <div style={{ textAlign: "center", marginTop: 16, marginBottom: 16 }}>
@@ -258,120 +356,74 @@ const SinglePost: React.FC<Props> = ({
           <Typography variant="h6" component="div" gutterBottom>
             Comments
           </Typography>
-          <List sx={{ maxHeight: 200, overflow: "auto" }}>
-            {post.comments.map((comment) => (
-              <div key={comment.id}>
-                <ListItem>
-                  <Avatar
-                    alt={comment.user}
-                    src={comment.profilePicture}
-                    sx={{ marginRight: 2 }}
-                  />
-                  <ListItemText
-                    primary={`${comment.user} - ${new Date(
-                      comment.timestamp
-                    ).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })} ago`}
-                    secondary={comment.content}
-                  />
-                  <ListItemSecondaryAction>
-                    {!comment.isArtist && (
-                      <IconButton
-                        onClick={() => handleReplyToComment(comment.id)}
-                      >
-                        <ReplyIcon />
+
+          <CommentList
+            comments={post.comments}
+            handleReply={handleReplyToComment}
+            handleDeleteComment={handleDeleteComment}
+            replyingCommentId={replyingCommentId}
+            replyContent={replyContent}
+            setReplyContent={setReplyContent}
+            handleSendReply={handleSendReply}
+          />
+
+          <Formik
+            initialValues={{ comment: "" }}
+            validationSchema={Yup.object({
+              comment: Yup.string().required("Comment is required"),
+            })}
+            onSubmit={(values, { setSubmitting }) => {
+              handleAddComment();
+              setSubmitting(false);
+            }}
+          >
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <Field
+                  as={TextField}
+                  name="comment"
+                  label="Add a comment"
+                  variant="outlined"
+                  fullWidth
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddComment();
+                    }
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton onClick={handleAddComment} edge="end">
+                        <SendIcon />
                       </IconButton>
-                    )}
-                    <IconButton onClick={() => handleDeleteComment(comment.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                {comment.replies &&
-                  comment.replies.map((reply) => (
-                    <ListItem key={reply.id} sx={{ pl: 4 }}>
-                      <Avatar
-                        alt={reply.user}
-                        src={reply.profilePicture}
-                        sx={{ marginRight: 2 }}
-                      />
-                      <ListItemText
-                        primary={`${reply.user} - ${new Date(
-                          reply.timestamp
-                        ).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })} ago`}
-                        secondary={reply.content}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          onClick={() =>
-                            handleDeleteComment(comment.id, reply.id)
-                          }
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                {replyingCommentId === comment.id && (
-                  <ListItem sx={{ pl: 4 }}>
-                    <TextField
-                      fullWidth
-                      value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
-                      variant="standard"
-                      margin="dense"
-                      label="Reply to comment"
-                    />
-                    <IconButton onClick={handleSendReply}>
-                      <SendIcon />
-                    </IconButton>
-                  </ListItem>
-                )}
-              </div>
-            ))}
-            <Formik
-              initialValues={{ comment: "" }}
-              validationSchema={Yup.object({
-                comment: Yup.string().required("Comment is required"),
-              })}
-              onSubmit={(values, { setSubmitting }) => {
-                setNewComment(values.comment);
-                handleAddComment();
-                setSubmitting(false);
-              }}
-            >
-              <Field
-                as={TextField}
-                name="comment"
-                label="Add a comment"
-                variant="outlined"
-                fullWidth
-                value={newComment}
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setNewComment(e.target.value)}
-                onKeyDown={(e: { key: string }) => {
-                  if (e.key === "Enter") {
-                    handleAddComment();
-                  }
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={handleAddComment} edge="end">
-                      <SendIcon />
-                    </IconButton>
-                  ),
-                }}
-              />
-            </Formik>
-          </List>
+                    ),
+                  }}
+                />
+              </form>
+            )}
+          </Formik>
         </>
       )}
+
+      <Dialog open={openDialog} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this post? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };
