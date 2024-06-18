@@ -357,6 +357,8 @@ const ArtistPage: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>(dummyData);
   const [tabValue, setTabValue] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null); // State for selected image file
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // State for image preview URL
   const router = useRouter();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -402,7 +404,12 @@ const ArtistPage: React.FC = () => {
     content: string;
     image: File | null;
     video: File | null;
-  }) => {
+  }, { resetForm }: FormikHelpers<{
+    title: string;
+    content: string;
+    image: File | null;
+    video: File | null;
+  }>) => {
     try {
       await validationSchema.validate(values, { abortEarly: false });
       const newPost: Post = {
@@ -418,7 +425,9 @@ const ArtistPage: React.FC = () => {
         timestamp: new Date().toISOString(),
       };
       setPosts([...posts, newPost]);
-      handleDialogClose();
+      resetForm(); // Clear form fields after successful post creation
+      setTabValue(0); // Reset tab value to the Feed tab after post creation
+      handleDialogClose(); // Close the dialog after successful post creation
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const errorMessages = {};
@@ -429,6 +438,8 @@ const ArtistPage: React.FC = () => {
       }
     }
   };
+
+
   const handleCardClick = (post: Post) => {
     setSelectedPost(post);
   };
@@ -471,10 +482,12 @@ const ArtistPage: React.FC = () => {
       </Paper>
       <Tabs value={tabValue} onChange={handleTabChange} centered>
         <Tab label="Feed" />
-        <Tab label="Photos" />
-        <Tab label="Videos" />
         <Tab label="News" />
+        <Tab label="Photos" />
         <Tab label="Events" />
+        <Tab label="Videos" />
+      
+       
       </Tabs>
       <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
         <FeedTab
@@ -524,79 +537,88 @@ const ArtistPage: React.FC = () => {
         </Fab>
       ) : null}
 
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>
-          Create New {dialogType === "post" ? "Post" : "News"}
-        </DialogTitle>
+<Dialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Create New Post</DialogTitle>
         <DialogContent>
           <Formik
-            initialValues={{ title: "", content: "", image: null, video: null }}
+            initialValues={{ title: '', content: '', image: null, video: null }}
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              handleCreatePost(values);
-              setSubmitting(false);
-            }}
+            onSubmit={handleCreatePost}
           >
-            {({
-              values,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting,
-              errors,
-              touched,
-              setFieldValue,
-            }) => (
-              <Form onSubmit={handleSubmit}>
+            {({ setFieldValue, errors, touched,resetForm  }) => (
+              <Form>
                 <Field
                   as={TextField}
-                  autoFocus
-                  margin="dense"
                   name="title"
                   label="Title"
                   fullWidth
-                  variant="standard"
-                  error={touched.title && Boolean(errors.title)}
+                  error={touched.title && !!errors.title}
                   helperText={touched.title && errors.title}
+                  margin="dense"
                 />
                 <Field
                   as={TextField}
-                  margin="dense"
                   name="content"
                   label="Content"
-                  fullWidth
+                  
                   multiline
                   rows={4}
-                  variant="standard"
-                  error={touched.content && Boolean(errors.content)}
+                  error={touched.content && !!errors.content}
                   helperText={touched.content && errors.content}
+                  margin="dense"
+                  sx={{width:"100%"}}
                 />
-                <DropFile
+                <input
+                  id="image"
                   name="image"
-                  label="Image"
-                  onFileChange={(file) => setFieldValue("image", file)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    setFieldValue('image', file);
+                    setSelectedImage(file);
+                    setImagePreview(URL.createObjectURL(file));
+                  }}
+                  style={{ margin: '16px 0' }}
                 />
+                {imagePreview && (
+                  <img
+                    src={imagePreview}
+                    alt="Selected Image"
+                    style={{ maxWidth: '100%', marginTop: '16px' }}
+                  />
+                )}
                 {touched.image && errors.image && (
-                  <Typography color="error" variant="body2">
+                  <Typography variant="body2" color="error">
                     {errors.image}
                   </Typography>
                 )}
-                <DropFile
+                <input
+                  id="video"
                   name="video"
-                  label="Video"
-                  onFileChange={(file) => setFieldValue("video", file)}
+                  type="file"
+                  accept="video/*"
+                  onChange={(event) => {
+                    setFieldValue('video', event.currentTarget.files[0]);
+                  }}
+                  style={{ margin: '16px 0' }}
                 />
                 {touched.video && errors.video && (
-                  <Typography color="error" variant="body2">
+                  <Typography variant="body2" color="error">
                     {errors.video}
                   </Typography>
                 )}
                 <DialogActions>
-                  <Button onClick={handleDialogClose} color="primary">
+                  <Button onClick={handleDialogClose} color="secondary">
                     Cancel
                   </Button>
-                  <Button type="submit" color="primary" disabled={isSubmitting}>
-                    {dialogType === "post" ? "Create Post" : "Create News"}
+                  <Button type="submit" color="primary" variant="contained">
+                    Create
                   </Button>
                 </DialogActions>
               </Form>
@@ -604,6 +626,34 @@ const ArtistPage: React.FC = () => {
           </Formik>
         </DialogContent>
       </Dialog>
+
+      {selectedPost && (
+        <Dialog open={true} onClose={handleClosePostDialog} maxWidth="md" fullWidth>
+          <DialogTitle>{selectedPost.title}</DialogTitle>
+          <DialogContent>
+            <Card>
+              <CardHeader
+                avatar={<Avatar src={selectedPost.profilePicture} />}
+                title={selectedPost.user}
+                subheader={new Date(selectedPost.timestamp).toLocaleString()}
+              />
+              {selectedPost.image && (
+                <CardMedia component="img" image={selectedPost.image} alt={selectedPost.title} />
+              )}
+              {selectedPost.video && (
+                <CardMedia component="video" controls>
+                  <source src={selectedPost.video} type="video/mp4" />
+                </CardMedia>
+              )}
+              <CardContent>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  {selectedPost.content}
+                </Typography>
+              </CardContent>
+            </Card>
+          </DialogContent>
+        </Dialog>
+      )}
 
       <Dialog open={selectedPost !== null} onClose={handleClosePostDialog}>
         {selectedPost && (
