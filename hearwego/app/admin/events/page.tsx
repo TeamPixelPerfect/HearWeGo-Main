@@ -7,17 +7,28 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Chip,
   Grid,
   IconButton,
+  Menu,
+  MenuItem,
+  Modal,
   Pagination,
+  Paper,
   Stack,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Tabs,
   Typography,
   duration,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { IoAddOutline, IoClose } from "react-icons/io5";
 import { IoIosPause, IoIosPlay, IoMdMore } from "react-icons/io";
 import { MdAlbum, MdDelete } from "react-icons/md";
@@ -37,6 +48,187 @@ import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
 import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
+import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { getEvents } from "@/app/services/EventServices";
+import { getAllEvents } from "@/app/services/EventServices";
+import { Event } from "@/app/constants/models";
+import { render } from "react-dom";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { getEvent } from "@/app/services/EventServices";
+import { Artist } from "@/app/constants/models";
+import Link from 'next/link';
+// import router, { Router } from "next/router";
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+};
+
+function EventDataGrid() {
+  const router = useRouter();
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const [events, setEvents] = useState<Event[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [eventId, setEventId] = useState("")
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    getAllEvents().then((events) => {
+      console.log("Events......",events);
+      setEvents(events.data);
+    });
+
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
+    });
+  }
+  , []);
+
+  function createEventData(
+    event_id: string,
+    event_img: string,
+    event_name: string,
+    event_type: string,
+    age_from: number,
+    age_to: number,
+    sessions: any,
+    event_status: string,
+    event_created_by: string,
+    createdAt: string,
+    updatedAt: string
+  ){return { event_id, event_img, event_name, event_type, age_from, age_to, no_of_sessions: sessions.length, sessions, event_status, event_created_by, createdAt, updatedAt };}
+
+  const eventRows = events.map((event) => 
+    createEventData(
+      event.event_id,
+      event.event_img,
+      event.event_name,
+      event.event_type,
+      event.age_from,
+      event.age_to,
+      event.sessions,
+      event.event_status,
+      event.event_created_by,
+      event.createdAt,
+      event.updatedAt
+    )
+  );
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
+
+  const columns = [
+    { field: "event_id", headerName: "Event ID", flex: 1 },
+    { field: "event_img", headerName: "Event Image", flex: 1, renderCell: (params) => (<img src={params.row.event_img} style={{ width: 50, height: 50 }} />)},
+    { field: "event_name", headerName: "Event Name", flex: 2 },
+    { field: "event_type", headerName: "Event Type", flex: 1 },
+    { field: "age_from", headerName: "Age From", flex: 1 },
+    { field: "age_to", headerName: "Age To", flex: 1 },
+    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1},
+    {
+      field: "event_status",
+      headerName: "Event Status",
+      flex: 1,
+      renderCell: (params) => {
+        const status = params.row.event_status;
+        let chipColor;
+        switch (status) {
+          case "private":
+            chipColor = "primary";
+            break;
+          case "public":
+            chipColor = "success";
+            break;
+          case "blocked":
+            chipColor = "error";
+            break;
+          default:
+            chipColor = "default";
+        }
+        return <Chip label={status.charAt(0).toUpperCase() + status.slice(1)} color={chipColor} />;
+      }
+    },
+    { field: "event_created_by", headerName: "Artist ID", flex: 1 },
+    {
+      field: "ArtistName",
+      headerName: "Artist Name",
+      flex: 2,
+      valueGetter: (params) => getArtistName(params.row.event_created_by),
+    },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
+    { field: "updatedAt", headerName: "Updated At", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 2,
+      renderCell: (params) => (
+        <ButtonGroup>
+          <IconButton color="primary" sx={{ fontSize: "16px" }}>
+            <FaEdit />
+          </IconButton>
+          {/* <Link href={`/app/admin/events/${params.row.event_id}`}> */}
+          <IconButton
+            color="secondary"
+            sx={{ fontSize: "16px" }}
+            onClick= {()=> {router.push(`/admin/events/${params.row.event_id}`)}}
+          >
+            <FaEye />
+          </IconButton>
+          {/* </Link> */}
+          <IconButton color="error" sx={{ fontSize: "16px" }}>
+            <MdDelete />
+          </IconButton>
+        </ButtonGroup>
+      ),
+    },
+  ];
+
+
+  const handleView = (id) => {
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (id) => {
+    // Logic to edit an event
+    alert(`Edit event with ID: ${id}`);
+  };
+
+  const handleDelete = (id) => {
+    // Logic to delete an event
+    setEvents((prevRows) => prevRows.filter((row) => row.event_id !== id));
+    alert(`Delete event with ID: ${id}`);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
+  return (
+    <div style={{ height: 600, width: '100%' }}>
+      <DataGrid
+        rows={eventRows}
+        columns={columns}
+        pageSize={10}
+        rowsPerPageOptions={[10]}
+        components={{ Toolbar: GridToolbar }}
+        getRowId={(row) => row.event_id}  // Specify the custom id field
+      />
+    </div>
+  );
+}
 
 const AdminUserPage = () => {
   const theme = useTheme();
@@ -98,7 +290,10 @@ const AdminUserPage = () => {
             Add New Event
           </Button>
         </Box>
-        <ADTabBox></ADTabBox>
+        <ADTabBox>
+        <EventDataGrid />
+        </ADTabBox>
+
         <Box
           sx={{
             width: "100%",
@@ -108,12 +303,7 @@ const AdminUserPage = () => {
             padding: "2em 0",
           }}
         >
-          <Pagination
-            count={10}
-            page={page}
-            onChange={handlePageChange}
-            color="secondary"
-          />
+          
         </Box>
       </Card>
     </Grid>
