@@ -202,7 +202,7 @@ const errorModalStyle = {
 
 function CreateEvent() {
   const artist = useAppSelector((state) => state.artist.user);
-
+  
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = React.useState(0);

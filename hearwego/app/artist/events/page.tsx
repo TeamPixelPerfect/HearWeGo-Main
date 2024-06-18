@@ -188,10 +188,10 @@ function EventArea() {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
-      getEvents(artist?.token, page, limit, filter, createdArtist ).then((events) => {
+      getEvents( page, limit, filter, artist.artist_id ).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
-      });
+      }); 
     }
   }, [artist, page]);
 

@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,6 +12,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { PressReleaseSaved } from "../styles/PressReleaseOriginal.styles";
+import jsPDF from 'jspdf';
 
 interface Props {
   id: string;
@@ -34,6 +33,15 @@ export default function PressReleaseSavedRow({
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [shareMessage, setShareMessage] = useState("Select your share option");
   const [deleteMessage, setDeleteMessage] = useState("");
+
+  const generatePDF = () => {
+    const pdf = new jsPDF();
+    // Add content to the PDF
+    pdf.text('Press Release Title: ' + title, 10, 10);
+    pdf.text('Release Date: ' + releaseDate, 10, 20);
+    // Save the PDF
+    pdf.save('press_release.pdf');
+  };
 
   const handleShareClick = () => {
     setOpenShareDialog(true);
@@ -79,7 +87,7 @@ export default function PressReleaseSavedRow({
             backgroundColor: "white",
           }}
         >
-          <Button onClick={() => console.log(id)}>
+          <Button onClick={generatePDF}>
             <PictureAsPdfIcon
               sx={{
                 color: "red",
