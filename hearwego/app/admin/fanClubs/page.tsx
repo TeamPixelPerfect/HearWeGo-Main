@@ -52,9 +52,9 @@ function FanClubsDataGrid() {
   const [artists, setArtists] = useState<Artist[]>([]);
 
   useEffect(() => {
-    getFanClubs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((fanClubs) => {
-      console.log("Fan Clubs......",fanClubs);
-      setFanClubs(fanClubs.data);
+    getFanClubs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjFiMTNiYTg1MDg2ZjY1MDc4NzMwMCIsInJvbGUiOiJhcnRpc3QiLCJpYXQiOjE3MTg1MTAxNjAsImV4cCI6MTcxODc2OTM2MH0.bKV_fcbrHdDRtLS9kmyC4ubDLH4nKYTLPLQbndLRL5w").then((_fanClubs) => {
+      console.log("Fan Clubs......",_fanClubs);
+      setFanClubs(_fanClubs.data);
     });
 
     getAllArtists().then((artists) => {
@@ -73,7 +73,7 @@ function FanClubsDataGrid() {
     updatedAt: string
   ){return {clubId, artistId, coverImage_URL, visibility, createdAt, updatedAt};}
 
-  const fcRows = fanClubs.map((fc) => {
+  const fcRows = fanClubs?.map((fc) => {
     return createFanClubData(fc.clubId, fc.artistId, fc.coverImage_URL, fc.visibility, fc.createdAt, fc.updatedAt);
   });
 
@@ -137,10 +137,9 @@ function FanClubsDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={fcRows}
+        rows={fanClubs ? fcRows : []}
         columns={columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
+        pageSizeOptions={[25, 50]}
         components={{ Toolbar: GridToolbar }}
         getRowId={(row) => row.clubId}
         // checkboxSelection
