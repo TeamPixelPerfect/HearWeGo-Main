@@ -482,12 +482,10 @@ const ArtistPage: React.FC = () => {
       </Paper>
       <Tabs value={tabValue} onChange={handleTabChange} centered>
         <Tab label="Feed" />
-        <Tab label="News" />
         <Tab label="Photos" />
-        <Tab label="Events" />
         <Tab label="Videos" />
-      
-       
+        <Tab label="News" />
+        <Tab label="Events" />
       </Tabs>
       <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
         <FeedTab
