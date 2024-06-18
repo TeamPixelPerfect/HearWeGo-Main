@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   Typography,
   IconButton,
@@ -30,6 +30,10 @@ import VideosTab from "./VideosTab";
 import DropFile from "../../components/DropFile";
 import NewsPage from "./NewsTab";
 import EventsTab from "./EventsTab";
+import { set } from "date-fns";
+import { addPost } from "../../services/FanClubServices";
+import { ClubPost } from "../../constants/models";
+import { useAppSelector } from "@/lib/hooks";
 
 const dummyData: Post[] = [
   {
@@ -344,11 +348,37 @@ const validationSchema = Yup.object().shape({
 });
 
 const ArtistPage: React.FC = () => {
+  const artist = useAppSelector((state) => state.artist.user);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"post" | "news" | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>(dummyData);
   const [tabValue, setTabValue] = useState(0);
+
+  const [postData, setPostData] = useState<ClubPost>({
+    postType: "",
+    postDescription: "",
+    postpublisher: "ar4",
+    postImage_URL: "",
+    clubId: "fc0",
+  });
+
+  const [postImg, setPostImg] = useState<File | null>(null);
+
+  useEffect(() => {
+    if(postImg){
+      setPostData({...postData, postImage_URL: postImg})
+    }
+  }, [postImg]);
+
+  const submitData = async () => {
+    try {
+      await addPost(artist.token, postData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -538,6 +568,8 @@ const ArtistPage: React.FC = () => {
                   as={TextField}
                   autoFocus
                   margin="dense"
+                  value={postData.postType}
+                  onChange={(e)=>setPostData({...postData, postType: e.target.value})}
                   name="title"
                   label="Title"
                   fullWidth
@@ -550,6 +582,8 @@ const ArtistPage: React.FC = () => {
                   margin="dense"
                   name="content"
                   label="Content"
+                  value={postData.postDescription}
+                  onChange={(e)=>setPostData({...postData, postDescription: e.target.value})}
                   fullWidth
                   variant="standard"
                   multiline
@@ -565,8 +599,8 @@ const ArtistPage: React.FC = () => {
                       isCircular={false}
                       width="100%"
                       height="200px"
-                      file={null}
-                      setFile={(file) => setFieldValue("image", file)}
+                      file={postImg}
+                      setFile={setPostImg}
                       aspectX={1}
                       aspectY={1}
                       shape="rect"
@@ -593,7 +627,7 @@ const ArtistPage: React.FC = () => {
                   <Button onClick={handleDialogClose} disabled={isSubmitting}>
                     Cancel
                   </Button>
-                  <Button type="submit" color="primary" disabled={isSubmitting}>
+                  <Button type="submit" color="primary" onClick={submitData}>
                     Create
                   </Button>
                 </DialogActions>
