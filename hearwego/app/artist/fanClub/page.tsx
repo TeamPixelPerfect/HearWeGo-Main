@@ -399,17 +399,22 @@ const ArtistPage: React.FC = () => {
     setPosts(updatedPosts);
   };
 
-  const handleCreatePost = async (values: {
-    title: string;
-    content: string;
-    image: File | null;
-    video: File | null;
-  }, { resetForm }: FormikHelpers<{
-    title: string;
-    content: string;
-    image: File | null;
-    video: File | null;
-  }>) => {
+  const handleCreatePost = async (
+    values: {
+      title: string;
+      content: string;
+      image: File | null;
+      video: File | null;
+    },
+    {
+      resetForm,
+    }: FormikHelpers<{
+      title: string;
+      content: string;
+      image: File | null;
+      video: File | null;
+    }>
+  ) => {
     try {
       await validationSchema.validate(values, { abortEarly: false });
       const newPost: Post = {
@@ -438,7 +443,6 @@ const ArtistPage: React.FC = () => {
       }
     }
   };
-
 
   const handleCardClick = (post: Post) => {
     setSelectedPost(post);
@@ -535,7 +539,7 @@ const ArtistPage: React.FC = () => {
         </Fab>
       ) : null}
 
-<Dialog
+      <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
         maxWidth="sm"
@@ -544,11 +548,11 @@ const ArtistPage: React.FC = () => {
         <DialogTitle>Create New Post</DialogTitle>
         <DialogContent>
           <Formik
-            initialValues={{ title: '', content: '', image: null, video: null }}
+            initialValues={{ title: "", content: "", image: null, video: null }}
             validationSchema={validationSchema}
             onSubmit={handleCreatePost}
           >
-            {({ setFieldValue, errors, touched,resetForm  }) => (
+            {({ setFieldValue, errors, touched, resetForm }) => (
               <Form>
                 <Field
                   as={TextField}
@@ -563,13 +567,12 @@ const ArtistPage: React.FC = () => {
                   as={TextField}
                   name="content"
                   label="Content"
-                  
                   multiline
                   rows={4}
                   error={touched.content && !!errors.content}
                   helperText={touched.content && errors.content}
                   margin="dense"
-                  sx={{width:"100%"}}
+                  sx={{ width: "100%" }}
                 />
                 <input
                   id="image"
@@ -578,17 +581,17 @@ const ArtistPage: React.FC = () => {
                   accept="image/*"
                   onChange={(event) => {
                     const file = event.currentTarget.files[0];
-                    setFieldValue('image', file);
+                    setFieldValue("image", file);
                     setSelectedImage(file);
                     setImagePreview(URL.createObjectURL(file));
                   }}
-                  style={{ margin: '16px 0' }}
+                  style={{ margin: "16px 0" }}
                 />
                 {imagePreview && (
                   <img
                     src={imagePreview}
                     alt="Selected Image"
-                    style={{ maxWidth: '100%', marginTop: '16px' }}
+                    style={{ maxWidth: "100%", marginTop: "16px" }}
                   />
                 )}
                 {touched.image && errors.image && (
@@ -602,9 +605,9 @@ const ArtistPage: React.FC = () => {
                   type="file"
                   accept="video/*"
                   onChange={(event) => {
-                    setFieldValue('video', event.currentTarget.files[0]);
+                    setFieldValue("video", event.currentTarget.files[0]);
                   }}
-                  style={{ margin: '16px 0' }}
+                  style={{ margin: "16px 0" }}
                 />
                 {touched.video && errors.video && (
                   <Typography variant="body2" color="error">
@@ -626,7 +629,12 @@ const ArtistPage: React.FC = () => {
       </Dialog>
 
       {selectedPost && (
-        <Dialog open={true} onClose={handleClosePostDialog} maxWidth="md" fullWidth>
+        <Dialog
+          open={true}
+          onClose={handleClosePostDialog}
+          maxWidth="md"
+          fullWidth
+        >
           <DialogTitle>{selectedPost.title}</DialogTitle>
           <DialogContent>
             <Card>
@@ -636,7 +644,11 @@ const ArtistPage: React.FC = () => {
                 subheader={new Date(selectedPost.timestamp).toLocaleString()}
               />
               {selectedPost.image && (
-                <CardMedia component="img" image={selectedPost.image} alt={selectedPost.title} />
+                <CardMedia
+                  component="img"
+                  image={selectedPost.image}
+                  alt={selectedPost.title}
+                />
               )}
               {selectedPost.video && (
                 <CardMedia component="video" controls>

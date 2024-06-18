@@ -331,7 +331,7 @@ const SinglePost = ({
           <img
             src={post.image}
             alt={post.title}
-            style={{ maxWidth: "70%", minWidth: "70%" }}
+            style={{ width: "80%", maxHeight: "700px", objectFit: "cover" }}
           />
         </div>
       )}
