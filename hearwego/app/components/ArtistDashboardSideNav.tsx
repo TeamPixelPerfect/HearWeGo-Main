@@ -39,9 +39,8 @@ const ArtistDashboardSideNav = () => {
 
   return (
     <ArtistDashboardSideNavContainer>
-      <Box sx={{ marginBottom: "3em" }}></Box>
       <Box
-        sx={{ cursor: "pointer", marginBottom: "1em" }}
+        sx={{ cursor: "pointer", p: "2em", pb: "2em" }}
         onClick={() => {
           Router.push("/artist");
         }}
@@ -60,30 +59,27 @@ const ArtistDashboardSideNav = () => {
           </IconButton>
         )}
       </Box>
-      <Box>
-        <Box
-          sx={
-            matches
-              ? { padding: "1em 0", width: "auto" }
-              : { padding: "1em 0", width: "100%" }
-          }
-        >
-          {sideMenuOpts.map((opt) => {
-            return (
-              <ADNavItemGroup
-                groupLabel={opt.groupLabel}
-                items={opt.items}
-              ></ADNavItemGroup>
-            );
-          })}
-        </Box>
+      <Box sx={{ overflowY: "scroll", maxHeight: "85vh", scrollbarWidth: "10px" }}>
+        {sideMenuOpts.map((opt) => {
+          return (
+            <ADNavItemGroup
+              groupLabel={opt.groupLabel}
+              items={opt.items}
+            ></ADNavItemGroup>
+          );
+        })}
         <ADNavItemGroupBox>
           <ADNavItemBox sx={{ marginBottom: "2em" }}>
             <Link
               href="/artist"
               style={{ display: "flex", alignItems: "center" }}
             >
-              <SettingsIcon color="secondary" sx={{ marginRight: "10px" }} />
+              <SettingsIcon
+                sx={{
+                  marginRight: "10px",
+                  color: theme.palette.secondary.light,
+                }}
+              />
               {!matches && (
                 <Box style={{ color: theme.palette.secondary.main }}>
                   Settings

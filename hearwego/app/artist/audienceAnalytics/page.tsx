@@ -1,9 +1,27 @@
 "use client";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { ADTabBox } from "@/app/styles/artistDashboard.styles";
-import { Box, Button, Tab, Tabs, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Rating,
+  Select,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Card, Grid } from "@mui/material";
 import React, { useState } from "react";
+import { ADAnalyticBox, ADGraphTab } from "@/app/styles/artistAnalytics.styles";
+import { LineChart } from "@mui/x-charts/LineChart";
+import ADAdvancedAnalytics from "@/app/artist/audienceAnalytics/AdvancedAnalytics";
+import ADGeneralAnalytics from "@/app/artist/audienceAnalytics/GeneralAnalytics";
+import ADCompareAnalytics from "./CompareAnalytics";
 
 const ArtistAudienceAnalytics = () => {
   const theme = useTheme();
@@ -13,14 +31,17 @@ const ArtistAudienceAnalytics = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-      
+
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
       <Card
         sx={{
           width: "100%",
           minHeight: "100vh",
+          height: "100%",
           background: theme.palette.background.paper,
+          scrollbarWidth: "none",
+          scrollbarColor: "transparent transparent",
         }}
       >
         <Box
@@ -29,7 +50,7 @@ const ArtistAudienceAnalytics = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "1em 2em 0 2em",
+            padding: "2em 2em 0 2em",
           }}
         >
           <Typography
@@ -53,21 +74,15 @@ const ArtistAudienceAnalytics = () => {
             <Tab label="Merchandise" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              <em>General</em>
-            </Typography>
+            <ADGeneralAnalytics />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              <em>Advanced</em>
-            </Typography>
+            <ADAdvancedAnalytics />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              <em>Compare</em>
-            </Typography>
+            <ADCompareAnalytics />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>

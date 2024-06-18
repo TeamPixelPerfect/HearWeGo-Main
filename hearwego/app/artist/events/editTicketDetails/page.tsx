@@ -22,11 +22,7 @@ import DialogActions from "@mui/material/DialogActions";
 
 import CloseIcon from "@mui/icons-material/Close";
 
-
-import {
-  Autocomplete,
- 
-} from "@mui/material";
+import { Autocomplete } from "@mui/material";
 
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -253,7 +249,7 @@ const page = () => {
                         </StyledTableCell>
                       </TableRow>
                     </TableHead>
-                     {/* Mapping through data to create table rows */}
+                    {/* Mapping through data to create table rows */}
                     <TableBody>
                       {rows.map((row) => (
                         <StyledTableRow key={row.name}>
@@ -487,7 +483,7 @@ const page = () => {
         <Box
           component="form"
           sx={{
-            "& .MuiTextField-root": { m: 1, width:"100%", },
+            "& .MuiTextField-root": { m: 1, width: "100%" },
             marginLeft: "25px",
           }}
           noValidate

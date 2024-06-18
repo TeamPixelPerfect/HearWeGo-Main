@@ -37,8 +37,9 @@ export const hearWeGoTheme = createTheme({
     mode: "light",
     primary: {
       main: "#7e22ce",
-      light: "#ffff",
-      dark: "#6b21a8",
+      light: "#D2CDFD",
+      dark: "#c4b5fd",
+      // contrastText: "#C4B5FD"
     },
     background: {
       default: "#ffffff",
@@ -51,7 +52,7 @@ export const hearWeGoTheme = createTheme({
     },
 
     text: {
-      primary: "#787878",
+      primary: "#222222",
       secondary: "#4B4B4B",
     },
   },
@@ -63,6 +64,7 @@ export const hearWeGoDarkTheme = createTheme({
     primary: {
       main: "#7e22ce",
       light: "#000000",
+      contrastText: "#0F172A"
     },
     secondary: {
       main: "#818cf8",
@@ -73,7 +75,7 @@ export const hearWeGoDarkTheme = createTheme({
     },
     text: {
       primary: "#fff",
-      secondary: "#787878",
+      secondary: "#cccccc",
     },
   },
 });
