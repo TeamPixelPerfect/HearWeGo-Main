@@ -249,7 +249,7 @@ const NewsPage: React.FC = () => {
     setSelectedPostId(null);
   };
   return (
-    <Container>
+    <Container maxWidth="xl">
       <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
         News
       </Typography>

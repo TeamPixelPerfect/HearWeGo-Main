@@ -94,7 +94,7 @@ const EventsTab: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container>
+      <Container maxWidth="xl">
         <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
           Events
         </Typography>
