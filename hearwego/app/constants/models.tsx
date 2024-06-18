@@ -185,18 +185,6 @@ export interface Event {
   event_created_by?: string;
 }
 
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias ?: string[];
-}
-
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
@@ -235,26 +223,12 @@ export interface Budget {
   event_id?: string;
 }
 
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias ?: string[];
-  
-}
-
 export interface FanClub {
   clubId?: string;
   artistId?: string;
   coverImage_URL?: string;
   visibility?: boolean;
 }
-
 
 export interface ClubMember {
   memberId?: string;
@@ -277,4 +251,35 @@ export interface Comment {
   commenter?: string;
   commentBody?: string;
   postId?: string;
+}
+
+export interface PRCampaigns {
+  ArtistID: string;
+  CampaignID?: string;
+  Campaign_Name?: string;
+  Campaign_Description?: string;
+  CampaignImage_URL?: string;
+  CampaignStatus?: string;
+  Com_percentage?: number;
+  PRPosts?: PRPosts[];
+  PRtask?: PRtask[];
+}
+
+export interface PRPosts {
+  PrPostID?: string;
+  ArtistName?: string;
+  Description?: string;
+  Scheduled_Date?: Date;
+  Scheduled_Time?: string;
+  SocialMedias?: string[];
+  PostImage_URL?: string;
+  CampaignID?: string;
+}
+export interface PRtask {
+  TaskID?: string;
+  TaskName?: string;
+  TaskDescription?: string;
+  TaskStatus?: string;
+  TaskPercentage?: number;
+  CampaignID?: string;
 }

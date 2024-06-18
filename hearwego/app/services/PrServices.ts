@@ -1,5 +1,5 @@
 import { base_url } from "../constants/keys";
-
+import { PRCampaigns, PRPosts, PRtask } from "../constants/models";
 //get all PR Campaigns
 export const getPRCampaigns = async (
   token: string,
@@ -26,6 +26,7 @@ export const getPRCampaigns = async (
   }
 };
 
+//add PR Campaign
 export const addPRCampaign = async (token: string, data: any) => {
   const res = await fetch(`${base_url}/PRManager/PRCampaign`, {
     method: "POST",
@@ -36,8 +37,8 @@ export const addPRCampaign = async (token: string, data: any) => {
     body: JSON.stringify(data),
   });
   if (res.ok) {
-    const event = await res.json();
-    return event;
+    const Campaigns = await res.json();
+    return Campaigns;
   } else {
     const error = await res.json();
     throw new Error(error.message);

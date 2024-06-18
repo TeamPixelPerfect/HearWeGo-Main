@@ -27,6 +27,9 @@ import SaveIcon from "@mui/icons-material/Save";
 import TaskIcon from "@mui/icons-material/Assignment";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { addPRCampaign } from "@/app/services/PrServices";
+import { PRCampaigns } from "@/app/constants/models";
+import { useAppSelector } from "@/lib/hooks";
 
 interface CreateCampaignPopProps {
   open: boolean;
@@ -37,13 +40,38 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   open,
   onClose,
 }) => {
+  const artist = useAppSelector((state) => state.artist.user);
   const [step, setStep] = useState(0);
   const [tabValue, setTabValue] = useState(0);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
-  const [tasks, setTasks] = useState<
-    { id: number; name: string; editing: boolean }[]
-  >([{ id: Date.now(), name: "New Task", editing: false }]);
+  const [campaign, setCampaign] = useState<PRCampaigns>({
+    ArtistID: "",
+    Campaign_Name: "",
+    Campaign_Description: "",
+    CampaignImage_URL: "",
+    CampaignStatus: "",
+    Com_percentage: 0,
+    PRPosts: [
+      {
+        PrPostID: "",
+        ArtistName: "",
+        Description: "",
+        Scheduled_Date: new Date(),
+        Scheduled_Time: "",
+        SocialMedias: [],
+        PostImage_URL: "",
+        CampaignID: "",
+      },
+    ],
+    PRtask: [
+      {
+        TaskID: "",
+        TaskName: "",
+        TaskDescription: "",
+      },
+    ],
+  });
 
   const formik = useFormik({
     initialValues: {
