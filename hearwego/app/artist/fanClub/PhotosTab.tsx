@@ -50,7 +50,7 @@ const PhotosTab: React.FC<PhotosTabProps> = ({ posts, handleCardClick }) => {
                 <CardActionArea>
                   <CardMedia
                     component="img"
-                    height="200"
+                    height="300"
                     image={post.image}
                     alt={post.title}
                     sx={{

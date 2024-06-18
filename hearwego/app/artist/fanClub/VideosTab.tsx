@@ -50,7 +50,7 @@ const VideosTab: React.FC<VideosTabProps> = ({ posts, handleCardClick }) => {
                 <CardActionArea>
                   <CardMedia
                     component="video"
-                    height="200"
+                    height="300"
                     src={post.video}
                     controls
                     sx={{
