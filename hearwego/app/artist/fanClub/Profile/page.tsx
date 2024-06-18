@@ -86,7 +86,7 @@ const ArtistInfo = ({ name, fansCount }) => (
         width: "50%",
         flexDirection: "column",
         textAlign: "left",
-        padding: "30px",
+        padding: "20px",
       }}
     >
       <Typography
