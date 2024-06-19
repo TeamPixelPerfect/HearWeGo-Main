@@ -21,6 +21,7 @@ import {
   Step,
   StepLabel,
   Paper,
+  FormHelperText,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -30,6 +31,7 @@ import * as Yup from "yup";
 import { addPRCampaign } from "@/app/services/PrServices";
 import { PRCampaigns } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
+import DropFile from "@/app/components/DropFile";
 
 interface CreateCampaignPopProps {
   open: boolean;
@@ -45,40 +47,27 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   const [tabValue, setTabValue] = useState(0);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
-  const [campaign, setCampaign] = useState<PRCampaigns>({
-    ArtistID: "",
+
+  const [campaignImg, setCampaignImg] = useState<File | null>(null);
+  const [taskError, setTaskError] = useState<string | null>(null);
+
+  const [campaignData, setCampaignData] = useState<PRCampaigns>({
+    ArtistID: "ar4",
     Campaign_Name: "",
     Campaign_Description: "",
     CampaignImage_URL: "",
     CampaignStatus: "",
     Com_percentage: 0,
-    PRPosts: [
-      {
-        PrPostID: "",
-        ArtistName: "",
-        Description: "",
-        Scheduled_Date: new Date(),
-        Scheduled_Time: "",
-        SocialMedias: [],
-        PostImage_URL: "",
-        CampaignID: "",
-      },
-    ],
-    PRtask: [
-      {
-        TaskID: "",
-        TaskName: "",
-        TaskDescription: "",
-      },
-    ],
+    PRPosts: [],
+    PRtask: [],
   });
 
   const formik = useFormik({
     initialValues: {
-      campaignName: "",
+      Campaign_Name: "",
     },
     validationSchema: Yup.object({
-      campaignName: Yup.string().required("Campaign name is required"),
+      Campaign_Name: Yup.string().required("Campaign name is required"),
     }),
     onSubmit: (values) => {
       handleNext();
@@ -88,17 +77,20 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   const steps = ["Enter Campaign Name", "Create Campaign", "Review & Save"];
 
   const handleNext = async () => {
+    setTaskError(null);
     if (step === 0) {
       await formik.validateForm();
-      if (!formik.errors.campaignName) {
+      if (!formik.errors.Campaign_Name) {
         setStep(step + 1);
       }
     } else if (step === 1) {
-      const emptyTask = tasks.some((task) => task.name.trim() === "");
+      const emptyTask = campaignData.PRtask?.some(
+        (task) => task.TaskName?.trim() === ""
+      );
       if (!emptyTask) {
         setStep(step + 1);
       } else {
-        alert("All task names must be filled out.");
+        setTaskError("All task names must be filled out.");
       }
     } else {
       setStep(step + 1);
@@ -131,40 +123,69 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   };
 
   const handleAddTask = () => {
-    const newTaskId = Date.now(); // Use timestamp for unique ID
-    setTasks([...tasks, { id: newTaskId, name: "", editing: true }]);
-  };
-
-  const handleEditSaveTask = (index: number) => {
-    const updatedTasks = [...tasks];
-    if (updatedTasks[index].editing) {
-      if (updatedTasks[index].name.trim()) {
-        updatedTasks[index].editing = false;
-      } else {
-        alert("Task name cannot be empty!");
-      }
-    } else {
-      updatedTasks[index].editing = true;
-    }
-    setTasks(updatedTasks);
-  };
-
-  const handleTaskNameChange = (index: number, newName: string) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].name = newName;
-    setTasks(updatedTasks);
+    const newTaskId = Date.now().toString(); // Use timestamp for unique ID
+    setCampaignData({
+      ...campaignData,
+      PRtask: [
+        ...campaignData.PRtask,
+        { TaskID: newTaskId, TaskName: "", TaskDescription: "", isEdit: true },
+      ],
+    });
   };
 
   useEffect(() => {
-    if (!open) {
-      setStep(0);
-      formik.resetForm();
-      setTabValue(0);
-      setConfirmCancelOpen(false);
-      setConfirmSaveOpen(false);
-      setTasks([{ id: Date.now(), name: "New Task", editing: false }]);
+    if (campaignImg) {
+      setCampaignData({
+        ...campaignData,
+        CampaignImage_URL: campaignImg,
+      });
     }
-  }, [open]);
+  }, [campaignImg]);
+
+  const handleEditSaveTask = (index: number) => {
+    const updatedTasks = [...campaignData.PRtask];
+    if (updatedTasks[index].TaskName.trim()) {
+      updatedTasks[index].isEdit = !updatedTasks[index].isEdit; // Toggle editing state
+    } else {
+      setTaskError("Task name cannot be empty!");
+    }
+    setCampaignData({
+      ...campaignData,
+      PRtask: updatedTasks,
+    });
+  };
+
+  const handleTaskNameChange = (index: number, newName: string) => {
+    const updatedTasks = [...campaignData.PRtask];
+    updatedTasks[index].TaskName = newName;
+    setCampaignData({
+      ...campaignData,
+      PRtask: updatedTasks,
+    });
+  };
+
+  const submitCampaign = async () => {
+    try {
+      // Filter out tasks with empty TaskName
+      const tasksToSubmit = campaignData.PRtask.filter(
+        (task) => task.TaskName.trim() !== ""
+      );
+
+      const campaignToSubmit = {
+        ...campaignData,
+        PRtask: tasksToSubmit.map((task) => ({
+          ...task,
+          isEdit: undefined, // Remove editing state before submission
+        })),
+      };
+
+      const res = await addPRCampaign(artist.token, campaignToSubmit);
+      console.log(res);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const renderStepContent = (step: number) => {
     switch (step) {
@@ -176,18 +197,32 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
               margin="dense"
               label="Campaign Name"
               fullWidth
-              id="campaignName"
-              name="campaignName"
-              value={formik.values.campaignName}
-              onChange={formik.handleChange}
+              id="Campaign_Name"
+              name="Campaign_Name"
+              value={campaignData.Campaign_Name}
+              onChange={(e) =>
+                formik.setFieldValue("Campaign_Name", e.target.value)
+              }
               onBlur={formik.handleBlur}
               error={
-                formik.touched.campaignName &&
-                Boolean(formik.errors.campaignName)
+                formik.touched.Campaign_Name &&
+                Boolean(formik.errors.Campaign_Name)
               }
               helperText={
-                formik.touched.campaignName && formik.errors.campaignName
+                formik.touched.Campaign_Name && formik.errors.Campaign_Name
               }
+            />
+            <DropFile
+              fileTypes="image"
+              fileExtensions="JPEG,PNG,WEBP,SVG"
+              isCircular={false}
+              width="100%"
+              height="200px"
+              aspectX={1}
+              aspectY={1}
+              shape="rect"
+              file={campaignImg}
+              setFile={setCampaignImg}
             />
           </form>
         );
@@ -208,27 +243,32 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
                 >
                   Add New Task
                 </Button>
+                {taskError && (
+                  <FormHelperText error>{taskError}</FormHelperText>
+                )}
                 <List>
-                  {tasks.map((task, index) => (
-                    <ListItem key={task.id}>
+                  {campaignData.PRtask?.map((task, index) => (
+                    <ListItem key={task.TaskID}>
                       <ListItemIcon>
                         <TaskIcon />
                       </ListItemIcon>
-                      {task.editing ? (
+                      {task.isEdit ? (
                         <TextField
                           fullWidth
-                          value={task.name}
+                          value={task.TaskName}
                           onChange={(e) =>
                             handleTaskNameChange(index, e.target.value)
                           }
-                          error={task.name.trim() === ""}
+                          error={task.TaskName?.trim() === ""}
                           helperText={
-                            task.name.trim() === "" &&
+                            task.TaskName?.trim() === "" &&
                             "Task name cannot be empty"
                           }
                         />
                       ) : (
-                        <ListItemText>{task.name || "New Task"}</ListItemText>
+                        <ListItemText>
+                          {task.TaskName ? task.TaskName : "New Task"}
+                        </ListItemText>
                       )}
                       <ListItemSecondaryAction>
                         <IconButton
@@ -236,7 +276,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
                           aria-label="edit"
                           onClick={() => handleEditSaveTask(index)}
                         >
-                          {task.editing ? <SaveIcon /> : <EditIcon />}
+                          {task.isEdit ? <SaveIcon /> : <EditIcon />}
                         </IconButton>
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -255,16 +295,16 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
         return (
           <Box>
             <Typography variant="h6">
-              Campaign Name: {formik.values.campaignName}
+              Campaign Name: {campaignData.Campaign_Name}
             </Typography>
             <Typography variant="h6">Tasks:</Typography>
             <List>
-              {tasks.map((task) => (
-                <ListItem key={task.id}>
+              {campaignData.PRtask?.map((task) => (
+                <ListItem key={task.TaskID}>
                   <ListItemIcon>
                     <TaskIcon />
                   </ListItemIcon>
-                  <ListItemText>{task.name}</ListItemText>
+                  <ListItemText>{task.TaskName}</ListItemText>
                 </ListItem>
               ))}
             </List>
@@ -274,6 +314,37 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
         return null;
     }
   };
+
+  useEffect(() => {
+    if (!open) {
+      setStep(0);
+      formik.resetForm();
+      setTabValue(0);
+      setConfirmCancelOpen(false);
+      setConfirmSaveOpen(false);
+      setCampaignImg(null);
+      setCampaignData({
+        ArtistID: "ar4",
+        Campaign_Name: "",
+        Campaign_Description: "",
+        CampaignImage_URL: "",
+        CampaignStatus: "",
+        Com_percentage: 0,
+        PRPosts: [],
+        PRtask: [],
+      });
+      setTaskError(null);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (campaignImg) {
+      setCampaignData({
+        ...campaignData,
+        CampaignImage_URL: campaignImg,
+      });
+    }
+  }, [campaignImg]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -298,7 +369,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
           Cancel
         </Button>
         {step === steps.length - 1 ? (
-          <Button onClick={handleSave} color="primary">
+          <Button onClick={submitCampaign} color="primary">
             Save
           </Button>
         ) : (
@@ -343,7 +414,13 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
           <Button onClick={handleConfirmSaveClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleConfirmSaveClose} color="primary">
+          <Button
+            onClick={() => {
+              handleConfirmSaveClose();
+              submitCampaign();
+            }}
+            color="primary"
+          >
             Confirm
           </Button>
         </DialogActions>

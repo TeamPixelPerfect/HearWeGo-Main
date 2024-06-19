@@ -28,6 +28,7 @@ export const getPRCampaigns = async (
 
 //add PR Campaign
 export const addPRCampaign = async (token: string, data: any) => {
+  console.log(" ",data);
   const res = await fetch(`${base_url}/PRManager/PRCampaign`, {
     method: "POST",
     headers: {

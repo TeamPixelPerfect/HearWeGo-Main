@@ -280,6 +280,6 @@ export interface PRtask {
   TaskName?: string;
   TaskDescription?: string;
   TaskStatus?: string;
-  TaskPercentage?: number;
   CampaignID?: string;
+  isEdit?: boolean;
 }
