@@ -29,7 +29,7 @@ import TaskIcon from "@mui/icons-material/Assignment";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { addPRCampaign } from "@/app/services/PrServices";
-import { PRCampaigns } from "@/app/constants/models";
+import { PRCampaigns, PRtask } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import DropFile from "@/app/components/DropFile";
 
@@ -47,21 +47,21 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   const [tabValue, setTabValue] = useState(0);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
-
+  const [taskContent, setTaskContent] = useState([]);
   const [campaignImg, setCampaignImg] = useState<File | null>(null);
   const [taskError, setTaskError] = useState<string | null>(null);
-
   const [campaignData, setCampaignData] = useState<PRCampaigns>({
     ArtistID: "ar4",
     Campaign_Name: "",
     Campaign_Description: "",
     CampaignImage_URL: "",
-    CampaignStatus: "",
+    CampaignStatus: "in_progress", // Set CampaignStatus here
     Com_percentage: 0,
     PRPosts: [],
-    PRtask: [],
+    PRtask: [], // Initialize as an empty array
   });
 
+  
   const formik = useFormik({
     initialValues: {
       Campaign_Name: "",
@@ -84,9 +84,9 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
         setStep(step + 1);
       }
     } else if (step === 1) {
-      const emptyTask = campaignData.PRtask?.some(
-        (task) => task.TaskName?.trim() === ""
-      );
+      const emptyTask =
+        campaignData.PRtask?.some((task) => task.TaskName?.trim() === "") ??
+        false;
       if (!emptyTask) {
         setStep(step + 1);
       } else {
@@ -133,15 +133,6 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
     });
   };
 
-  useEffect(() => {
-    if (campaignImg) {
-      setCampaignData({
-        ...campaignData,
-        CampaignImage_URL: campaignImg,
-      });
-    }
-  }, [campaignImg]);
-
   const handleEditSaveTask = (index: number) => {
     const updatedTasks = [...campaignData.PRtask];
     if (updatedTasks[index].TaskName.trim()) {
@@ -170,16 +161,20 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       const tasksToSubmit = campaignData.PRtask.filter(
         (task) => task.TaskName.trim() !== ""
       );
-
       const campaignToSubmit = {
         ...campaignData,
+        Campaign_Name: formik.values.Campaign_Name, // Ensure Campaign_Name is correctly mapped
+        CampaignStatus: "in_progress", // Ensure CampaignStatus is set here
         PRtask: tasksToSubmit.map((task) => ({
           ...task,
           isEdit: undefined, // Remove editing state before submission
         })),
       };
 
-      const res = await addPRCampaign(artist.token, campaignToSubmit);
+      const res = await addPRCampaign(
+        artist ? artist.token : "",
+        campaignToSubmit
+      );
       console.log(res);
       onClose();
     } catch (error) {
@@ -199,7 +194,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
               fullWidth
               id="Campaign_Name"
               name="Campaign_Name"
-              value={campaignData.Campaign_Name}
+              value={formik.values.Campaign_Name}
               onChange={(e) =>
                 formik.setFieldValue("Campaign_Name", e.target.value)
               }
@@ -295,7 +290,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
         return (
           <Box>
             <Typography variant="h6">
-              Campaign Name: {campaignData.Campaign_Name}
+              Campaign Name: {formik.values.Campaign_Name}
             </Typography>
             <Typography variant="h6">Tasks:</Typography>
             <List>
@@ -378,7 +373,6 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
           </Button>
         )}
       </DialogActions>
-
       {/* Confirmation Dialogs */}
       <Dialog open={confirmCancelOpen} onClose={handleConfirmCancelClose}>
         <DialogTitle>Are you sure?</DialogTitle>

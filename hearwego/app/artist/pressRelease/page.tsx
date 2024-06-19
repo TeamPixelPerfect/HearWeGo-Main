@@ -43,6 +43,7 @@ import {
   PDFViewer,
   Image,
 } from "@react-pdf/renderer";
+import { PressRelease } from "../../constants/models";
 
 // Define your backend API endpoint for uploading files
 const UPLOAD_ENDPOINT = "https://your-backend-api.com/upload";
@@ -89,19 +90,7 @@ const PDFDocument = ({ formData, logoData, signatureData }) => (
   </Document>
 );
 
-interface PressReleaseDetails {
-  headline: string;
-  subHeadline: string;
-  date: Dayjs | null;
-  venue: string;
-  description: string;
-  releaseDate: Dayjs | null;
-  logo: string;
-  signature: string;
-  sharedDateTime: string; // Add sharedDateTime property
-}
-
-export default function PressRelease() {
+export default function PressReleasePage() {
   const [value, setValue] = useState<string>("1");
   const [formData, setFormData] = useState(null);
   const [logoData, setLogoData] = useState(null);
@@ -111,7 +100,6 @@ export default function PressRelease() {
   const [draftItems, setDraftItems] = useState([]);
   // State to manage drafts
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
-  const [userConfirmedCancel, setUserConfirmedCancel] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -182,10 +170,6 @@ export default function PressRelease() {
   const handleEditDraft = (draft) => {
     // Set formik values to edit the draft
     formik.setValues(draft);
-
-    // Optionally, navigate to the form section or show the form
-    // You can use React Router or manage a state to control the section
-    // For demonstration, let's assume redirecting to the "Scheduling" tab (value="1")
     setValue("1"); // Assuming you have a state value for controlling tabs
   };
 
@@ -388,255 +372,287 @@ export default function PressRelease() {
                 </TabList>
               </Box>
               <TabPanel value="1">
-    <Paper elevation={3} sx={{ p: 3 }}>
-      <form onSubmit={formik.handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <Box>
-              <DropFile
-                fileTypes="Logo"
-                fileExtensions=".jpg, .jpeg, .png"
-                isCircular={false}
-                width="100%"
-                height="250px"
-                file={formik.values.logo}
-                setFile={(file) => formik.setFieldValue("logo", file)}
-                aspectX={1}
-                aspectY={1}
-                shape="rect"
-                sx={{ margin: "20px" }}
-              />
-              {formik.touched.logo && formik.errors.logo ? (
-                <Typography color="error">{formik.errors.logo}</Typography>
-              ) : null}
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Headline"
-                  name="headline"
-                  value={formik.values.headline}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  sx={{ marginTop: "20px" }}
-                />
-                {formik.touched.headline && formik.errors.headline ? (
-                  <Typography color="error">{formik.errors.headline}</Typography>
-                ) : null}
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Sub Headline"
-                  name="subHeadline"
-                  value={formik.values.subHeadline}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                {formik.touched.subHeadline && formik.errors.subHeadline ? (
-                  <Typography color="error">{formik.errors.subHeadline}</Typography>
-                ) : null}
-              </Grid>
-              <Grid item xs={12}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="Event Date"
-                    value={formik.values.date}
-                    onChange={(newDate) => formik.setFieldValue("date", newDate)}
-                    renderInput={(params) => <TextField fullWidth {...params} required />}
-                  />
-                </LocalizationProvider>
-                {formik.touched.date && formik.errors.date ? (
-                  <Typography color="error">{formik.errors.date}</Typography>
-                ) : null}
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Venue"
-                  name="venue"
-                  value={formik.values.venue}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  sx={{ width: "100%" }}
-                />
-                {formik.touched.venue && formik.errors.venue ? (
-                  <Typography color="error">{formik.errors.venue}</Typography>
-                ) : null}
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Description"
-                  name="description"
-                  value={formik.values.description}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  multiline
-                  rows={4}
-                  sx={{ width: "100%" }}
-                />
-                {formik.touched.description && formik.errors.description ? (
-                  <Typography color="error">{formik.errors.description}</Typography>
-                ) : null}
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Box>
-                  <DropFile
-                    fileTypes="Signature"
-                    fileExtensions=".jpg, .jpeg, .png"
-                    isCircular={false}
-                    width="100%"
-                    height="160px"
-                    file={formik.values.signature}
-                    setFile={(file) => formik.setFieldValue("signature", file)}
-                    aspectX={1}
-                    aspectY={1}
-                    shape="rect"
-                  />
-                  {formik.touched.signature && formik.errors.signature ? (
-                    <Typography color="error">{formik.errors.signature}</Typography>
-                  ) : null}
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <Box sx={{ width: "100%" }}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Release Date"
-                      value={formik.values.releaseDate}
-                      onChange={(newDate) => formik.setFieldValue("releaseDate", newDate)}
-                      renderInput={(params) => <TextField fullWidth {...params} required />}
-                    />
-                  </LocalizationProvider>
-                  {formik.touched.releaseDate && formik.errors.releaseDate ? (
-                    <Typography color="error">{formik.errors.releaseDate}</Typography>
-                  ) : null}
-                </Box>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Box
-          sx={{
-            position: "relative",
-            display: "flex",
-            justifyContent: "flex-end",
-            p: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<SaveIcon />}
-            type="submit"
-            onClick={formik.handleSubmit}
-            sx={{ mr: 2 }}
-          >
-            Save
-          </Button>
-          <Button variant="outlined" onClick={handleCancel}>
-            Cancel
-          </Button>
-        </Box>
-      </form>
-    </Paper>
-  </TabPanel>
-  <TabPanel value="2">
-    {savedItems.length > 0 ? (
-      savedItems.map((item, index) => (
-        <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
-          <Typography variant="h5">{item.headline}</Typography>
-          <Typography variant="body1">
-            {item.subHeadline}
-          </Typography>
-          <Typography variant="body2">
-            Event Date:{" "}
-            {item.date && item.date.format("YYYY-MM-DD")}
-          </Typography>
-          {/* Uncomment below lines for Venue and Description if needed */}
-          {/* <Typography variant="body2">Venue: {item.venue}</Typography> */}
-          {/* <Typography variant="body2">Description: {item.description}</Typography> */}
-          <Typography variant="body2">
-            Release Date:{" "}
-            {item.releaseDate &&
-              item.releaseDate.format("YYYY-MM-DD")}
-          </Typography>
-          <Box
-            sx={{
-              mt: 2,
-              display: "flex",
-              flexDirection: "row",
-              gap: "3px",
-              // backgroundColor: "red",
-              justifyContent:"space-between"
-            }}
-          >
-            <PDFDownloadLink
-              document={
-                <PDFDocument
-                  logoData={logoData}
-                  formData={item}
-                  signatureData={signatureData}
-                />
-              }
-              fileName={`${item.headline}.pdf`}
-            >
-              {({ loading }) =>
-                loading ? (
-                  "Loading document..."
-                ) : (
-                  <Button
-                    variant="contained"
-                    startIcon={<PictureAsPdfIcon />}
-                    sx={{ width: "100%" }}
-                  >
-                    Download PDF
-                  </Button>
-                )
-              }
-            </PDFDownloadLink>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "right",
-                gap: "5px",
+                <Paper elevation={3} sx={{ p: 3 }}>
+                  <form onSubmit={formik.handleSubmit}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={4}>
+                        <Box>
+                          <DropFile
+                            fileTypes="Logo"
+                            fileExtensions=".jpg, .jpeg, .png"
+                            isCircular={false}
+                            width="100%"
+                            height="250px"
+                            file={formik.values.logo}
+                            setFile={(file) =>
+                              formik.setFieldValue("logo", file)
+                            }
+                            aspectX={1}
+                            aspectY={1}
+                            shape="rect"
+                            sx={{ margin: "20px" }}
+                          />
+                          {formik.touched.logo && formik.errors.logo ? (
+                            <Typography color="error">
+                              {formik.errors.logo}
+                            </Typography>
+                          ) : null}
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} md={8}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
+                            <TextField
+                              fullWidth
+                              label="Headline"
+                              name="headline"
+                              value={formik.values.headline}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              sx={{ marginTop: "20px" }}
+                            />
+                            {formik.touched.headline &&
+                            formik.errors.headline ? (
+                              <Typography color="error">
+                                {formik.errors.headline}
+                              </Typography>
+                            ) : null}
+                          </Grid>
+                          <Grid item xs={12}>
+                            <TextField
+                              fullWidth
+                              label="Sub Headline"
+                              name="subHeadline"
+                              value={formik.values.subHeadline}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                            />
+                            {formik.touched.subHeadline &&
+                            formik.errors.subHeadline ? (
+                              <Typography color="error">
+                                {formik.errors.subHeadline}
+                              </Typography>
+                            ) : null}
+                          </Grid>
+                          <Grid item xs={12}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DatePicker
+                                label="Event Date"
+                                value={formik.values.date}
+                                onChange={(newDate) =>
+                                  formik.setFieldValue("date", newDate)
+                                }
+                                renderInput={(params) => (
+                                  <TextField fullWidth {...params} required />
+                                )}
+                              />
+                            </LocalizationProvider>
+                            {formik.touched.date && formik.errors.date ? (
+                              <Typography color="error">
+                                {formik.errors.date}
+                              </Typography>
+                            ) : null}
+                          </Grid>
+                          <Grid item xs={12}>
+                            <TextField
+                              label="Venue"
+                              name="venue"
+                              value={formik.values.venue}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              sx={{ width: "100%" }}
+                            />
+                            {formik.touched.venue && formik.errors.venue ? (
+                              <Typography color="error">
+                                {formik.errors.venue}
+                              </Typography>
+                            ) : null}
+                          </Grid>
+                          <Grid item xs={12}>
+                            <TextField
+                              label="Description"
+                              name="description"
+                              value={formik.values.description}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              multiline
+                              rows={4}
+                              sx={{ width: "100%" }}
+                            />
+                            {formik.touched.description &&
+                            formik.errors.description ? (
+                              <Typography color="error">
+                                {formik.errors.description}
+                              </Typography>
+                            ) : null}
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Box>
+                              <DropFile
+                                fileTypes="Signature"
+                                fileExtensions=".jpg, .jpeg, .png"
+                                isCircular={false}
+                                width="100%"
+                                height="160px"
+                                file={formik.values.signature}
+                                setFile={(file) =>
+                                  formik.setFieldValue("signature", file)
+                                }
+                                aspectX={1}
+                                aspectY={1}
+                                shape="rect"
+                              />
+                              {formik.touched.signature &&
+                              formik.errors.signature ? (
+                                <Typography color="error">
+                                  {formik.errors.signature}
+                                </Typography>
+                              ) : null}
+                            </Box>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Box sx={{ width: "100%" }}>
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                  label="Release Date"
+                                  value={formik.values.releaseDate}
+                                  onChange={(newDate) =>
+                                    formik.setFieldValue("releaseDate", newDate)
+                                  }
+                                  renderInput={(params) => (
+                                    <TextField fullWidth {...params} required />
+                                  )}
+                                />
+                              </LocalizationProvider>
+                              {formik.touched.releaseDate &&
+                              formik.errors.releaseDate ? (
+                                <Typography color="error">
+                                  {formik.errors.releaseDate}
+                                </Typography>
+                              ) : null}
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        p: 2,
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<SaveIcon />}
+                        type="submit"
+                        onClick={formik.handleSubmit}
+                        sx={{ mr: 2 }}
+                      >
+                        Save
+                      </Button>
+                      <Button variant="outlined" onClick={handleCancel}>
+                        Cancel
+                      </Button>
+                    </Box>
+                  </form>
+                </Paper>
+              </TabPanel>
+              <TabPanel value="2">
+                {savedItems.length > 0 ? (
+                  savedItems.map((item, index) => (
+                    <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
+                      <Typography variant="h5">{item.headline}</Typography>
+                      <Typography variant="body1">
+                        {item.subHeadline}
+                      </Typography>
+                      <Typography variant="body2">
+                        Event Date:{" "}
+                        {item.date && item.date.format("YYYY-MM-DD")}
+                      </Typography>
+                      {/* Uncomment below lines for Venue and Description if needed */}
+                      {/* <Typography variant="body2">Venue: {item.venue}</Typography> */}
+                      {/* <Typography variant="body2">Description: {item.description}</Typography> */}
+                      <Typography variant="body2">
+                        Release Date:{" "}
+                        {item.releaseDate &&
+                          item.releaseDate.format("YYYY-MM-DD")}
+                      </Typography>
+                      <Box
+                        sx={{
+                          mt: 2,
+                          display: "flex",
+                          flexDirection: "row",
+                          gap: "3px",
+                          // backgroundColor: "red",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <PDFDownloadLink
+                          document={
+                            <PDFDocument
+                              logoData={logoData}
+                              formData={item}
+                              signatureData={signatureData}
+                            />
+                          }
+                          fileName={`${item.headline}.pdf`}
+                        >
+                          {({ loading }) =>
+                            loading ? (
+                              "Loading document..."
+                            ) : (
+                              <Button
+                                variant="contained"
+                                startIcon={<PictureAsPdfIcon />}
+                                sx={{ width: "100%" }}
+                              >
+                                Download PDF
+                              </Button>
+                            )
+                          }
+                        </PDFDownloadLink>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "right",
+                            gap: "5px",
 
-                // backgroundColor: "green",
-              }}
-            >
-              <Button
-                variant="outlined"
-                startIcon={<DeleteIcon />}
-                onClick={() => handleOpenDeleteDialog(item)}
-              >
-                Delete
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleOpenShareDialog}
-              >
-                {pressReleaseShared ? (
-                  "Shared"
+                            // backgroundColor: "green",
+                          }}
+                        >
+                          <Button
+                            variant="outlined"
+                            startIcon={<DeleteIcon />}
+                            onClick={() => handleOpenDeleteDialog(item)}
+                          >
+                            Delete
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={handleOpenShareDialog}
+                          >
+                            {pressReleaseShared ? (
+                              "Shared"
+                            ) : (
+                              <>
+                                <ShareIcon /> Share
+                              </>
+                            )}
+                          </Button>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  ))
                 ) : (
-                  <>
-                    <ShareIcon /> Share
-                  </>
+                  <Typography variant="body1">
+                    No saved press releases.
+                  </Typography>
                 )}
-              </Button>
-            </Box>
-          </Box>
-        </Paper>
-      ))
-    ) : (
-      <Typography variant="body1">
-        No saved press releases.
-      </Typography>
-    )}
-  </TabPanel>
-
+              </TabPanel>
 
               <TabPanel value="3">
                 <Typography variant="h6" sx={{ margin: "10px" }}>
