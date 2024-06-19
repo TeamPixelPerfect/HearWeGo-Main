@@ -194,7 +194,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
+  SocialMedias?: string[];
 }
 
 export interface Ticket {
@@ -244,8 +244,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
-  
+  SocialMedias?: string[];
 }
 
 export interface FanClub {
@@ -254,7 +253,6 @@ export interface FanClub {
   coverImage_URL?: string;
   visibility?: boolean;
 }
-
 
 export interface ClubMember {
   memberId?: string;
@@ -280,7 +278,7 @@ export interface Comment {
 }
 
 export interface MerchStore {
-  store_id?: string;                        
+  store_id?: string;
   store_banner?: string;
   promo_banner?: string[];
   store_description?: string;
@@ -288,3 +286,13 @@ export interface MerchStore {
   delivery_services?: string;
   artist_id?: string;
 }
+
+export interface MerchCategory {
+  store_id?: string;
+  category_id?: string;
+  category_name?: string;
+  category_description?: string;
+  subCategories?: string[];
+  image?: string;
+}
+
