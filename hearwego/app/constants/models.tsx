@@ -278,3 +278,13 @@ export interface Comment {
   commentBody?: string;
   postId?: string;
 }
+
+export interface MerchStore {
+  store_id?: string;                        
+  store_banner?: string;
+  promo_banner?: string[];
+  store_description?: string;
+  shipping_fees?: string;
+  delivery_services?: string;
+  artist_id?: string;
+}
