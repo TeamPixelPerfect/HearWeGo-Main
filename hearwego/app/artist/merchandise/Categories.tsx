@@ -95,6 +95,7 @@ const Categories: React.FC = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+  const []
 
   const handleClickOpen = (isEdit: boolean) => {
     setOpen(true);
