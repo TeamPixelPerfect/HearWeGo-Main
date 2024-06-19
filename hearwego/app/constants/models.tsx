@@ -278,3 +278,16 @@ export interface Comment {
   commentBody?: string;
   postId?: string;
 }
+
+export interface PressReleaseData{
+  PressReleaseID?: string;
+  ArtistLogo_URL?: string;
+  Headline?: string;
+  SubHeadline?: string;
+  EventDate?: string;
+  Venue?: string;
+  Description?: string;
+  Siganature?: string;
+  ReleaseDate?: string;
+  ArtistID?: string;
+}
