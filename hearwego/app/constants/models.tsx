@@ -290,4 +290,5 @@ export interface PressReleaseData{
   Siganature?: string;
   ReleaseDate?: string;
   ArtistID?: string;
+  Status?: string;
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Box from "@mui/material/Box";
@@ -15,70 +15,39 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import TabPanel from "@mui/lab/TabPanel";
-import { Dayjs } from "dayjs";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import SaveIcon from "@mui/icons-material/Save";
 import DropFile from "../../components/DropFile";
-import { set } from "date-fns";
 import { addPressRelease } from "../../services/PressReleaseServices";
 import { PressReleaseData } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
-
-
+import {
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 export default function PressRelease() {
   const artist = useAppSelector((state) => state.artist.user);
 
   const [value, setValue] = useState<string>("1");
- 
+  const [logoImg, setLogoImg] = useState<File | null>(null);
+  const [signatureImg, setSignatureImg] = useState<File | null>(null);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [draftSavedDialogOpen, setDraftSavedDialogOpen] =
+    useState<boolean>(false);
 
-const[pressReleaseData, setPressReleaseData] = useState<PressReleaseData>({
-  ArtistLogo_URL: "",	
-  Headline: "",
-  SubHeadline: "",
-  EventDate: null,
-  Venue: "",
-  Description: "",
-  Siganature: "",
-  ReleaseDate: null,
-  ArtistID: "ar4",
-});
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
 
-
-const [logoImg, setLogoImg] = useState<File | null>(null);
-
-useEffect(() => {
-  if(logoImg){
-    setPressReleaseData({...pressReleaseData, ArtistLogo_URL: logoImg});
-  }
-}, [logoImg]);
-
-const[signatureImg, setSignatureImg] = useState<File | null>(null);
-
-useEffect(() => {
-  if(signatureImg){
-    setPressReleaseData({...pressReleaseData, Siganature: signatureImg});
-  }
-}, [signatureImg]);
-const submitData = async () => {
-  try{
-    await addPressRelease(artist.token, pressReleaseData);
-  }catch(error){
-    console.log(error);
-  }
-};
-
-  const validationSchema = Yup.object({
-    Headline: Yup.string().required("Headline is required"),
-    SubHeadline: Yup.string().required("Sub Headline is required"),
-    date: Yup.date().nullable().required("Event Date is required"),
-    Venue: Yup.string().required("Venue is required"),
-    Description: Yup.string().required("Description is required"),
-    releaseDate: Yup.date().nullable().required("Release Date is required"),
-    ArtistLogo_URL: Yup.string().required("Logo is required"),
-    Siganature: Yup.string().required("Signature is required"),
-  });
+  const handleDraftSavedDialogClose = () => {
+    setDraftSavedDialogOpen(false);
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -90,24 +59,94 @@ const submitData = async () => {
       ReleaseDate: null,
       ArtistLogo_URL: "",
       Siganature: "",
+      ArtistID: "ar4",
+      Status: "",
     },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    validationSchema: Yup.object({
+      Headline: Yup.string().required("Headline is required"),
+      SubHeadline: Yup.string().required("Sub Headline is required"),
+      EventDate: Yup.date().nullable().required("Event Date is required"),
+      Venue: Yup.string().required("Venue is required"),
+      Description: Yup.string().required("Description is required"),
+      ReleaseDate: Yup.date().nullable().required("Release Date is required"),
+      ArtistLogo_URL: Yup.string().required("Logo is required"),
+      Siganature: Yup.string().required("Signature is required"),
+    }),
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        await addPressRelease(artist ? artist.token : "", values);
+        setOpenDialog(true);
+        resetForm();
+        setLogoImg(null);
+        setSignatureImg(null);
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
 
-const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+  useEffect(() => {
+    if (logoImg) {
+      formik.setFieldValue("ArtistLogo_URL", logoImg);
+    }
+  }, [logoImg]);
 
+  useEffect(() => {
+    if (signatureImg) {
+      formik.setFieldValue("Siganature", signatureImg);
+    }
+  }, [signatureImg]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
   };
 
-//   const handleCancel = () => {
-//     formik.resetForm();
-//   };
+  const handleSave = () => {
+    formik.setFieldValue("Status", "Saved");
+    formik.handleSubmit();
+  };
+
+  const handleCancel = async () => {
+    try {
+      const draftData = {
+        ...formik.values,
+        Status: "Draft",
+      };
+      await addPressRelease(artist ? artist.token : "", draftData);
+      setDraftSavedDialogOpen(true);
+      formik.resetForm();
+      setLogoImg(null);
+      setSignatureImg(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const isFormFilled = () => {
+    const {
+      Headline,
+      SubHeadline,
+      EventDate,
+      Venue,
+      Description,
+      ReleaseDate,
+      ArtistLogo_URL,
+      Siganature,
+    } = formik.values;
+    return (
+      Headline ||
+      SubHeadline ||
+      EventDate ||
+      Venue ||
+      Description ||
+      ReleaseDate ||
+      ArtistLogo_URL ||
+      Siganature
+    );
+  };
 
   return (
-    <Box sx={{ minWidth: 375, py: 3 }}>
+    <Container maxWidth="xl">
       <Card
         variant="outlined"
         sx={{ maxWidth: 1200, mx: "auto", p: 3, boxShadow: 3 }}
@@ -144,10 +183,11 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
               </Box>
               <TabPanel value="1">
                 <Paper elevation={3} sx={{ p: 3 }}>
-                  <form onSubmit={submitData}>
+                  <form onSubmit={formik.handleSubmit}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={4}>
                         <Box>
+                          {/* DropFile component for logo */}
                           <DropFile
                             fileTypes="Logo"
                             fileExtensions=".jpg, .jpeg, .png"
@@ -161,7 +201,8 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                             shape="rect"
                             sx={{ margin: "30px" }}
                           />
-                          {formik.touched.ArtistLogo_URL && formik.errors.ArtistLogo_URL ? (
+                          {formik.touched.ArtistLogo_URL &&
+                          formik.errors.ArtistLogo_URL ? (
                             <Typography color="error">
                               {formik.errors.ArtistLogo_URL}
                             </Typography>
@@ -171,12 +212,13 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                       <Grid item xs={12} md={8}>
                         <Grid container spacing={2}>
                           <Grid item xs={12}>
+                            {/* Headline TextField */}
                             <TextField
                               fullWidth
-                              value = {pressReleaseData.Headline}
-                              onChange = {(e) => setPressReleaseData({...pressReleaseData, Headline: e.target.value})}
+                              value={formik.values.Headline}
+                              onChange={formik.handleChange}
                               label="Headline"
-                              name="headline"
+                              name="Headline"
                               onBlur={formik.handleBlur}
                               sx={{ marginTop: "20px" }}
                             />
@@ -188,12 +230,13 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                             ) : null}
                           </Grid>
                           <Grid item xs={12}>
+                            {/* SubHeadline TextField */}
                             <TextField
                               fullWidth
-                              value = {pressReleaseData.SubHeadline}
-                              onChange={(e) => setPressReleaseData({...pressReleaseData, SubHeadline: e.target.value})}
-                              label="Sub Headline"
-                              name="subHeadline"
+                              value={formik.values.SubHeadline}
+                              onChange={formik.handleChange}
+                              label="SubHeadline"
+                              name="SubHeadline"
                               onBlur={formik.handleBlur}
                             />
                             {formik.touched.SubHeadline &&
@@ -204,30 +247,40 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                             ) : null}
                           </Grid>
                           <Grid item xs={12}>
+                            {/* Event Date DatePicker */}
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                               <DatePicker
                                 label="Event Date"
-                                value = {pressReleaseData.EventDate}
-                                onChange={(e) => setPressReleaseData({...pressReleaseData, EventDate: e.target.value})}
+                                value={formik.values.EventDate}
+                                onChange={(date) =>
+                                  formik.setFieldValue("EventDate", date)
+                                }
                                 renderInput={(params) => (
-                                  <TextField fullWidth {...params} required />
+                                  <TextField
+                                    fullWidth
+                                    {...params}
+                                    name="EventDate"
+                                    onBlur={formik.handleBlur}
+                                  />
                                 )}
                               />
                             </LocalizationProvider>
-                            {formik.touched.date && formik.errors.date ? (
+                            {formik.touched.EventDate &&
+                            formik.errors.EventDate ? (
                               <Typography color="error">
-                                {formik.errors.date}
+                                {formik.errors.EventDate}
                               </Typography>
                             ) : null}
                           </Grid>
                           <Grid item xs={12}>
+                            {/* Venue TextField */}
                             <TextField
-                              value = {pressReleaseData.Venue}
-                              onChange = {(e) => setPressReleaseData({...pressReleaseData, Venue: e.target.value})}
+                              value={formik.values.Venue}
+                              onChange={formik.handleChange}
                               label="Venue"
-                              name="venue"
-                            
+                              name="Venue"
                               sx={{ width: "100%" }}
+                              onBlur={formik.handleBlur}
                             />
                             {formik.touched.Venue && formik.errors.Venue ? (
                               <Typography color="error">
@@ -236,12 +289,12 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                             ) : null}
                           </Grid>
                           <Grid item xs={12}>
+                            {/* Description TextField */}
                             <TextField
-                             value = {pressReleaseData.Description}
-                             onChange={(e) => setPressReleaseData({...pressReleaseData, Description: e.target.value})}
+                              value={formik.values.Description}
+                              onChange={formik.handleChange}
                               label="Description"
-                              name="description"
-                             
+                              name="Description"
                               onBlur={formik.handleBlur}
                               multiline
                               rows={4}
@@ -256,13 +309,14 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                           </Grid>
                           <Grid item xs={12} md={6}>
                             <Box>
+                              {/* DropFile component for signature */}
                               <DropFile
                                 fileTypes="Signature"
                                 fileExtensions=".jpg, .jpeg, .png"
                                 isCircular={false}
                                 width="100%"
                                 height="160px"
-                                file ={signatureImg}
+                                file={signatureImg}
                                 setFile={setSignatureImg}
                                 aspectX={1}
                                 aspectY={1}
@@ -278,18 +332,28 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                           </Grid>
                           <Grid item xs={12}>
                             <Box sx={{ width: "100%" }}>
+                              {/* Release Date DatePicker */}
                               <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
                                   label="Release Date"
-                                  value = {pressReleaseData.ReleaseDate}
-                                  onChange={(e) => setPressReleaseData({...pressReleaseData, ReleaseDate: e.target.value})}
-                                
+                                  value={formik.values.ReleaseDate}
+                                  onChange={(date) =>
+                                    formik.setFieldValue("ReleaseDate", date)
+                                  }
+                                  renderInput={(params) => (
+                                    <TextField
+                                      fullWidth
+                                      {...params}
+                                      name="ReleaseDate"
+                                      onBlur={formik.handleBlur}
+                                    />
+                                  )}
                                 />
                               </LocalizationProvider>
-                              {formik.touched.releaseDate &&
-                              formik.errors.releaseDate ? (
+                              {formik.touched.ReleaseDate &&
+                              formik.errors.ReleaseDate ? (
                                 <Typography color="error">
-                                  {formik.errors.releaseDate}
+                                  {formik.errors.ReleaseDate}
                                 </Typography>
                               ) : null}
                             </Box>
@@ -305,42 +369,84 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
                         p: 2,
                       }}
                     >
+                      {/* Save Button */}
                       <Button
                         variant="contained"
                         color="primary"
                         startIcon={<SaveIcon />}
-                        // type="submit"
-                        onClick={submitData}  
+                        onClick={handleSave}
                         sx={{ mr: 2 }}
                       >
                         Save
                       </Button>
-                      <Button variant="outlined">
-                        Cancel
-                      </Button>
+                      {/* Cancel Button */}
+                      {isFormFilled() && (
+                        <Button variant="outlined" onClick={handleCancel}>
+                          Cancel
+                        </Button>
+                      )}
                     </Box>
                   </form>
                 </Paper>
               </TabPanel>
+              {/* Saved Ones Tab */}
               <TabPanel value="2">
                 <Typography variant="h6" sx={{ margin: "10px" }}>
-                  Saved Ones{" "}
+                  Saved Ones
                 </Typography>
               </TabPanel>
-
+              {/* Drafts Tab */}
               <TabPanel value="3">
                 <Typography variant="h6" sx={{ margin: "10px" }}>
                   Drafts
                 </Typography>
               </TabPanel>
-
+              {/* Already Shared Tab */}
               <TabPanel value="4">
-                <Typography> Shared </Typography>
+                <Typography>Already Shared</Typography>
               </TabPanel>
             </TabContext>
           </Box>
         </CardContent>
       </Card>
-    </Box>
+      {/* Success Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Success"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Press Release successfully created!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Draft Saved Dialog */}
+      <Dialog
+        open={draftSavedDialogOpen}
+        onClose={handleDraftSavedDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Draft Saved"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Press Release saved as draft.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDraftSavedDialogClose} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 }
