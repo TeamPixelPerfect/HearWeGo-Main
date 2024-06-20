@@ -1,4 +1,6 @@
+
 "use client";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
@@ -17,40 +19,38 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import { Formik } from "formik";
 import * as Yup from "yup";
 import DropFile from "@/app/components/DropFile";
-import { useRouter } from "next/navigation";
+
+import { MerchProduct } from "../../../constants/models";
+import { addMerchProduct } from "../../../services/StoreServices";
+import { useAppSelector } from "@/lib/hooks";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Product title is required"),
-  description: Yup.string().required("Product description is required"),
-  category: Yup.string().required("Product category is required"),
-  price: Yup.number()
-    .required("Price is required")
-    .positive("Price must be positive"),
-  quantity: Yup.number()
+  product_name: Yup.string().required("Product title is required"),
+  product_description: Yup.string().required("Product description is required"),
+  catagory_name: Yup.string().required("Product category is required"),
+  product_rating: Yup.string().required("Product rating is required"),
+  product_price: Yup.string().required("Price is required"),
+  product_quantity: Yup.number()
     .required("Quantity is required")
     .min(0, "Quantity cannot be negative"),
-  logoFile: Yup.mixed().required("Main product image is required"),
-  additionalImageFile: Yup.mixed().required(
+  product_Main_image: Yup.mixed().required("Main product image is required"),
+  product_Additional_image: Yup.mixed().required(
     "Additional product image is required"
   ),
 });
 
-const AddProduct = ({
-  handleAddProduct,
-}: {
-  handleAddProduct: (values: any) => void;
-}) => {
+const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => void; }) => {
+  const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
 
   const handleClose = () => {
     setConfirmDialogOpen(true);
@@ -61,7 +61,49 @@ const AddProduct = ({
   };
 
   const handleCancel = () => {
-    router.push("/artist/merchandise");
+    router.push("../merchandise");
+  };
+
+  const [productData, setProductData] = useState<MerchProduct>({
+    product_name: "",
+    product_description: "",
+    product_Main_image: "",
+    product_Additional_image: "",
+    catagory_name: "",
+    product_price: "",
+    product_quantity: "",
+    product_rating: "",
+    store_id: "st20",
+  });
+
+  const [productMainImage, setProductMainImage] = useState<File | null>(null);
+  const [productAdditionalImage, setProductAdditionalImage] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (productMainImage) {
+      setProductData({ ...productData, product_Main_image: productMainImage });
+    }
+  }, [productMainImage]);
+
+  useEffect(() => {
+    if (productAdditionalImage) {
+      setProductData({ ...productData, product_Additional_image: productAdditionalImage });
+    }
+  }, [productAdditionalImage]);
+
+  const submitData = async () => {
+    try {
+      const res = await addMerchProduct(artist.token, productData);
+      console.log(res);
+      setSnackbarMessage("Product added successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error adding product:", error);
+      setSnackbarMessage("Failed to add product");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
 
   return (
@@ -84,25 +126,20 @@ const AddProduct = ({
             </Typography>
             <Formik
               initialValues={{
-                title: "",
-                description: "",
-                category: "",
-                price: "",
-                quantity: "",
-                sku: "",
-                brand: "",
-                tags: "",
-                logoFile: null,
-                additionalImageFile: null,
+                product_name: "",
+                product_description: "",
+                catagory_name: "",
+                product_rating: "",
+                product_price: "",
+                product_quantity: "",
+                product_Main_image: "",
+                product_Additional_image: "",
               }}
               validationSchema={validationSchema}
               onSubmit={(values, { setSubmitting }) => {
                 handleConfirmClose();
-                handleAddProduct(values);
                 setSubmitting(false);
-                setSnackbarMessage("Product added successfully!");
-                setSnackbarSeverity("success");
-                setSnackbarOpen(true);
+                submitData();
               }}
             >
               {({
@@ -141,41 +178,39 @@ const AddProduct = ({
                           isCircular={false}
                           width="100%"
                           height="200px"
-                          file={values.logoFile}
-                          setFile={(file) => setFieldValue("logoFile", file)}
+                          file={productMainImage}
+                          setFile={setProductMainImage}
                           aspectX={1}
                           aspectY={1}
                           shape="rect"
-                          error={touched.logoFile && errors.logoFile}
+                          error={touched.product_Main_image && errors.product_Main_image}
                         />
-                        {touched.logoFile && errors.logoFile && (
+                        {touched.product_Main_image && errors.product_Main_image && (
                           <Typography variant="body2" color="error">
-                            {errors.logoFile}
+                            {errors.product_Main_image}
                           </Typography>
                         )}
-                        
+
                         <DropFile
                           fileTypes="Additional Product Image"
                           fileExtensions="JPEG,PNG,WEBP,SVG"
                           isCircular={false}
                           width="100%"
                           height="200px"
-                          file={values.additionalImageFile}
-                          setFile={(file) =>
-                            setFieldValue("additionalImageFile", file)
-                          }
+                          file={productAdditionalImage}
+                          setFile={setProductAdditionalImage}
                           aspectX={1}
                           aspectY={1}
                           shape="rect"
                           error={
-                            touched.additionalImageFile &&
-                            errors.additionalImageFile
+                            touched.product_Additional_image &&
+                            errors.product_Additional_image
                           }
                         />
-                        {touched.additionalImageFile &&
-                          errors.additionalImageFile && (
+                        {touched.product_Additional_image &&
+                          errors.product_Additional_image && (
                             <Typography variant="body2" color="error">
-                              {errors.additionalImageFile}
+                              {errors.product_Additional_image}
                             </Typography>
                           )}
                       </CardMedia>
@@ -185,69 +220,82 @@ const AddProduct = ({
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <TextField
-                            value={values.title}
+                            value={values.product_name}
                             onChange={handleChange}
-                            name="title"
+                            name="product_name"
                             type="text"
                             label="Product Title"
                             variant="outlined"
                             fullWidth
-                            error={touched.title && !!errors.title}
-                            helperText={touched.title && errors.title}
+                            error={touched.product_name && !!errors.product_name}
+                            helperText={touched.product_name ? errors.product_name : ""}
                           />
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
-                            value={values.description}
+                            value={values.product_description}
                             onChange={handleChange}
-                            name="description"
+                            name="product_description"
                             type="text"
                             label="Product Description"
                             variant="outlined"
                             fullWidth
-                            error={touched.description && !!errors.description}
-                            helperText={
-                              touched.description && errors.description
-                            }
+                            error={touched.product_description && !!errors.product_description}
+                            helperText={touched.product_description ? errors.product_description : ""}
                           />
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
-                            value={values.category}
+                            value={values.catagory_name}
                             onChange={handleChange}
-                            name="category"
+                            name="catagory_name"
                             type="text"
                             label="Product Category"
                             variant="outlined"
                             fullWidth
-                            error={touched.category && !!errors.category}
-                            helperText={touched.category && errors.category}
+                            error={touched.catagory_name && !!errors.catagory_name}
+                            helperText={touched.catagory_name ? errors.catagory_name : ""}
                           />
                         </Grid>
+
+                        <Grid item xs={12}>
+                          <TextField
+                            value={values.product_rating}
+                            onChange={handleChange}
+                            name="product_rating"
+                            type="text"
+                            label="Product Rating"
+                            variant="outlined"
+                            fullWidth
+                            error={touched.product_rating && !!errors.product_rating}
+                            helperText={touched.product_rating ? errors.product_rating : ""}
+                          />
+                        </Grid>
+
                         <Grid item xs={6}>
                           <TextField
-                            value={values.price}
+                            value={values.product_price}
                             onChange={handleChange}
-                            name="price"
+                            name="product_price"
                             type="number"
                             label="Price"
                             variant="outlined"
                             fullWidth
-                            error={touched.price && !!errors.price}
-                            helperText={touched.price && errors.price}
+                            error={touched.product_price && !!errors.product_price}
+                            helperText={touched.product_price ? errors.product_price : ""}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
-                            value={values.quantity}
+                            value={values.product_quantity}
                             onChange={handleChange}
-                            name="quantity"
+                            name="product_quantity"
                             type="number"
                             label="Quantity"
                             variant="outlined"
                             fullWidth
-                            error={touched.quantity && !!errors.quantity}
-                            helperText={touched.quantity && errors.quantity}
+                            error={touched.product_quantity && !!errors.product_quantity}
+                            helperText={touched.product_quantity ? errors.product_quantity : ""}
                           />
                         </Grid>
                       </Grid>
@@ -258,9 +306,9 @@ const AddProduct = ({
                         type="submit"
                         variant="contained"
                         color="primary"
-                        disabled={isSubmitting}
                         fullWidth
                         sx={{ mb: 1 }}
+                        disabled={isSubmitting}
                       >
                         Add Product
                       </Button>
@@ -269,6 +317,7 @@ const AddProduct = ({
                         color="secondary"
                         onClick={handleClose}
                         fullWidth
+                        disabled={isSubmitting}
                       >
                         Cancel
                       </Button>
@@ -286,8 +335,7 @@ const AddProduct = ({
         <DialogTitle>Cancel Adding Product</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to cancel adding the product? Your changes
-            will not be saved.
+            Are you sure you want to cancel adding the product? Your changes will not be saved.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -300,6 +348,7 @@ const AddProduct = ({
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar for Success/Error Message */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -317,3 +366,4 @@ const AddProduct = ({
 };
 
 export default AddProduct;
+

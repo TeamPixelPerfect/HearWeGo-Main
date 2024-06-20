@@ -296,3 +296,16 @@ export interface MerchCategory {
   image?: string;
 }
 
+
+ export interface MerchProduct {
+      product_id?: string,
+      product_name?: string,
+      product_description?: string,
+      product_Main_image?: string,
+      product_Additional_image?: string,
+      catagory_name?: string,
+      product_price?: string,
+      product_quantity?: string,
+      product_rating?: string,
+      store_id?: string,
+}
