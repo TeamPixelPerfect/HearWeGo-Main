@@ -161,10 +161,12 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       const tasksToSubmit = campaignData.PRtask.filter(
         (task) => task.TaskName.trim() !== ""
       );
+      console.log(tasksToSubmit);
       const campaignToSubmit = {
         ...campaignData,
         Campaign_Name: formik.values.Campaign_Name, // Ensure Campaign_Name is correctly mapped
         CampaignStatus: "in_progress", // Ensure CampaignStatus is set here
+        ArtistID: artist ? artist.user.artist_id : "",
         PRtask: tasksToSubmit.map((task) => ({
           ...task,
           isEdit: undefined, // Remove editing state before submission
