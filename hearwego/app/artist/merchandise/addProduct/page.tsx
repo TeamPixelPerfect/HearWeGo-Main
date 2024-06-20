@@ -1,6 +1,4 @@
-
 "use client";
-import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
@@ -19,23 +17,24 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
-
+import React, { use, useState } from "react";
+import { useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import DropFile from "@/app/components/DropFile";
-
+import { useRouter } from "next/navigation";
 import { MerchProduct } from "../../../constants/models";
 import { addMerchProduct } from "../../../services/StoreServices";
 import { useAppSelector } from "@/lib/hooks";
+import { set } from "date-fns";
 
 const validationSchema = Yup.object({
   product_name: Yup.string().required("Product title is required"),
   product_description: Yup.string().required("Product description is required"),
   catagory_name: Yup.string().required("Product category is required"),
-  product_rating: Yup.string().required("Product rating is required"),
+  product_rating: Yup.string().required("Product category is required"),
   product_price: Yup.string().required("Price is required"),
-  product_quantity: Yup.number()
+  product_quantity: Yup.string()
     .required("Quantity is required")
     .min(0, "Quantity cannot be negative"),
   product_Main_image: Yup.mixed().required("Main product image is required"),
@@ -44,13 +43,19 @@ const validationSchema = Yup.object({
   ),
 });
 
-const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => void; }) => {
+const AddProduct = ({
+  handleAddProduct,
+}: {
+  handleAddProduct: (values: any) => void;
+}) => {
   const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   const handleClose = () => {
     setConfirmDialogOpen(true);
@@ -77,7 +82,8 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
   });
 
   const [productMainImage, setProductMainImage] = useState<File | null>(null);
-  const [productAdditionalImage, setProductAdditionalImage] = useState<File | null>(null);
+  const [productAdditionalImage, setProductAdditionalImage] =
+    useState<File | null>(null);
 
   useEffect(() => {
     if (productMainImage) {
@@ -87,7 +93,10 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
 
   useEffect(() => {
     if (productAdditionalImage) {
-      setProductData({ ...productData, product_Additional_image: productAdditionalImage });
+      setProductData({
+        ...productData,
+        product_Additional_image: productAdditionalImage,
+      });
     }
   }, [productAdditionalImage]);
 
@@ -95,14 +104,8 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
     try {
       const res = await addMerchProduct(artist.token, productData);
       console.log(res);
-      setSnackbarMessage("Product added successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
     } catch (error) {
-      console.error("Error adding product:", error);
-      setSnackbarMessage("Failed to add product");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      console.log(error);
     }
   };
 
@@ -138,8 +141,11 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
               validationSchema={validationSchema}
               onSubmit={(values, { setSubmitting }) => {
                 handleConfirmClose();
+                // handleAddProduct(values);
                 setSubmitting(false);
-                submitData();
+                setSnackbarMessage("Product added successfully!");
+                setSnackbarSeverity("success");
+                setSnackbarOpen(true);
               }}
             >
               {({
@@ -183,14 +189,17 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
                           aspectX={1}
                           aspectY={1}
                           shape="rect"
-                          error={touched.product_Main_image && errors.product_Main_image}
+                          error={
+                            touched.product_Main_image &&
+                            errors.product_Main_image
+                          }
                         />
-                        {touched.product_Main_image && errors.product_Main_image && (
-                          <Typography variant="body2" color="error">
-                            {errors.product_Main_image}
-                          </Typography>
-                        )}
-
+                        {touched.product_Main_image &&
+                          errors.product_Main_image && (
+                            <Typography variant="body2" color="error">
+                              {errors.product_Main_image}
+                            </Typography>
+                          )}
                         <DropFile
                           fileTypes="Additional Product Image"
                           fileExtensions="JPEG,PNG,WEBP,SVG"
@@ -220,82 +229,140 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <TextField
-                            value={values.product_name}
-                            onChange={handleChange}
-                            name="product_name"
+                            value={productData.product_name}
+                            onChange={(e) =>
+                              setProductData({
+                                ...productData,
+                                product_name: e.target.value,
+                              })
+                            }
+                            name="title"
                             type="text"
                             label="Product Title"
                             variant="outlined"
                             fullWidth
-                            error={touched.product_name && !!errors.product_name}
-                            helperText={touched.product_name ? errors.product_name : ""}
+                            error={
+                              touched.product_name && !!errors.product_name
+                            }
+                            helperText={
+                              touched.product_name && errors.product_name
+                            }
                           />
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
-                            value={values.product_description}
-                            onChange={handleChange}
-                            name="product_description"
+                            value={productData.product_description}
+                            onChange={(e) =>
+                              setProductData({
+                                ...productData,
+                                product_description: e.target.value,
+                              })
+                            }
+                            name="description"
                             type="text"
                             label="Product Description"
                             variant="outlined"
                             fullWidth
-                            error={touched.product_description && !!errors.product_description}
-                            helperText={touched.product_description ? errors.product_description : ""}
+                            error={
+                              touched.product_description &&
+                              !!errors.product_description
+                            }
+                            helperText={
+                              touched.product_description &&
+                              errors.product_description
+                            }
                           />
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
-                            value={values.catagory_name}
-                            onChange={handleChange}
-                            name="catagory_name"
+                            value={productData.catagory_name}
+                            onChange={(e) =>
+                              setProductData({
+                                ...productData,
+                                catagory_name: e.target.value,
+                              })
+                            }
+                            name="category"
                             type="text"
                             label="Product Category"
                             variant="outlined"
                             fullWidth
-                            error={touched.catagory_name && !!errors.catagory_name}
-                            helperText={touched.catagory_name ? errors.catagory_name : ""}
+                            error={
+                              touched.catagory_name && !!errors.catagory_name
+                            }
+                            helperText={
+                              touched.catagory_name && errors.catagory_name
+                            }
                           />
                         </Grid>
 
                         <Grid item xs={12}>
                           <TextField
-                            value={values.product_rating}
-                            onChange={handleChange}
-                            name="product_rating"
+                            value={productData.product_rating}
+                            onChange={(e) =>
+                              setProductData({
+                                ...productData,
+                                product_rating: e.target.value,
+                              })
+                            }
+                            name="rate"
                             type="text"
-                            label="Product Rating"
+                            label="Product rate"
                             variant="outlined"
                             fullWidth
-                            error={touched.product_rating && !!errors.product_rating}
-                            helperText={touched.product_rating ? errors.product_rating : ""}
+                            error={
+                              touched.product_rating && !!errors.product_rating
+                            }
+                            helperText={
+                              touched.product_rating && errors.product_rating
+                            }
                           />
                         </Grid>
 
                         <Grid item xs={6}>
                           <TextField
-                            value={values.product_price}
-                            onChange={handleChange}
-                            name="product_price"
+                            value={productData.product_price}
+                            onChange={(e) =>
+                              setProductData({
+                                ...productData,
+                                product_price: e.target.value,
+                              })
+                            }
+                            name="price"
                             type="number"
                             label="Price"
                             variant="outlined"
                             fullWidth
-                            error={touched.product_price && !!errors.product_price}
-                            helperText={touched.product_price ? errors.product_price : ""}
+                            error={
+                              touched.product_price && !!errors.product_price
+                            }
+                            helperText={
+                              touched.product_price && errors.product_price
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
-                            value={values.product_quantity}
-                            onChange={handleChange}
-                            name="product_quantity"
+                            value={productData.product_quantity}
+                            onChange={(e) =>
+                              setProductData({
+                                ...productData,
+                                product_quantity: e.target.value,
+                              })
+                            }
+                            name="quantity"
                             type="number"
                             label="Quantity"
                             variant="outlined"
                             fullWidth
-                            error={touched.product_quantity && !!errors.product_quantity}
-                            helperText={touched.product_quantity ? errors.product_quantity : ""}
+                            error={
+                              touched.product_quantity &&
+                              !!errors.product_quantity
+                            }
+                            helperText={
+                              touched.product_quantity &&
+                              errors.product_quantity
+                            }
                           />
                         </Grid>
                       </Grid>
@@ -306,9 +373,9 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
                         type="submit"
                         variant="contained"
                         color="primary"
+                        onClick={submitData}
                         fullWidth
                         sx={{ mb: 1 }}
-                        disabled={isSubmitting}
                       >
                         Add Product
                       </Button>
@@ -317,7 +384,6 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
                         color="secondary"
                         onClick={handleClose}
                         fullWidth
-                        disabled={isSubmitting}
                       >
                         Cancel
                       </Button>
@@ -335,7 +401,8 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
         <DialogTitle>Cancel Adding Product</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to cancel adding the product? Your changes will not be saved.
+            Are you sure you want to cancel adding the product? Your changes
+            will not be saved.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -348,7 +415,6 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for Success/Error Message */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -364,6 +430,4 @@ const AddProduct = ({ handleAddProduct }: { handleAddProduct: (values: any) => v
     </Box>
   );
 };
-
 export default AddProduct;
-
