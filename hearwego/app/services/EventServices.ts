@@ -107,6 +107,46 @@ export const addEvent = async (token: string, data: any) => {
   }
 };
 
+export const addAutoTicket = async (token: string, data: any) => {
+  console.log("Sending auto ticket data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/autoTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const addManualTicket = async (token: string, data: any) => {
+  console.log("Sending manual ticket data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/manualTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
 
 export const addTicket = async (token: string, data: any) => {
   console.log("Sending ticket data:", data); 
