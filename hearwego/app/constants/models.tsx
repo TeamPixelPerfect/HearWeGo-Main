@@ -247,3 +247,44 @@ export interface PRPost {
   SocialMedias ?: string[];
   
 }
+
+export interface AutoTicket {
+  auto_ticket_id?: string;
+  ticket_type?: string;
+  ticket_price?: number;
+  ticket_count?: number;
+  ticket_session?: string;
+  event_id?: string;
+}
+
+export interface ManualTicket {
+  manual_ticket_id?: string;
+  ticket_location?: string;
+  ticket_session?: string;
+  event_id?: string;
+}
+
+export interface TicketType {
+  ticket_type_id? : string;
+  ticket_type?: string;
+  ticket_description?: string;
+  ticket_img?: string;
+  event_id?: string;
+}
+
+export interface SoldTickets {
+  sold_ticket_id?: string;
+  ticket_id?: string;
+  user_id?: string;
+  bought_quantity?: number;
+  total_price?: number;
+  user_name?: string;
+  user_email?: string;
+  user_contact?: string;
+}
+
+export interface RemainingTickets {
+  remaining_ticket_id?: string;
+  ticket_id?: string;
+  remaining_quantity?: number;
+}
