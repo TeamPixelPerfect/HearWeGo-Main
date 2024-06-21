@@ -17,31 +17,14 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import React, { use, useState } from "react";
-import { useEffect } from "react";
-import { Formik } from "formik";
-import * as Yup from "yup";
+import React, { useState, useEffect } from "react";
 import DropFile from "@/app/components/DropFile";
 import { useRouter } from "next/navigation";
 import { MerchProduct } from "../../../constants/models";
 import { addMerchProduct } from "../../../services/StoreServices";
 import { useAppSelector } from "@/lib/hooks";
-import { set } from "date-fns";
-
-const validationSchema = Yup.object({
-  product_name: Yup.string().required("Product title is required"),
-  product_description: Yup.string().required("Product description is required"),
-  catagory_name: Yup.string().required("Product category is required"),
-  product_rating: Yup.string().required("Product category is required"),
-  product_price: Yup.string().required("Price is required"),
-  product_quantity: Yup.string()
-    .required("Quantity is required")
-    .min(0, "Quantity cannot be negative"),
-  product_Main_image: Yup.mixed().required("Main product image is required"),
-  product_Additional_image: Yup.mixed().required(
-    "Additional product image is required"
-  ),
-});
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const AddProduct = ({
   handleAddProduct,
@@ -56,6 +39,7 @@ const AddProduct = ({
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleClose = () => {
     setConfirmDialogOpen(true);
@@ -69,16 +53,56 @@ const AddProduct = ({
     router.push("../merchandise");
   };
 
-  const [productData, setProductData] = useState<MerchProduct>({
-    product_name: "",
-    product_description: "",
-    product_Main_image: "",
-    product_Additional_image: "",
-    catagory_name: "",
-    product_price: "",
-    product_quantity: "",
-    product_rating: "",
-    store_id: "st20",
+  const validationSchema = Yup.object({
+    product_name: Yup.string().required("Product name is required"),
+    product_description: Yup.string().required("Product description is required"),
+    catagory_name: Yup.string().required("Category name is required"),
+    product_price: Yup.number()
+      .required("Product price is required")
+      .min(0, "Price must be a positive number"),
+    product_quantity: Yup.number()
+      .required("Product quantity is required")
+      .min(0, "Quantity must be a positive number"),
+    product_rating: Yup.number()
+      .required("Product rating is required")
+      .min(0, "Rating must be between 0 and 5")
+      .max(5, "Rating must be between 0 and 5"),
+    product_Main_image: Yup.mixed()
+      .required("Main product image is required"),
+
+    product_Additional_image: Yup.mixed()
+      .required("Additional product image is required")
+  
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      product_name: "",
+      product_description: "",
+      product_Main_image: "",
+      product_Additional_image: "",
+      catagory_name: "",
+      product_price: "",
+      product_quantity: "",
+      product_rating: "",
+      store_id: "st20",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const res = await addMerchProduct(artist.token, values);
+        console.log(res);
+        setSuccessMessage("Product added successfully!");
+        setSnackbarSeverity("success");
+        resetForm();
+        router.push("../merchandise");
+      } catch (error) {
+        console.log(error);
+        setSnackbarMessage("Failed to add product");
+        setSnackbarSeverity("error");
+      }
+      setSnackbarOpen(true);
+    },
   });
 
   const [productMainImage, setProductMainImage] = useState<File | null>(null);
@@ -87,27 +111,18 @@ const AddProduct = ({
 
   useEffect(() => {
     if (productMainImage) {
-      setProductData({ ...productData, product_Main_image: productMainImage });
+      formik.setFieldValue("product_Main_image", productMainImage);
     }
   }, [productMainImage]);
 
   useEffect(() => {
     if (productAdditionalImage) {
-      setProductData({
-        ...productData,
-        product_Additional_image: productAdditionalImage,
-      });
+      formik.setFieldValue(
+        "product_Additional_image",
+        productAdditionalImage
+      );
     }
   }, [productAdditionalImage]);
-
-  const submitData = async () => {
-    try {
-      const res = await addMerchProduct(artist.token, productData);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <Box
@@ -124,274 +139,220 @@ const AddProduct = ({
       <Container maxWidth="lg">
         <Card sx={{ display: "flex", flexDirection: "column", p: 3 }}>
           <CardContent>
-            <Typography variant="h4" component="h2" gutterBottom align="center">
+            <Typography
+              variant="h4"
+              component="h2"
+              gutterBottom
+              align="center"
+            >
               Add New Product
             </Typography>
-            <Formik
-              initialValues={{
-                product_name: "",
-                product_description: "",
-                catagory_name: "",
-                product_rating: "",
-                product_price: "",
-                product_quantity: "",
-                product_Main_image: "",
-                product_Additional_image: "",
-              }}
-              validationSchema={validationSchema}
-              onSubmit={(values, { setSubmitting }) => {
-                handleConfirmClose();
-                // handleAddProduct(values);
-                setSubmitting(false);
-                setSnackbarMessage("Product added successfully!");
-                setSnackbarSeverity("success");
-                setSnackbarOpen(true);
-              }}
-            >
-              {({
-                handleSubmit,
-                isSubmitting,
-                errors,
-                touched,
-                values,
-                handleChange,
-                setFieldValue,
-              }) => (
-                <form onSubmit={handleSubmit}>
+            <form onSubmit={formik.handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  container
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <CardMedia
+                    component="div"
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "90%", // Adjust width here
+                    }}
+                  >
+                    <DropFile
+                      fileTypes="Main Product Image"
+                      fileExtensions="JPEG,PNG,WEBP,SVG"
+                      isCircular={false}
+                      width="100%"
+                      height="200px"
+                      file={productMainImage}
+                      setFile={setProductMainImage}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                    />
+                    {formik.touched.product_Main_image &&
+                      formik.errors.product_Main_image && (
+                        <Typography color="error" variant="body2">
+                          {formik.errors.product_Main_image}
+                        </Typography>
+                      )}
+                    <DropFile
+                      fileTypes="Additional Product Image"
+                      fileExtensions="JPEG,PNG,WEBP,SVG"
+                      isCircular={false}
+                      width="100%"
+                      height="200px"
+                      file={productAdditionalImage}
+                      setFile={setProductAdditionalImage}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                    />
+                    {formik.touched.product_Additional_image &&
+                      formik.errors.product_Additional_image && (
+                        <Typography color="error" variant="body2">
+                          {formik.errors.product_Additional_image}
+                        </Typography>
+                      )}
+                  </CardMedia>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
                   <Grid container spacing={2}>
-                    <Grid
-                      item
-                      xs={12}
-                      md={6}
-                      container
-                      justifyContent="center"
-                      alignItems="center"
-                    >
-                      <CardMedia
-                        component="div"
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 1,
-                          justifyContent: "center",
-                          alignItems: "center",
-                          width: "90%", // Adjust width here
-                        }}
-                      >
-                        <DropFile
-                          fileTypes="Main Product Image"
-                          fileExtensions="JPEG,PNG,WEBP,SVG"
-                          isCircular={false}
-                          width="100%"
-                          height="200px"
-                          file={productMainImage}
-                          setFile={setProductMainImage}
-                          aspectX={1}
-                          aspectY={1}
-                          shape="rect"
-                          error={
-                            touched.product_Main_image &&
-                            errors.product_Main_image
-                          }
-                        />
-                        {touched.product_Main_image &&
-                          errors.product_Main_image && (
-                            <Typography variant="body2" color="error">
-                              {errors.product_Main_image}
-                            </Typography>
-                          )}
-                        <DropFile
-                          fileTypes="Additional Product Image"
-                          fileExtensions="JPEG,PNG,WEBP,SVG"
-                          isCircular={false}
-                          width="100%"
-                          height="200px"
-                          file={productAdditionalImage}
-                          setFile={setProductAdditionalImage}
-                          aspectX={1}
-                          aspectY={1}
-                          shape="rect"
-                          error={
-                            touched.product_Additional_image &&
-                            errors.product_Additional_image
-                          }
-                        />
-                        {touched.product_Additional_image &&
-                          errors.product_Additional_image && (
-                            <Typography variant="body2" color="error">
-                              {errors.product_Additional_image}
-                            </Typography>
-                          )}
-                      </CardMedia>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <TextField
-                            value={productData.product_name}
-                            onChange={(e) =>
-                              setProductData({
-                                ...productData,
-                                product_name: e.target.value,
-                              })
-                            }
-                            name="title"
-                            type="text"
-                            label="Product Title"
-                            variant="outlined"
-                            fullWidth
-                            error={
-                              touched.product_name && !!errors.product_name
-                            }
-                            helperText={
-                              touched.product_name && errors.product_name
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            value={productData.product_description}
-                            onChange={(e) =>
-                              setProductData({
-                                ...productData,
-                                product_description: e.target.value,
-                              })
-                            }
-                            name="description"
-                            type="text"
-                            label="Product Description"
-                            variant="outlined"
-                            fullWidth
-                            error={
-                              touched.product_description &&
-                              !!errors.product_description
-                            }
-                            helperText={
-                              touched.product_description &&
-                              errors.product_description
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            value={productData.catagory_name}
-                            onChange={(e) =>
-                              setProductData({
-                                ...productData,
-                                catagory_name: e.target.value,
-                              })
-                            }
-                            name="category"
-                            type="text"
-                            label="Product Category"
-                            variant="outlined"
-                            fullWidth
-                            error={
-                              touched.catagory_name && !!errors.catagory_name
-                            }
-                            helperText={
-                              touched.catagory_name && errors.catagory_name
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <TextField
-                            value={productData.product_rating}
-                            onChange={(e) =>
-                              setProductData({
-                                ...productData,
-                                product_rating: e.target.value,
-                              })
-                            }
-                            name="rate"
-                            type="text"
-                            label="Product rate"
-                            variant="outlined"
-                            fullWidth
-                            error={
-                              touched.product_rating && !!errors.product_rating
-                            }
-                            helperText={
-                              touched.product_rating && errors.product_rating
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <TextField
-                            value={productData.product_price}
-                            onChange={(e) =>
-                              setProductData({
-                                ...productData,
-                                product_price: e.target.value,
-                              })
-                            }
-                            name="price"
-                            type="number"
-                            label="Price"
-                            variant="outlined"
-                            fullWidth
-                            error={
-                              touched.product_price && !!errors.product_price
-                            }
-                            helperText={
-                              touched.product_price && errors.product_price
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <TextField
-                            value={productData.product_quantity}
-                            onChange={(e) =>
-                              setProductData({
-                                ...productData,
-                                product_quantity: e.target.value,
-                              })
-                            }
-                            name="quantity"
-                            type="number"
-                            label="Quantity"
-                            variant="outlined"
-                            fullWidth
-                            error={
-                              touched.product_quantity &&
-                              !!errors.product_quantity
-                            }
-                            helperText={
-                              touched.product_quantity &&
-                              errors.product_quantity
-                            }
-                          />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-
                     <Grid item xs={12}>
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        onClick={submitData}
+                      <TextField
+                        value={formik.values.product_name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="product_name"
+                        type="text"
+                        label="Product Title"
+                        variant="outlined"
                         fullWidth
-                        sx={{ mb: 1 }}
-                      >
-                        Add Product
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleClose}
+                        error={
+                          formik.touched.product_name &&
+                          Boolean(formik.errors.product_name)
+                        }
+                        helperText={
+                          formik.touched.product_name &&
+                          formik.errors.product_name
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        value={formik.values.product_description}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="product_description"
+                        type="text"
+                        label="Product Description"
+                        variant="outlined"
                         fullWidth
-                      >
-                        Cancel
-                      </Button>
+                        error={
+                          formik.touched.product_description &&
+                          Boolean(formik.errors.product_description)
+                        }
+                        helperText={
+                          formik.touched.product_description &&
+                          formik.errors.product_description
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        value={formik.values.catagory_name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="catagory_name"
+                        type="text"
+                        label="Product Category"
+                        variant="outlined"
+                        fullWidth
+                        error={
+                          formik.touched.catagory_name &&
+                          Boolean(formik.errors.catagory_name)
+                        }
+                        helperText={
+                          formik.touched.catagory_name &&
+                          formik.errors.catagory_name
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        value={formik.values.product_rating}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="product_rating"
+                        type="number"
+                        label="Product Rating"
+                        variant="outlined"
+                        fullWidth
+                        error={
+                          formik.touched.product_rating &&
+                          Boolean(formik.errors.product_rating)
+                        }
+                        helperText={
+                          formik.touched.product_rating &&
+                          formik.errors.product_rating
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        value={formik.values.product_price}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="product_price"
+                        type="number"
+                        label="Price"
+                        variant="outlined"
+                        fullWidth
+                        error={
+                          formik.touched.product_price &&
+                          Boolean(formik.errors.product_price)
+                        }
+                        helperText={
+                          formik.touched.product_price &&
+                          formik.errors.product_price
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        value={formik.values.product_quantity}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="product_quantity"
+                        type="number"
+                        label="Quantity"
+                        variant="outlined"
+                        fullWidth
+                        error={
+                          formik.touched.product_quantity &&
+                          Boolean(formik.errors.product_quantity)
+                        }
+                        helperText={
+                          formik.touched.product_quantity &&
+                          formik.errors.product_quantity
+                        }
+                      />
                     </Grid>
                   </Grid>
-                </form>
-              )}
-            </Formik>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ mb: 1 }}
+                  >
+                    Add Product
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleClose}
+                    fullWidth
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
           </CardContent>
         </Card>
       </Container>
@@ -425,6 +386,17 @@ const AddProduct = ({
           severity={snackbarSeverity}
         >
           {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={Boolean(successMessage)}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage("")}
+      >
+        <Alert onClose={() => setSuccessMessage("")} severity="success">
+          {successMessage}
         </Alert>
       </Snackbar>
     </Box>
