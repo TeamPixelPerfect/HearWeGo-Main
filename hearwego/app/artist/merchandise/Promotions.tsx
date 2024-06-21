@@ -19,7 +19,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Tooltip,
+  Snackbar,
+  SnackbarContent,
   IconButton,
   Container,
   Fade,
@@ -31,6 +32,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
 import EventIcon from "@mui/icons-material/Event";
+import CloseIcon from "@mui/icons-material/Close";
+import { addMerchPromo } from "../../services/StoreServices";
+import { useAppSelector } from "@/lib/hooks";
 
 interface Promotion {
   id: number;
@@ -41,20 +45,25 @@ interface Promotion {
 }
 
 const Promotions = () => {
+  const artist = useAppSelector((state) => state.artist.user);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
     null
   );
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+
+  const initialValues = {
+    code: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+  };
 
   const formik = useFormik({
-    initialValues: {
-      code: "",
-      description: "",
-      startDate: "",
-      endDate: "",
-    },
+    initialValues,
     validationSchema: Yup.object({
       code: Yup.string().required("Promo Code is required"),
       description: Yup.string().required("Description is required"),
@@ -66,13 +75,25 @@ const Promotions = () => {
         .typeError("Invalid date")
         .min(Yup.ref("startDate"), "End Date cannot be before Start Date"),
     }),
-    onSubmit: (values, { resetForm, setSubmitting }) => {
-      setPromotions([
-        ...promotions,
-        { ...values, id: Date.now() } as Promotion,
-      ]);
-      resetForm();
-      setSubmitting(false);
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      try {
+        const promoData = {
+          promo_code: values.code,
+          promo_description: values.description,
+          promo_start: values.startDate,
+          promo_end: values.endDate,
+          promo_status: "active", // Example status, adjust as necessary
+          store_id: "st20", // Example store ID, adjust as necessary
+        };
+        const newPromo = await addMerchPromo(artist.token, promoData);
+        setPromotions([...promotions, { ...newPromo, id: Date.now() }]);
+        resetForm();
+        handleSnackbarOpen("Promotion created successfully!");
+      } catch (error) {
+        console.error("Error submitting promotion:", error);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -95,11 +116,7 @@ const Promotions = () => {
 
   const handleDeletePromotion = (id: number) => {
     setPromotions(promotions.filter((promotion) => promotion.id !== id));
-  };
-
-  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditingPromotion((prev) => (prev ? { ...prev, [name]: value } : null));
+    setOpenEditDialog(false);
   };
 
   const generateQRCodeValue = (promotion: Promotion) => {
@@ -116,6 +133,15 @@ const Promotions = () => {
     if (filter === "completed") return now > endDate;
     return true;
   });
+
+  const handleSnackbarOpen = (message: string) => {
+    setSnackbarMessage(message);
+    setOpenSnackbar(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -198,7 +224,6 @@ const Promotions = () => {
                   variant="contained"
                   color="primary"
                   type="submit"
-                  disabled={formik.isSubmitting}
                   fullWidth
                   sx={{ py: 1.5 }}
                 >
@@ -218,7 +243,7 @@ const Promotions = () => {
         <InputLabel>Filter Promotions</InputLabel>
         <Select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => setFilter(e.target.value as string)}
           label="Filter Promotions"
         >
           <MenuItem value="all">All</MenuItem>
@@ -270,19 +295,14 @@ const Promotions = () => {
                   </Box>
                 </CardContent>
                 <CardActions>
-                  <Tooltip title="Edit">
-                    <IconButton onClick={() => handleEditPromotion(promotion)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton
-                      onClick={() => handleDeletePromotion(promotion.id)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <IconButton onClick={() => handleEditPromotion(promotion)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleDeletePromotion(promotion.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </CardActions>
               </Card>
             </Fade>
@@ -293,57 +313,38 @@ const Promotions = () => {
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
         <DialogTitle>Edit Promotion</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Edit the details of the promotion.
-          </DialogContentText>
-          {editingPromotion && (
-            <Box sx={{ mt: 2 }}>
-              <TextField
-                label="Promo Code"
-                name="code"
-                fullWidth
-                value={editingPromotion.code}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Description"
-                name="description"
-                fullWidth
-                value={editingPromotion.description}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Start Date"
-                name="startDate"
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={editingPromotion.startDate}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="End Date"
-                name="endDate"
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={editingPromotion.endDate}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-            </Box>
-          )}
+          <DialogContentText>Edit your promotion details here.</DialogContentText>
+          {/* Add form fields for editing promotion */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenEditDialog(false)} color="primary">
+            Cancel
+          </Button>
           <Button onClick={handleSaveEdit} color="primary">
             Save
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <SnackbarContent
+          message={snackbarMessage}
+          action={
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleSnackbarClose}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          }
+        />
+      </Snackbar>
     </Container>
   );
 };

@@ -309,3 +309,14 @@ export interface MerchCategory {
       product_rating?: string,
       store_id?: string,
 }
+
+export interface MerchPromo{
+  promo_id?: string,
+  promo_code?: string,
+  promo_description?: string,
+  promo_image?: string,
+  promo_start?: string,
+  promo_end?: string,
+  promo_status?: string,
+  store_id?: string,
+}
