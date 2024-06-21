@@ -26,6 +26,8 @@ export const getPRCampaigns = async (
   }
 };
 
+
+
 //add PR Campaign
 export const addPRCampaign = async (token: string, data: any) => {
   console.log(" sending data", data);
@@ -46,3 +48,38 @@ export const addPRCampaign = async (token: string, data: any) => {
   }
 };
 
+export const getallPRCampaigns = async (
+  token: string
+): Promise<PRCampaigns[]> => {
+  const res = await fetch(`${base_url}/PRManager/PRCampaign`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const campaigns = await res.json();
+    return campaigns;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getPRCampaignByID = async (token: string, id: string) => {
+  const res = await fetch(`${base_url}/PRManager/PRCampaign/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const campaign = await res.json();
+    return campaign;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
