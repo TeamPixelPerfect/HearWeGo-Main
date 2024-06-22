@@ -147,6 +147,66 @@ export const addManualTicket = async (token: string, data: any) => {
   }
 };
 
+export const addTicketType = async (token: string, data: any) => {
+  console.log("Sending ticket type data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/ticketTypes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const addSoldTicket = async (token: string, data: any) => {
+  console.log("Sending ticket sold data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/soldTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const addRemainTicket = async (token: string, data: any) => {
+  console.log("Sending ticket remain data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/remainTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
 
 export const addTicket = async (token: string, data: any) => {
   console.log("Sending ticket data:", data); 
