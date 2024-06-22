@@ -212,7 +212,7 @@ const errorModalStyle = {
 
 function CreateEvent() {
   const artist = useAppSelector((state) => state.artist.user);
-  
+
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = React.useState(0);
@@ -409,20 +409,19 @@ function CreateEvent() {
 
   const handleNext = async (skipValidation = false) => {
     if (!skipValidation) {
-        const isValid = await validateCurrentStep();
-        if (!isValid) {
-            console.log("Validation failed for step: ", activeStep);
-            return; // Block navigation if validation fails
-        }
+      const isValid = await validateCurrentStep();
+      if (!isValid) {
+        console.log("Validation failed for step: ", activeStep);
+        return; // Block navigation if validation fails
+      }
     }
 
     const newActiveStep =
-        isLastStep() && !allStepsCompleted()
-            ? steps.findIndex((step, i) => !(i in completed))
-            : activeStep + 1;
+      isLastStep() && !allStepsCompleted()
+        ? steps.findIndex((step, i) => !(i in completed))
+        : activeStep + 1;
     setActiveStep(newActiveStep);
-};
-
+  };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -732,9 +731,9 @@ function CreateEvent() {
                   Skip
                 </Button>
               )}
-              <Button onClick={handleNext} sx={{ mr: 1 }}>
+              {/* <Button onClick={handleNext} sx={{ mr: 1 }}>
                 Next
-              </Button>
+              </Button> */}
               {activeStep !== steps.length &&
                 (completed[activeStep] ? (
                   <Typography
@@ -960,17 +959,6 @@ function EventDetails({
                   label="Age Limits"
                 />
               </Stack>
-
-              <TextField
-                id="no_of_sessions"
-                label="No. of Sessions"
-                type="number"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                variant="filled"
-                sx={{ width: "66%" }}
-              />
             </Stack>
           </Box>
         </Box>
@@ -1232,7 +1220,13 @@ function SessionTable({ sessionRows, setSessionRows }) {
   );
   const [open, setOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
+
+  const [dateError, setDateError] = useState("");
+  const [timeError, setTimeError] = useState("");
+  const [durationError, setDurationError] = useState("");
+  const [venueError, setVenueError] = useState("");
+  const [artistsError, setArtistsError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
 
   const getArtists = () => {
     getAllArtists().then((res) => {
@@ -1252,45 +1246,82 @@ function SessionTable({ sessionRows, setSessionRows }) {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSessionDate(event.target.value);
+    setDateError(""); // Clear error on change
   };
 
   const handleSessionTimeChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSessionTime(event.target.value);
+    setTimeError(""); // Clear error on change
   };
 
   const handleDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDuration(event.target.value);
+    setDurationError(""); // Clear error on change
   };
 
   const handleVenueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVenue(event.target.value);
+    setVenueError(""); // Clear error on change
   };
 
   const handleArtistsChange = (event, newValue) => {
     setSelectedArtists(newValue);
+    setArtistsError(""); // Clear error on change
   };
 
   const handleDescriptionChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setDescription(event.target.value);
+    setDescriptionError(""); // Clear error on change
   };
 
   const handleSelectionModelChange = (newSelectionModel) => {
     setSelectedRows(newSelectionModel);
   };
 
+  // Enhanced validation to provide specific error messages and focus on problematic fields
   const validateFields = () => {
-    return (
-      sessionDate &&
-      sessionTime &&
-      duration &&
-      venue &&
-      artists.length > 0 &&
-      description
-    );
+    const today = new Date();
+    const selectedDate = new Date(sessionDate);
+    let isValid = true;
+
+    if (!sessionDate) {
+      setDateError("Session date is required.");
+      isValid = false;
+    } else if (selectedDate <= today) {
+      setDateError("Session date must be greater than today's date.");
+      isValid = false;
+    }
+
+    if (!sessionTime) {
+      setTimeError("Session time is required.");
+      isValid = false;
+    }
+
+    if (!duration) {
+      setDurationError("Duration is required.");
+      isValid = false;
+    }
+
+    if (!venue) {
+      setVenueError("Venue is required.");
+      isValid = false;
+    }
+
+    if (selectedArtists.length === 0) {
+      setArtistsError("At least one artist must be selected.");
+      isValid = false;
+    }
+
+    if (!description) {
+      setDescriptionError("Description is required.");
+      isValid = false;
+    }
+
+    return isValid;
   };
 
   const addNewSession = () => {
@@ -1309,14 +1340,9 @@ function SessionTable({ sessionRows, setSessionRows }) {
       };
 
       setSessionRows([...sessionRows, newSession]);
-      sessionCount += 1;
       console.log(sessionRows);
       refreshTable();
       handleClose();
-    } else {
-      setErrorMessage(
-        "Please fill in all required fields with correct format."
-      );
     }
   };
 
@@ -1366,13 +1392,17 @@ function SessionTable({ sessionRows, setSessionRows }) {
     setSessionRows(reindexedRows);
     setSelectedRows([]);
 
-    sessionCount = reindexedRows.length;
     refreshTable();
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setErrorMessage("");
+    setDateError("");
+    setTimeError("");
+    setDurationError("");
+    setVenueError("");
+    setArtistsError("");
+    setDescriptionError("");
     setOpen(false);
   };
 
@@ -1493,11 +1523,12 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   <FormHelperText id="session-date">Date</FormHelperText>
                   <FilledInput
                     id="session_date"
-                    sx={{ width: "100%" }}
+                    sx={{ width: "100%", ...(dateError && { borderColor: "red" }) }}
                     type="date"
                     value={sessionDate}
                     onChange={handleSessionDateChange}
-                    defaultValue="2024-10-10"
+                    error={Boolean(dateError)}
+                    helperText={dateError}
                   />
                 </FormControl>
 
@@ -1514,6 +1545,8 @@ function SessionTable({ sessionRows, setSessionRows }) {
                       <InputAdornment position="start">Hours</InputAdornment>
                     ),
                   }}
+                  error={Boolean(durationError)}
+                  helperText={durationError}
                 />
               </Box>
 
@@ -1525,10 +1558,12 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   <FormHelperText id="session-time">Time</FormHelperText>
                   <FilledInput
                     id="session_time"
-                    sx={{ width: "100%" }}
+                    sx={{ width: "100%", ...(timeError && { borderColor: "red" }) }}
                     type="time"
                     value={sessionTime}
                     onChange={handleSessionTimeChange}
+                    error={Boolean(timeError)}
+                    helperText={timeError}
                   />
                 </FormControl>
 
@@ -1539,6 +1574,8 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   sx={{ width: "100%", marginBottom: 2 }}
                   value={venue}
                   onChange={handleVenueChange}
+                  error={Boolean(venueError)}
+                  helperText={venueError}
                 />
               </Box>
             </Box>
@@ -1554,7 +1591,13 @@ function SessionTable({ sessionRows, setSessionRows }) {
               value={selectedArtists}
               onChange={handleArtistsChange}
               renderInput={(params) => (
-                <TextField {...params} label="Artists" variant="filled" />
+                <TextField
+                  {...params}
+                  label="Artists"
+                  variant="filled"
+                  error={Boolean(artistsError)}
+                  helperText={artistsError}
+                />
               )}
             />
 
@@ -1567,20 +1610,9 @@ function SessionTable({ sessionRows, setSessionRows }) {
               rows={4}
               value={description}
               onChange={handleDescriptionChange}
+              error={Boolean(descriptionError)}
+              helperText={descriptionError}
             />
-
-            {errorMessage && (
-              <div
-                style={{
-                  color: "red",
-                  marginBottom: "2em",
-                  fontSize: "14px",
-                  textDecoration: "italic",
-                }}
-              >
-                {errorMessage}
-              </div>
-            )}
 
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" onClick={handleClose}>
@@ -1599,6 +1631,9 @@ function SessionTable({ sessionRows, setSessionRows }) {
     </div>
   );
 }
+
+
+            
 
 type TeamRow = {
   id: number;
@@ -3490,7 +3525,7 @@ function EventFormFinish({
     sponsorType: string,
     sponsorName: string,
     sponsorContact: string,
-    sponsorEmail: string,
+    sponsorEmail: string
   ) {
     return { sponsorType, sponsorName, sponsorContact, sponsorEmail };
   }
@@ -3499,7 +3534,7 @@ function EventFormFinish({
     teamType: string,
     teamName: string,
     teamContact: string,
-    teamEmail: string,
+    teamEmail: string
   ) {
     return { teamType, teamName, teamContact, teamEmail };
   }
@@ -3508,7 +3543,7 @@ function EventFormFinish({
     ticketType: string,
     ticketPrice: string,
     ticketCount: string,
-    ticketSession: string,
+    ticketSession: string
   ) {
     return { ticketType, ticketPrice, ticketCount, ticketSession };
   }
@@ -3568,7 +3603,11 @@ function EventFormFinish({
             }}
           >
             <CardMedia
-              image={(eventData.event_img=="")? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg":eventData.event_img}
+              image={
+                eventData.event_img == ""
+                  ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg"
+                  : eventData.event_img
+              }
               sx={{ width: 250, height: 250, borderRadius: 2 }}
             />
           </Box>
@@ -3662,8 +3701,6 @@ function EventFormFinish({
               </TableBody>
             </Table>
           </TableContainer>
-
-          
         </Box>
 
         <CardContent>
@@ -3748,7 +3785,7 @@ function EventFormFinish({
       </Card>
 
       <Card sx={{ width: "100%", padding: 2 }}>
-      <CardContent>
+        <CardContent>
           <Typography variant="h5" component="div">
             Ticket Details
           </Typography>
@@ -3756,11 +3793,12 @@ function EventFormFinish({
         <Divider />
 
         <Box sx={{ width: "100%", padding: 2 }}>
-          {(ticketData.ticket_catagory == "Not Provided") ? (
-            <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
-          ) : (
-            (ticketData.ticket_catagory == "Auto") ? (
-              <TableContainer component={Paper}>
+          {ticketData.ticket_catagory == "Not Provided" ? (
+            <Typography variant="h6">
+              Ticket Catagory: {ticketData.ticket_catagory}
+            </Typography>
+          ) : ticketData.ticket_catagory == "Auto" ? (
+            <TableContainer component={Paper}>
               <Table
                 sx={{ minWidth: 650 }}
                 size="small"
@@ -3791,14 +3829,16 @@ function EventFormFinish({
                 </TableBody>
               </Table>
             </TableContainer>
-            ) : (
-              <Box>
-                <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
-                <Typography variant="h6">Ticket Description: {ticketData.ticket_description}</Typography>
-              </Box>
-            )
+          ) : (
+            <Box>
+              <Typography variant="h6">
+                Ticket Catagory: {ticketData.ticket_catagory}
+              </Typography>
+              <Typography variant="h6">
+                Ticket Description: {ticketData.ticket_description}
+              </Typography>
+            </Box>
           )}
-          
         </Box>
       </Card>
     </Box>
