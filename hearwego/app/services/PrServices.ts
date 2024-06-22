@@ -1,14 +1,15 @@
 import { base_url } from "../constants/keys";
 import { PRCampaigns, PRPosts, PRtask } from "../constants/models";
+
 //get all PR Campaigns
-export const getPRCampaigns = async (
+export const getPRCampaignsByArtist = async (
   token: string,
+  artistId: string,
   page?: number,
-  limit?: number,
-  sort?: string
+  limit?: number
 ) => {
   const res = await fetch(
-    `${base_url}/PRManager/PRCampaign?page=${page}&limit=${limit}&`,
+    `${base_url}/PRManager/PRCampaign/artist/${artistId}?page=${page}&limit=${limit}`,
     {
       method: "GET",
       headers: {
@@ -18,15 +19,13 @@ export const getPRCampaigns = async (
     }
   );
   if (res.ok) {
-    const songs = await res.json();
-    return songs;
+    const campaigns = await res.json();
+    return campaigns;
   } else {
     const error = await res.json();
     throw new Error(error.message);
   }
 };
-
-
 
 //add PR Campaign
 export const addPRCampaign = async (token: string, data: any) => {

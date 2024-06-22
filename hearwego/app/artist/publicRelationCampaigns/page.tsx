@@ -12,18 +12,20 @@ import {
   useTheme,
   useMediaQuery,
   Container,
+  CircularProgress,
 } from "@mui/material";
-import CampaignCard from "./CampaignSeeMore/[id]/SingleCampaignCard"; // Ensure this is correctly imported
-import CreateCampaignPop from "./CreateCampaign/page"; // Ensure this is correctly imported
+import CampaignCard from "./CampaignSeeMore/[id]/SingleCampaignCard";
+import CreateCampaignPop from "./CreateCampaign/page";
 import CreatePost from "./SchedulePost/page";
-import ScheduledPostCard from "./scheduledPostView/[id]/page"; // Ensure this is correctly imported
+import ScheduledPostCard from "./scheduledPostView/[id]/page";
 import { PRCampaigns } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
-import { getPRCampaigns } from "@/app/services/PrServices";
+import { getPRCampaignsByArtist } from "@/app/services/PrServices";
 
 const Dashboard = () => {
   const [value, setValue] = useState(0);
   const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<PRCampaigns[]>([]);
   const [openCreateCampaignDialog, setOpenCreateCampaignDialog] =
     useState(false);
@@ -33,21 +35,15 @@ const Dashboard = () => {
   const artist = useAppSelector((state) => state.artist.user);
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        const campaignsData = await getPRCampaigns(artist ? artist.token : "");
-        if (Array.isArray(campaignsData)) {
-          setCampaigns(campaignsData);
-        } else {
-          throw new Error("Unexpected response format");
-        }
-      } catch (err) {
-        setError(err);
-      }
-    };
-
-    fetchCampaigns();
-  }, [artist?.token]);
+    if (artist?.token && artist?.user?.artist_id) {
+      getPRCampaignsByArtist(artist.token, artist.user.artist_id)
+        .then((response) => {
+          setCampaigns(Array.isArray(response) ? response : []);
+        })
+        .catch((error) => setError(error))
+        .finally(() => setLoading(false));
+    }
+  }, [artist?.token, artist?.user?.artist_id]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -86,12 +82,12 @@ const Dashboard = () => {
         {scheduledPosts.map((post) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={post.id}>
             <ScheduledPostCard
-              description={post.description}
-              assignedCampaign={post.assignedCampaign}
-              image={post.image}
-              socialMedias={post.socialMedias}
-              date={post.date}
-              time={post.time}
+              description={post.Description}
+              assignedCampaign={post.CampaignID}
+              image={post.PostImage_URL}
+              socialMedias={post.SocialMedias}
+              date={post.Scheduled_Date}
+              time={post.Scheduled_Time}
             />
           </Grid>
         ))}
@@ -117,7 +113,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <Container maxWidth="xxl">
+      <Container maxWidth="xl">
         <AppBar
           position="static"
           sx={{ bgcolor: "transparent", boxShadow: "none" }}
@@ -152,7 +148,11 @@ const Dashboard = () => {
             </Button>
           </Toolbar>
         </AppBar>
-        {error ? (
+        {loading ? (
+          <Box p={3} textAlign="center">
+            <CircularProgress />
+          </Box>
+        ) : error ? (
           <Box p={3}>
             <Typography variant="h6" color="error">
               Something went wrong: {error.message}

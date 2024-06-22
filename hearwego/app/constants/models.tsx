@@ -285,17 +285,3 @@ export interface PRtask {
   CampaignID?: string;
   isEdit?: boolean;
 }
-
-export interface PressRelease {
-  PressReleaseID: string;
-  Headline: string;
-  SubHeadline: string;
-  When: Date;
-  Where: string;
-  Body: string;
-  ReleaseDate: Date;
-  Artistlogo_URL: string;
-  signature: string;
-  EmailsToShare: string[];
-  ArtistID:string // Add sharedDateTime property
-}
