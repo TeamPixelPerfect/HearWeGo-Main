@@ -76,6 +76,16 @@ import { Ticket } from "@/app/constants/models";
 import { addTicket } from "@/app/services/EventServices";
 import { Budget } from "@/app/constants/models";
 import { addBudget } from "@/app/services/EventServices";
+import { AutoTicket } from "@/app/constants/models";
+import { ManualTicket } from "@/app/constants/models";
+import { TicketType } from "@/app/constants/models";
+import { SoldTickets } from "@/app/constants/models";
+import { RemainingTickets } from "@/app/constants/models";
+import { addAutoTicket } from "@/app/services/EventServices";
+import { addManualTicket } from "@/app/services/EventServices";
+import { addTicketType } from "@/app/services/EventServices";
+import { addSoldTicket } from "@/app/services/EventServices";
+import { addRemainTicket } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
 import { getAllArtists } from "@/app/services/ArtistServices";
@@ -247,6 +257,32 @@ function CreateEvent() {
     budget_currency: "LKR",
     budget_details: [],
     event_id: "",
+  });
+
+  const [autoTicketData, setAutoTicketData] = useState<AutoTicket>({
+    ticket_type: "",
+    ticket_price: 0,
+    ticket_count: 0,
+    ticket_session: "",
+    event_id: "",
+  });
+
+  const [manualTicketData, setManualTicketData] = useState<ManualTicket>({
+    ticket_location: "",
+    ticket_session: "",
+    event_id: "",
+  });
+
+  const [ticketTypeData, setTicketTypeData] = useState<TicketType>({
+    ticket_type: "",
+    ticket_description: "",
+    ticket_img: "",
+    event_id: "",
+  });
+
+  const [remainTicketData, setRemainTicketData] = useState<RemainingTickets>({
+    ticket_id: "",
+    remaining_quantity: 0,
   });
 
   const [openErrorModal, setOpenErrorModal] = React.useState(false);
