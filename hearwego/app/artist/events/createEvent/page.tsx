@@ -409,16 +409,20 @@ function CreateEvent() {
 
   const handleNext = async (skipValidation = false) => {
     if (!skipValidation) {
-      const isValid = await validateCurrentStep();
-      if (!isValid) return;
+        const isValid = await validateCurrentStep();
+        if (!isValid) {
+            console.log("Validation failed for step: ", activeStep);
+            return; // Block navigation if validation fails
+        }
     }
 
     const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
+        isLastStep() && !allStepsCompleted()
+            ? steps.findIndex((step, i) => !(i in completed))
+            : activeStep + 1;
     setActiveStep(newActiveStep);
-  };
+};
+
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
