@@ -270,6 +270,7 @@ export interface PRCampaigns {
 export interface PRPosts {
   PrPostID?: string;
   ArtistName?: string;
+  Campaigns?: string;
   Description?: string;
   Scheduled_Date?: Date;
   Scheduled_Time?: string;

@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
 import DropFile from "../../../components/DropFile";
 import { addPRPost } from "../../../services/PrServices";
 import { PRPosts } from "../../../constants/models";
@@ -47,23 +48,27 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"postNow" | "schedule">();
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-  const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
-  const[prPostData, setPrPostData] = useState<PRPosts>();
+  const artist = useAppSelector((state) => state.artist.user);
+  const theme = useTheme();
+
+  const [prPostImage, setPrPostImage] = useState<File | null>(null);
 
   const formik = useFormik({
     initialValues: {
-      ArtistName: "",
+      ArtistName: artist?.user.artistName || "",
       Description: "",
+      Campaigns: "",
       Scheduled_Date: new Date(),
       Scheduled_Time: "",
       SocialMedias: [],
       PostImage_URL: "",
-      CampaignID: "",
+      CampaignID: "PRCamp33",
     },
     validationSchema: Yup.object({
       ArtistName: Yup.string().required("Artist Name is required"),
       Description: Yup.string().required("Description is required"),
+      Campaigns: Yup.string().required("Campaign is required"),
       Scheduled_Date: Yup.date().required("Scheduled Date is required"),
       Scheduled_Time: Yup.string().required("Scheduled Time is required"),
       SocialMedias: Yup.array()
@@ -71,43 +76,50 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         .min(1, "Select at least one social media platform"),
       PostImage_URL: Yup.string().required("Post Image is required"),
     }),
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
+      const prPostData: PRPosts = {
+        ...values,
+        Scheduled_Date: selectedDate,
+        Scheduled_Time: selectedTime?.toLocaleTimeString() || "",
+        SocialMedias: selectedSocialMedia,
+        PostImage_URL: prPostImage ? URL.createObjectURL(prPostImage) : "",
+      };
+
       try {
-        const postData: PRPosts = {
-          ArtistName: values.ArtistName,
-          Description: values.Description,
-          Scheduled_Date:
-            confirmAction === "schedule" ? selectedDate : new Date(),
-          Scheduled_Time:
-            confirmAction === "schedule" ? selectedTime : new Date(),
-          SocialMedias: selectedSocialMedia,
-          PostImage_URL: values.PostImage_URL,
-          CampaignID: values.CampaignID,
-        };
-
-        await addPRPost(artist ? artist.token : "", postData);
-
+        await addPRPost(artist?.token ? artist.token : "", prPostData);
         setSnackbarMessage(
-          confirmAction === "schedule"
-            ? "Post Scheduled Successfully!"
-            : "Post Created Successfully!"
+          confirmAction === "postNow"
+            ? "Post Created Successfully!"
+            : "Post Scheduled Successfully!"
         );
         setSnackbarOpen(true);
         onClose();
         router.push("/artist/publicRelationCampaigns");
+        resetForm(); // Optionally reset form after successful submission
       } catch (error) {
-        setSnackbarMessage("Failed to create post. Please try again.");
-        setSnackbarOpen(true);
+        console.error("Error submitting post:", error);
+        // Handle error state or display error message
       }
     },
   });
 
+  const handlePostSubmit = async () => {
+    try {
+      await formik.handleSubmit();
+    } catch (error) {
+      console.error("Error submitting post:", error);
+      // Handle error state or display error message
+    }
+  };
+
   const handleDateChange = (date: Date | null) => {
     setSelectedDate(date);
+    formik.setFieldValue("Scheduled_Date", date);
   };
 
   const handleTimeChange = (time: Date | null) => {
     setSelectedTime(time);
+    formik.setFieldValue("Scheduled_Time", time?.toLocaleTimeString() || "");
   };
 
   const handleSnackbarClose = () => {
@@ -123,44 +135,32 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         ? prev.filter((item) => item !== value)
         : [...prev, value]
     );
+    formik.setFieldValue(
+      "SocialMedias",
+      selectedSocialMedia.includes(value)
+        ? selectedSocialMedia.filter((item) => item !== value)
+        : [...selectedSocialMedia, value]
+    );
   };
 
   const handleConfirmOpen = (action: "postNow" | "schedule") => {
-    if (formik.isValid) {
-      setConfirmAction(action);
-      setConfirmOpen(true);
-    } else {
-      formik.setTouched({
-        ArtistName: true,
-        Description: true,
-        Scheduled_Date: true,
-        Scheduled_Time: true,
-        SocialMedias: true,
-        PostImage_URL: true,
-      });
-    }
+    setConfirmAction(action);
+    setConfirmOpen(true);
   };
 
   const handleConfirmClose = (confirmed: boolean) => {
-    setConfirmOpen(false);
+    // setConfirmOpen(false);
+    console.log(confirmed, "confirmed");
     if (confirmed) {
+      console.log("confirmed");
       formik.handleSubmit();
+    } else {
+      setConfirmOpen(false);
     }
   };
 
   const handlePreviewOpen = () => {
-    if (formik.isValid) {
-      setPreviewOpen(true);
-    } else {
-      formik.setTouched({
-        ArtistName: true,
-        Description: true,
-        Scheduled_Date: true,
-        Scheduled_Time: true,
-        SocialMedias: true,
-        PostImage_URL: true,
-      });
-    }
+    setPreviewOpen(true);
   };
 
   const handlePreviewClose = () => {
@@ -173,20 +173,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       <DialogContent>
         <form onSubmit={formik.handleSubmit}>
           <TextField
-            label="Artist Name"
-            fullWidth
-            variant="outlined"
-            name="ArtistName"
-            value={formik.values.ArtistName}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.ArtistName && Boolean(formik.errors.ArtistName)
-            }
-            helperText={formik.touched.ArtistName && formik.errors.ArtistName}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Description"
+            label="What's On Your Mind?"
             fullWidth
             multiline
             rows={4}
@@ -201,25 +188,24 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
             sx={{ mb: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="event-label">Select the Event</InputLabel>
+            <InputLabel id="campaign-label">Select the Campaign</InputLabel>
             <Select
-              labelId="event-label"
-              id="event-select"
-              name="event"
-              value={formik.values.event}
+              labelId="campaign-label"
+              id="campaign-select"
+              name="Campaigns"
+              value={formik.values.Campaigns}
               onChange={formik.handleChange}
-              variant="outlined"
-              error={formik.touched.event && Boolean(formik.errors.event)}
+              error={
+                formik.touched.Campaigns && Boolean(formik.errors.Campaigns)
+              }
             >
-              <MenuItem value="New Song Release">New Song Release</MenuItem>
-              <MenuItem value="New Album Release">New Album Release</MenuItem>
-              <MenuItem value="Concert Announcement">
-                Concert Announcement
-              </MenuItem>
+              <MenuItem value="Campaign_01">Campaign_01</MenuItem>
+              <MenuItem value="Campaign_02">Campaign_02</MenuItem>
+              <MenuItem value="Campaign_03">Campaign_03</MenuItem>
             </Select>
-            {formik.touched.event && formik.errors.event && (
+            {formik.touched.Campaigns && formik.errors.Campaigns && (
               <Typography color="error" variant="caption">
-                {formik.errors.event}
+                {formik.errors.Campaigns}
               </Typography>
             )}
           </FormControl>
@@ -227,52 +213,27 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
             <Typography variant="subtitle1">
               Select Social Media Platforms
             </Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={selectedSocialMedia.includes("facebook")}
-                  onChange={handleSocialMediaChange}
-                  name="facebook"
+            {["facebook", "twitter", "linkedin", "instagram"].map(
+              (platform) => (
+                <FormControlLabel
+                  key={platform}
+                  control={
+                    <Checkbox
+                      checked={selectedSocialMedia.includes(platform)}
+                      onChange={handleSocialMediaChange}
+                      name={platform}
+                    />
+                  }
+                  label={platform.charAt(0).toUpperCase() + platform.slice(1)}
                 />
-              }
-              label="Facebook"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={selectedSocialMedia.includes("twitter")}
-                  onChange={handleSocialMediaChange}
-                  name="twitter"
-                />
-              }
-              label="Twitter"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={selectedSocialMedia.includes("linkedin")}
-                  onChange={handleSocialMediaChange}
-                  name="linkedin"
-                />
-              }
-              label="LinkedIn"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={selectedSocialMedia.includes("instagram")}
-                  onChange={handleSocialMediaChange}
-                  name="instagram"
-                />
-              }
-              label="Instagram"
-            />
+              )
+            )}
           </FormControl>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <DatePicker
-                  label="Scheduled Date"
+                  label="Input The Date"
                   value={selectedDate}
                   onChange={handleDateChange}
                   renderInput={(params) => (
@@ -282,7 +243,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
               </Grid>
               <Grid item xs={6}>
                 <TimePicker
-                  label="Scheduled Time"
+                  label="Input The Time"
                   value={selectedTime}
                   onChange={handleTimeChange}
                   renderInput={(params) => (
@@ -294,13 +255,13 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
           </LocalizationProvider>
           <Box sx={{ mt: 2 }}>
             <DropFile
-              fileTypes="Post Image"
+              fileTypes="Additional Product Image"
               fileExtensions="JPEG,PNG,WEBP,SVG"
               isCircular={false}
               width="100%"
               height="200px"
-              file={formik.values.PostImage_URL}
-              setFile={(file) => formik.setFieldValue("PostImage_URL", file)}
+              file={prPostImage}
+              setFile={setPrPostImage}
               aspectX={1}
               aspectY={1}
               shape="rect"
@@ -327,7 +288,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         <Button onClick={() => handleConfirmOpen("postNow")} color="primary">
           Post Now
         </Button>
-        <Button onClick={() => handleConfirmOpen("schedule")} type="submit" color="primary">
+        <Button onClick={() => handleConfirmOpen("schedule")} color="primary">
           Schedule
         </Button>
       </DialogActions>
@@ -379,7 +340,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       >
         <DialogTitle>Post Preview</DialogTitle>
         <DialogContent>
-          <Typography variant="h6">{formik.values.event}</Typography>
+          <Typography variant="h6">{formik.values.Campaigns}</Typography>
           <Typography variant="body1">{formik.values.Description}</Typography>
           <Typography variant="subtitle1">Social Media Platforms:</Typography>
           <ul>
