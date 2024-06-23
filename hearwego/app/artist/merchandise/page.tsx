@@ -14,7 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
 import Categories from "./Categories";
 import Promotions from "./Promotions";
@@ -22,16 +22,34 @@ import Orders from "./Orders/page";
 import Store from "./Store";
 import Drafts from "./Drafts";
 import Inventory from "./Inventory";
+import { getStoreForArtist } from "@/app/services/StoreServices";
+import { useAppSelector } from "@/lib/hooks";
 
 const ArtistMerchandise = () => {
   const theme = useTheme();
   const router = useRouter();
 
+  const artist = useAppSelector((state) => state.artist.user);
+  const [store, setStore] = useState<any>({});
   const [tabValue, setTabValue] = useState(0);
+
+  const getStore = () => {
+    getStoreForArtist(artist?.user?.artist_id ? artist.user.artist_id : "")
+      .then((res) => {
+        setStore(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    getStore();
+  }, []);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -61,17 +79,19 @@ const ArtistMerchandise = () => {
             Merchandise
           </Typography>
           <Stack direction="row" spacing={1}>
-            <Button
-              color="secondary"
-              variant="contained"
-              startIcon={<IoAddOutline />}
-              sx={{ textTransform: "capitalize" }}
-              onClick={() => {
-                router.push("/artist/merchandise/addStore");
-              }}
-            >
-              Create New Store
-            </Button>
+            {!store?.store_id && (
+              <Button
+                color="secondary"
+                variant="contained"
+                startIcon={<IoAddOutline />}
+                sx={{ textTransform: "capitalize" }}
+                onClick={() => {
+                  router.push("/artist/merchandise/addStore");
+                }}
+              >
+                Create New Store
+              </Button>
+            )}
 
             <Button
               variant="contained"
@@ -96,11 +116,11 @@ const ArtistMerchandise = () => {
           </Tabs>
 
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            <Inventory />
+            <Inventory store_id={store?.store_id} />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
-            <Drafts />
+            <Drafts store_id={store?.store_id} />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
@@ -108,16 +128,18 @@ const ArtistMerchandise = () => {
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>
-            <Promotions />
+            <Promotions store_id={store?.store_id} />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={4} fullWidth={true}>
-            <Orders />
+            <Orders store_id={store?.store_id} />
           </CustomTabPanel>
 
-          <CustomTabPanel value={tabValue} index={5} fullWidth={true}>
-            <Store />
-          </CustomTabPanel>
+          {store?.store_id && (
+            <CustomTabPanel value={tabValue} index={5} fullWidth={true}>
+              <Store />
+            </CustomTabPanel>
+          )}
         </ADTabBox>
       </Card>
     </Grid>

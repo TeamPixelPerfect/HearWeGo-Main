@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -33,8 +33,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
 import EventIcon from "@mui/icons-material/Event";
 import CloseIcon from "@mui/icons-material/Close";
-import { addMerchPromo } from "../../services/StoreServices";
+import { addMerchPromo, getPromosForStore } from "../../services/StoreServices";
 import { useAppSelector } from "@/lib/hooks";
+import { String } from "aws-sdk/clients/apigateway";
 
 interface Promotion {
   id: number;
@@ -44,7 +45,11 @@ interface Promotion {
   endDate: string;
 }
 
-const Promotions = () => {
+interface Props {
+  store_id: String
+}
+
+const Promotions = ({ store_id }: Props) => {
   const artist = useAppSelector((state) => state.artist.user);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [filter, setFilter] = useState<string>("all");
@@ -85,7 +90,7 @@ const Promotions = () => {
           promo_status: "active", // Example status, adjust as necessary
           store_id: "st20", // Example store ID, adjust as necessary
         };
-        const newPromo = await addMerchPromo(artist.token, promoData);
+        const newPromo = await addMerchPromo(artist?.token? artist.token : "", promoData);
         setPromotions([...promotions, { ...newPromo, id: Date.now() }]);
         resetForm();
         handleSnackbarOpen("Promotion created successfully!");
@@ -122,6 +127,16 @@ const Promotions = () => {
   const generateQRCodeValue = (promotion: Promotion) => {
     return `Promo Code: ${promotion.code}\nDescription: ${promotion.description}\nStart Date: ${promotion.startDate}\nEnd Date: ${promotion.endDate}`;
   };
+
+  const fetchPromos = () => {
+    getPromosForStore(store_id).then((res) => {
+      setPromotions(res);
+    })
+  }
+
+  useEffect(() => {
+    fetchPromos();
+  }, [])
 
   const filteredPromotions = promotions.filter((promotion) => {
     const now = new Date();

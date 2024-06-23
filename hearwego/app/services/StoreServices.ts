@@ -96,3 +96,84 @@ export const getProductsforStore = async (storeId: string) => {
     throw new Error(error.message);
   }
 }
+
+export const getDraftProductsforStore = async (storeId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/products/store/drafts/${storeId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const product = await res.json();
+    return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
+
+
+export const getStoreForArtist = async (artistId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/merchStores/artist/${artistId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const store = await res.json();
+    return store;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
+
+export const getCategories = async () => {
+  const res = await fetch(`${base_url}/MerchsManager/categories`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const category = await res.json();
+    return category;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
+
+export const getPromosForStore = async (storeId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/promos/store/${storeId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const promo = await res.json();
+    return promo;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
+
+export const getOrdersForStore = async (storeId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/orders/store/${storeId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const order = await res.json();
+    return order;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}

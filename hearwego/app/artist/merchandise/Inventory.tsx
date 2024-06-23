@@ -110,7 +110,11 @@ const productsData = [
   },
 ];
 
-const Inventory = () => {
+interface Props {
+  store_id: string;
+}
+
+const Inventory = ({ store_id } : Props ) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -118,11 +122,12 @@ const Inventory = () => {
   const [productsData, setProductsData] = useState<MerchProduct[]>([]);
   const [outOfStockFilter, setOutOfStockFilter] = useState(false);
   
+  
   useEffect(() => {
-    getProductsforStore("st20").then((data) => {
+    getProductsforStore(store_id).then((data) => {
       setProductsData(data);
     });
-  }, []);
+  }, [store_id]);
 
   const handleSearchChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -182,7 +187,7 @@ const Inventory = () => {
       sx={{
         width: "100%",
         minHeight: "100vh",
-        bgcolor: "background.default",
+        bgcolor: "background.paper",
         p: 3,
         borderRadius: "10px",
       }}
@@ -262,7 +267,7 @@ const Inventory = () => {
         </Grid>
         <Grid container spacing={2}>
           {filteredProducts.map((product) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={product.pid}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product?.pid}>
               <SingleProductCard product={product} />
             </Grid>
           ))}

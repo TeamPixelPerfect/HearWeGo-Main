@@ -26,7 +26,7 @@ import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import DropFile from "../../components/DropFile";
-import { addMerchCategory } from "../../services/StoreServices"; // Make sure to implement this service
+import { addMerchCategory, getCategories } from "../../services/StoreServices"; // Make sure to implement this service
 import { MerchCategory } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
 
@@ -110,9 +110,9 @@ const Categories: React.FC = () => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Required"),
-      description: Yup.string().required("Required"),
-      subCategories: Yup.string().required("Required"),
-      logoFile: Yup.mixed().required("A file is required"),
+      // description: Yup.string().required("Required"),
+      // subCategories: Yup.string().required("Required"),
+      // logoFile: Yup.mixed().required("A file is required"),
     }),
     onSubmit: async (values) => {
       const newCategory: MerchCategory = {
@@ -164,6 +164,16 @@ const Categories: React.FC = () => {
     });
     handleClickOpen(true);
   };
+
+  const fetchCategories = () => {
+    getCategories().then((res) => {
+      setCategories(res.data);
+    })
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>

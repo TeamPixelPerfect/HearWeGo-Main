@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -16,6 +17,8 @@ import SwipeableStoreImg from "@/app/components/SwipebannermerchARTIST";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { motion } from "framer-motion";
+import { getStoreForArtist } from "@/app/services/StoreServices";
+import { MerchStore } from "@/app/constants/models";
 
 const StoreImgs = [
   {
@@ -76,7 +79,7 @@ const InfoCard = ({
   onSave,
   editedContent,
   setEditedContent,
-}) => (
+}: any) => (
   <Paper
     elevation={3}
     sx={{
@@ -123,7 +126,7 @@ const InfoCard = ({
   </Paper>
 );
 
-const PromotionCard = ({ id, image, title, publishedDate, onDelete }) => (
+const PromotionCard = ({ id, image, title, publishedDate, onDelete }: any) => (
   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} key={id}>
     <Paper
       elevation={3}
@@ -177,6 +180,10 @@ const PromotionCard = ({ id, image, title, publishedDate, onDelete }) => (
   </motion.div>
 );
 
+interface Props {
+  store: MerchStore;
+}
+
 const Store = () => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [storeDescription, setStoreDescription] = useState(
@@ -187,6 +194,7 @@ const Store = () => {
   const [isEditingDeliveryFees, setIsEditingDeliveryFees] = useState(false);
   const [deliveryFees, setDeliveryFees] = useState(shippingInfo.deliveryFees);
   const [editedDeliveryFees, setEditedDeliveryFees] = useState(deliveryFees);
+  const [storeData, setStoreData] = useState<MerchStore>();
 
   const [isEditingDeliveryServices, setIsEditingDeliveryServices] =
     useState(false);
@@ -228,9 +236,16 @@ const Store = () => {
     setDeliveryServices(editedDeliveryServices);
   };
 
-  const handleDeleteCampaign = (id) => {
+  const handleDeleteCampaign = (id: any) => {
     setCampaigns(campaigns.filter((campaign) => campaign.id !== id));
   };
+
+  useEffect(() => {
+    getStoreForArtist("ar4").then((data) => {
+      console.log(data);
+      setStoreData(data);
+    });
+  }, []);
 
   return (
     <Box
@@ -244,7 +259,17 @@ const Store = () => {
     >
       <Box sx={{ width: "100%" }}>
         <SwipeableStoreImg
-          StoreImgs={StoreImgs}
+          StoreImgs={
+            storeData?.promo_banner
+              ? storeData.promo_banner.map((banner, index) => {
+                  return {
+                    id: index,
+                    image: banner,
+                    title: "Banner " + (index + 1),
+                  };
+                })
+              : StoreImgs
+          }
           autoPlay={false}
           indicators={false}
           height="500px"
@@ -288,7 +313,7 @@ const Store = () => {
                   Welcome to Our Store
                 </Typography>
                 <Typography variant="body1" gutterBottom sx={{ color: "grey" }}>
-                  {storeDescription}
+                  {storeData?.store_description}
                 </Typography>
                 <IconButton
                   onClick={handleEditDescription}
