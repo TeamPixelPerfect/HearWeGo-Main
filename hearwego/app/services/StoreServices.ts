@@ -79,3 +79,20 @@ export const addMerchPromo = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
+ 
+
+export const getProductsforStore = async (storeId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/products/store/${storeId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const product = await res.json();
+    return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}

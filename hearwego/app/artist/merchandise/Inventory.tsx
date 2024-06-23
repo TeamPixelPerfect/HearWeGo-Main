@@ -11,8 +11,10 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SingleProductCard from "../../components/SingleProductCardMerchA";
+import { MerchProduct } from "../../constants/models";
+import { getProductsforStore } from "@/app/services/StoreServices";
 
 const productsData = [
   {
@@ -113,7 +115,14 @@ const Inventory = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [productsData, setProductsData] = useState<MerchProduct[]>([]);
   const [outOfStockFilter, setOutOfStockFilter] = useState(false);
+  
+  useEffect(() => {
+    getProductsforStore("st20").then((data) => {
+      setProductsData(data);
+    });
+  }, []);
 
   const handleSearchChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -148,9 +157,9 @@ const Inventory = () => {
   const filteredProducts = productsData
     .filter(
       (product) =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.pid.toString().includes(searchQuery)
+        product.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.product_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.product_id.toString().includes(searchQuery)
     )
     .filter(
       (product) =>
@@ -159,8 +168,8 @@ const Inventory = () => {
     )
     .filter(
       (product) =>
-        (minPrice === "" || product.price >= parseFloat(minPrice)) &&
-        (maxPrice === "" || product.price <= parseFloat(maxPrice))
+        (minPrice === "" || product.product_price >= parseFloat(minPrice)) &&
+        (maxPrice === "" || product.product_price <= parseFloat(maxPrice))
     )
     .filter((product) => !outOfStockFilter || product.quantity === 0);
 

@@ -68,23 +68,23 @@ const SingleProductCard = ({ product }) => {
       <CardMedia
         component="img"
         height="200"
-        image={product.image}
-        alt={product.title}
+        image={product.product_Main_image}
+        alt={product.product_name}
       />
       <CardContent>
         {!isEditing ? (
           <>
             <Typography gutterBottom variant="h5" component="div">
-              {product.title}
+              {product.product_name}
             </Typography>
             <Typography variant="body1" color="textSecondary">
-              {product.description}
+              {product.product_description}
             </Typography>
             <Typography variant="body1" color="textPrimary" sx={{ mt: 1 }}>
-              ${product.price}
+              ${product.product_price}
             </Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-              Quantity: {product.quantity}
+              Quantity: {product.product_quantity}
             </Typography>
           </>
         ) : (
