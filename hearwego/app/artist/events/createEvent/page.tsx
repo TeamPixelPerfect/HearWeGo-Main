@@ -556,11 +556,14 @@ function CreateEvent() {
             "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
         };
       }
-      const createdEvent = await addEvent(artist ? artist.token : "", updatedEventData);
+      const createdEvent = await addEvent(
+        artist ? artist.token : "",
+        updatedEventData
+      );
       const eventId = createdEvent.event_id;
-  
+
       let updatedTicketData = { ...ticketData, event_id: eventId };
-  
+
       if (ticketData.ticket_catagory === "Manual") {
         updatedTicketData = { ...updatedTicketData, auto_ticket_details: [] };
       } else if (ticketData.ticket_catagory === "Auto") {
@@ -572,9 +575,9 @@ function CreateEvent() {
           manual_ticket_details: [],
         };
       }
-  
+
       await addTicket(artist ? artist.token : "", updatedTicketData);
-  
+
       // Handle AutoTicket and ManualTicket data submissions
       if (ticketData.ticket_catagory === "Auto") {
         await Promise.all(
@@ -588,26 +591,47 @@ function CreateEvent() {
               ticket_price: row.ticketPrice,
               ticket_count: row.ticketCount,
             };
-            const {ticketSession, ...autoTicketWithoutSession} = autoTicket;
-            const {ticketType, ...autoTicketWithoutType} = autoTicketWithoutSession;
-            const {ticketPrice, ...autoTicketWithoutPrice} = autoTicketWithoutType;
-            const {ticketCount, ...autoTicketWithoutCount} = autoTicketWithoutPrice;
-            console.log("Auto Ticket: ................", autoTicketWithoutCount);
+            const { ticketSession, ...autoTicketWithoutSession } = autoTicket;
+            const { ticketType, ...autoTicketWithoutType } =
+              autoTicketWithoutSession;
+            const { ticketPrice, ...autoTicketWithoutPrice } =
+              autoTicketWithoutType;
+            const { ticketCount, ...autoTicketWithoutCount } =
+              autoTicketWithoutPrice;
+            console.log(
+              "Auto Ticket: ................",
+              autoTicketWithoutCount
+            );
             // Submit autoTicket to backend function addAutoTicket
-            const createdAutoTicket = await addAutoTicket(artist ? artist.token : "", autoTicketWithoutCount);
+            const createdAutoTicket = await addAutoTicket(
+              artist ? artist.token : "",
+              autoTicketWithoutCount
+            );
 
             console.log("Created Auto Ticket: ", createdAutoTicket);
 
-            await Promise.all(
-              createdAutoTicket?.map(async (row) => {
-                const remainingTicket = {
-                  ticket_id: row.auto_ticket_id,
-                  remaining_quantity: row.ticket_count,
-                };
-                // Submit remainingTicket to backend function addRemainingTickets
-                await addRemainTicket(artist ? artist.token : "", remainingTicket);
-              })
+            const remainingTicket = {
+              ticket_id: createdAutoTicket.auto_ticket_id,
+              remaining_quantity: createdAutoTicket.ticket_count,
+            };
+
+            await addRemainTicket(
+              artist ? artist.token : "",
+              remainingTicket
             );
+            // await Promise.all(
+            //   createdAutoTicket?.map(async (row) => {
+            //     const remainingTicket = {
+            //       ticket_id: row.auto_ticket_id,
+            //       remaining_quantity: row.ticket_count,
+            //     };
+            //     // Submit remainingTicket to backend function addRemainingTickets
+            //     await addRemainTicket(
+            //       artist ? artist.token : "",
+            //       remainingTicket
+            //     );
+            //   })
+            // );
           })
         );
       } else if (ticketData.ticket_catagory === "Manual") {
@@ -621,17 +645,24 @@ function CreateEvent() {
               ticket_session: row.ticketSession,
             };
 
-            const {ticketLocation, ...manualTicketWithoutLocation} = manualTicket;         
-            const {ticketSession, ...manualTicketWithoutSession} = manualTicketWithoutLocation;         
-            console.log("Manual Ticket: ................", manualTicketWithoutSession);
+            const { ticketLocation, ...manualTicketWithoutLocation } =
+              manualTicket;
+            const { ticketSession, ...manualTicketWithoutSession } =
+              manualTicketWithoutLocation;
+            console.log(
+              "Manual Ticket: ................",
+              manualTicketWithoutSession
+            );
             // Submit manualTicket to backend function addManualTicket
-            await addManualTicket(artist ? artist.token : "", manualTicketWithoutSession);
+            await addManualTicket(
+              artist ? artist.token : "",
+              manualTicketWithoutSession
+            );
           })
         );
       }
-  
+
       // Handling RemainingTickets if ticket type is "Auto"
-      
     } catch (error) {
       console.error("Error submitting event data:", error);
     } finally {
@@ -1562,7 +1593,10 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   <FormHelperText id="session-date">Date</FormHelperText>
                   <FilledInput
                     id="session_date"
-                    sx={{ width: "100%", ...(dateError && { borderColor: "red" }) }}
+                    sx={{
+                      width: "100%",
+                      ...(dateError && { borderColor: "red" }),
+                    }}
                     type="date"
                     value={sessionDate}
                     onChange={handleSessionDateChange}
@@ -1597,7 +1631,10 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   <FormHelperText id="session-time">Time</FormHelperText>
                   <FilledInput
                     id="session_time"
-                    sx={{ width: "100%", ...(timeError && { borderColor: "red" }) }}
+                    sx={{
+                      width: "100%",
+                      ...(timeError && { borderColor: "red" }),
+                    }}
                     type="time"
                     value={sessionTime}
                     onChange={handleSessionTimeChange}
@@ -1670,8 +1707,6 @@ function SessionTable({ sessionRows, setSessionRows }) {
     </div>
   );
 }
-
-            
 
 type TeamRow = {
   id: number;
