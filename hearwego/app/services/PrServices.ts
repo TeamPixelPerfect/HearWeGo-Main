@@ -82,3 +82,22 @@ export const getPRCampaignByID = async (token: string, id: string) => {
     throw new Error(error.message);
   }
 };
+
+export const addPRPost = async (token: string, data: any) => {
+  console.log(" sending data", data);
+  const res = await fetch(`${base_url}/PRManager/PRPosts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const PRPost = await res.json();
+    return PRPost;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
