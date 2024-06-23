@@ -548,10 +548,7 @@ function CreateEvent() {
   const submitData = async () => {
     setLoading(true);
     try {
-      let updatedEventData = {
-        ...eventData,
-      };
-
+      let updatedEventData = { ...eventData };
       if (eventData.event_img === "") {
         updatedEventData = {
           ...updatedEventData,
@@ -559,27 +556,15 @@ function CreateEvent() {
             "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
         };
       }
-      const createdEvent = await addEvent(
-        artist ? artist.token : "",
-        updatedEventData
-      );
+      const createdEvent = await addEvent(artist ? artist.token : "", updatedEventData);
       const eventId = createdEvent.event_id;
-
-      let updatedTicketData = {
-        ...ticketData,
-        event_id: eventId,
-      };
-
+  
+      let updatedTicketData = { ...ticketData, event_id: eventId };
+  
       if (ticketData.ticket_catagory === "Manual") {
-        updatedTicketData = {
-          ...updatedTicketData,
-          auto_ticket_details: [],
-        };
+        updatedTicketData = { ...updatedTicketData, auto_ticket_details: [] };
       } else if (ticketData.ticket_catagory === "Auto") {
-        updatedTicketData = {
-          ...updatedTicketData,
-          manual_ticket_details: [],
-        };
+        updatedTicketData = { ...updatedTicketData, manual_ticket_details: [] };
       } else if (ticketData.ticket_catagory === "Not-Provided") {
         updatedTicketData = {
           ...updatedTicketData,
@@ -587,15 +572,66 @@ function CreateEvent() {
           manual_ticket_details: [],
         };
       }
-
+  
       await addTicket(artist ? artist.token : "", updatedTicketData);
+  
+      // Handle AutoTicket and ManualTicket data submissions
+      if (ticketData.ticket_catagory === "Auto") {
+        await Promise.all(
+          autoTicketRows.map(async (row) => {
+            const { id, ...autoTicketWithoutId } = row;
+            const autoTicket = {
+              ...autoTicketWithoutId,
+              event_id: eventId,
+              ticket_session: row.ticketSession,
+              ticket_type: row.ticketType,
+              ticket_price: row.ticketPrice,
+              ticket_count: row.ticketCount,
+            };
+            const {ticketSession, ...autoTicketWithoutSession} = autoTicket;
+            const {ticketType, ...autoTicketWithoutType} = autoTicketWithoutSession;
+            const {ticketPrice, ...autoTicketWithoutPrice} = autoTicketWithoutType;
+            const {ticketCount, ...autoTicketWithoutCount} = autoTicketWithoutPrice;
+            console.log("Auto Ticket: ................", autoTicketWithoutCount);
+            // Submit autoTicket to backend function addAutoTicket
+            const createdAutoTicket = await addAutoTicket(artist ? artist.token : "", autoTicketWithoutCount);
 
-      let updatedBudgetData = {
-        ...budgetData,
-        event_id: eventId,
-      };
+            console.log("Created Auto Ticket: ", createdAutoTicket);
 
-      await addBudget(artist ? artist.token : "", updatedBudgetData);
+            await Promise.all(
+              createdAutoTicket?.map(async (row) => {
+                const remainingTicket = {
+                  ticket_id: row.auto_ticket_id,
+                  remaining_quantity: row.ticket_count,
+                };
+                // Submit remainingTicket to backend function addRemainingTickets
+                await addRemainTicket(artist ? artist.token : "", remainingTicket);
+              })
+            );
+          })
+        );
+      } else if (ticketData.ticket_catagory === "Manual") {
+        await Promise.all(
+          manualTicketRows.map(async (row) => {
+            const { id, ...manualTicketWithoutId } = row;
+            const manualTicket = {
+              ...manualTicketWithoutId,
+              event_id: eventId,
+              ticket_location: row.ticketLocation,
+              ticket_session: row.ticketSession,
+            };
+
+            const {ticketLocation, ...manualTicketWithoutLocation} = manualTicket;         
+            const {ticketSession, ...manualTicketWithoutSession} = manualTicketWithoutLocation;         
+            console.log("Manual Ticket: ................", manualTicketWithoutSession);
+            // Submit manualTicket to backend function addManualTicket
+            await addManualTicket(artist ? artist.token : "", manualTicketWithoutSession);
+          })
+        );
+      }
+  
+      // Handling RemainingTickets if ticket type is "Auto"
+      
     } catch (error) {
       console.error("Error submitting event data:", error);
     } finally {
@@ -1033,9 +1069,11 @@ function TicketDetails({
     if (isChecked) {
       setIsAutoTicket(true);
       setIsManualTicket(false);
+      setTicketData((prev) => ({ ...prev, ticket_catagory: "Auto" }));
     } else {
       setIsAutoTicket(false);
       setIsManualTicket(true);
+      setTicketData((prev) => ({ ...prev, ticket_catagory: "Manual" }));
     }
   }, [isChecked]);
 
@@ -1050,7 +1088,7 @@ function TicketDetails({
           <FormControlLabel
             control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
             label="Generate Tickets Here"
-            onChange={handleSwitchChange}
+            onChange={(e) => setIsChecked(e.target.checked)}
           />
         </FormGroup>
       </InputRow>
@@ -1342,6 +1380,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
       setSessionRows([...sessionRows, newSession]);
       console.log(sessionRows);
       refreshTable();
+      sessionCount++;
       handleClose();
     }
   };
@@ -1391,7 +1430,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
 
     setSessionRows(reindexedRows);
     setSelectedRows([]);
-
+    sessionCount--;
     refreshTable();
   };
 
@@ -1631,7 +1670,6 @@ function SessionTable({ sessionRows, setSessionRows }) {
     </div>
   );
 }
-
 
             
 
