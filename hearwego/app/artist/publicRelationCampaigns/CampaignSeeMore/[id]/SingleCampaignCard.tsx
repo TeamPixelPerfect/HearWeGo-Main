@@ -34,7 +34,7 @@ import * as Yup from "yup";
 
 interface Task {
   id: number;
-  name: string;
+  TaskName: string;
   completed: boolean;
 }
 
@@ -109,13 +109,13 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
     const taskToEdit = tasks.find((task) => taskId === task.id);
     if (taskToEdit) {
       setEditingTaskId(taskId);
-      setEditedTaskName(taskToEdit.name);
+      setEditedTaskName(taskToEdit.TaskName);
     }
   };
 
   const handleSaveEditTask = () => {
     const updatedTasks = tasks.map((task) =>
-      task.id === editingTaskId ? { ...task, name: editedTaskName } : task
+      task.id === editingTaskId ? { ...task, TaskName: editedTaskName } : task
     );
     setTasks(updatedTasks); // Save edited task
     setEditingTaskId(null); // Reset editing state
@@ -127,7 +127,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
 
     const newTask: Task = {
       id: tasks.length ? Math.max(...tasks.map((task) => task.id)) + 1 : 1,
-      name: values.newTaskName,
+      TaskName: values.newTaskName,
       completed: false,
     };
     setTasks([...tasks, newTask]); // Add new task
@@ -309,7 +309,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                           autoFocus
                         />
                       ) : (
-                        <ListItemText primary={task.name} />
+                        <ListItemText primary={task.TaskName} />
                       )}
                     </Box>
                     <ListItemSecondaryAction>

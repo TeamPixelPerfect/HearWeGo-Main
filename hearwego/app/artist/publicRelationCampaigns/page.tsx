@@ -35,10 +35,10 @@ const Dashboard = () => {
   const artist = useAppSelector((state) => state.artist.user);
 
   useEffect(() => {
-    if (artist?.token && artist?.user?.artist_id) {
-      getPRCampaignsByArtist(artist.token, artist.user.artist_id)
+    if (artist?.token) {
+      getPRCampaignsByArtist(artist.token, artist?.user?.artist_id ? artist.user.artist_id : "")
         .then((response) => {
-          setCampaigns(Array.isArray(response) ? response : []);
+          setCampaigns(response.data);
         })
         .catch((error) => setError(error))
         .finally(() => setLoading(false));
@@ -50,6 +50,7 @@ const Dashboard = () => {
   };
 
   const CampaignTabPanel = ({ status }: { status: string }) => {
+    console.log(status, campaigns)
     const filteredCampaigns = campaigns.filter(
       (campaign) => campaign.CampaignStatus === status
     );
@@ -59,12 +60,12 @@ const Dashboard = () => {
         {filteredCampaigns.map((campaign) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={campaign.CampaignID}>
             <CampaignCard
-              title={campaign.Campaign_Name}
-              image={campaign.CampaignImage_URL}
-              description={campaign.Campaign_Description}
-              completedProgress={campaign.Com_percentage}
-              status={campaign.CampaignStatus}
-              tasks={campaign.PRtask}
+              title={campaign?.Campaign_Name}
+              image={campaign?.CampaignImage_URL}
+              description={campaign?.Campaign_Description}
+              completedProgress={campaign?.Com_percentage}
+              status={campaign?.CampaignStatus}
+              tasks={campaign?.PRtask}
             />
           </Grid>
         ))}
