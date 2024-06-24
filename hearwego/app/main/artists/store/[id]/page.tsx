@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect} from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -17,6 +18,8 @@ import Button from "@mui/material/Button";
 import CategoryComponent from "../../../../components/MerchandiseCategory";
 import Link from "next/link";
 import { useState } from "react";
+import { MerchProduct } from "../../../../constants/models";
+import { getProductsforStore } from "@/app/services/StoreServices";
 
 import {
   Search,
@@ -429,31 +432,40 @@ const categories = [
       "https://m.media-amazon.com/images/S/aplus-media-library-service-media/e0b884c3-c7a3-4253-93d0-25cb0373f424.__CR158,0,2425,1500_PT0_SX970_V1___.jpg", // Provide the URL of the category image
   },
 ];
-const ArtistStore = () => {
-  const router = useRouter();
-  // State to manage the search query
-  const [searchQuery, setSearchQuery] = useState("");
+interface Props {
+  store_id: string;
+}
 
-  // Function to handle changes in the search input
+const ArtistStore =({ store_id }: Props) => {
+  const [productsData, setProductsData] = useState<MerchProduct[]>([]);
+  const [editComplete, setEditComplete] = useState(false);
+ 
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
   const handleSearchInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSearchQuery(event.target.value);
   };
-
-  // Filter products based on the search query
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  //Filter categories based on the search query
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    getProductsforStore(store_id).then((data) => {
+      setProductsData(data);
+    });
+    if (editComplete) {
+      setEditComplete(false);
+    }
+  }, [store_id, editComplete]);
+
   return (
     <>
-      {/* Search bar */}
+
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -579,7 +591,9 @@ const ArtistStore = () => {
           <Grid container spacing={4}>
             {filteredProducts.map((product) => (
               <Grid item xs={5} sm={4} md={2} lg={2} key={product.id}>
-                <ProductCard product={product} />
+                <ProductCard 
+                product={product}
+               />
               </Grid>
             ))}
           </Grid>

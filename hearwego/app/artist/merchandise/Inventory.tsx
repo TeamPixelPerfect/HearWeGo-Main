@@ -146,10 +146,8 @@ const Inventory = ({ store_id }: Props) => {
     getProductsforStore(store_id).then((data) => {
       setProductsData(data);
     });
-    if (editComplete) {
-      setEditComplete(false);
-    }
-  }, [store_id, editComplete]);
+  
+  }, [store_id]);
 
   const handleSearchChange = (event: {
     target: { value: React.SetStateAction<string> };

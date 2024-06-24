@@ -279,7 +279,7 @@ export interface Comment {
 
 export interface MerchStore {
   store_id?: string;
-  store_banner?: string;
+  store_banner?: string[];
   promo_banner?: string[];
   store_description?: string;
   shipping_fees?: string;

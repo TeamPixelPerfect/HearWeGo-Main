@@ -115,7 +115,7 @@ const Categories: React.FC = () => {
     }),
     onSubmit: async (values) => {
       const newCategory: MerchCategory = {
-        store_id: "st19",
+        store_id: "st25",
         category_id: isEditing ? values.id : String(Date.now()),
         category_name: values.name,
         category_description: values.description,
@@ -355,8 +355,10 @@ const Categories: React.FC = () => {
                 >
                   Cancel
                 </Button>
+                
                 <Button type="submit" color="primary">
-                  {isEditing ? "Update" : "Add"}
+                  Add
+                  {/* {isEditing ? "Update" : "Add"} */}
                 </Button>
               </DialogActions>
             </form>
