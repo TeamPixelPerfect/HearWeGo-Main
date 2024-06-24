@@ -244,12 +244,10 @@ function CreateEvent() {
     event_created_by: artist ? artist.artist_id : "",
   });
 
-  const [ticketData, setTicketData] = useState<Ticket>({
-    ticket_catagory: "Not-Provided",
-    ticket_img: "",
-    auto_ticket_details: [],
-    manual_ticket_details: [],
+  const [ticketData, setTicketData] = useState<TicketType>({
+    ticket_type: "Not-Provided",
     ticket_description: "",
+    ticket_img: "",
     event_id: "",
   });
 
