@@ -248,6 +248,23 @@ export const updateEvent = async (token: string, id: string, data: any) => {
   }
 }
 
+export const deleteEvent = async (token: string, id: string) => {
+  const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    return true;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
 export const addBudget = async (token: string, data: any) => {
   console.log("Sending budget data:", data); 
   const res = await fetch(`${base_url}/EventsManager/budget`, {

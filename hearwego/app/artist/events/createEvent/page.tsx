@@ -59,6 +59,7 @@ import Typography from "@mui/material/Typography";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Modal from "@mui/material/Modal";
+import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -215,6 +216,7 @@ const errorModalStyle = {
 
 function CreateEvent() {
   const artist = useAppSelector((state) => state.artist.user);
+  const router = useRouter();
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -496,6 +498,10 @@ function CreateEvent() {
     return true;
   };
 
+  const handleViewEvents = () => {
+    router.push("/artist/events");
+  };
+
   const validateEventDetails = () => {
     let isValid = true;
 
@@ -678,7 +684,7 @@ function CreateEvent() {
             );
           })
         );
-      }  
+      }
 
       handleOpenSuccessModal();
     } catch (error) {
@@ -733,7 +739,7 @@ function CreateEvent() {
                 <CircularProgress />
               </Box>
             ) : (
-              <ArtistEvents />
+              <></>
             )}
           </>
         ) : (
@@ -864,10 +870,14 @@ function CreateEvent() {
               Event Created Successfully!
             </Typography>
             <Stack direction="row" spacing={2}>
-              <Button variant="outlined" onClick={handleCloseSuccessModal}>
+              <Button variant="outlined" onClick={handleViewEvents}>
                 Not Now
               </Button>
-              <Button variant="contained" onClick={updateEventDetails} endIcon={<PublishIcon />}>
+              <Button
+                variant="contained"
+                onClick={updateEventDetails}
+                endIcon={<PublishIcon />}
+              >
                 Publish to Fans
               </Button>
             </Stack>
@@ -3619,6 +3629,7 @@ function EventCreateShow(
         setTicketData={setTicketData}
         autoTicketRows={autoTicketRows}
         manualTicketRows={manualTicketRows}
+        budgetRows={budgetRows}
       />
     );
   }
@@ -3637,6 +3648,7 @@ function EventFormFinish({
   setTicketData,
   autoTicketRows,
   manualTicketRows,
+  budgetRows,
 }) {
   function createSessionData(
     sessionDate: string,
@@ -3681,6 +3693,35 @@ function EventFormFinish({
       ticket.ticketPrice,
       ticket.ticketCount,
       ticket.ticketSession
+    )
+  );
+
+  function createManualTicketData(
+    ticketSession: string,
+    ticketLocation: string
+  ) {
+    return { ticketSession, ticketLocation };
+  }
+
+  const mtRows = manualTicketRows.map((ticket) =>
+    createManualTicketData(ticket.ticketSession, ticket.ticketLocation)
+  );
+
+  function createBudgetData(
+    budgetTitle: string,
+    budgetSession: string,
+    budgetType: string,
+    budgetAmount: string
+  ) {
+    return { budgetTitle, budgetSession, budgetType, budgetAmount };
+  }
+
+  const budRows = budgetRows.map((budget) =>
+    createBudgetData(
+      budget.budgetTitle,
+      budget.budgetSession,
+      budget.budgetType,
+      budget.budgetAmount
     )
   );
 
@@ -3911,7 +3952,7 @@ function EventFormFinish({
         </Box>
       </Card>
 
-      <Card sx={{ width: "100%", padding: 2 }}>
+      <Card sx={{ width: "100%", padding: 2, marginBottom: 2 }}>
         <CardContent>
           <Typography variant="h5" component="div">
             Ticket Details
@@ -3920,11 +3961,11 @@ function EventFormFinish({
         <Divider />
 
         <Box sx={{ width: "100%", padding: 2 }}>
-          {ticketData.ticket_catagory == "Not Provided" ? (
+          {ticketData.ticket_type == "Not Provided" ? (
             <Typography variant="h6">
-              Ticket Catagory: {ticketData.ticket_catagory}
+              Ticket Catagory: {ticketData.ticket_type}
             </Typography>
-          ) : ticketData.ticket_catagory == "Auto" ? (
+          ) : ticketData.ticket_type == "Auto" ? (
             <TableContainer component={Paper}>
               <Table
                 sx={{ minWidth: 650 }}
@@ -3957,15 +3998,77 @@ function EventFormFinish({
               </Table>
             </TableContainer>
           ) : (
-            <Box>
-              <Typography variant="h6">
-                Ticket Catagory: {ticketData.ticket_catagory}
-              </Typography>
-              <Typography variant="h6">
-                Ticket Description: {ticketData.ticket_description}
-              </Typography>
-            </Box>
+            <TableContainer component={Paper}>
+              <Table
+                sx={{ minWidth: 650 }}
+                size="small"
+                aria-label="a dense table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Session</TableCell>
+                    <TableCell align="right">Location</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {mtRows.map((row) => (
+                    <TableRow
+                      key={row.ticketType}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.ticketSession}
+                      </TableCell>
+                      <TableCell align="right">{row.ticketLocation}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
+        </Box>
+      </Card>
+
+      <Card sx={{ width: "100%", padding: 2 }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Budget Details
+          </Typography>
+        </CardContent>
+        <Divider />
+
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell align="right">Session</TableCell>
+                  <TableCell align="right">Type</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {budRows.map((row) => (
+                  <TableRow
+                    key={row.budgetTitle}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.budgetTitle}
+                    </TableCell>
+                    <TableCell align="right">{row.budgetSession}</TableCell>
+                    <TableCell align="right">{row.budgetType}</TableCell>
+                    <TableCell align="right">{row.budgetAmount}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Card>
     </Box>

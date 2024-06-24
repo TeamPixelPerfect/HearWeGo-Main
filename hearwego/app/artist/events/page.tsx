@@ -16,7 +16,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import { CardActionArea, CardActions, Grid, Paper } from "@mui/material";
+import { CardActionArea, CardActions, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper } from "@mui/material";
 import CardMedia from "@mui/material/CardMedia";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -35,7 +35,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Avatar from "@mui/material/Avatar";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
+import { useRouter } from "next/navigation";
 import { Event } from "@/app/constants/models";
+import { deleteEvent } from "@/app/services/EventServices";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -51,24 +53,10 @@ import {
 } from "../../styles/artistDashboardEventsPage.styles";
 import { getEvents } from "@/app/services/EventServices";
 import { RoundaboutLeft } from "@mui/icons-material";
+import { set } from "date-fns";
 
 //event cards display
 export default function ArtistEvents() {
-  const [eventDetails, setEventDetails] = useState([]);
-
-  useEffect(() => {
-    // Fetch event data from the API route
-    fetch("http://localhost:5000/api/EventsManager/events")
-      .then((response) => response.json())
-      .then((data) => setEventDetails(data))
-      .catch((error) => console.error("Error fetching event data:", error));
-  }, []);
-
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
 
   return (
     <>
@@ -174,6 +162,7 @@ function EventTabs() {
 //event details
 function EventArea() {
   const artist = useAppSelector((state) => state.artist.user);
+  const router = useRouter();
 
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
@@ -182,6 +171,9 @@ function EventArea() {
   const [createdArtist, setCreatedArtist] = useState("");
   const [filter, setFilter] = useState("event_created_by");
   const [pageCount, setPageCount] = useState(0);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState("");
+
 
   useEffect(() => {
     if(artist){
@@ -191,12 +183,43 @@ function EventArea() {
       getEvents( page, limit, filter, artist.artist_id ).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
+        setPageCount(Math.ceil(events.total / limit));
       }); 
     }
   }, [artist, page]);
 
+  const handleDeleteEvent = (event_id: string) => {
+    deleteEvent(artist?.token, event_id).then((res) => {
+      console.log("Event Deleted:::", res);
+      getEvents( page, limit, filter, artist.artist_id ).then((events) => {
+        console.log("Events:::", events);
+        setUpcomingEvents(events.data);
+      }); 
+    });
+  }
+
+  const handleDeleteModal = (event_id: string) => {
+    setSelectedEventId(event_id);
+    setOpenDeleteModal(true);
+  };
+  
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+    setSelectedEventId("");
+  };
+  
+  const handleConfirmDelete = () => {
+    handleDeleteEvent(selectedEventId);
+    handleCloseDeleteModal();
+  };
+
+
   const handlePageChange = (event, value) => {
     setPage(value);
+  }
+
+  const handleCreateEvent = () => {
+    router.push("/artist/events/createEvent");
   }
 
   return (
@@ -217,7 +240,7 @@ function EventArea() {
         >
           My Upcoming Events
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />}>
+        <Button variant="contained" onClick={handleCreateEvent} startIcon={<AddIcon />}>
           Add New Event
         </Button>
       </Box>
@@ -302,7 +325,7 @@ function EventArea() {
                       <IconButton aria-label="budget">
                         <PaidIcon />
                       </IconButton>
-                      <IconButton aria-label="add to shopping cart">
+                      <IconButton onClick={() => { handleDeleteModal(events.event_id) }} aria-label="delete">
                         <DeleteIcon />
                       </IconButton>
                     </Stack>
@@ -324,6 +347,29 @@ function EventArea() {
       >
         <Pagination count={5} color="primary" page={page} onChange={handlePageChange} />
       </Box>
+
+      <Dialog
+  open={openDeleteModal}
+  onClose={handleCloseDeleteModal}
+  aria-labelledby="alert-dialog-title"
+  aria-describedby="alert-dialog-description"
+>
+  <DialogTitle id="alert-dialog-title">{"Delete Event"}</DialogTitle>
+  <DialogContent>
+    <DialogContentText id="alert-dialog-description">
+      Are you sure you want to delete this event?
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleCloseDeleteModal} color="primary">
+      No
+    </Button>
+    <Button onClick={handleConfirmDelete} color="secondary" autoFocus>
+      Yes
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </>
   );
 }
