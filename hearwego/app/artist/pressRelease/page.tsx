@@ -19,7 +19,10 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import SaveIcon from "@mui/icons-material/Save";
 import DropFile from "../../components/DropFile";
-import { addPressRelease } from "../../services/PressReleaseServices";
+import {
+  addPressRelease,
+  getPressReleasesByArtist,
+} from "../../services/PressReleaseServices";
 import { PressReleaseData } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import {
@@ -29,7 +32,19 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  PDFViewer,
+  Image,
+} from "@react-pdf/renderer";
 
 export default function PressRelease() {
   const artist = useAppSelector((state) => state.artist.user);
@@ -40,6 +55,29 @@ export default function PressRelease() {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [draftSavedDialogOpen, setDraftSavedDialogOpen] =
     useState<boolean>(false);
+  const [savedPressReleases, setSavedPressReleases] = useState<
+    PressReleaseData[]
+  >([]);
+  const [error, setError] = useState<Error | null>(null);
+  const [draftPressReleases, setDraftPressReleases] = useState<
+    PressReleaseData[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (artist?.token) {
+      getPressReleasesByArtist(
+        artist.token,
+        artist?.user?.artist_id ? artist.user.artist_id : ""
+      )
+        .then((response) => {
+          setSavedPressReleases(response.data);
+        })
+        .catch((error) => setError(error))
+        .finally(() => setLoading(false));
+    }
+  }, [artist?.token, artist?.user?.artist_id]);
 
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -59,7 +97,7 @@ export default function PressRelease() {
       ReleaseDate: null,
       ArtistLogo_URL: "",
       Siganature: "",
-      ArtistID: "ar4",
+      ArtistID: artist ? artist.user.artist_id : "",
       Status: "",
     },
     validationSchema: Yup.object({
@@ -79,6 +117,7 @@ export default function PressRelease() {
         resetForm();
         setLogoImg(null);
         setSignatureImg(null);
+        setIsEdit(false);
       } catch (error) {
         console.log(error);
       }
@@ -143,6 +182,23 @@ export default function PressRelease() {
       ArtistLogo_URL ||
       Siganature
     );
+  };
+
+  const handleEditDraft = (draft: PressReleaseData) => {
+    formik.setValues({
+      Headline: draft.Headline,
+      SubHeadline: draft.SubHeadline,
+      EventDate: draft.EventDate,
+      Venue: draft.Venue,
+      Description: draft.Description,
+      ReleaseDate: draft.ReleaseDate,
+      ArtistLogo_URL: draft.ArtistLogo_URL,
+      Siganature: draft.Siganature,
+      ArtistID: draft.ArtistID,
+      Status: draft.Status,
+    });
+    setIsEdit(true);
+    setValue("1");
   };
 
   return (
@@ -391,9 +447,27 @@ export default function PressRelease() {
               </TabPanel>
               {/* Saved Ones Tab */}
               <TabPanel value="2">
-                <Typography variant="h6" sx={{ margin: "10px" }}>
-                  Saved Ones
-                </Typography>
+                {savedPressReleases.length > 0 ? (
+                  savedPressReleases.map((item, index) => (
+                    <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
+                      <Typography variant="h5">{item.Headline}</Typography>
+                      <Typography variant="body1">
+                        {item.SubHeadline}
+                      </Typography>
+                      <Typography variant="body2">
+                        Event Date: {item.EventDate}
+                      </Typography>
+
+                      <Typography variant="body2">
+                        Release Date: {item.ReleaseDate}
+                      </Typography>
+                    </Paper>
+                  ))
+                ) : (
+                  <Typography variant="body1">
+                    No saved press releases.
+                  </Typography>
+                )}
               </TabPanel>
               {/* Drafts Tab */}
               <TabPanel value="3">
