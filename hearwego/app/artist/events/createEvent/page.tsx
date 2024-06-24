@@ -65,6 +65,7 @@ import CardMedia from "@mui/material/CardMedia";
 import {
   Alert,
   CardActionArea,
+  CircularProgress,
   Divider,
   FilledInput,
   IconButton,
@@ -76,6 +77,7 @@ import { Ticket } from "@/app/constants/models";
 import { addTicket } from "@/app/services/EventServices";
 import { Budget } from "@/app/constants/models";
 import { addBudget } from "@/app/services/EventServices";
+import { updateEvent } from "@/app/services/EventServices";
 import { AutoTicket } from "@/app/constants/models";
 import { ManualTicket } from "@/app/constants/models";
 import { TicketType } from "@/app/constants/models";
@@ -215,6 +217,10 @@ function CreateEvent() {
 
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openSuccessModal, setOpenSuccessModal] = useState(false);
+  const handleOpenSuccessModal = () => setOpenSuccessModal(true);
+  const handleCloseSuccessModal = () => setOpenSuccessModal(false);
+
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
@@ -461,7 +467,7 @@ function CreateEvent() {
       // If the user skips the second step, set ticket_catagory to "Not-Provided"
       setTicketData((prevTicketData) => ({
         ...prevTicketData,
-        ticket_catagory: "Not-Provided",
+        ticket_type: "Not-Provided",
       }));
     }
 
@@ -543,6 +549,30 @@ function CreateEvent() {
     return isValid;
   };
 
+  const updateEventDetails = async () => {
+    setLoading(true);
+    try {
+      const updatedEventData = { ...eventData };
+      if (eventData.event_status === "private") {
+        updatedEventData.event_status =
+          "public";
+      }
+      const updatedEvent = await updateEvent(
+        artist ? artist.token : "",
+        eventData.event_id,
+        updatedEventData
+      );
+      console.log("Updated Event: ", updatedEvent);
+      handleOpenSuccessModal();
+    } catch (error) {
+      setErrorMessages(["Failed to update event data. Please try again."]);
+      handleOpenErrorModal();
+      console.error("Error updating event data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const submitData = async () => {
     setLoading(true);
     try {
@@ -601,10 +631,7 @@ function CreateEvent() {
               remaining_quantity: createdAutoTicket.ticket_count,
             };
 
-            await addRemainTicket(
-              artist ? artist.token : "",
-              remainingTicket
-            );
+            await addRemainTicket(artist ? artist.token : "", remainingTicket);
           })
         );
       } else if (ticketData.ticket_type === "Manual") {
@@ -635,8 +662,11 @@ function CreateEvent() {
         );
       }
 
+      handleOpenSuccessModal();
       // Handling RemainingTickets if ticket type is "Auto"
     } catch (error) {
+      setErrorMessages(["Failed to submit event data. Please try again."]);
+      handleOpenErrorModal();
       console.error("Error submitting event data:", error);
     } finally {
       setLoading(false);
@@ -672,127 +702,160 @@ function CreateEvent() {
       </Stack>
       <Box sx={{ padding: "2em", paddingLeft: "7em", paddingRight: "7em" }}>
         {allStepsCompleted() ? (
-          <Box
-            sx={{ width: "100%", display: "flex", justifyContent: "center" }}
-          >
-            <Box
-              sx={{
-                width: "50%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Box sx={{ fontSize: "8em", textAlign: "center" }}>
-                <IoCheckmarkDoneCircle />
-              </Box>
+          <>
+            {loading ? (
               <Box
                 sx={{
-                  fontSize: "2em",
-                  textAlign: "center",
                   display: "flex",
                   justifyContent: "center",
+                  alignItems: "center",
+                  height: "100vh",
                 }}
               >
-                <Stack spacing={1} direction="row" sx={{ marginBottom: "1em" }}>
-                  <Typography
-                    color={"text.secondary"}
-                    component={"div"}
-                    sx={{ fontSize: "1em", fontWeight: 400 }}
-                  >
-                    Event Created
-                  </Typography>
-                  <Typography
-                    color={"primary.main"}
-                    component={"div"}
-                    sx={{ fontSize: "1em", fontWeight: 500 }}
-                  >
-                    Successfully !
-                  </Typography>
-                </Stack>
+                <CircularProgress />
               </Box>
-              <Stack direction="row" spacing={2}>
-                <Button variant="outlined">Not Now</Button>
-                <Button variant="contained" endIcon={<PublishIcon />}>
-                  Publish to Fans
-                </Button>
-              </Stack>
-            </Box>
-          </Box>
+            ) : (
+              <ArtistEvents />
+            )}
+          </>
         ) : (
           <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-              <div>
-                {EventCreateShow(
-                  activeStep,
-                  sessionRows,
-                  setSessionRows,
-                  teamRows,
-                  setTeamRows,
-                  sponsorRows,
-                  setSponsorRows,
-                  autoTicketRows,
-                  setAutoTicketRows,
-                  manualTicketRows,
-                  setManualTicketRows,
-                  eventData,
-                  setEventData,
-                  ticketData,
-                  setTicketData,
-                  isAutoTicket,
-                  setIsAutoTicket,
-                  isManualTicket,
-                  setIsManualTicket,
-                  ticketImage,
-                  setTicketImage,
-                  eventImage,
-                  setEventImage,
-                  budgetRows,
-                  setBudgetRows
-                )}
-              </div>
-            </Typography>
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
+            {loading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100vh",
+                }}
               >
-                Back
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              {activeStep < 3 && (
-                <Button
-                  onClick={handleSkip}
-                  sx={{ mr: 1 }}
-                  disabled={activeStep === 0}
-                >
-                  Skip
-                </Button>
-              )}
-              {/* <Button onClick={handleNext} sx={{ mr: 1 }}>
-                Next
-              </Button> */}
-              {activeStep !== steps.length &&
-                (completed[activeStep] ? (
-                  <Typography
-                    variant="caption"
-                    sx={{ display: "inline-block" }}
+                <CircularProgress />
+              </Box>
+            ) : (
+              <>
+                <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
+                  <div>
+                    {EventCreateShow(
+                      activeStep,
+                      sessionRows,
+                      setSessionRows,
+                      teamRows,
+                      setTeamRows,
+                      sponsorRows,
+                      setSponsorRows,
+                      autoTicketRows,
+                      setAutoTicketRows,
+                      manualTicketRows,
+                      setManualTicketRows,
+                      eventData,
+                      setEventData,
+                      ticketData,
+                      setTicketData,
+                      isAutoTicket,
+                      setIsAutoTicket,
+                      isManualTicket,
+                      setIsManualTicket,
+                      ticketImage,
+                      setTicketImage,
+                      eventImage,
+                      setEventImage,
+                      budgetRows,
+                      setBudgetRows
+                    )}
+                  </div>
+                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                  <Button
+                    color="inherit"
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
+                    sx={{ mr: 1 }}
                   >
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
-                  <Button onClick={handleComplete}>
-                    {completedSteps() === totalSteps() - 1
-                      ? "Finish"
-                      : "Complete Step"}
+                    Back
                   </Button>
-                ))}
-            </Box>
+                  <Box sx={{ flex: "1 1 auto" }} />
+                  {activeStep < 3 && (
+                    <Button
+                      onClick={handleSkip}
+                      sx={{ mr: 1 }}
+                      disabled={activeStep === 0}
+                    >
+                      Skip
+                    </Button>
+                  )}
+                  {activeStep !== steps.length &&
+                    (completed[activeStep] ? (
+                      <Typography
+                        variant="caption"
+                        sx={{ display: "inline-block" }}
+                      >
+                        Step {activeStep + 1} already completed
+                      </Typography>
+                    ) : (
+                      <Button onClick={handleComplete} disabled={loading}>
+                        {loading ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          "Complete Step"
+                        )}
+                      </Button>
+                    ))}
+                </Box>
+              </>
+            )}
           </React.Fragment>
         )}
       </Box>
+
+      <Modal open={openSuccessModal} onClose={handleCloseSuccessModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 5,
+          }}
+        >
+          <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
+            <IconButton onClick={handleCloseSuccessModal}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <IoCheckmarkDoneCircle
+              style={{ fontSize: "5em", color: "green" }}
+            />
+            <Typography
+              variant="h6"
+              component="h2"
+              color="success.main"
+              sx={{ marginBottom: 2 }}
+            >
+              Event Created Successfully!
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleCloseSuccessModal}>
+                Not Now
+              </Button>
+              <Button variant="contained" onClick = {updateEventDetails} endIcon={<PublishIcon />}>
+                Publish to Fans
+              </Button>
+            </Stack>
+          </Box>
+        </Box>
+      </Modal>
 
       <Modal open={openErrorModal} onClose={handleCloseErrorModal}>
         <Box
@@ -808,9 +871,9 @@ function CreateEvent() {
             borderRadius: 5,
           }}
         >
-          <Box sx={{ width: "100", display: "flex", justifyContent: "end" }}>
-            <IconButton>
-              <CloseIcon onClick={handleCloseErrorModal} />
+          <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
+            <IconButton onClick={handleCloseErrorModal}>
+              <CloseIcon />
             </IconButton>
           </Box>
           <Box
@@ -832,7 +895,7 @@ function CreateEvent() {
             </Typography>
 
             {errorMessages.map((error, index) => (
-              <Alert severity="error" sx={{ marginBottom: 1 }}>
+              <Alert key={index} severity="error" sx={{ marginBottom: 1 }}>
                 {error}
               </Alert>
             ))}

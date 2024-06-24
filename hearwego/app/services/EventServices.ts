@@ -228,6 +228,26 @@ export const addTicket = async (token: string, data: any) => {
   }
 };
 
+export const updateEvent = async (token: string, id: string, data: any) => {
+  console.log("Sending updated event data:", data);
+  const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const event = await res.json();
+    return event;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
 export const addBudget = async (token: string, data: any) => {
   console.log("Sending budget data:", data); 
   const res = await fetch(`${base_url}/EventsManager/budget`, {
