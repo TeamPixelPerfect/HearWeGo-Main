@@ -1,6 +1,13 @@
 // Drafts.jsx
 import React, { useEffect, useState } from "react";
-import { Box, TextField, Container, Grid } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Container,
+  Grid,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import SingleProductCard from "../../components/SingleProductCardMerchA";
 import { getDraftProductsforStore } from "@/app/services/StoreServices";
 import { Product } from "@/app/constants/models";
@@ -105,6 +112,12 @@ interface Props {
 const Drafts = ({ store_id }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [draftProductsData, setDraftProductsData] = useState<Product[]>([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+  const [editComplete, setEditComplete] = useState(false);
 
   const handleSearchChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -125,14 +138,31 @@ const Drafts = ({ store_id }: Props) => {
 
   useEffect(() => {
     getDraftProducts();
-  }, [])
+    if (editComplete) {
+      getDraftProducts();
+      setEditComplete(false);
+    }
+  }, [store_id, editComplete]);
 
   const filteredDraftProducts = draftProductsData.filter(
     (product) =>
-      product?.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.product_description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product?.product_name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      product?.product_description
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       product?.product_id?.toString().includes(searchQuery)
   );
+
+  const handleSnackbarOpen = (
+    message: string,
+    severity: "success" | "error"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
   return (
     <Box
@@ -162,11 +192,27 @@ const Drafts = ({ store_id }: Props) => {
         <Grid container spacing={2}>
           {filteredDraftProducts.map((product) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={product?.product_id}>
-              <SingleProductCard product={product} />
+              <SingleProductCard
+                product={product}
+                setEditComplete={setEditComplete}
+                handleSnackbarOpen={handleSnackbarOpen}
+              />
             </Grid>
           ))}
         </Grid>
       </Container>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

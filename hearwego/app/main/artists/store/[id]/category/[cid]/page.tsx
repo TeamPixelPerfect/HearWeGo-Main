@@ -317,12 +317,18 @@ export default function ArtistStoreProduct() {
     <>
       <AppBar position="static">
         <Toolbar>
-          <IconButton size="large" color="inherit" aria-label="open drawer" sx={{ mr: 2 }}>
+          <IconButton
+            size="large"
+            color="inherit"
+            aria-label="open drawer"
+            sx={{ mr: 2 }}
+          >
             <Avatar
               alt="Remy Sharp"
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7MqiW7aEQD6l9uy0Icz9mn48gFLO5eahaMw&s"
             />
           </IconButton>
+
           <Search>
             <SearchIconWrapper>
               <IconButton type="button" sx={{ p: "10" }} aria-label="Search">
@@ -330,13 +336,16 @@ export default function ArtistStoreProduct() {
               </IconButton>
             </SearchIconWrapper>
             <StyledInputBase
-              sx={{ padding: "10px" }}
+              sx={{
+                padding: "70px",
+              }}
               placeholder="Search here"
               inputProps={{ "aria-label": "search" }}
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
           </Search>
+
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -344,11 +353,32 @@ export default function ArtistStoreProduct() {
             onClick={() => {
               router.push("/main/user/cart");
             }}
+             
           >
             <Badge badgeContent={4} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
+
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "right",
+              justifyContent: "right",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                router.push("/main/user/orders");
+              }}
+              sx={{ textTransform: "none", marginLeft: "80px" }}
+            >
+              Orders
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
       <WhiteArea>

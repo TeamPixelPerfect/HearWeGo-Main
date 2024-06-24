@@ -16,15 +16,25 @@ import {
   DialogTitle,
   Snackbar,
   Alert,
+  Select,
+  MenuItem,
+  FormHelperText,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import DropFile from "@/app/components/DropFile";
 import { useRouter } from "next/navigation";
 import { MerchProduct } from "../../../constants/models";
-import { addMerchProduct } from "../../../services/StoreServices";
+import {
+  addMerchProduct,
+  getCategories,
+  getStoreForArtist,
+} from "../../../services/StoreServices";
 import { useAppSelector } from "@/lib/hooks";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { isDraft } from "@reduxjs/toolkit";
 
 const AddProduct = ({
   handleAddProduct,
@@ -40,6 +50,7 @@ const AddProduct = ({
     "success"
   );
   const [successMessage, setSuccessMessage] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const handleClose = () => {
     setConfirmDialogOpen(true);
@@ -50,12 +61,31 @@ const AddProduct = ({
   };
 
   const handleCancel = () => {
+    handleSaveToDraft();
     router.push("../merchandise");
+  };
+
+  const handleSaveToDraft = async () => {
+    try {
+      await addMerchProduct(artist?.token ? artist?.token : "", {
+        isDraft: true,
+        ...formik.values,
+      });
+      setSuccessMessage("Product saved to drafts successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      setSnackbarMessage("Failed to save product to drafts");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
 
   const validationSchema = Yup.object({
     product_name: Yup.string().required("Product name is required"),
-    product_description: Yup.string().required("Product description is required"),
+    product_description: Yup.string().required(
+      "Product description is required"
+    ),
     catagory_name: Yup.string().required("Category name is required"),
     product_price: Yup.number()
       .required("Product price is required")
@@ -67,12 +97,11 @@ const AddProduct = ({
       .required("Product rating is required")
       .min(0, "Rating must be between 0 and 5")
       .max(5, "Rating must be between 0 and 5"),
-    product_Main_image: Yup.mixed()
-      .required("Main product image is required"),
+    product_Main_image: Yup.mixed().required("Main product image is required"),
 
-    product_Additional_image: Yup.mixed()
-      .required("Additional product image is required")
-  
+    product_Additional_image: Yup.mixed().required(
+      "Additional product image is required"
+    ),
   });
 
   const formik = useFormik({
@@ -85,12 +114,15 @@ const AddProduct = ({
       product_price: "",
       product_quantity: "",
       product_rating: "",
-      store_id: "st20",
+      store_id: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
-        const res = await addMerchProduct(artist.token, values);
+        const res = await addMerchProduct(
+          artist?.token ? artist?.token : "",
+          values
+        );
         console.log(res);
         setSuccessMessage("Product added successfully!");
         setSnackbarSeverity("success");
@@ -117,12 +149,22 @@ const AddProduct = ({
 
   useEffect(() => {
     if (productAdditionalImage) {
-      formik.setFieldValue(
-        "product_Additional_image",
-        productAdditionalImage
-      );
+      formik.setFieldValue("product_Additional_image", productAdditionalImage);
     }
   }, [productAdditionalImage]);
+
+  useEffect(() => {
+    getCategories().then((res) => {
+      setCategories(res.data);
+    });
+
+    getStoreForArtist(artist?.user.artist_id ? artist.user.artist_id : "").then(
+      (res) => {
+        console.log(res);
+        formik.setFieldValue("store_id", res.store_id);
+      }
+    );
+  }, []);
 
   return (
     <Box
@@ -139,12 +181,7 @@ const AddProduct = ({
       <Container maxWidth="lg">
         <Card sx={{ display: "flex", flexDirection: "column", p: 3 }}>
           <CardContent>
-            <Typography
-              variant="h4"
-              component="h2"
-              gutterBottom
-              align="center"
-            >
+            <Typography variant="h4" component="h2" gutterBottom align="center">
               Add New Product
             </Typography>
             <form onSubmit={formik.handleSubmit}>
@@ -250,24 +287,37 @@ const AddProduct = ({
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <TextField
-                        value={formik.values.catagory_name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        name="catagory_name"
-                        type="text"
-                        label="Product Category"
-                        variant="outlined"
-                        fullWidth
-                        error={
-                          formik.touched.catagory_name &&
-                          Boolean(formik.errors.catagory_name)
-                        }
-                        helperText={
-                          formik.touched.catagory_name &&
-                          formik.errors.catagory_name
-                        }
-                      />
+                      <FormControl variant="outlined" fullWidth>
+                        <InputLabel>Product Category</InputLabel>
+                        <Select
+                          value={formik.values.catagory_name}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          name="catagory_name"
+                          type="text"
+                          label="Product Category"
+                          variant="outlined"
+                          fullWidth
+                          error={
+                            formik.touched.catagory_name &&
+                            Boolean(formik.errors.catagory_name)
+                          }
+                        >
+                          {categories &&
+                            categories?.map((category: any) => (
+                              <MenuItem
+                                value={category?.category_name}
+                                key={category}
+                              >
+                                {category?.category_name}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>
+                          {formik.touched.catagory_name &&
+                            formik.errors.catagory_name}
+                        </FormHelperText>
+                      </FormControl>
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
@@ -363,12 +413,12 @@ const AddProduct = ({
         <DialogContent>
           <DialogContentText>
             Are you sure you want to cancel adding the product? Your changes
-            will not be saved.
+            will be saved to drafts.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancel} color="primary">
-            Yes, Cancel
+            Yes, Save to Drafts
           </Button>
           <Button onClick={handleConfirmClose} color="primary" autoFocus>
             No

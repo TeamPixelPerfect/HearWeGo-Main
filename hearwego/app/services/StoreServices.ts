@@ -79,15 +79,17 @@ export const addMerchPromo = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
- 
 
 export const getProductsforStore = async (storeId: string) => {
-  const res = await fetch(`${base_url}/MerchsManager/products/store/${storeId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const res = await fetch(
+    `${base_url}/MerchsManager/products/store/${storeId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (res.ok) {
     const product = await res.json();
     return product;
@@ -95,15 +97,18 @@ export const getProductsforStore = async (storeId: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 export const getDraftProductsforStore = async (storeId: string) => {
-  const res = await fetch(`${base_url}/MerchsManager/products/store/drafts/${storeId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const res = await fetch(
+    `${base_url}/MerchsManager/products/store/drafts/${storeId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (res.ok) {
     const product = await res.json();
     return product;
@@ -111,16 +116,18 @@ export const getDraftProductsforStore = async (storeId: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
-
+};
 
 export const getStoreForArtist = async (artistId: string) => {
-  const res = await fetch(`${base_url}/MerchsManager/merchStores/artist/${artistId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const res = await fetch(
+    `${base_url}/MerchsManager/merchStores/artist/${artistId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (res.ok) {
     const store = await res.json();
     return store;
@@ -128,7 +135,7 @@ export const getStoreForArtist = async (artistId: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 export const getCategories = async () => {
   const res = await fetch(`${base_url}/MerchsManager/categories`, {
@@ -144,7 +151,7 @@ export const getCategories = async () => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 export const getPromosForStore = async (storeId: string) => {
   const res = await fetch(`${base_url}/MerchsManager/promos/store/${storeId}`, {
@@ -160,7 +167,7 @@ export const getPromosForStore = async (storeId: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 export const getOrdersForStore = async (storeId: string) => {
   const res = await fetch(`${base_url}/MerchsManager/orders/store/${storeId}`, {
@@ -176,4 +183,104 @@ export const getOrdersForStore = async (storeId: string) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
+
+export const editProduct = async (
+  token: string,
+  productId: string,
+  data: any
+) => {
+  console.log("Sending product data :", data);
+  const res = await fetch(`${base_url}/MerchsManager/products/${productId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const product = await res.json();
+    return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deleteProduct = async (token: string, productId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/products/${productId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const editCategory = async (
+  token: string,
+  categoryId: string,
+  data: any
+) => {
+  console.log("Sending category data :", data);
+  const res = await fetch(
+    `${base_url}/MerchsManager/categories/${categoryId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  if (res.ok) {
+    const category = await res.json();
+    return category;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deleteCategory = async (token: string, categoryId: string) => {
+  const res = await fetch(
+    `${base_url}/MerchsManager/categories/${categoryId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    return;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deletePromo = async (token: string, promoId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/promos/${promoId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};

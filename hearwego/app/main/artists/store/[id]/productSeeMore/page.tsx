@@ -483,6 +483,26 @@ export default function ArtistStoreProduct() {
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
+
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "right",
+              justifyContent: "right",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                router.push("/main/user/orders");
+              }}
+              sx={{ textTransform: "none", marginLeft: "80px" }}
+            >
+              Orders
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
       <WhiteArea>

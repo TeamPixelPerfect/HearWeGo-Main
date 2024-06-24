@@ -55,7 +55,7 @@ export const products = [
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     image2:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
     ratingCount: 10,
     category: "Clothing",
@@ -80,10 +80,10 @@ export const products = [
     name: "Printed Mug",
     description: "This is a sample product description.",
     price: 450.99,
-  
+
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhgAP-60PT1IOBAQddQodNfcFd5dbH4MsIqA&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4,
     ratingCount: 10,
@@ -111,7 +111,7 @@ export const products = [
     price: 2500,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     ratingCount: 10,
@@ -139,7 +139,7 @@ export const products = [
     price: 500.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_Hvy958Oj2sGzhIWCv-QezqAAcqzsct3HdA&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
     ratingCount: 10,
@@ -167,7 +167,7 @@ export const products = [
     price: 290.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT92vvUqXdziIP4FrxCPJo7G6oemT4TnpxUSg&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
     ratingCount: 10,
@@ -195,7 +195,7 @@ export const products = [
     price: 2900.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5oBDb1RPCPRI9YcsN461xLBsPSixy1hf_Gw&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     ratingCount: 10,
@@ -223,7 +223,7 @@ export const products = [
     price: 699.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeGtLvPukCF2z-9ruBGJgfK1ufoqI63244lw&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
     ratingCount: 10,
@@ -251,7 +251,7 @@ export const products = [
     price: 2900.99,
     image1:
       "https://estudio.lk/wp-content/uploads/2021/09/WhatsApp-Image-2021-08-30-at-9.36.34-PM-300x300.jpeg",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2,
     ratingCount: 10,
@@ -279,7 +279,7 @@ export const products = [
     price: 290.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3TvBn8PhR6toQ_Tv2Z-4SUhCp2YesmO5caA&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 4.5,
     ratingCount: 10,
@@ -307,7 +307,7 @@ export const products = [
     price: 3909.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUPbylf85GIvt4JPKd6w3lgObJhEj9_jWIQ&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 3.5,
     ratingCount: 10,
@@ -335,7 +335,7 @@ export const products = [
     price: 829.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQJIynAUBiePm7bn2ozvVZAgtItfWsOdYMoA&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 2.5,
     ratingCount: 10,
@@ -363,7 +363,7 @@ export const products = [
     price: 9900.99,
     image1:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNqV1tfB4BP5W-acPcRcTXG9cHzqOKPkirNw&s",
-      image2:
+    image2:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Mly2gYaxlsywPgiP2sXaPEkOE333Dwgu3w&s",
     rating: 1.5,
     ratingCount: 10,
@@ -484,8 +484,7 @@ const ArtistStore = () => {
               onChange={handleSearchInputChange}
             />
           </Search>
-         
-         {/* <Link href ="/main/user/cart"> */}
+
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -493,12 +492,31 @@ const ArtistStore = () => {
             onClick={() => {
               router.push("/main/user/cart");
             }}
-             >
+          >
             <Badge badgeContent={4} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
-          {/* </Link> */}
+
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "right",
+              justifyContent: "right",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                router.push("/main/user/orders");
+              }}
+              sx={{ textTransform: "none", marginLeft: "80px" }}
+            >
+              Orders
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -546,15 +564,15 @@ const ArtistStore = () => {
             </Button>
 
             {/* <Link href="/main/artists/store/1/productSeeMore"> */}
-              <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               color="primary"
               onClick={() => {
                 router.push("/main/artists/store/1/productSeeMore");
               }}
-              >
-                See More
-              </Button>
+            >
+              See More
+            </Button>
             {/* </Link> */}
           </div>
 

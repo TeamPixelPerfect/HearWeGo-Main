@@ -15,6 +15,8 @@ import {
   TextField,
 } from "@mui/material";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Link from '@mui/material/Link';
+import { useRouter } from "next/navigation";
 
 
 interface OrderItemProps {
@@ -40,18 +42,24 @@ const OrderItem: React.FC<OrderItemProps> = ({
   total,
   buttonLabel,
 }) => {
+
+  const router = useRouter();
+
   return (
+    
     <Card
       style={{
         marginBottom: "20px",
         width: "98%",
         padding: "10px",
+       
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Typography variant="subtitle2">{orderId}</Typography>
         <Typography variant="body2">{orderDate}</Typography>
       </Box>
+      <Link href={"/main/user/orders/1"}>
       <Box style={{ display: "flex", flexDirection: "row" }}>
         {items.map((item, index) => (
           <Box key={index} style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
@@ -62,6 +70,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
                 style={{ width: "100px", height: "100px", objectFit: "cover" }}
               />
             </Box>
+            
             <CardContent>
               <Typography variant="h6">{item.title}</Typography>
               <Typography variant="body2">Rs. {item.price}</Typography>
@@ -70,16 +79,24 @@ const OrderItem: React.FC<OrderItemProps> = ({
           </Box>
         ))}
       </Box>
+      </Link>
       <Box style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="body2" color="textSecondary">
           {status}
         </Typography>
         <Typography variant="body2">Total: Rs. {total}</Typography>
-        <Button variant="contained" color="primary">
+        <Button 
+        variant="contained" 
+        color="primary"
+        onClick={() => {
+          router.push("/main/artists/store/1/product/1");
+        }}
+        >
           {buttonLabel}
         </Button>
       </Box>
     </Card>
+  
   );
 };
 
@@ -171,6 +188,7 @@ const OrderPage: React.FC = () => {
       item.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
+
 
   return (
     <Box style={{ padding: "20px", fontFamily: "Arial, Helvetica, sans-serif" }}>

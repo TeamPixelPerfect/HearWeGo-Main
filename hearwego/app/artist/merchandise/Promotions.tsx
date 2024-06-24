@@ -33,16 +33,17 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
 import EventIcon from "@mui/icons-material/Event";
 import CloseIcon from "@mui/icons-material/Close";
-import { addMerchPromo, getPromosForStore } from "../../services/StoreServices";
+import { addMerchPromo, deletePromo, getPromosForStore } from "../../services/StoreServices";
 import { useAppSelector } from "@/lib/hooks";
 import { String } from "aws-sdk/clients/apigateway";
+import { ar } from "date-fns/locale";
 
 interface Promotion {
-  id: number;
-  code: string;
-  description: string;
-  startDate: string;
-  endDate: string;
+  promo_id: number;
+  promo_code: string;
+  promo_description: string;
+  promo_start: string;
+  promo_end: string;
 }
 
 interface Props {
@@ -88,7 +89,7 @@ const Promotions = ({ store_id }: Props) => {
           promo_start: values.startDate,
           promo_end: values.endDate,
           promo_status: "active", // Example status, adjust as necessary
-          store_id: "st20", // Example store ID, adjust as necessary
+          store_id: store_id // Example store ID, adjust as necessary
         };
         const newPromo = await addMerchPromo(artist?.token? artist.token : "", promoData);
         setPromotions([...promotions, { ...newPromo, id: Date.now() }]);
@@ -111,7 +112,7 @@ const Promotions = ({ store_id }: Props) => {
     if (editingPromotion) {
       setPromotions(
         promotions.map((p) =>
-          p.id === editingPromotion.id ? editingPromotion : p
+          p.promo_id === editingPromotion.promo_id ? editingPromotion : p
         )
       );
       setEditingPromotion(null);
@@ -119,17 +120,22 @@ const Promotions = ({ store_id }: Props) => {
     setOpenEditDialog(false);
   };
 
-  const handleDeletePromotion = (id: number) => {
-    setPromotions(promotions.filter((promotion) => promotion.id !== id));
+  const handleDeletePromotion = (id: string) => {
+    deletePromo(artist?.token? artist.token : "", id).then(() => {
+      handleSnackbarOpen("Promotion deleted successfully!");
+      fetchPromos();
+    });
+    
     setOpenEditDialog(false);
   };
 
   const generateQRCodeValue = (promotion: Promotion) => {
-    return `Promo Code: ${promotion.code}\nDescription: ${promotion.description}\nStart Date: ${promotion.startDate}\nEnd Date: ${promotion.endDate}`;
+    return `Promo Code: ${promotion.promo_code}\nDescription: ${promotion.promo_description}\nStart Date: ${promotion.promo_start?.split("T")[0]}\nEnd Date: ${promotion.promo_end?.split("T")[0]}`;
   };
 
   const fetchPromos = () => {
     getPromosForStore(store_id).then((res) => {
+      console.log(res)
       setPromotions(res);
     })
   }
@@ -140,8 +146,8 @@ const Promotions = ({ store_id }: Props) => {
 
   const filteredPromotions = promotions.filter((promotion) => {
     const now = new Date();
-    const startDate = new Date(promotion.startDate);
-    const endDate = new Date(promotion.endDate);
+    const startDate = new Date(promotion.promo_start);
+    const endDate = new Date(promotion.promo_end);
 
     if (filter === "ongoing") return now >= startDate && now <= endDate;
     if (filter === "upcoming") return now < startDate;
@@ -270,7 +276,7 @@ const Promotions = ({ store_id }: Props) => {
 
       <Grid container spacing={3}>
         {filteredPromotions.map((promotion) => (
-          <Grid item xs={12} sm={6} md={4} key={promotion.id}>
+          <Grid item xs={12} sm={6} md={4} key={promotion.promo_id}>
             <Fade in>
               <Card
                 sx={{
@@ -288,13 +294,13 @@ const Promotions = ({ store_id }: Props) => {
                 >
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h6" component="div" gutterBottom>
-                      {promotion.code}
+                      {promotion.promo_code}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
                       <DescriptionIcon
                         sx={{ verticalAlign: "middle", mr: 1 }}
                       />
-                      {promotion.description}
+                      {promotion.promo_description}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -302,7 +308,7 @@ const Promotions = ({ store_id }: Props) => {
                       sx={{ mt: 1 }}
                     >
                       <EventIcon sx={{ verticalAlign: "middle", mr: 1 }} />
-                      {promotion.startDate} - {promotion.endDate}
+                      {promotion.promo_start?.split("T")[0]} - {promotion.promo_end?.split("T")[0]}
                     </Typography>
                   </Box>
                   <Box sx={{ ml: 2 }}>
@@ -310,11 +316,11 @@ const Promotions = ({ store_id }: Props) => {
                   </Box>
                 </CardContent>
                 <CardActions>
-                  <IconButton onClick={() => handleEditPromotion(promotion)}>
+                  {/* <IconButton onClick={() => handleEditPromotion(promotion)}>
                     <EditIcon />
-                  </IconButton>
+                  </IconButton> */}
                   <IconButton
-                    onClick={() => handleDeletePromotion(promotion.id)}
+                    onClick={() => handleDeletePromotion(promotion.promo_id)}
                   >
                     <DeleteIcon />
                   </IconButton>

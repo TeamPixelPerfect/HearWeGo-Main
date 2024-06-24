@@ -26,9 +26,10 @@ import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import DropFile from "../../components/DropFile";
-import { addMerchCategory, getCategories } from "../../services/StoreServices"; // Make sure to implement this service
+import { addMerchCategory, deleteCategory, editCategory, getCategories } from "../../services/StoreServices"; // Make sure to implement this service
 import { MerchCategory } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
+import { String } from "aws-sdk/clients/apigateway";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -53,6 +54,7 @@ const Categories: React.FC = () => {
     "success"
   );
   const [categories, setCategories] = useState<MerchCategory[]>([]);
+  const [categoryId, setCategoryId] = useState<String>("");
 
   const handleClickOpen = (isEdit: boolean) => {
     setOpen(true);
@@ -71,21 +73,18 @@ const Categories: React.FC = () => {
 
   const handleConfirmDialogOpen = (
     type: "cancel" | "delete",
-    index?: number
+    categoryId?: string | undefined
   ) => {
-    setConfirmDialogType(type);
-    setDeleteIndex(index ?? null);
+    setConfirmDialogType(type); 	
+    setCategoryId(categoryId? categoryId: "")
     setConfirmDialogOpen(true);
   };
 
   const handleConfirmAction = () => {
     if (confirmDialogType === "cancel") {
       handleClose();
-    } else if (confirmDialogType === "delete" && deleteIndex !== null) {
-      setCategories((prev) => prev.filter((_, i) => i !== deleteIndex));
-      setSnackbarMessage("Category deleted successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+    } else if (confirmDialogType === "delete") {
+      handleDelete(categoryId);
     }
     handleConfirmDialogClose();
   };
@@ -123,7 +122,7 @@ const Categories: React.FC = () => {
         subCategories: values.subCategories
           .split(",")
           .map((subCat) => subCat.trim()),
-        image: values.logoFile,
+        image: values?.logoFile? values.logoFile : "",
       };
 
       try {
@@ -162,8 +161,25 @@ const Categories: React.FC = () => {
       subCategories: categoryToEdit.subCategories.join(", "),
       logoFile: categoryToEdit.image,
     });
+    editCategory(artist?.token? artist.token : "", categoryToEdit?.category_id? categoryToEdit.category_id: "", categoryToEdit).then((res) => {
+      console.log("Category edited successfully:", res);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      setSnackbarMessage("Category edited successfully!");
+      fetchCategories();
+    })
     handleClickOpen(true);
   };
+
+  const handleDelete = async (categoryId: string | undefined) => {
+    deleteCategory(artist?.token? artist.token : "", categoryId? categoryId : "").then((res) => {
+      console.log("Category deleted successfully:", res);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      setSnackbarMessage("Category deleted successfully!");
+      fetchCategories();
+    })
+  }
 
   const fetchCategories = () => {
     getCategories().then((res) => {
@@ -211,7 +227,7 @@ const Categories: React.FC = () => {
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleConfirmDialogOpen("delete", index)}
+                      onClick={() => handleConfirmDialogOpen("delete", category.category_id)}
                     >
                       <DeleteIcon />
                     </IconButton>

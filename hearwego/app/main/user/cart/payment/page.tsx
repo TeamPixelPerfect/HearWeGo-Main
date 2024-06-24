@@ -166,7 +166,12 @@ const App: React.FC = () => {
                 <Typography variant="h6">Total:</Typography>
                 <Typography variant="h6">$240</Typography>
               </Box>
-              <Button variant="contained" color="primary" fullWidth sx={{ marginTop: '20px' }} onClick={handlePlaceOrder}>
+
+              <Button 
+              variant="contained" 
+              color="primary" 
+              fullWidth sx={{ marginTop: '20px' }} 
+              onClick={handlePlaceOrder}>
                 Place Order
               </Button>
             </CardContent>

@@ -9,7 +9,9 @@ import {
   InputLabel,
   FormControl,
   Checkbox,
+  Snackbar,
   FormControlLabel,
+  Alert,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import SingleProductCard from "../../components/SingleProductCardMerchA";
@@ -114,20 +116,40 @@ interface Props {
   store_id: string;
 }
 
-const Inventory = ({ store_id } : Props ) => {
+const Inventory = ({ store_id }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [productsData, setProductsData] = useState<MerchProduct[]>([]);
   const [outOfStockFilter, setOutOfStockFilter] = useState(false);
-  
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editComplete, setEditComplete] = useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+  // Function to handle closing snackbar
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleSnackbarOpen = (message: string, severity: "success" | "error") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  }
+
   useEffect(() => {
     getProductsforStore(store_id).then((data) => {
       setProductsData(data);
     });
-  }, [store_id]);
+    if (editComplete) {
+      setEditComplete(false);
+    }
+  }, [store_id, editComplete]);
 
   const handleSearchChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -161,25 +183,29 @@ const Inventory = ({ store_id } : Props ) => {
 
   const filteredProducts = productsData
     .filter(
-      (product) =>
-        product.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.product_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product: any) =>
+        product.product_name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        product.product_description
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         product.product_id.toString().includes(searchQuery)
     )
     .filter(
-      (product) =>
+      (product: any) =>
         !categoryFilter ||
         product.category.toLowerCase() === categoryFilter.toLowerCase()
     )
     .filter(
-      (product) =>
+      (product: any) =>
         (minPrice === "" || product.product_price >= parseFloat(minPrice)) &&
         (maxPrice === "" || product.product_price <= parseFloat(maxPrice))
     )
-    .filter((product) => !outOfStockFilter || product.quantity === 0);
+    .filter((product: any) => !outOfStockFilter || product.quantity === 0);
 
   const uniqueCategories = [
-    ...new Set(productsData.map((product) => product.category)),
+    ...new Set(productsData.map((product: any) => product.category)),
   ];
 
   return (
@@ -266,13 +292,29 @@ const Inventory = ({ store_id } : Props ) => {
           </Grid>
         </Grid>
         <Grid container spacing={2}>
-          {filteredProducts.map((product) => (
+          {filteredProducts.map((product: any) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={product?.pid}>
-              <SingleProductCard product={product} />
+              <SingleProductCard
+                product={product}
+                setEditComplete={setEditComplete}
+                handleSnackbarOpen={handleSnackbarOpen}
+              />
             </Grid>
           ))}
         </Grid>
       </Container>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
