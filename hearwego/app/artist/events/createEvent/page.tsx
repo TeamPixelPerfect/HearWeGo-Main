@@ -291,10 +291,10 @@ function CreateEvent() {
 
   useEffect(() => {
     if (isAutoTicket) {
-      setTicketData({ ...ticketData, ticket_catagory: "Auto" });
+      setTicketData({ ...ticketData, ticket_type: "Auto" });
     }
     if (isManualTicket) {
-      setTicketData({ ...ticketData, ticket_catagory: "Manual" });
+      setTicketData({ ...ticketData, ticket_type: "Manual" });
     }
   }, [isAutoTicket, isManualTicket]);
 
@@ -562,22 +562,10 @@ function CreateEvent() {
 
       let updatedTicketData = { ...ticketData, event_id: eventId };
 
-      if (ticketData.ticket_catagory === "Manual") {
-        updatedTicketData = { ...updatedTicketData, auto_ticket_details: [] };
-      } else if (ticketData.ticket_catagory === "Auto") {
-        updatedTicketData = { ...updatedTicketData, manual_ticket_details: [] };
-      } else if (ticketData.ticket_catagory === "Not-Provided") {
-        updatedTicketData = {
-          ...updatedTicketData,
-          auto_ticket_details: [],
-          manual_ticket_details: [],
-        };
-      }
-
-      await addTicket(artist ? artist.token : "", updatedTicketData);
+      await addTicketType(artist ? artist.token : "", updatedTicketData);
 
       // Handle AutoTicket and ManualTicket data submissions
-      if (ticketData.ticket_catagory === "Auto") {
+      if (ticketData.ticket_type === "Auto") {
         await Promise.all(
           autoTicketRows.map(async (row) => {
             const { id, ...autoTicketWithoutId } = row;
@@ -617,22 +605,9 @@ function CreateEvent() {
               artist ? artist.token : "",
               remainingTicket
             );
-            // await Promise.all(
-            //   createdAutoTicket?.map(async (row) => {
-            //     const remainingTicket = {
-            //       ticket_id: row.auto_ticket_id,
-            //       remaining_quantity: row.ticket_count,
-            //     };
-            //     // Submit remainingTicket to backend function addRemainingTickets
-            //     await addRemainTicket(
-            //       artist ? artist.token : "",
-            //       remainingTicket
-            //     );
-            //   })
-            // );
           })
         );
-      } else if (ticketData.ticket_catagory === "Manual") {
+      } else if (ticketData.ticket_type === "Manual") {
         await Promise.all(
           manualTicketRows.map(async (row) => {
             const { id, ...manualTicketWithoutId } = row;
@@ -1098,11 +1073,11 @@ function TicketDetails({
     if (isChecked) {
       setIsAutoTicket(true);
       setIsManualTicket(false);
-      setTicketData((prev) => ({ ...prev, ticket_catagory: "Auto" }));
+      setTicketData((prev) => ({ ...prev, ticket_type: "Auto" }));
     } else {
       setIsAutoTicket(false);
       setIsManualTicket(true);
-      setTicketData((prev) => ({ ...prev, ticket_catagory: "Manual" }));
+      setTicketData((prev) => ({ ...prev, ticket_type: "Manual" }));
     }
   }, [isChecked]);
 
