@@ -100,6 +100,7 @@ import { IOSSwitch } from "../../../styles/switch.styles";
 
 import DropFile from "../../../components/DropFile";
 import { useAppSelector } from "@/lib/hooks";
+import { GiConsoleController } from "react-icons/gi";
 
 const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
   ({ theme, ownerState }) => ({
@@ -215,6 +216,8 @@ const errorModalStyle = {
 function CreateEvent() {
   const artist = useAppSelector((state) => state.artist.user);
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
@@ -236,6 +239,7 @@ function CreateEvent() {
   const [ticketImage, setTicketImage] = useState("");
   const [eventImage, setEventImage] = useState("");
   const [eventData, setEventData] = useState<Event>({
+    event_id: "",
     event_img: "",
     event_name: "",
     event_type: "",
@@ -552,17 +556,21 @@ function CreateEvent() {
   const updateEventDetails = async () => {
     setLoading(true);
     try {
-      const updatedEventData = { ...eventData };
+      let updatedEventData = { ...eventData };
+      console.log("Event Data for update function: ", eventData);
       if (eventData.event_status === "private") {
-        updatedEventData.event_status =
-          "public";
+        updatedEventData = {
+          ...updatedEventData,
+          event_status: "public",
+        };
       }
+
       const updatedEvent = await updateEvent(
         artist ? artist.token : "",
-        eventData.event_id,
+        updatedEventData.event_id,
         updatedEventData
       );
-      console.log("Updated Event: ", updatedEvent);
+
       handleOpenSuccessModal();
     } catch (error) {
       setErrorMessages(["Failed to update event data. Please try again."]);
@@ -571,9 +579,9 @@ function CreateEvent() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const submitData = async () => {
+  const submitData = async (isPublish: number) => {
     setLoading(true);
     try {
       let updatedEventData = { ...eventData };
@@ -584,15 +592,26 @@ function CreateEvent() {
             "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
         };
       }
+
       const createdEvent = await addEvent(
         artist ? artist.token : "",
         updatedEventData
       );
+
+      setEventData((prevEventData) => ({
+        ...prevEventData,
+        event_id: createdEvent.event_id,
+      }));
+
       const eventId = createdEvent.event_id;
 
       let updatedTicketData = { ...ticketData, event_id: eventId };
 
       await addTicketType(artist ? artist.token : "", updatedTicketData);
+
+      let updatedBudgetData = { ...budgetData, event_id: eventId };
+
+      await addBudget(artist ? artist.token : "", updatedBudgetData);
 
       // Handle AutoTicket and ManualTicket data submissions
       if (ticketData.ticket_type === "Auto") {
@@ -653,22 +672,21 @@ function CreateEvent() {
               "Manual Ticket: ................",
               manualTicketWithoutSession
             );
-            // Submit manualTicket to backend function addManualTicket
             await addManualTicket(
               artist ? artist.token : "",
               manualTicketWithoutSession
             );
           })
         );
-      }
+      }  
 
       handleOpenSuccessModal();
-      // Handling RemainingTickets if ticket type is "Auto"
     } catch (error) {
       setErrorMessages(["Failed to submit event data. Please try again."]);
       handleOpenErrorModal();
       console.error("Error submitting event data:", error);
     } finally {
+      await delay(2000);
       setLoading(false);
     }
   };
@@ -849,7 +867,7 @@ function CreateEvent() {
               <Button variant="outlined" onClick={handleCloseSuccessModal}>
                 Not Now
               </Button>
-              <Button variant="contained" onClick = {updateEventDetails} endIcon={<PublishIcon />}>
+              <Button variant="contained" onClick={updateEventDetails} endIcon={<PublishIcon />}>
                 Publish to Fans
               </Button>
             </Stack>
