@@ -25,7 +25,7 @@ export const getPressReleasesByArtist = async (
   token: string,
   ArtistID: string
 ) => {
-  const res = await fetch(`${base_url}/PressRelease/PressRelease/${ArtistID}`, {
+  const res = await fetch(`${base_url}/PressRelease/PressRelease/Artist/${ArtistID}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,

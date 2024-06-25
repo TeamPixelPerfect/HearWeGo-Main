@@ -284,11 +284,11 @@ export interface PressReleaseData{
   ArtistLogo_URL?: string;
   Headline?: string;
   SubHeadline?: string;
-  EventDate?: string;
+  EventDate?: Date;
   Venue?: string;
   Description?: string;
   Siganature?: string;
-  ReleaseDate?: string;
+  ReleaseDate?: Date;
   ArtistID?: string;
   Status?: string;
 }

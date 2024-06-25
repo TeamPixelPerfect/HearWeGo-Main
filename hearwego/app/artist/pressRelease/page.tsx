@@ -32,23 +32,19 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
 } from "@mui/material";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  PDFViewer,
-  Image,
-} from "@react-pdf/renderer";
+import { jsPDF } from "jspdf";
+import { formatDate } from "@/app/constants/functions";
+
+const options = {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+};
 
 export default function PressRelease() {
   const artist = useAppSelector((state) => state.artist.user);
-
   const [value, setValue] = useState<string>("1");
   const [logoImg, setLogoImg] = useState<File | null>(null);
   const [signatureImg, setSignatureImg] = useState<File | null>(null);
@@ -59,9 +55,6 @@ export default function PressRelease() {
     PressReleaseData[]
   >([]);
   const [error, setError] = useState<Error | null>(null);
-  const [draftPressReleases, setDraftPressReleases] = useState<
-    PressReleaseData[]
-  >([]);
   const [loading, setLoading] = useState(true);
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
@@ -85,6 +78,69 @@ export default function PressRelease() {
 
   const handleDraftSavedDialogClose = () => {
     setDraftSavedDialogOpen(false);
+  };
+
+  const generatePDF = (data: PressReleaseData) => {
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(22);
+    doc.text(data.Headline, 20, 20);
+
+    // Subtitle
+    doc.setFontSize(16);
+    doc.text(data.SubHeadline, 20, 30);
+
+    // Event Date
+    doc.setFontSize(14);
+    doc.text(formatDate(data.EventDate as string), 20, 40);
+
+    // Venue
+    doc.text(data.Venue, 20, 50);
+
+    // Description
+    doc.setFontSize(12);
+    doc.text(data.Description, 20, 60);
+
+    // Release Date
+    doc.text(
+      `Release Date: ${formatDate(data.ReleaseDate as string)}`,
+      20,
+      100
+    );
+
+    // Artist Logo
+    if (data.ArtistLogo_URL) {
+      const img = new Image();
+      img.src = data.ArtistLogo_URL;
+      img.onload = () => {
+        doc.addImage(img, "JPEG", 20, 110, 50, 50);
+
+        // Signature
+        if (data.Siganature) {
+          const sigImg = new Image();
+          sigImg.src = data.Siganature;
+          sigImg.onload = () => {
+            doc.addImage(sigImg, "JPEG", 20, 170, 50, 50);
+            doc.save("_press_release.pdf");
+          };
+        } else {
+          doc.save("press_release.pdf");
+        }
+      };
+    } else {
+      // Signature only
+      if (data.Siganature) {
+        const sigImg = new Image();
+        sigImg.src = data.Siganature;
+        sigImg.onload = () => {
+          doc.addImage(sigImg, "JPEG", 20, 110, 50, 50);
+          doc.save("press_release.pdf");
+        };
+      } else {
+        doc.save("press_release.pdf");
+      }
+    }
   };
 
   const formik = useFormik({
@@ -118,6 +174,7 @@ export default function PressRelease() {
         setLogoImg(null);
         setSignatureImg(null);
         setIsEdit(false);
+        generatePDF(values); // Generate PDF after successful submission
       } catch (error) {
         console.log(error);
       }
@@ -182,23 +239,6 @@ export default function PressRelease() {
       ArtistLogo_URL ||
       Siganature
     );
-  };
-
-  const handleEditDraft = (draft: PressReleaseData) => {
-    formik.setValues({
-      Headline: draft.Headline,
-      SubHeadline: draft.SubHeadline,
-      EventDate: draft.EventDate,
-      Venue: draft.Venue,
-      Description: draft.Description,
-      ReleaseDate: draft.ReleaseDate,
-      ArtistLogo_URL: draft.ArtistLogo_URL,
-      Siganature: draft.Siganature,
-      ArtistID: draft.ArtistID,
-      Status: draft.Status,
-    });
-    setIsEdit(true);
-    setValue("1");
   };
 
   return (
@@ -455,12 +495,22 @@ export default function PressRelease() {
                         {item.SubHeadline}
                       </Typography>
                       <Typography variant="body2">
-                        Event Date: {item.EventDate}
+                        Event Date:{" "}
+                        {item.EventDate && formatDate(item.EventDate as string)}
                       </Typography>
 
                       <Typography variant="body2">
-                        Release Date: {item.ReleaseDate}
+                        Release Date:{" "}
+                        {item.ReleaseDate &&
+                          formatDate(item.ReleaseDate as string)}
                       </Typography>
+                      <Button
+                        variant="outlined"
+                        onClick={() => generatePDF(item)}
+                        sx={{ mt: 2 }}
+                      >
+                        Download PDF
+                      </Button>
                     </Paper>
                   ))
                 ) : (
