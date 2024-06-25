@@ -80,68 +80,103 @@ export default function PressRelease() {
     setDraftSavedDialogOpen(false);
   };
 
-  const generatePDF = (data: PressReleaseData) => {
+  const generatePDF = async (data: PressReleaseData, artist: any) => {
     const doc = new jsPDF();
 
-    // Title
-    doc.setFontSize(22);
-    doc.text(data.Headline, 20, 20);
-
-    // Subtitle
-    doc.setFontSize(16);
-    doc.text(data.SubHeadline, 20, 30);
-
-    // Event Date
-    doc.setFontSize(14);
-    doc.text(formatDate(data.EventDate as string), 20, 40);
-
-    // Venue
-    doc.text(data.Venue, 20, 50);
-
-    // Description
-    doc.setFontSize(12);
-    doc.text(data.Description, 20, 60);
-
-    // Release Date
-    doc.text(
-      `Release Date: ${formatDate(data.ReleaseDate as string)}`,
-      20,
-      100
-    );
-
-    // Artist Logo
+    // Adding Artist Logo (Top Right)
     if (data.ArtistLogo_URL) {
-      const img = new Image();
-      img.src = data.ArtistLogo_URL;
-      img.onload = () => {
-        doc.addImage(img, "JPEG", 20, 110, 50, 50);
-
-        // Signature
-        if (data.Siganature) {
-          const sigImg = new Image();
-          sigImg.src = data.Siganature;
-          sigImg.onload = () => {
-            doc.addImage(sigImg, "JPEG", 20, 170, 50, 50);
-            doc.save("_press_release.pdf");
-          };
-        } else {
-          doc.save("press_release.pdf");
-        }
-      };
-    } else {
-      // Signature only
-      if (data.Siganature) {
-        const sigImg = new Image();
-        sigImg.src = data.Siganature;
-        sigImg.onload = () => {
-          doc.addImage(sigImg, "JPEG", 20, 110, 50, 50);
-          doc.save("press_release.pdf");
-        };
-      } else {
-        doc.save("press_release.pdf");
+      try {
+        const imgLogo = await loadImage(data.ArtistLogo_URL);
+        doc.addImage(imgLogo, 150, 10, 50, 50); // Adjust positioning as needed
+      } catch (error) {
+        console.error("Error loading artist logo:", error);
       }
     }
+
+    // Header Section
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("FOR IMMEDIATE RELEASE", 105, 20, { align: "center" });
+
+    // Title Section
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text(data.Headline, 105, 40, { align: "center" });
+
+    // Subtitle Section
+    doc.setFont("Helvetica", "italic");
+    doc.setFontSize(16);
+    doc.text(data.SubHeadline, 105, 50, { align: "center" });
+
+    // Date and Location Section
+    doc.setFont("Helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`${formatDate(data.EventDate)} | ${data.Venue}`, 105, 60, {
+      align: "center",
+    });
+
+    // Line Separator
+    doc.setLineWidth(0.5);
+    doc.line(20, 70, 190, 70);
+
+    // Body Section
+    doc.setFont("Helvetica", "normal");
+    doc.setFontSize(12);
+    const descriptionLines = doc.splitTextToSize(data.Description, 170);
+    doc.text(descriptionLines, 20, 80);
+
+    // Release Date
+    doc.setFont("Helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`Release Date: ${formatDate(data.ReleaseDate)}`, 20, 140);
+
+    // Adding Signature
+    if (data.Signature) {
+      try {
+        const imgSignature = await loadImage(data.Signature);
+        doc.addImage(imgSignature, 20, 150, 50, 50); // Adjust positioning as needed
+      } catch (error) {
+        console.error("Error loading signature:", error);
+      }
+    }
+
+    // Contact Information Section
+    doc.setFont("Helvetica", "normal");
+    doc.setFontSize(12);
+    const contactY = data.Signature ? 210 : 160;
+    doc.text("Contact Information", 20, contactY);
+    doc.setFont("Helvetica", "bold");
+    doc.text(artist?.user.artistName, 20, contactY + 10);
+    doc.setFont("Helvetica", "normal");
+    doc.text(`Phone: ${artist?.user.mobileNumber}`, 20, contactY + 20);
+    doc.text(`Email: ${artist?.user.email}`, 20, contactY + 30);
+
+    // Footer Section
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setFontSize(10);
+    doc.text(
+      `Press Release generated on ${new Date().toLocaleDateString()}`,
+      105,
+      pageHeight - 10,
+      { align: "center" }
+    );
+
+    // Save the PDF
+    doc.save(`${data.Headline}_press_release.pdf`);
   };
+
+  // Helper function to load image
+  const loadImage = (url: string) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous"; // This enables cross-origin image loading
+      img.src = url;
+      img.onload = () => resolve(img);
+      img.onerror = (error) => reject(error);
+    });
+  };
+
+  // Helper function to format date
 
   const formik = useFormik({
     initialValues: {
@@ -152,7 +187,7 @@ export default function PressRelease() {
       Description: "",
       ReleaseDate: null,
       ArtistLogo_URL: "",
-      Siganature: "",
+      Signature: "",
       ArtistID: artist ? artist.user.artist_id : "",
       Status: "",
     },
@@ -164,7 +199,7 @@ export default function PressRelease() {
       Description: Yup.string().required("Description is required"),
       ReleaseDate: Yup.date().nullable().required("Release Date is required"),
       ArtistLogo_URL: Yup.string().required("Logo is required"),
-      Siganature: Yup.string().required("Signature is required"),
+      Signature: Yup.string().required("Signature is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
@@ -189,7 +224,7 @@ export default function PressRelease() {
 
   useEffect(() => {
     if (signatureImg) {
-      formik.setFieldValue("Siganature", signatureImg);
+      formik.setFieldValue("Signature", signatureImg);
     }
   }, [signatureImg]);
 
@@ -227,7 +262,7 @@ export default function PressRelease() {
       Description,
       ReleaseDate,
       ArtistLogo_URL,
-      Siganature,
+      Signature,
     } = formik.values;
     return (
       Headline ||
@@ -237,7 +272,7 @@ export default function PressRelease() {
       Description ||
       ReleaseDate ||
       ArtistLogo_URL ||
-      Siganature
+      Signature
     );
   };
 
@@ -418,10 +453,10 @@ export default function PressRelease() {
                                 aspectY={1}
                                 shape="rect"
                               />
-                              {formik.touched.Siganature &&
-                              formik.errors.Siganature ? (
+                              {formik.touched.Signature &&
+                              formik.errors.Signature ? (
                                 <Typography color="error">
-                                  {formik.errors.Siganature}
+                                  {formik.errors.Signature}
                                 </Typography>
                               ) : null}
                             </Box>

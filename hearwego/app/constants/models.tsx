@@ -287,7 +287,7 @@ export interface PressReleaseData{
   EventDate?: Date;
   Venue?: string;
   Description?: string;
-  Siganature?: string;
+  Signature?: string;
   ReleaseDate?: Date;
   ArtistID?: string;
   Status?: string;
