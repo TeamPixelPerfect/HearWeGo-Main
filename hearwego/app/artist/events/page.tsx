@@ -16,7 +16,17 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import { CardActionArea, CardActions, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper } from "@mui/material";
+import {
+  CardActionArea,
+  CardActions,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Paper,
+} from "@mui/material";
 import CardMedia from "@mui/material/CardMedia";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -57,7 +67,6 @@ import { set } from "date-fns";
 
 //event cards display
 export default function ArtistEvents() {
-
   return (
     <>
       <Box sx={{ width: "100%" }}>
@@ -174,53 +183,52 @@ function EventArea() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
 
-
   useEffect(() => {
-    if(artist){
+    if (artist) {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
-      getEvents( page, limit, filter, artist.artist_id ).then((events) => {
+      getEvents(page, limit, filter, artist.artist_id).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
         setPageCount(Math.ceil(events.total / limit));
-      }); 
+      });
     }
-  }, [artist, page]);
+  }, [artist, page, upcomingEvents.length]);
 
-  const handleDeleteEvent = (event_id: string) => {
-    deleteEvent(artist?.token, event_id).then((res) => {
-      console.log("Event Deleted:::", res);
-      getEvents( page, limit, filter, artist.artist_id ).then((events) => {
-        console.log("Events:::", events);
-        setUpcomingEvents(events.data);
-      }); 
-    });
-  }
+  const handleDeleteEvent = async (event_id: string) => {
+    try {
+      await deleteEvent(artist?.token, event_id);
+      setUpcomingEvents((prevEvents) =>
+        prevEvents.filter((event) => event.event_id !== event_id)
+      );
+    } catch (error) {
+      console.log("Error Deleting Event:::", error);
+    }
+  };
 
   const handleDeleteModal = (event_id: string) => {
     setSelectedEventId(event_id);
     setOpenDeleteModal(true);
   };
-  
+
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
     setSelectedEventId("");
   };
-  
+
   const handleConfirmDelete = () => {
     handleDeleteEvent(selectedEventId);
     handleCloseDeleteModal();
   };
 
-
   const handlePageChange = (event, value) => {
     setPage(value);
-  }
+  };
 
   const handleCreateEvent = () => {
     router.push("/artist/events/createEvent");
-  }
+  };
 
   return (
     <>
@@ -240,7 +248,11 @@ function EventArea() {
         >
           My Upcoming Events
         </Typography>
-        <Button variant="contained" onClick={handleCreateEvent} startIcon={<AddIcon />}>
+        <Button
+          variant="contained"
+          onClick={handleCreateEvent}
+          startIcon={<AddIcon />}
+        >
           Add New Event
         </Button>
       </Box>
@@ -269,7 +281,10 @@ function EventArea() {
                 <Divider sx={{ marginBottom: 2 }} />
                 <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
                   {events.sessions?.map((session, index) => (
-                    <Paper elevation={2} sx={{ width: "25%", padding: 2, marginRight: 1 }}>
+                    <Paper
+                      elevation={2}
+                      sx={{ width: "25%", padding: 2, marginRight: 1 }}
+                    >
                       <Typography variant="h6" color="secondary">
                         {session.session_name.charAt(0).toUpperCase() +
                           session.session_name.slice(1)}
@@ -311,8 +326,14 @@ function EventArea() {
                     marginTop: "1em",
                   }}
                 >
-                  <Box sx={{marginLeft: 1}}>
-                    <Link href="#" color="secondary" style={{fontStyle: "italic"}}>more details...</Link>
+                  <Box sx={{ marginLeft: 1 }}>
+                    <Link
+                      href="#"
+                      color="secondary"
+                      style={{ fontStyle: "italic" }}
+                    >
+                      more details...
+                    </Link>
                   </Box>
                   <Box>
                     <Stack direction="row" spacing={1}>
@@ -325,7 +346,12 @@ function EventArea() {
                       <IconButton aria-label="budget">
                         <PaidIcon />
                       </IconButton>
-                      <IconButton onClick={() => { handleDeleteModal(events.event_id) }} aria-label="delete">
+                      <IconButton
+                        onClick={() => {
+                          handleDeleteModal(events.event_id);
+                        }}
+                        aria-label="delete"
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </Stack>
@@ -345,31 +371,36 @@ function EventArea() {
           marginTop: "1em",
         }}
       >
-        <Pagination count={5} color="primary" page={page} onChange={handlePageChange} />
+        <Pagination
+          count={pageCount}
+          color="primary"
+          page={page}
+          onChange={handlePageChange}
+        />
       </Box>
 
       <Dialog
-  open={openDeleteModal}
-  onClose={handleCloseDeleteModal}
-  aria-labelledby="alert-dialog-title"
-  aria-describedby="alert-dialog-description"
->
-  <DialogTitle id="alert-dialog-title">{"Delete Event"}</DialogTitle>
-  <DialogContent>
-    <DialogContentText id="alert-dialog-description">
-      Are you sure you want to delete this event?
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleCloseDeleteModal} color="primary">
-      No
-    </Button>
-    <Button onClick={handleConfirmDelete} color="secondary" autoFocus>
-      Yes
-    </Button>
-  </DialogActions>
-</Dialog>
-
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        sx={{ borderRadius: 20 }}
+      >
+        <DialogTitle id="alert-dialog-title" color="error">{"Delete Event"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this event?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal} color="secondary">
+            No
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
