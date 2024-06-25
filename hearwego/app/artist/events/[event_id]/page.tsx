@@ -194,7 +194,7 @@ const ArtistSingleEventPage = () => {
                       </Box>
                       <Box sx={{ width: "50%" }}>
                         <Typography variant="subtitle1">
-                          {event.createdAt}
+                          {event.createdAt.substring(0, 10)}
                         </Typography>
                       </Box>
                     </Box>
@@ -205,22 +205,11 @@ const ArtistSingleEventPage = () => {
                       </Box>
                       <Box sx={{ width: "50%" }}>
                         <Typography variant="subtitle1">
-                          {event.updatedAt}
+                          {event.updatedAt.substring(0, 10)}
                         </Typography>
                       </Box>
                     </Box>
   
-                    <Box sx={{ width: "100%", display: "flex" }}>
-                      <Box sx={{ width: "50%" }}>
-                        <Typography variant="h6">Created By</Typography>
-                      </Box>
-                      <Box sx={{ width: "50%" }}>
-                        <Typography variant="subtitle1">
-                          {event.event_created_by} -{" "}
-                          {getArtistName(event.event_created_by)}
-                        </Typography>
-                      </Box>
-                    </Box>
                   </Box>
                 </Box>
   
@@ -325,9 +314,6 @@ const ArtistSingleEventPage = () => {
               <Stack direction="row" spacing={2}>
                 <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
                   Delete
-                </Button>
-                <Button variant="outlined" color="error" startIcon={<BlockIcon />}>
-                  Block
                 </Button>
                 <Button variant="outlined" color="secondary" startIcon={<EditIcon />}>
                   Update
