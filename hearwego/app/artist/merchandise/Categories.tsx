@@ -115,7 +115,7 @@ const Categories: React.FC = () => {
     }),
     onSubmit: async (values) => {
       const newCategory: MerchCategory = {
-        store_id: "st25",
+        store_id: "st26",
         category_id: isEditing ? values.id : String(Date.now()),
         category_name: values.name,
         category_description: values.description,
