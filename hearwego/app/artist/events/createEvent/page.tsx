@@ -570,13 +570,22 @@ function CreateEvent() {
           event_status: "public",
         };
       }
+      if (eventData.event_img === "") {
+        updatedEventData = {
+          ...updatedEventData,
+          event_img:
+            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
+        };
+      }
 
       const updatedEvent = await updateEvent(
         artist ? artist.token : "",
         updatedEventData.event_id,
         updatedEventData
       );
+      <Alert severity="success">Event Updated Successfully</Alert>;
 
+      router.push("/artist/events");
       handleOpenSuccessModal();
     } catch (error) {
       setErrorMessages(["Failed to update event data. Please try again."]);

@@ -279,11 +279,11 @@ function EventArea() {
               </AccordionSummary>
               <AccordionDetails>
                 <Divider sx={{ marginBottom: 2 }} />
-                <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
+                <Box sx={{ width: "100%", display: "flex", justifyContent:"center", flexWrap: "wrap" }}>
                   {events.sessions?.map((session, index) => (
                     <Paper
                       elevation={2}
-                      sx={{ width: "25%", padding: 2, marginRight: 1 }}
+                      sx={{ width: "25%", padding: 2, marginRight: 1, marginBottom: 1}}
                     >
                       <Typography variant="h6" color="secondary">
                         {session.session_name.charAt(0).toUpperCase() +
@@ -327,13 +327,10 @@ function EventArea() {
                   }}
                 >
                   <Box sx={{ marginLeft: 1 }}>
-                    <Link
-                      href="#"
-                      color="secondary"
-                      style={{ fontStyle: "italic" }}
-                    >
-                      more details...
-                    </Link>
+                    <Button onClick={()=> {router.push(`/artist/events/${events.event_id}`)}}>
+                      See more
+                    </Button>
+                  
                   </Box>
                   <Box>
                     <Stack direction="row" spacing={1}>
