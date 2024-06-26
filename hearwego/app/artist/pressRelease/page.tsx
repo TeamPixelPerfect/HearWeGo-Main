@@ -18,6 +18,9 @@ import TabPanel from "@mui/lab/TabPanel";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import SaveIcon from "@mui/icons-material/Save";
+import ShareIcon from "@mui/icons-material/Share";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
 import DropFile from "../../components/DropFile";
 import {
   addPressRelease,
@@ -32,9 +35,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
 } from "@mui/material";
 import { jsPDF } from "jspdf";
 import { formatDate } from "@/app/constants/functions";
+import { deletePressRelease } from "@/app/services/PressReleaseServices";
 
 const options = {
   weekday: "long",
@@ -54,9 +59,13 @@ export default function PressRelease() {
   const [savedPressReleases, setSavedPressReleases] = useState<
     PressReleaseData[]
   >([]);
+  const [DraftedPressReleases, setDraftedPressReleases] = useState<
+    PressReleaseData[]
+  >([]);
   const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [IsSavedDelete, setIsSavedDelete] = useState<boolean>(false);
+  const [IsSaved, setIsSaved] = useState<boolean>(false);
+  const [IsDraftedDelete, setIsDraftedDelete] = useState<boolean>(false);
 
   useEffect(() => {
     if (artist?.token) {
@@ -65,12 +74,24 @@ export default function PressRelease() {
         artist?.user?.artist_id ? artist.user.artist_id : ""
       )
         .then((response) => {
-          setSavedPressReleases(response.data);
+          const savedReleases = response.data.filter(
+            (pr) => pr.Status === "Saved"
+          );
+          const draftedReleases = response.data.filter(
+            (pr) => pr.Status === "Draft"
+          );
+          setSavedPressReleases(savedReleases);
+          setDraftedPressReleases(draftedReleases);
         })
-        .catch((error) => setError(error))
-        .finally(() => setLoading(false));
+        .catch((error) => setError(error));
     }
-  }, [artist?.token, artist?.user?.artist_id]);
+  }, [
+    artist?.token,
+    artist?.user?.artist_id,
+    IsSavedDelete,
+    IsSaved,
+    IsDraftedDelete,
+  ]);
 
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -80,14 +101,14 @@ export default function PressRelease() {
     setDraftSavedDialogOpen(false);
   };
 
-  const generatePDF = async (data: PressReleaseData, artist: any) => {
+  const generatePDF = async (data: PressReleaseData) => {
     const doc = new jsPDF();
 
-    // Adding Artist Logo (Top Right)
+    // Adding Artist Logo (Top Left)
     if (data.ArtistLogo_URL) {
       try {
         const imgLogo = await loadImage(data.ArtistLogo_URL);
-        doc.addImage(imgLogo, 150, 10, 50, 50); // Adjust positioning as needed
+        doc.addImage(imgLogo, 20, 10, 30, 30); // Adjust positioning as needed
       } catch (error) {
         console.error("Error loading artist logo:", error);
       }
@@ -96,45 +117,43 @@ export default function PressRelease() {
     // Header Section
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(12);
-    doc.text("FOR IMMEDIATE RELEASE", 105, 20, { align: "center" });
+    doc.text("FOR IMMEDIATE RELEASE", 20, 70); // Left aligned
 
     // Title Section
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(22);
-    doc.text(data.Headline, 105, 40, { align: "center" });
+    doc.text(data.Headline, 20, 80); // Left aligned
 
     // Subtitle Section
     doc.setFont("Helvetica", "italic");
     doc.setFontSize(16);
-    doc.text(data.SubHeadline, 105, 50, { align: "center" });
+    doc.text(data.SubHeadline, 20, 90); // Left aligned
 
     // Date and Location Section
     doc.setFont("Helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(`${formatDate(data.EventDate)} | ${data.Venue}`, 105, 60, {
-      align: "center",
-    });
+    doc.text(`${formatDate(data.EventDate)} | ${data.Venue}`, 20, 100); // Left aligned
 
     // Line Separator
     doc.setLineWidth(0.5);
-    doc.line(20, 70, 190, 70);
+    doc.line(20, 110, 190, 110);
 
     // Body Section
     doc.setFont("Helvetica", "normal");
     doc.setFontSize(12);
     const descriptionLines = doc.splitTextToSize(data.Description, 170);
-    doc.text(descriptionLines, 20, 80);
+    doc.text(descriptionLines, 20, 120);
 
     // Release Date
     doc.setFont("Helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(`Release Date: ${formatDate(data.ReleaseDate)}`, 20, 140);
+    doc.text(`Release Date: ${formatDate(data.ReleaseDate)}`, 20, 180);
 
     // Adding Signature
     if (data.Signature) {
       try {
         const imgSignature = await loadImage(data.Signature);
-        doc.addImage(imgSignature, 20, 150, 50, 50); // Adjust positioning as needed
+        doc.addImage(imgSignature, 20, 190, 30, 30);
       } catch (error) {
         console.error("Error loading signature:", error);
       }
@@ -143,7 +162,7 @@ export default function PressRelease() {
     // Contact Information Section
     doc.setFont("Helvetica", "normal");
     doc.setFontSize(12);
-    const contactY = data.Signature ? 210 : 160;
+    const contactY = data.Signature ? 230 : 200;
     doc.text("Contact Information", 20, contactY);
     doc.setFont("Helvetica", "bold");
     doc.text(artist?.user.artistName, 20, contactY + 10);
@@ -176,8 +195,6 @@ export default function PressRelease() {
     });
   };
 
-  // Helper function to format date
-
   const formik = useFormik({
     initialValues: {
       Headline: "",
@@ -208,8 +225,6 @@ export default function PressRelease() {
         resetForm();
         setLogoImg(null);
         setSignatureImg(null);
-        setIsEdit(false);
-        generatePDF(values); // Generate PDF after successful submission
       } catch (error) {
         console.log(error);
       }
@@ -234,6 +249,7 @@ export default function PressRelease() {
 
   const handleSave = () => {
     formik.setFieldValue("Status", "Saved");
+    setIsSaved(true);
     formik.handleSubmit();
   };
 
@@ -524,42 +540,157 @@ export default function PressRelease() {
               <TabPanel value="2">
                 {savedPressReleases.length > 0 ? (
                   savedPressReleases.map((item, index) => (
+                    <Paper
+                      key={index}
+                      elevation={3}
+                      sx={{
+                        p: 2,
+                        mb: 2,
+                        display: "flex",
+                        flexDirection: { xs: "column", md: "row" },
+                        alignItems: { xs: "center", md: "flex-start" },
+                        textAlign: { xs: "center", md: "left" },
+                        bgcolor: "background.default",
+                        borderRadius: 2,
+                        boxShadow: 3,
+                        transition: "transform 0.3s ease-in-out",
+                        "&:hover": {
+                          transform: "scale(1.02)",
+                        },
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={item.ArtistLogo_URL}
+                        alt="logo"
+                        sx={{
+                          width: 170,
+                          height: 170,
+                          mb: { xs: 2, md: 0 },
+                          mr: { md: 2 },
+                          borderRadius: "50%",
+                          border: "2px solid #1976d2",
+                        }}
+                      />
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography
+                          variant="h5"
+                          sx={{ fontWeight: "bold", mb: 1 }}
+                        >
+                          {item.Headline}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{ mb: 1, color: "text.secondary" }}
+                        >
+                          {item.SubHeadline}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 0.5 }}>
+                          Event Date:{" "}
+                          {item.EventDate &&
+                            formatDate(item.EventDate.toString())}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 2 }}>
+                          Release Date:{" "}
+                          {item.ReleaseDate &&
+                            formatDate(item.ReleaseDate.toString())}
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: { xs: "center", md: "flex-start" },
+                            gap: 2,
+                            mt: 2,
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => generatePDF(item)}
+                            startIcon={<DownloadIcon />}
+                            sx={{ textTransform: "none" }}
+                          >
+                            Download PDF
+                          </Button>
+                          <IconButton
+                            color="secondary"
+                            onClick={() => sharePressRelease(item)}
+                            sx={{ textTransform: "none" }}
+                          >
+                            <ShareIcon />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={() => {
+                              deletePressRelease(
+                                artist ? artist.token : "",
+                                item.PressReleaseID as string
+                              ).then(() => {
+                                setIsSavedDelete(true);
+                              });
+                            }}
+                            sx={{ textTransform: "none" }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  ))
+                ) : (
+                  <Typography variant="h6" sx={{ textAlign: "center" }}>
+                    No press releases saved.
+                  </Typography>
+                )}
+              </TabPanel>
+              {/* Drafts Tab */}
+              <TabPanel value="3">
+                {DraftedPressReleases.length > 0 ? (
+                  DraftedPressReleases.map((item, index) => (
                     <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
+                      <img
+                        src={item.ArtistLogo_URL}
+                        alt="logo"
+                        style={{ width: 50, height: 50, marginBottom: 10 }}
+                      />
                       <Typography variant="h5">{item.Headline}</Typography>
                       <Typography variant="body1">
                         {item.SubHeadline}
                       </Typography>
                       <Typography variant="body2">
                         Event Date:{" "}
-                        {item.EventDate && formatDate(item.EventDate as string)}
+                        {item.EventDate &&
+                          formatDate(item.EventDate.toString())}
                       </Typography>
-
                       <Typography variant="body2">
                         Release Date:{" "}
                         {item.ReleaseDate &&
-                          formatDate(item.ReleaseDate as string)}
+                          formatDate(item.ReleaseDate.toString())}
                       </Typography>
+
                       <Button
                         variant="outlined"
-                        onClick={() => generatePDF(item)}
+                        onClick={() => {
+                          deletePressRelease(
+                            artist ? artist.token : "",
+                            item.PressReleaseID as string
+                          ).then(() => {
+                            setIsDraftedDelete(true);
+                          });
+                        }}
                         sx={{ mt: 2 }}
                       >
-                        Download PDF
+                        Delete
                       </Button>
                     </Paper>
                   ))
                 ) : (
-                  <Typography variant="body1">
-                    No saved press releases.
+                  <Typography variant="h6">
+                    No drafted press releases saved.
                   </Typography>
                 )}
               </TabPanel>
-              {/* Drafts Tab */}
-              <TabPanel value="3">
-                <Typography variant="h6" sx={{ margin: "10px" }}>
-                  Drafts
-                </Typography>
-              </TabPanel>
+
               {/* Already Shared Tab */}
               <TabPanel value="4">
                 <Typography>Already Shared</Typography>
