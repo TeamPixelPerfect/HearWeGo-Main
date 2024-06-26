@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Card,
+  Chip,
   Divider,
   Grid,
   Stack,
@@ -16,9 +17,14 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import { getEventById } from "@/app/services/EventServices";
 import { useEffect, useState } from "react";
 import { Event } from "@/app/constants/models";
@@ -74,6 +80,17 @@ interface SessionSummary {
   total_profit: number;
 }
 
+function switchStatus (status: string) {
+  switch(status) {
+    case "public":
+      return <Chip color="success" icon={<PublicIcon />} label="Public" />;
+    case "private":
+      return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
+    default:
+      return <Chip icon={<LockIcon />} label="Private" />;
+  }
+}
+
 const BudgetDetails = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
   const Router = useRouter();
@@ -124,6 +141,15 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
   const totalIncome = result.reduce((sum, session) => sum += session.income, 0);
   const totalExpense = result.reduce((sum, session) => sum += session.expense, 0);
   const totalProfit = totalIncome - totalExpense;
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    doc.autoTable({
+      head: [['Session', 'Income', 'Expense', 'Current Profit']],
+      body: result.map(row => [row.session_name, row.income, row.expense, row.total_profit])
+    });
+    doc.save('budget_report.pdf');
+  };
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -176,6 +202,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
                   display: "flex",
                   alignItems: "center",
                   fontSize: "24px",
+                  m: 1
                 }}
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
@@ -188,6 +215,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
                   display: "flex",
                   alignItems: "center",
                   fontSize: "24px",
+                  m: 1
                 }}
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
@@ -200,12 +228,13 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
                   display: "flex",
                   alignItems: "center",
                   fontSize: "24px",
+                  m: 1
                 }}
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
                   Status:{" "}
                 </Typography>
-                <Typography variant="subtitle1">{event?.event_status}</Typography>
+                <span>{switchStatus(event?.event_status)}</span>
               </Box>
             </Box>
           </Box>
@@ -238,6 +267,8 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
           </Table>
         </TableContainer>
 
+        <Button endIcon={<PictureAsPdfIcon />} sx={{marginLeft: 4}} color="secondary" variant="contained" onClick={downloadPDF}>Download PDF</Button>
+
         <Box sx={{width: "100%", display: "flex", m: 2, flexWrap: "wrap", alignItems: "center"}}>
           <Paper elevation={2} sx={{width: "200px", padding: 2, m: 2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             <Typography variant="h6" color="secondary">Total Income</Typography>
@@ -257,24 +288,6 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
             <Typography variant="h5" fontWeight={700} color={(totalProfit>0)? "success": "error"}>{totalProfit}</Typography>
           </Paper>
         </Box>
-        {/* <TableContainer sx={{ maxWidth: "70%", m: 3 }} component={Paper}>
-          <Table sx={{ borderRadius: "20px" }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell align="center">Total Income</StyledTableCell>
-                <StyledTableCell align="center">Total Expense</StyledTableCell>
-                <StyledTableCell align="center">Total Profit</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <StyledTableRow>
-                <StyledTableCell align="center">1000000</StyledTableCell>
-                <StyledTableCell align="center">500000</StyledTableCell>
-                <StyledTableCell align="center">500000</StyledTableCell>
-              </StyledTableRow>
-            </TableBody>
-          </Table>
-        </TableContainer> */}
         <div
           style={{
             display: "flex",
