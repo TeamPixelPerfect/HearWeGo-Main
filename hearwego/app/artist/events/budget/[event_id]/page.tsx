@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Card,
+  Divider,
   Grid,
   Stack,
   Typography,
@@ -24,6 +25,7 @@ import { Event } from "@/app/constants/models";
 import { Budget } from "@/app/constants/models";
 import { getBudgetByEventId } from "@/app/services/EventServices";
 import { useRouter } from "next/navigation";
+import { WidthFull } from "@mui/icons-material";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -44,21 +46,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
-
-function createData(
-  session: string,
-  income: number,
-  expense: number,
-  currentProfit: number
-) {
-  return { session, income, expense, currentProfit };
-}
-
-const rows = [
-  createData("Session 01", 70000, 50000, 20000),
-  createData("Session 02", 80000, 40000, 40000),
-  createData("Session 03", 70000, 50000, 20000),
-];
 
 interface Props {
   params: { event_id: string };
@@ -91,13 +78,18 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
   const Router = useRouter();
   const [budget, setBudget] = useState<Budget>();
+  const [event, setEvent] = useState<Event[]>([]);
 
   useEffect(() => {
     getBudgetByEventId(event_id).then((budget) => {
       setBudget(budget);
       console.log("Budget", budget);
       console.log("Budget", budget.budget_details);
-      // console.log("Budget", budget.data.budget_details);
+    });
+
+    getEventById(event_id).then((event) => {
+      setEvent(event.data);
+      console.log("Event", event.data);
     });
   }, []);
 
@@ -129,6 +121,9 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
   
   console.log(result);
   
+  const totalIncome = result.reduce((sum, session) => sum += session.income, 0);
+  const totalExpense = result.reduce((sum, session) => sum += session.expense, 0);
+  const totalProfit = totalIncome - totalExpense;
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -160,13 +155,14 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
             
           </Typography>
         </Box>
-        <Box sx={{ m: 3 }}>
-          <Box sx={{ display: "flex" }}>
+        {event.map((event) => (
+          <Box sx={{ m: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Card
               sx={{
-                width: "250px",
-                height: "250px",
-                backgroundImage: `url("https://d1csarkz8obe9u.cloudfront.net/posterpreviews/modern-glossy-music-event-poster-design-template-84d38a706368baec17981e71a5e5810d_screen.jpg?ts=1636991393")`,
+                width: "150px",
+                height: "150px",
+                backgroundImage: `url(${event?.event_img})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
@@ -185,7 +181,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
                   Event Name:{" "}
                 </Typography>
-                <Typography variant="subtitle1">Night Club Party</Typography>
+                <Typography variant="subtitle1">{event?.event_name}</Typography>
               </Box>
               <Box
                 sx={{
@@ -195,9 +191,9 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
                 }}
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
-                  Session:{" "}
+                  Sessions:{" "}
                 </Typography>
-                <Typography variant="subtitle1">Session 01</Typography>
+                <Typography variant="subtitle1">{event?.sessions?.length}</Typography>
               </Box>
               <Box
                 sx={{
@@ -207,37 +203,14 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
                 }}
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
-                  Date:{" "}
+                  Status:{" "}
                 </Typography>
-                <Typography variant="subtitle1">2024-01-29</Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontSize: "24px",
-                }}
-              >
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
-                  Time:{" "}
-                </Typography>
-                <Typography variant="subtitle1">8.00PM</Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontSize: "24px",
-                }}
-              >
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, mr: 1 }}>
-                  Venue:{" "}
-                </Typography>
-                <Typography variant="subtitle1">XYZ Hall</Typography>
+                <Typography variant="subtitle1">{event?.event_status}</Typography>
               </Box>
             </Box>
           </Box>
-        </Box>
+        </Box>  
+        ))}
         <TableContainer sx={{ maxWidth: "90%", m: 3 }} component={Paper}>
           <Table sx={{ borderRadius: "20px" }} aria-label="customized table">
             <TableHead>
@@ -264,7 +237,27 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <TableContainer sx={{ maxWidth: "70%", m: 3 }} component={Paper}>
+
+        <Box sx={{width: "100%", display: "flex", m: 2, flexWrap: "wrap", alignItems: "center"}}>
+          <Paper elevation={2} sx={{width: "200px", padding: 2, m: 2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <Typography variant="h6" color="secondary">Total Income</Typography>
+            <Divider sx={{width: "100%", marginBottom: 2}} />
+            <Typography variant="h5">{totalIncome}</Typography>
+          </Paper>
+              <Typography variant="h5">-</Typography>
+          <Paper elevation={2} sx={{width: "200px", padding: 2, m: 2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <Typography variant="h6" color="secondary">Total Expense</Typography>
+            <Divider sx={{width: "100%", marginBottom: 2}} />
+            <Typography variant="h5">{totalExpense}</Typography>
+          </Paper>
+          <Typography variant="h5">=</Typography>
+          <Paper elevation={2} sx={{width: "200px", padding: 2, m: 2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <Typography variant="h6" color="primary" fontWeight={600}>Current Profit</Typography>
+            <Divider sx={{width: "100%", marginBottom: 2}} />
+            <Typography variant="h5" fontWeight={700} color={(totalProfit>0)? "success": "error"}>{totalProfit}</Typography>
+          </Paper>
+        </Box>
+        {/* <TableContainer sx={{ maxWidth: "70%", m: 3 }} component={Paper}>
           <Table sx={{ borderRadius: "20px" }} aria-label="customized table">
             <TableHead>
               <TableRow>
@@ -281,7 +274,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
               </StyledTableRow>
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
         <div
           style={{
             display: "flex",
@@ -311,34 +304,6 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
             </Button>
           </Stack>
         </div>
-
-        {/* {budgetItem?.budget_details?.map((item: BudgetItem) => (
-          <Box sx={{ m: 3 }}>
-            <Typography variant="h6" sx={{ color: theme.palette.secondary.main }}>
-              {item.budget_title}
-            </Typography>
-            <TableContainer sx={{ maxWidth: "90%" }} component={Paper}>
-              <Table sx={{ borderRadius: "20px" }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Session</StyledTableCell>
-                    <StyledTableCell align="right">Amount</StyledTableCell>
-                    <StyledTableCell align="right">Type</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell component="th" scope="row">
-                      {item.budget_session}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">{item.budget_amount}</StyledTableCell>
-                    <StyledTableCell align="right">{item.budget_type}</StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        ))} */}
       </Card>
     </Grid>
   );
