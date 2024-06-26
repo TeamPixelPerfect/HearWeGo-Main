@@ -148,7 +148,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
       head: [['Session', 'Income', 'Expense', 'Current Profit']],
       body: result.map(row => [row.session_name, row.income, row.expense, row.total_profit])
     });
-    doc.save('budget_report.pdf');
+    doc.save(`budget_${event_id}.pdf`);
   };
 
   return (

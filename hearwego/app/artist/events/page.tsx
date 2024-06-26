@@ -340,7 +340,7 @@ function EventArea() {
                       <IconButton aria-label="ticket">
                         <LocalActivityIcon />
                       </IconButton>
-                      <IconButton aria-label="budget">
+                      <IconButton aria-label="budget" onClick={()=>{router.push(`/artist/events/budget/${events.event_id}`)}}>
                         <PaidIcon />
                       </IconButton>
                       <IconButton
