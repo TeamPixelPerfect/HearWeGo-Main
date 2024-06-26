@@ -12,7 +12,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -25,6 +25,9 @@ import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Dialog from "@mui/material/Dialog";
+import { useAppSelector } from "@/lib/hooks";
+import SaveIcon from '@mui/icons-material/Save';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import FeedIcon from "@mui/icons-material/Feed";
@@ -32,7 +35,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import DialogActions from "@mui/material/DialogActions";
 import CloseIcon from "@mui/icons-material/Close";
-import { getEvent } from "@/app/services/EventServices";
+import { getEvent, updateBudget } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
 import { getBudgetByEventId } from "@/app/services/EventServices";
 import { Budget } from "@/app/constants/models";
@@ -124,8 +127,14 @@ const budgetDataRows = [
 const BudgetManager = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
 
+  const artist = useAppSelector((state) => state.artist.user);
+
   const [event, setEvent] = useState<Event | null>(null);
-  const [budgets, setBudgets] = useState<Budget | null>(null);
+  const [budgets, setBudgets] = useState<Budget | null>({
+    budget_currency: "LKR",
+    budget_details: [],
+    event_id: event_id,
+  });
   const [budgetRows, setBudgetRows] = useState([]);
 
   React.useEffect(() => {
@@ -147,6 +156,31 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
       console.log("Budgets......", budgets);
     });
   }, []);
+
+  React.useEffect(() => {
+    setBudgets({
+      ...budgets,
+      budget_details: budgetRows.map(
+        ({ id, budgetTitle, budgetSession, budgetType, budgetAmount }) => ({
+          budget_title: budgetTitle,
+          budget_session: budgetSession,
+          budget_type: budgetType,
+          budget_amount: budgetAmount,
+        })
+      ),
+    })
+  }
+  , [budgetRows]);
+
+  const handleBudgetUpdate = async () => {
+    console.log("Updating budget data:", budgets);
+    console.log("Token:", artist.token);
+    await updateBudget(
+      artist.token,
+      event_id,
+      budgets
+    )
+  }
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -177,6 +211,15 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
           setBudgetRows={setBudgetRows}
           event={event}
         />
+
+        <Stack direction="row" spacing={2} sx={{ marginTop: 4, display: "flex", justifyContent: "end" }}>
+          <Button startIcon={<RestartAltIcon />} variant="outlined" color="error">
+            Reset
+          </Button>
+          <Button endIcon={<SaveIcon />} variant="contained" onClick={handleBudgetUpdate}>
+            Save Changes
+          </Button>
+        </Stack>
       </Card>
     </Grid>
   );

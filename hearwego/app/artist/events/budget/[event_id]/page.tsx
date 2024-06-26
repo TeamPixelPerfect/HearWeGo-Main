@@ -310,7 +310,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
               color="secondary"
               sx={{ textTransform: "capitalize" }}
               onClick={() => {
-                Router.push("manage/b1");
+                Router.push(`manage/${event_id}`);
               }}
             >
               Open Budget Manager
