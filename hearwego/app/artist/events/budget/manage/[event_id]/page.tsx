@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -8,6 +9,7 @@ import {
   Grid,
   IconButton,
   Modal,
+  Snackbar,
   Stack,
   Typography,
   useTheme,
@@ -57,72 +59,43 @@ import {
 import TextField from "@mui/material/TextField";
 import { DataGrid, GridColDef, GridRowSelectionModel, GridToolbar } from "@mui/x-data-grid";
 
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
-    padding: theme.spacing(2),
-  },
-  "& .MuiDialogActions-root": {
-    padding: theme.spacing(1),
-  },
-}));
-
 interface Props {
   params: { event_id: string };
 }
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.secondary.main,
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  '& .MuiDataGrid-columnsContainer': {
+    backgroundColor: theme.palette.background.default,
+  },
+  '& .MuiDataGrid-columnHeader': {
+    backgroundColor: theme.palette.primary.light,
     color: theme.palette.common.white,
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark,
+    },
   },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+  '& .MuiDataGrid-cell': {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  '& .MuiDataGrid-row': {
+    '&:nth-of-type(even)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+  '& .MuiDataGrid-footerContainer': {
+    backgroundColor: theme.palette.background.default,
+  },
+  '& .MuiCheckbox-root': {
+    color: `${theme.palette.primary.main} !important`,
+  },
+  '& .MuiDataGrid-toolbarContainer': {
+    '& .MuiButton-text': {
+      color: theme.palette.primary.main,
+    },
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
-
-function createData(
-  session: string,
-  income: number,
-  expense: number,
-  currentProfit: number
-) {
-  return { session, income, expense, currentProfit };
-}
-
-function createBudgetData(
-  budgetTitle: string,
-  session: string,
-  type: string,
-  amount: number
-) {
-  return { budgetTitle, session, type, amount };
-}
-
-const rows = [
-  createData("Session 01", 70000, 50000, 20000),
-  createData("Session 02", 80000, 40000, 40000),
-  createData("Session 03", 70000, 50000, 20000),
-];
-
-const budgetDataRows = [
-  createBudgetData("Hall Rent", "Session 01", "Income", 7000),
-  createBudgetData("Hall Rent", "Session 01", "Expense", 5000),
-  createBudgetData("Hall Rent", "Session 02", "Income", 7000),
-  createBudgetData("Hall Rent", "Session 01", "Income", 7000),
-  createBudgetData("Hall Rent", "Session 01", "Income", 7000),
-  createBudgetData("Hall Rent", "Session 02", "Income", 7000),
-  createBudgetData("Hall Rent", "Session 02", "Income", 7000),
-];
 
 const BudgetManager = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
@@ -136,6 +109,14 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
     event_id: event_id,
   });
   const [budgetRows, setBudgetRows] = useState([]);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   React.useEffect(() => {
     getEvent(event_id).then((event) => {
@@ -173,13 +154,20 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
   , [budgetRows]);
 
   const handleBudgetUpdate = async () => {
-    console.log("Updating budget data:", budgets);
-    console.log("Token:", artist.token);
-    await updateBudget(
-      artist.token,
-      event_id,
-      budgets
-    )
+    try {
+      await updateBudget(
+        artist.token,
+        event_id,
+        budgets
+      );
+      setSnackbarSeverity("success");
+      setSnackbarMessage("Budget updated successfully!");
+      setSnackbarOpen(true);
+    } catch (error) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Failed to update budget.");
+      setSnackbarOpen(true);
+    }
   }
 
   const [open, setOpen] = React.useState(false);
@@ -221,6 +209,16 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
           </Button>
         </Stack>
       </Card>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 };
@@ -239,12 +237,26 @@ const sponsorModalStyle = {
 };
 
 const budgetColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "budgetTitle", headerName: "Title", width: 150 },
-  { field: "budgetSession", headerName: "Session", width: 150 },
-  { field: "budgetType", headerName: "Type", width: 250 },
-  { field: "budgetAmount", headerName: "Amount", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "budgetTitle", headerName: "Title", flex: 1, editable: true },
+  { field: "budgetSession", headerName: "Session", flex: 1, editable: true },
+  {
+    field: "budgetType",
+    headerName: "Type",
+    type: "singleSelect",
+    valueOptions: ["Income", "Expense"],
+    flex: 1,
+    editable: true,
+  },
+  {
+    field: "budgetAmount",
+    headerName: "Amount",
+    type: "number",
+    flex: 1,
+    editable: true,
+  },
 ];
+
 
 let budgetRows = [];
 
@@ -448,7 +460,7 @@ function BudgetTable({ budgetRows, setBudgetRows, event }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={budgetRows}
         columns={budgetColumns}
