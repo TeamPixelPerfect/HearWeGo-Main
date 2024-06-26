@@ -248,6 +248,14 @@ const NewsPage: React.FC = () => {
     setAnchorEl(null);
     setSelectedPostId(null);
   };
+
+  const handleSelectImage = (postId: number, imageUrl: string) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId ? { ...post, imageUrl } : post
+      )
+    );
+  };
   return (
     <Container>
       <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
@@ -295,6 +303,22 @@ const NewsPage: React.FC = () => {
                       multiline
                       rows={4}
                     />
+
+                    <DropFile
+                      file={post.imageUrl} // Assuming imageUrl is already part of post
+                      setFile={(imageUrl) =>
+                        handleSelectImage(post.id, imageUrl)
+                      }
+                      fileTypes="images"
+                      fileExtensions="jpg, png, gif"
+                      isCircular={false} // Adjust based on your design
+                      width="100%" // Adjust width as needed
+                      height="250px" // Adjust height as needed
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                    />
+
                     <Button
                       variant="contained"
                       onClick={handleSaveEditPost}

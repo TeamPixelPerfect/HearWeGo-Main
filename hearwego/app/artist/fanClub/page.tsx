@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
+import { useRouter } from "next/navigation";
 import { Add as AddIcon } from "@mui/icons-material";
 import FeedTab from "./FeedTab";
 import PhotosTab from "./PhotosTab";
@@ -347,7 +348,8 @@ const validationSchema = Yup.object().shape({
   video: Yup.mixed().nullable().required("Video is required"),
 });
 
-const ArtistPage: React.FC = () => {
+const ArtistPage = () => {
+  const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -367,8 +369,8 @@ const ArtistPage: React.FC = () => {
   const [postImg, setPostImg] = useState<File | null>(null);
 
   useEffect(() => {
-    if(postImg){
-      setPostData({...postData, postImage_URL: postImg})
+    if (postImg) {
+      setPostData({ ...postData, postImage_URL: postImg });
     }
   }, [postImg]);
 
@@ -476,6 +478,20 @@ const ArtistPage: React.FC = () => {
           This is a place where you can share your latest posts, updates, and
           news with your audience.
         </Typography>
+        {/* <Button sx={{
+          bgcolor: "primary.main",
+          color: "white",
+          "&:hover": {
+            bgcolor: "primary.dark",
+          },
+          }}
+          onClick={() => {
+            router.push("/artist/fanClub/Profile");
+          }}
+           >
+           Go to Profile
+
+        </Button> */}
         <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Feed" />
           <Tab label="Photos" />
@@ -520,122 +536,8 @@ const ArtistPage: React.FC = () => {
         <EventsTab />
       </Box>
 
-      {tabValue === 0 || tabValue === 3 ? (
-        <Fab
-          color="primary"
-          onClick={() => handleDialogOpen(tabValue === 0 ? "post" : "news")}
-          sx={{
-            position: "fixed",
-            bottom: 16,
-            right: 16,
-            width: 80,
-            height: 80,
-            bgcolor: "primary.main",
-            color: "white",
-            "&:hover": {
-              bgcolor: "primary.dark",
-            },
-          }}
-        >
-          <AddIcon sx={{ fontSize: 40 }} />
-        </Fab>
-      ) : null}
-
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>
-          Create New {dialogType === "post" ? "Post" : "News"}
-        </DialogTitle>
-        <DialogContent>
-          <Formik
-            initialValues={{ title: "", content: "", image: null, video: null }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              handleCreatePost(values);
-              setSubmitting(false);
-            }}
-          >
-            {({
-              values,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting,
-              errors,
-              touched,
-            }) => (
-              <Form onSubmit={handleSubmit}>
-                <Field
-                  as={TextField}
-                  autoFocus
-                  margin="dense"
-                  value={postData.postType}
-                  onChange={(e)=>setPostData({...postData, postType: e.target.value})}
-                  name="title"
-                  label="Title"
-                  fullWidth
-                  variant="standard"
-                  error={touched.title && Boolean(errors.title)}
-                  helperText={touched.title && errors.title}
-                />
-                <Field
-                  as={TextField}
-                  margin="dense"
-                  name="content"
-                  label="Content"
-                  value={postData.postDescription}
-                  onChange={(e)=>setPostData({...postData, postDescription: e.target.value})}
-                  fullWidth
-                  variant="standard"
-                  multiline
-                  rows={4}
-                  error={touched.content && Boolean(errors.content)}
-                  helperText={touched.content && errors.content}
-                />
-                {dialogType === "post" && (
-                  <>
-                    <DropFile
-                      fileTypes="Image"
-                      fileExtensions="JPEG,PNG,WEBP,SVG"
-                      isCircular={false}
-                      width="100%"
-                      height="200px"
-                      file={postImg}
-                      setFile={setPostImg}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                      error={touched.image && Boolean(errors.image)}
-                      helperText={touched.image && errors.image}
-                    />
-                    <DropFile
-                      fileTypes="Video"
-                      fileExtensions="MP4,AVI,MOV"
-                      isCircular={false}
-                      width="100%"
-                      height="200px"
-                      file={null}
-                      setFile={(file) => setFieldValue("video", file)}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                      error={touched.video && Boolean(errors.video)}
-                      helperText={touched.video && errors.video}
-                    />
-                  </>
-                )}
-                <DialogActions>
-                  <Button onClick={handleDialogClose} disabled={isSubmitting}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" color="primary" onClick={submitData}>
-                    Create
-                  </Button>
-                </DialogActions>
-              </Form>
-            )}
-          </Formik>
-        </DialogContent>
-      </Dialog>
+      
+      
 
       <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
         <DialogTitle>{selectedPost?.title}</DialogTitle>
