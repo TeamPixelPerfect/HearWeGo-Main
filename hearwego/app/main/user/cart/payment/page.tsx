@@ -133,6 +133,7 @@ const Payment = () => {
         }}
         onClose={() => {
           setShowPayhere(false);
+          
           if (success) {
             console.log("Payment success");
           } else {
