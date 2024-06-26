@@ -9,7 +9,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { use } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -18,6 +18,11 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { getEventById } from "@/app/services/EventServices";
+import { useEffect, useState } from "react";
+import { Event } from "@/app/constants/models";
+import { Budget } from "@/app/constants/models";
+import { getBudgetByEventId } from "@/app/services/EventServices";
 import { useRouter } from "next/navigation";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -59,9 +64,71 @@ interface Props {
   params: { event_id: string };
 }
 
+interface GroupedSessions {
+  [key: string]: {
+    session_name: string;
+    income: number;
+    expense: number;
+  };
+}
+
+interface BudgetItem {
+  budget_amount: string;
+  budget_session: string;
+  budget_title: string;
+  budget_type: string;
+}
+
+
+interface SessionSummary {
+  session_name: string;
+  income: number;
+  expense: number;
+  total_profit: number;
+}
+
 const BudgetDetails = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
   const Router = useRouter();
+  const [budget, setBudget] = useState<Budget>();
+
+  useEffect(() => {
+    getBudgetByEventId(event_id).then((budget) => {
+      setBudget(budget);
+      console.log("Budget", budget);
+      console.log("Budget", budget.budget_details);
+      // console.log("Budget", budget.data.budget_details);
+    });
+  }, []);
+
+  const budgetData: BudgetItem[] = budget?.budget_details || [];
+
+  const groupedSessions: GroupedSessions = budgetData.reduce((acc: GroupedSessions, item: BudgetItem) => {
+    const session = item.budget_session;
+    const amount = parseFloat(item.budget_amount);
+  
+    if (!acc[session]) {
+      acc[session] = { session_name: session, income: 0, expense: 0 };
+    }
+  
+    if (item.budget_type === "Income") {
+      acc[session].income += amount;
+    } else if (item.budget_type === "Expense") {
+      acc[session].expense += amount;
+    }
+  
+    return acc;
+  }, {});
+  
+  const result: SessionSummary[] = Object.values(groupedSessions).map(session => ({
+    session_name: session.session_name,
+    income: session.income,
+    expense: session.expense,
+    total_profit: session.income - session.expense
+  }));
+  
+  console.log(result);
+  
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -90,6 +157,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
             }}
           >
             Budget Details
+            
           </Typography>
         </Box>
         <Box sx={{ m: 3 }}>
@@ -181,15 +249,15 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.session}>
+              {result.map((row) => (
+                <StyledTableRow key={row.session_name}>
                   <StyledTableCell component="th" scope="row">
-                    {row.session}
+                    {row.session_name}
                   </StyledTableCell>
                   <StyledTableCell align="right">{row.income}</StyledTableCell>
                   <StyledTableCell align="right">{row.expense}</StyledTableCell>
                   <StyledTableCell align="right">
-                    {row.currentProfit}
+                    {row.total_profit}
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
@@ -243,6 +311,34 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
             </Button>
           </Stack>
         </div>
+
+        {/* {budgetItem?.budget_details?.map((item: BudgetItem) => (
+          <Box sx={{ m: 3 }}>
+            <Typography variant="h6" sx={{ color: theme.palette.secondary.main }}>
+              {item.budget_title}
+            </Typography>
+            <TableContainer sx={{ maxWidth: "90%" }} component={Paper}>
+              <Table sx={{ borderRadius: "20px" }} aria-label="customized table">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Session</StyledTableCell>
+                    <StyledTableCell align="right">Amount</StyledTableCell>
+                    <StyledTableCell align="right">Type</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <StyledTableRow>
+                    <StyledTableCell component="th" scope="row">
+                      {item.budget_session}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">{item.budget_amount}</StyledTableCell>
+                    <StyledTableCell align="right">{item.budget_type}</StyledTableCell>
+                  </StyledTableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        ))} */}
       </Card>
     </Grid>
   );

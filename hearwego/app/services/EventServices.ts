@@ -301,3 +301,24 @@ export const getAllBudgets = async (): Promise<Budget[]> => {
     throw new Error(error.message);
   }
 };
+
+export const getBudgetByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/budget/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch budget:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+}
