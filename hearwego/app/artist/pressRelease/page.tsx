@@ -25,6 +25,7 @@ import DropFile from "../../components/DropFile";
 import {
   addPressRelease,
   getPressReleasesByArtist,
+  deletePressRelease,
 } from "../../services/PressReleaseServices";
 import { PressReleaseData } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
@@ -39,7 +40,6 @@ import {
 } from "@mui/material";
 import { jsPDF } from "jspdf";
 import { formatDate } from "@/app/constants/functions";
-import { deletePressRelease } from "@/app/services/PressReleaseServices";
 
 const options = {
   weekday: "long",
@@ -63,9 +63,7 @@ export default function PressRelease() {
     PressReleaseData[]
   >([]);
   const [error, setError] = useState<Error | null>(null);
-  const [IsSavedDelete, setIsSavedDelete] = useState<boolean>(false);
-  const [IsSaved, setIsSaved] = useState<boolean>(false);
-  const [IsDraftedDelete, setIsDraftedDelete] = useState<boolean>(false);
+  const [IsChanged, setIsChanged] = useState<boolean>(false);
 
   useEffect(() => {
     if (artist?.token) {
@@ -75,23 +73,18 @@ export default function PressRelease() {
       )
         .then((response) => {
           const savedReleases = response.data.filter(
-            (pr) => pr.Status === "Saved"
+            (pr: any) => pr.Status === "Saved"
           );
           const draftedReleases = response.data.filter(
-            (pr) => pr.Status === "Draft"
+            (pr: any) => pr.Status === "Draft"
           );
           setSavedPressReleases(savedReleases);
           setDraftedPressReleases(draftedReleases);
+          if (IsChanged) setIsChanged(false);
         })
         .catch((error) => setError(error));
     }
-  }, [
-    artist?.token,
-    artist?.user?.artist_id,
-    IsSavedDelete,
-    IsSaved,
-    IsDraftedDelete,
-  ]);
+  }, [artist?.token, artist?.user?.artist_id, IsChanged]);
 
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -248,9 +241,14 @@ export default function PressRelease() {
   };
 
   const handleSave = () => {
-    formik.setFieldValue("Status", "Saved");
-    setIsSaved(true);
-    formik.handleSubmit();
+    formik
+      .setFieldValue("Status", "Saved")
+      .then(() => {
+        formik.handleSubmit();
+      })
+      .finally(() => {
+        setIsChanged(true);
+      });
   };
 
   const handleCancel = async () => {
@@ -260,6 +258,7 @@ export default function PressRelease() {
         Status: "Draft",
       };
       await addPressRelease(artist ? artist.token : "", draftData);
+      setIsChanged(true);
       setDraftSavedDialogOpen(true);
       formik.resetForm();
       setLogoImg(null);
@@ -267,6 +266,16 @@ export default function PressRelease() {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    console.log("Deleting press release with ID:", id);
+    deletePressRelease(artist ? artist.token : "", id)
+      .then((res) => {
+        console.log(res);
+        setIsChanged(true);
+      })
+      .catch((error) => console.error(error));
   };
 
   const isFormFilled = () => {
@@ -346,7 +355,7 @@ export default function PressRelease() {
                             aspectX={1}
                             aspectY={1}
                             shape="rect"
-                            sx={{ margin: "30px" }}
+                            // style={{ margin: "30px" }}
                           />
                           {formik.touched.ArtistLogo_URL &&
                           formik.errors.ArtistLogo_URL ? (
@@ -487,7 +496,7 @@ export default function PressRelease() {
                                   onChange={(date) =>
                                     formik.setFieldValue("ReleaseDate", date)
                                   }
-                                  renderInput={(params) => (
+                                  renderInput={(params: any) => (
                                     <TextField
                                       fullWidth
                                       {...params}
@@ -539,104 +548,98 @@ export default function PressRelease() {
               {/* Saved Ones Tab */}
               <TabPanel value="2">
                 {savedPressReleases.length > 0 ? (
-                  savedPressReleases.map((item, index) => (
-                    <Paper
-                      key={index}
-                      elevation={3}
-                      sx={{
-                        p: 2,
-                        mb: 2,
-                        display: "flex",
-                        flexDirection: { xs: "column", md: "row" },
-                        alignItems: { xs: "center", md: "flex-start" },
-                        textAlign: { xs: "center", md: "left" },
-                        bgcolor: "background.default",
-                        borderRadius: 2,
-                        boxShadow: 3,
-                        transition: "transform 0.3s ease-in-out",
-                        "&:hover": {
-                          transform: "scale(1.02)",
-                        },
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={item.ArtistLogo_URL}
-                        alt="logo"
-                        sx={{
-                          width: 170,
-                          height: 170,
-                          mb: { xs: 2, md: 0 },
-                          mr: { md: 2 },
-                          borderRadius: "50%",
-                          border: "2px solid #1976d2",
-                        }}
-                      />
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Typography
-                          variant="h5"
-                          sx={{ fontWeight: "bold", mb: 1 }}
-                        >
-                          {item.Headline}
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{ mb: 1, color: "text.secondary" }}
-                        >
-                          {item.SubHeadline}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 0.5 }}>
-                          Event Date:{" "}
-                          {item.EventDate &&
-                            formatDate(item.EventDate.toString())}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 2 }}>
-                          Release Date:{" "}
-                          {item.ReleaseDate &&
-                            formatDate(item.ReleaseDate.toString())}
-                        </Typography>
-                        <Box
+                  <Grid container spacing={2}>
+                    {savedPressReleases.map((item, index) => (
+                      <Grid item xs={12} md={6} lg={4} key={index}>
+                        <Paper
+                          elevation={3}
                           sx={{
+                            p: 2,
                             display: "flex",
-                            justifyContent: { xs: "center", md: "flex-start" },
-                            gap: 2,
-                            mt: 2,
+                            flexDirection: "column",
+                            alignItems: "center",
+                            textAlign: "center",
+                            bgcolor: "background.default",
+                            borderRadius: 2,
+                            boxShadow: 3,
+                            transition: "transform 0.3s ease-in-out",
+                            height: "auto",
+                            "&:hover": {
+                              transform: "scale(1.02)",
+                            },
                           }}
                         >
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => generatePDF(item)}
-                            startIcon={<DownloadIcon />}
-                            sx={{ textTransform: "none" }}
-                          >
-                            Download PDF
-                          </Button>
-                          <IconButton
-                            color="secondary"
-                            onClick={() => sharePressRelease(item)}
-                            sx={{ textTransform: "none" }}
-                          >
-                            <ShareIcon />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={() => {
-                              deletePressRelease(
-                                artist ? artist.token : "",
-                                item.PressReleaseID as string
-                              ).then(() => {
-                                setIsSavedDelete(true);
-                              });
+                          <Box
+                            component="img"
+                            src={item.ArtistLogo_URL}
+                            alt="logo"
+                            sx={{
+                              width: 150,
+                              height: 150,
+                              mb: 2,
+                              borderRadius: "50%",
+                              border: "2px solid #3f51b5",
                             }}
-                            sx={{ textTransform: "none" }}
+                          />
+                          <Typography
+                            variant="h5"
+                            sx={{ fontWeight: "bold", mb: 1 }}
                           >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    </Paper>
-                  ))
+                            {item.Headline}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{ mb: 1, color: "text.secondary" }}
+                          >
+                            {item.SubHeadline}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 0.5 }}>
+                            Event Date:{" "}
+                            {item.EventDate &&
+                              formatDate(item.EventDate.toString())}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 2 }}>
+                            Release Date:{" "}
+                            {item.ReleaseDate &&
+                              formatDate(item.ReleaseDate.toString())}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                              gap: 2,
+                              mt: 2,
+                            }}
+                          >
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => generatePDF(item)}
+                              startIcon={<DownloadIcon />}
+                              sx={{ textTransform: "none" }}
+                            >
+                              Download
+                            </Button>
+                            <IconButton
+                              color="secondary"
+                              sx={{ textTransform: "none" }}
+                            >
+                              <ShareIcon />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              onClick={() => {
+                                handleDelete(item?.PressReleaseID as string);
+                              }}
+                              sx={{ textTransform: "none" }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
                 ) : (
                   <Typography variant="h6" sx={{ textAlign: "center" }}>
                     No press releases saved.
@@ -646,46 +649,100 @@ export default function PressRelease() {
               {/* Drafts Tab */}
               <TabPanel value="3">
                 {DraftedPressReleases.length > 0 ? (
-                  DraftedPressReleases.map((item, index) => (
-                    <Paper key={index} elevation={3} sx={{ p: 2, mb: 2 }}>
-                      <img
-                        src={item.ArtistLogo_URL}
-                        alt="logo"
-                        style={{ width: 50, height: 50, marginBottom: 10 }}
-                      />
-                      <Typography variant="h5">{item.Headline}</Typography>
-                      <Typography variant="body1">
-                        {item.SubHeadline}
-                      </Typography>
-                      <Typography variant="body2">
-                        Event Date:{" "}
-                        {item.EventDate &&
-                          formatDate(item.EventDate.toString())}
-                      </Typography>
-                      <Typography variant="body2">
-                        Release Date:{" "}
-                        {item.ReleaseDate &&
-                          formatDate(item.ReleaseDate.toString())}
-                      </Typography>
-
-                      <Button
-                        variant="outlined"
-                        onClick={() => {
-                          deletePressRelease(
-                            artist ? artist.token : "",
-                            item.PressReleaseID as string
-                          ).then(() => {
-                            setIsDraftedDelete(true);
-                          });
-                        }}
-                        sx={{ mt: 2 }}
-                      >
-                        Delete
-                      </Button>
-                    </Paper>
-                  ))
+                  <Grid container spacing={2}>
+                    {DraftedPressReleases.map((item, index) => (
+                      <Grid item xs={12} md={6} lg={4} key={index}>
+                        <Paper
+                          elevation={3}
+                          sx={{
+                            p: 2,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            textAlign: "center",
+                            bgcolor: "background.default",
+                            borderRadius: 2,
+                            boxShadow: 3,
+                            height: "auto",
+                            transition: "transform 0.3s ease-in-out",
+                            "&:hover": {
+                              transform: "scale(1.02)",
+                            },
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={item.ArtistLogo_URL}
+                            alt="logo"
+                            sx={{
+                              width: 150,
+                              height: 150,
+                              mb: 2,
+                              borderRadius: "50%",
+                              border: "2px solid #1976d2",
+                            }}
+                          />
+                          <Typography
+                            variant="h5"
+                            sx={{ fontWeight: "bold", mb: 1 }}
+                          >
+                            {item.Headline}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{ mb: 1, color: "text.secondary" }}
+                          >
+                            {item.SubHeadline}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 0.5 }}>
+                            Event Date:{" "}
+                            {item.EventDate &&
+                              formatDate(item.EventDate.toString())}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 2 }}>
+                            Release Date:{" "}
+                            {item.ReleaseDate &&
+                              formatDate(item.ReleaseDate.toString())}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                              gap: 2,
+                              mt: 2,
+                            }}
+                          >
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => generatePDF(item)}
+                              startIcon={<DownloadIcon />}
+                              sx={{ textTransform: "none" }}
+                            >
+                              Download
+                            </Button>
+                            <IconButton
+                              color="secondary"
+                              sx={{ textTransform: "none" }}
+                            >
+                              <ShareIcon />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              onClick={() => {
+                                handleDelete(item?.PressReleaseID as string);
+                              }}
+                              sx={{ textTransform: "none" }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
                 ) : (
-                  <Typography variant="h6">
+                  <Typography variant="h6" sx={{ textAlign: "center" }}>
                     No drafted press releases saved.
                   </Typography>
                 )}
