@@ -135,7 +135,7 @@ const UserProfilePopup = ({
           sx={{ mb: 2, p: 2, fontWeight: 700, fontSize: "32px" }}
           id="user-greeting"
         >
-          Hello, {user?.name.split(" ")[0]}!
+          Hello, {user?.name?.split(" ")[0]}!
         </DialogTitle>
         <IconButton
           aria-label="close"
@@ -330,7 +330,7 @@ const UserProfilePopup = ({
                         id="old-mobile-number"
                         label="Old Mobile Number"
                         defaultValue={
-                          "*** ** ***" + user?.mobileNumber.substring(9, 12)
+                          "*** ** ***" + user?.mobileNumber?.substring(9, 12)
                         }
                         variant="filled"
                       />
@@ -353,7 +353,7 @@ const UserProfilePopup = ({
                         variant="filled"
                         labelId="demo-simple-select-autowidth-label"
                         id="country"
-                        value={userDetails.country}
+                        value={userDetails?.country}
                         onChange={handleCountryChange}
                         // autoWidth
                         label="Country"

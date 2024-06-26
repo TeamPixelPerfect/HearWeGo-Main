@@ -26,10 +26,14 @@ import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import DropFile from "../../components/DropFile";
-import { addMerchCategory, deleteCategory, editCategory, getCategories } from "../../services/StoreServices"; // Make sure to implement this service
+import {
+  addMerchCategory,
+  deleteCategory,
+  editCategory,
+  getCategories,
+} from "../../services/StoreServices"; // Make sure to implement this service
 import { MerchCategory } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
-import { String } from "aws-sdk/clients/apigateway";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -38,7 +42,11 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Categories: React.FC = () => {
+interface Props {
+  store_id: string;
+}
+
+const Categories = ({ store_id }: Props) => {
   const artist = useAppSelector((state) => state.artist.user);
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -75,8 +83,8 @@ const Categories: React.FC = () => {
     type: "cancel" | "delete",
     categoryId?: string | undefined
   ) => {
-    setConfirmDialogType(type); 	
-    setCategoryId(categoryId? categoryId: "")
+    setConfirmDialogType(type);
+    setCategoryId(categoryId ? categoryId : "");
     setConfirmDialogOpen(true);
   };
 
@@ -115,32 +123,43 @@ const Categories: React.FC = () => {
     }),
     onSubmit: async (values) => {
       const newCategory: MerchCategory = {
-        store_id: "st26",
+        store_id: store_id,
         category_id: isEditing ? values.id : String(Date.now()),
         category_name: values.name,
         category_description: values.description,
         subCategories: values.subCategories
           .split(",")
           .map((subCat) => subCat.trim()),
-        image: values?.logoFile? values.logoFile : "",
+        image: values?.logoFile ? values.logoFile : "",
       };
 
       try {
-        await addMerchCategory(artist ? artist.token : "", newCategory);
         if (isEditing) {
-          setCategories((prev) =>
-            prev.map((category) =>
-              category.category_id === newCategory.category_id
-                ? newCategory
-                : category
-            )
-          );
-          setSnackbarMessage("Category updated successfully!");
+          editCategory(
+            artist?.token ? artist.token : "",
+            newCategory?.category_id ? newCategory.category_id : "",
+            newCategory
+          ).then((res) => {
+            console.log("Category edited successfully:", res);
+            setSnackbarSeverity("success");
+            setSnackbarOpen(true);
+            setSnackbarMessage("Category edited successfully!");
+            fetchCategories();
+          });
         } else {
-          setCategories((prev) => [...prev, newCategory]);
-          setSnackbarMessage("Category added successfully!");
+          const res = await addMerchCategory(
+            artist ? artist.token : "",
+            newCategory
+          );
+          if (res.error) {
+            setSnackbarMessage(res.error);
+            setSnackbarSeverity("error");
+          } else {
+            setSnackbarMessage("Category added successfully!");
+            setSnackbarSeverity("success");
+            fetchCategories();
+          }
         }
-        setSnackbarSeverity("success");
       } catch (error) {
         console.error("Error adding/updating category: ", error);
         setSnackbarMessage("Error adding/updating category!");
@@ -152,7 +171,7 @@ const Categories: React.FC = () => {
     },
   });
 
-  const handleEdit = (index: number) => {
+  const handleEdit = (index: Number) => {
     const categoryToEdit = categories[index];
     formik.setValues({
       id: categoryToEdit.category_id,
@@ -161,35 +180,31 @@ const Categories: React.FC = () => {
       subCategories: categoryToEdit.subCategories.join(", "),
       logoFile: categoryToEdit.image,
     });
-    editCategory(artist?.token? artist.token : "", categoryToEdit?.category_id? categoryToEdit.category_id: "", categoryToEdit).then((res) => {
-      console.log("Category edited successfully:", res);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-      setSnackbarMessage("Category edited successfully!");
-      fetchCategories();
-    })
     handleClickOpen(true);
   };
 
   const handleDelete = async (categoryId: string | undefined) => {
-    deleteCategory(artist?.token? artist.token : "", categoryId? categoryId : "").then((res) => {
+    deleteCategory(
+      artist?.token ? artist.token : "",
+      categoryId ? categoryId : ""
+    ).then((res) => {
       console.log("Category deleted successfully:", res);
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
       setSnackbarMessage("Category deleted successfully!");
       fetchCategories();
-    })
-  }
+    });
+  };
 
   const fetchCategories = () => {
     getCategories().then((res) => {
       setCategories(res.data);
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     fetchCategories();
-  }, [])
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -227,7 +242,9 @@ const Categories: React.FC = () => {
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleConfirmDialogOpen("delete", category.category_id)}
+                      onClick={() =>
+                        handleConfirmDialogOpen("delete", category.category_id)
+                      }
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -355,10 +372,9 @@ const Categories: React.FC = () => {
                 >
                   Cancel
                 </Button>
-                
+
                 <Button type="submit" color="primary">
-                  Add
-                  {/* {isEditing ? "Update" : "Add"} */}
+                  {isEditing ? "Update" : "Add"}
                 </Button>
               </DialogActions>
             </form>

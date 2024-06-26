@@ -38,6 +38,7 @@ export const addMerchCategory = async (token: string, data: any) => {
     return category;
   } else {
     const error = await res.json();
+    return error;
     throw new Error(error.message);
   }
 };
@@ -279,6 +280,129 @@ export const deletePromo = async (token: string, promoId: string) => {
   });
   if (res.ok) {
     return;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getMerchStore = async (storeId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/merchStores/${storeId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const store = await res.json();
+    return store;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getCartByUser = async (userId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/carts/user/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const cart = await res.json();
+    return cart;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getCartItems = async (cartId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/cartItems/${cartId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const cartItems = await res.json();
+    return cartItems;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getProduct = async (productId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/products/${productId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const product = await res.json();
+    return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const addItemToCart = async (token: string, data: any) => {
+  const res = await fetch(`${base_url}/MerchsManager/cartItems/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const product = await res.json();
+    return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const updateCartItem = async (
+  token: string,
+  cartItemId: string,
+  data: any
+) => {
+  const res = await fetch(`${base_url}/MerchsManager/cartItems/${cartItemId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const product = await res.json();
+    return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deleteCartItem = async (token: string, cartItemId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/cartItems/${cartItemId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const product = await res.json();
+    return product;
   } else {
     const error = await res.json();
     throw new Error(error.message);

@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect} from "react";
+import { useEffect } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -18,8 +18,18 @@ import Button from "@mui/material/Button";
 import CategoryComponent from "../../../../components/MerchandiseCategory";
 import Link from "next/link";
 import { useState } from "react";
-import { MerchProduct } from "../../../../constants/models";
-import { getProductsforStore } from "@/app/services/StoreServices";
+import {
+  Cart,
+  MerchCategory,
+  MerchProduct,
+} from "../../../../constants/models";
+import {
+  getCartByUser,
+  getCategories,
+  getMerchStore,
+  getProductsforStore,
+  getStoreForArtist,
+} from "@/app/services/StoreServices";
 
 import {
   Search,
@@ -28,26 +38,29 @@ import {
   WhiteArea,
 } from "../../../../styles/ArtistStrore.styles";
 import { Category } from "@mui/icons-material";
+import { useAppSelector } from "@/lib/hooks";
+import { MerchStore } from "@/app/admin/models/models";
+import { number } from "yup";
 
-const banners = [
-  {
-    id: 1,
-    image: "https://blog.daraz.lk/wp-content/uploads/2022/11/Banner.jpg",
-    title: "Banner 1",
-  },
-  {
-    id: 2,
-    image:
-      "https://blog.daraz.lk/wp-content/uploads/2022/11/Amazing-Black-Friday-Deals-On-Fashion-Up-To-30-Off-Banner.jpg",
-    title: "Banner 2",
-  },
-  {
-    id: 3,
-    image:
-      "https://blog.daraz.lk/wp-content/uploads/2023/03/Avurudu-Wasi-English-Banner-02.jpg",
-    title: "Banner 3",
-  },
-];
+// const banners = [
+//   {
+//     id: 1,
+//     image: "https://blog.daraz.lk/wp-content/uploads/2022/11/Banner.jpg",
+//     title: "Banner 1",
+//   },
+//   {
+//     id: 2,
+//     image:
+//       "https://blog.daraz.lk/wp-content/uploads/2022/11/Amazing-Black-Friday-Deals-On-Fashion-Up-To-30-Off-Banner.jpg",
+//     title: "Banner 2",
+//   },
+//   {
+//     id: 3,
+//     image:
+//       "https://blog.daraz.lk/wp-content/uploads/2023/03/Avurudu-Wasi-English-Banner-02.jpg",
+//     title: "Banner 3",
+//   },
+// ];
 
 export const products = [
   {
@@ -389,57 +402,67 @@ export const products = [
   },
 ];
 
-const categories = [
-  {
-    id: 1,
-    name: "Clothing",
-    image:
-      "https://hulaglobal.com/wp-content/uploads/2022/08/Hula-global-fashion-summer-guide.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 2,
-    name: "Accessories",
-    image:
-      "https://bournecrisp.com.au/wp-content/uploads/2019/07/accessories-make-or-break-1100x733.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 3,
-    name: "Footwear",
-    image:
-      "https://www.thespruce.com/thmb/JOkEQZjfndNozM9C5fOXxvhoyOU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/spr-tier-2-slippers-test-group-julia-fields-2-287418ff07c24849b0ef293adf4637f6.jpeg", // Provide the URL of the category image
-  },
-  {
-    id: 4,
-    name: "Home Accessories",
-    image:
-      "https://www.designersmk.com/wp-content/uploads/2023/08/home-accessories-1-1024x662.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 5,
-    name: "Instruments",
-    image:
-      "https://musiclessonsincorona.com/wp-content/uploads/2016/10/Most-Popular-Musical-Instruments-That-Students-Learn.jpeg", // Provide the URL of the category image
-  },
-  {
-    id: 6,
-    name: "Jewellery",
-    image: "https://static-01.daraz.lk/p/ba2ce801d17277faa688ff56b7c301dd.jpg", // Provide the URL of the category image
-  },
-  {
-    id: 7,
-    name: "watches",
-    image:
-      "https://m.media-amazon.com/images/S/aplus-media-library-service-media/e0b884c3-c7a3-4253-93d0-25cb0373f424.__CR158,0,2425,1500_PT0_SX970_V1___.jpg", // Provide the URL of the category image
-  },
-];
+// const categories = [
+//   {
+//     id: 1,
+//     name: "Clothing",
+//     image:
+//       "https://hulaglobal.com/wp-content/uploads/2022/08/Hula-global-fashion-summer-guide.jpg", // Provide the URL of the category image
+//   },
+//   {
+//     id: 2,
+//     name: "Accessories",
+//     image:
+//       "https://bournecrisp.com.au/wp-content/uploads/2019/07/accessories-make-or-break-1100x733.jpg", // Provide the URL of the category image
+//   },
+//   {
+//     id: 3,
+//     name: "Footwear",
+//     image:
+//       "https://www.thespruce.com/thmb/JOkEQZjfndNozM9C5fOXxvhoyOU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/spr-tier-2-slippers-test-group-julia-fields-2-287418ff07c24849b0ef293adf4637f6.jpeg", // Provide the URL of the category image
+//   },
+//   {
+//     id: 4,
+//     name: "Home Accessories",
+//     image:
+//       "https://www.designersmk.com/wp-content/uploads/2023/08/home-accessories-1-1024x662.jpg", // Provide the URL of the category image
+//   },
+//   {
+//     id: 5,
+//     name: "Instruments",
+//     image:
+//       "https://musiclessonsincorona.com/wp-content/uploads/2016/10/Most-Popular-Musical-Instruments-That-Students-Learn.jpeg", // Provide the URL of the category image
+//   },
+//   {
+//     id: 6,
+//     name: "Jewellery",
+//     image: "https://static-01.daraz.lk/p/ba2ce801d17277faa688ff56b7c301dd.jpg", // Provide the URL of the category image
+//   },
+//   {
+//     id: 7,
+//     name: "watches",
+//     image:
+//       "https://m.media-amazon.com/images/S/aplus-media-library-service-media/e0b884c3-c7a3-4253-93d0-25cb0373f424.__CR158,0,2425,1500_PT0_SX970_V1___.jpg", // Provide the URL of the category image
+//   },
+// ];
+
 interface Props {
-  store_id: string;
+  params: { id: string };
 }
 
-const ArtistStore =({ store_id }: Props) => {
+const ArtistStore = ({ params: { id } }: Props) => {
   const [productsData, setProductsData] = useState<MerchProduct[]>([]);
-  const [editComplete, setEditComplete] = useState(false);
- 
+  const [categories, setCategories] = useState<MerchCategory[]>([]);
+  const [storeData, setStoreData] = useState<MerchStore>();
+  const [banners, setBanners] = useState<
+    { id: number; image: string; title: string }[]
+  >([]);
+  const [cartData, setCartData] = useState<Cart>();
+
+  const user = useAppSelector((state) => state.user.user);
+
+  console.log("Store User:::", user?.user?.user_id);
+
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const handleSearchInputChange = (
@@ -447,91 +470,52 @@ const ArtistStore =({ store_id }: Props) => {
   ) => {
     setSearchQuery(event.target.value);
   };
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = productsData?.filter((product) =>
+    product?.product_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCategories = categories?.filter((category) =>
+    category?.category_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => {
-    getProductsforStore(store_id).then((data) => {
+    getProductsforStore(id).then((data) => {
+      console.log(id, data);
       setProductsData(data);
     });
-    if (editComplete) {
-      setEditComplete(false);
-    }
-  }, [store_id, editComplete]);
+
+    getCategories().then((data) => {
+      setCategories(data.data);
+    });
+
+    getMerchStore(id).then((data) => {
+      console.log(data);
+      setStoreData(data);
+
+      const storeBanner = {
+        id: 0,
+        image: data?.store_banner,
+        title: "Store Banner",
+      };
+
+      const _banners = data?.promo_banner?.map(
+        (banner: string, index: number) => ({
+          id: index,
+          image: banner,
+          title: `Banner ${index + 1}`,
+        })
+      );
+      setBanners([storeBanner, ..._banners]);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    getCartByUser(user?.user?.user_id).then((data) => {
+      setCartData(data);
+    });
+  }, [user?.user?.user_id]);
 
   return (
     <>
-
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <Avatar
-              alt="Remy Sharp"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7MqiW7aEQD6l9uy0Icz9mn48gFLO5eahaMw&s"
-            />
-          </IconButton>
-
-          <Search>
-            <SearchIconWrapper>
-              <IconButton type="button" sx={{ p: "10" }} aria-label="Search">
-                <SearchIcon />
-              </IconButton>
-            </SearchIconWrapper>
-            <StyledInputBase
-              sx={{
-                padding: "70px",
-              }}
-              placeholder="Search here"
-              inputProps={{ "aria-label": "search" }}
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-            />
-          </Search>
-
-          <IconButton
-            size="large"
-            aria-label="show 4 new mails"
-            color="inherit"
-            onClick={() => {
-              router.push("/main/user/cart");
-            }}
-          >
-            <Badge badgeContent={4} color="error">
-              <ShoppingCartIcon />
-            </Badge>
-          </IconButton>
-
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              alignItems: "right",
-              justifyContent: "right",
-            }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                router.push("/main/user/orders");
-              }}
-              sx={{ textTransform: "none", marginLeft: "80px" }}
-            >
-              Orders
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
       <WhiteArea>
         <Box
           sx={{
@@ -544,13 +528,83 @@ const ArtistStore =({ store_id }: Props) => {
           <Box
             sx={{
               width: "100%",
-              marginTop: "20px",
-              borderRadius: "10px",
             }}
           >
             <SwipeableBanner banners={banners} />
           </Box>
         </Box>
+
+        <AppBar position="static" sx={{ p: "1em 0" }}>
+          <Toolbar sx={{ alignItems: "center" }}>
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-label="open drawer"
+              // sx={{ mr: 2 }}
+            >
+              <Avatar
+                alt="Remy Sharp"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7MqiW7aEQD6l9uy0Icz9mn48gFLO5eahaMw&s"
+              />
+            </IconButton>
+
+            <Search>
+              <SearchIconWrapper>
+                <IconButton
+                  type="button"
+                  sx={{ p: "10px" }}
+                  aria-label="Search"
+                >
+                  <SearchIcon />
+                </IconButton>
+              </SearchIconWrapper>
+              <StyledInputBase
+                sx={{
+                  padding: "8px 16px",
+                  paddingLeft: "60px",
+                }}
+                placeholder="Search here"
+                inputProps={{ "aria-label": "search" }}
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+              />
+            </Search>
+
+            <IconButton
+              size="large"
+              aria-label="show 4 new mails"
+              color="inherit"
+              sx={{ marginLeft: "10px" }}
+              onClick={() => {
+                router.push("/main/user/cart/" );
+              }}
+            >
+              <Badge badgeContent={4} color="error">
+                <ShoppingCartIcon />
+              </Badge>
+            </IconButton>
+
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "right",
+                justifyContent: "right",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  router.push("/main/user/orders");
+                }}
+                sx={{ textTransform: "none", marginLeft: "80px" }}
+              >
+                Orders
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
         <div
           style={{ padding: "20px", display: "flex", flexDirection: "column" }}
@@ -589,11 +643,9 @@ const ArtistStore =({ store_id }: Props) => {
           </div>
 
           <Grid container spacing={4}>
-            {filteredProducts.map((product) => (
-              <Grid item xs={5} sm={4} md={2} lg={2} key={product.id}>
-                <ProductCard 
-                product={product}
-               />
+            {filteredProducts?.map((product) => (
+              <Grid item xs={5} sm={4} md={2} lg={2} key={product?.product_id}>
+                <ProductCard product={product} />
               </Grid>
             ))}
           </Grid>
@@ -625,7 +677,7 @@ const ArtistStore =({ store_id }: Props) => {
 
           <Grid container spacing={2}>
             {filteredCategories.map((category) => (
-              <Grid item xs={6} sm={8} md={8} lg={3} key={category.id}>
+              <Grid item xs={6} sm={8} md={8} lg={3} key={category.category_id}>
                 <CategoryComponent category={category} />
               </Grid>
             ))}

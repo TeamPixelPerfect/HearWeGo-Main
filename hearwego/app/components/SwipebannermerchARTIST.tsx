@@ -15,18 +15,19 @@ interface StoreImg {
 
 interface SwipeableStoreImgProps {
   StoreImgs: StoreImg[];
+  setStoreImgs: React.Dispatch<React.SetStateAction<StoreImg[]>>;
   autoPlay?: boolean;
   indicators?: boolean;
   height?: number | string;
 }
 
 const SwipeableStoreImg: React.FC<SwipeableStoreImgProps> = ({
-  StoreImgs: initialStoreImgs,
+  StoreImgs, 
+  setStoreImgs,
   autoPlay = true,
   indicators = false,
   height = "600px",
 }) => {
-  const [StoreImgs, setStoreImgs] = useState<StoreImg[]>(initialStoreImgs);
   const [editStoreImg, setEditStoreImg] = useState<StoreImg | null>(null);
 
   const handleEdit = (StoreImg: StoreImg) => {

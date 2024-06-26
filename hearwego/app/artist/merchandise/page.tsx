@@ -124,7 +124,7 @@ const ArtistMerchandise = () => {
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
-            <Categories />
+            <Categories store_id={store?.store_id} />
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>

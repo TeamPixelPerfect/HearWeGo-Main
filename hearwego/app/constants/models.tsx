@@ -36,6 +36,7 @@ export interface Address {
 }
 
 export interface User {
+  user_id?: string;
   email: string;
   password: string;
   name: string;
@@ -50,6 +51,7 @@ export interface User {
   isMobileVerified: boolean;
   role: string;
   joinedDate: string;
+  token?: string;
 }
 
 export interface SocialMediaLink {
@@ -128,6 +130,7 @@ export interface Song {
 }
 
 export interface Album {
+  album_id?: string;
   album_title?: string;
   artist?: { artist_id: string; artist_name: string }[];
   album_img?: string;
@@ -308,6 +311,10 @@ export interface MerchCategory {
       product_quantity?: string,
       product_rating?: string,
       store_id?: string,
+      rating_count?: number
+      product_variations?: ProductVariant[]
+      review_count?: number
+      product_sold?: number
 }
 
 export interface MerchPromo{
@@ -332,4 +339,28 @@ export interface Product {
   product_quantity?: string;
   product_rating?: string;
   store_id?: string;
+}
+
+export interface Cart {
+  cart_id?: string;
+  user_id?: string;
+  cart_total?: number;
+}
+
+export interface CartItem {
+  cart_item_id?: string;
+  product_id?: string;
+  product_variation?: string;
+  product_quantity?: number;
+  product_price?: number;
+  cart_id?: string;
+  cart_item_image?: string;
+  cart_item_name?: string;
+}
+
+export interface ProductVariant {
+  variation_name?: string;
+  variation_value?: string; 
+  variation_price?: Number;
+  variation_quantity?: Number;
 }
