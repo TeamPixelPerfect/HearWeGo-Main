@@ -1,10 +1,31 @@
 "use client";
-import React, { useState } from "react";
-import { Grid, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  IconButton,
+  Avatar,
+  Card,
+  CardHeader,
+  Typography,
+  Box,
+  Tooltip,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import ImageIcon from "@mui/icons-material/Image";
+import CloseIcon from "@mui/icons-material/Close";
 import SinglePost from "./SinglePost/page";
 import { Post, Comment } from "./page";
-import DropFile from "../../components/DropFile"; // Import the DropFile component
+import { ClubPost } from "../../constants/models";
+import { addPost } from "../../services/FanClubServices";
+import { useAppSelector } from "@/lib/hooks"; // Adjust path as per your project structure
+import { useDispatch } from "react-redux"; // Adjust path as per your project structure
+import DropFile from "../../components/DropFile"; // Adjust path as per your project structure
 
 type FeedTabProps = {
   posts: Post[];
@@ -20,7 +41,7 @@ type FeedTabProps = {
   onAddPost: (newPost: Post) => void;
 };
 
-const FeedTab: React.FC<FeedTabProps> = ({
+const FeedTab = ({
   posts,
   onDeletePost,
   onEditPost,
@@ -28,11 +49,34 @@ const FeedTab: React.FC<FeedTabProps> = ({
   onEditComment,
   onDeleteComment,
   onAddPost,
-}) => {
+}: FeedTabProps) => {
+  const artist = useAppSelector((state) => state.artist.user);
+  const dispatch = useDispatch();
+
   const [open, setOpen] = useState(false);
-  const [newPostTitle, setNewPostTitle] = useState("");
-  const [newPostContent, setNewPostContent] = useState("");
-  const [newPostImage, setNewPostImage] = useState<File | null>(null);
+  const [postData, setPostData] = useState<ClubPost>({
+    postType: "",
+    postDescription: "",
+    postpublisher: "ar4",
+    postImage_URL: "",
+    clubId: "fc0",
+  });
+
+  const [postImg, setPostImg] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (postImg) {
+      setPostData({ ...postData, postImage_URL: postImg });
+    }
+  }, [postImg]);
+
+  const submitData = async () => {
+    try {
+      await dispatch(addPost(artist?.token, postData));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -40,74 +84,103 @@ const FeedTab: React.FC<FeedTabProps> = ({
 
   const handleClose = () => {
     setOpen(false);
+    setPostData({
+      postType: "",
+      postDescription: "",
+      postpublisher: "ar4",
+      postImage_URL: "",
+      clubId: "fc0",
+    });
+    setPostImg(null);
+  };
+
+  const handleFileChange = (file: File) => {
+    setPostImg(file);
   };
 
   const handleAddPost = () => {
     const newPost: Post = {
       id: posts.length + 1,
-      title: newPostTitle,
-      content: newPostContent,
-      image: newPostImage ? URL.createObjectURL(newPostImage) : "",
+      content: postData.postDescription || "",
+      media: postData.postImage_URL || "",
       comments: [],
     };
     onAddPost(newPost);
-    setNewPostTitle("");
-    setNewPostContent("");
-    setNewPostImage(null);
     handleClose();
   };
 
   return (
     <div>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
+      <Card
+        sx={{ marginBottom: 2, cursor: "pointer" }}
         onClick={handleClickOpen}
-        style={{ marginBottom: '16px' }}
       >
-        Add Post
-      </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add a New Post</DialogTitle>
-        <DialogContent>
-          
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            fullWidth
-            value={newPostTitle}
-            onChange={(e) => setNewPostTitle(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Content"
-            multiline
-            rows={4}
-            value={newPostContent}
-            onChange={(e) => setNewPostContent(e.target.value)}
-            sx={{width:"100%"}}
-          />
-          <DropFile
-            fileTypes="image"
-            fileExtensions="jpeg, jpg, png, mp4"
-            isCircular={false}
-            width="100%"
-            height="200px"
-            file={newPostImage}
-            setFile={setNewPostImage}
-            aspectX={4}
-            aspectY={3}
-            shape="rect"
-          />
+        <CardHeader
+          avatar={<Avatar src={artist?.profilePicture} />}
+          title={
+            <Typography variant="body1" color="textSecondary">
+              What's on your mind?
+            </Typography>
+          }
+          action={
+            <Tooltip title="Create Post">
+              <IconButton onClick={handleClickOpen}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          }
+        />
+      </Card>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Create Post
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box display="flex" alignItems="center" marginBottom={2}>
+            <TextField
+              autoFocus
+              margin="dense"
+              value={postData.postDescription}
+              onChange={(e) =>
+                setPostData({ ...postData, postDescription: e.target.value })
+              }
+              placeholder="What's on your mind?"
+              multiline
+              rows={4}
+              variant="outlined"
+              sx={{ borderRadius: 2, width: "100%" }}
+            />
+          </Box>
+          <Box marginBottom={2}>
+            <DropFile
+              fileTypes="image"
+              fileExtensions="jpeg, jpg, png, mp4"
+              isCircular={false}
+              width="100%"
+              height="200px"
+              file={newPostImage}
+              setFile={setNewPostImage}
+              aspectX={4}
+              aspectY={3}
+              shape="rect"
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose} color="secondary">
             Cancel
           </Button>
           <Button onClick={handleAddPost} color="primary">
-            Add Post
+            Post
           </Button>
         </DialogActions>
       </Dialog>
