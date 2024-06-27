@@ -24,7 +24,6 @@ import { Post, Comment } from "./page";
 import { ClubPost } from "../../constants/models";
 import { addPost } from "../../services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks"; // Adjust path as per your project structure
-import { useDispatch } from "react-redux"; // Adjust path as per your project structure
 import DropFile from "../../components/DropFile"; // Adjust path as per your project structure
 
 type FeedTabProps = {
@@ -51,11 +50,11 @@ const FeedTab = ({
   onAddPost,
 }: FeedTabProps) => {
   const artist = useAppSelector((state) => state.artist.user);
-  const dispatch = useDispatch();
+
 
   const [open, setOpen] = useState(false);
   const [postData, setPostData] = useState<ClubPost>({
-    postType: "",
+    // postType: "",
     postDescription: "",
     postpublisher: "ar4",
     postImage_URL: "",
@@ -72,7 +71,7 @@ const FeedTab = ({
 
   const submitData = async () => {
     try {
-      await dispatch(addPost(artist?.token, postData));
+      await addPost(artist?.token, postData);
     } catch (error) {
       console.log(error);
     }
@@ -98,16 +97,16 @@ const FeedTab = ({
     setPostImg(file);
   };
 
-  const handleAddPost = () => {
-    const newPost: Post = {
-      id: posts.length + 1,
-      content: postData.postDescription || "",
-      media: postData.postImage_URL || "",
-      comments: [],
-    };
-    onAddPost(newPost);
-    handleClose();
-  };
+  // const handleAddPost = () => {
+  //   const newPost: Post = {
+  //     id: posts.length + 1,
+  //     content: postData.postDescription || "",
+  //     media: postData.postImage_URL || "",
+  //     comments: [],
+  //   };
+  //   onAddPost(newPost);
+  //   handleClose();
+  // };
 
   return (
     <div>
@@ -167,8 +166,8 @@ const FeedTab = ({
               isCircular={false}
               width="100%"
               height="200px"
-              file={newPostImage}
-              setFile={setNewPostImage}
+              file = {postImg}
+              setFile={setPostImg}
               aspectX={4}
               aspectY={3}
               shape="rect"
@@ -179,7 +178,7 @@ const FeedTab = ({
           <Button onClick={handleClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleAddPost} color="primary">
+          <Button onClick={submitData} color="primary">
             Post
           </Button>
         </DialogActions>

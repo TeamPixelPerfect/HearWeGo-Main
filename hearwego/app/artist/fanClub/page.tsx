@@ -341,12 +341,12 @@ export type Post = {
   timestamp: string;
 };
 
-const validationSchema = Yup.object().shape({
-  title: Yup.string().required("Title is required"),
-  content: Yup.string().required("Content is required"),
-  image: Yup.mixed().nullable().required("Image is required"),
-  video: Yup.mixed().nullable().required("Video is required"),
-});
+// const validationSchema = Yup.object().shape({
+//   title: Yup.string().required("Title is required"),
+//   content: Yup.string().required("Content is required"),
+//   image: Yup.mixed().nullable().required("Image is required"),
+//   video: Yup.mixed().nullable().required("Video is required"),
+// });
 
 const ArtistPage = () => {
   const router = useRouter();
