@@ -269,12 +269,26 @@ export interface ClubPost {
   postDescription?: string;
   postpublisher?: string;
   postImage_URL?: string;
+  reactions?: Reaction[];
   clubId?: string;
+  timestamps?: string;
+  comments?: Comment[];
 }
 
 export interface Comment {
   commentId?: string;
   commenter?: string;
   commentBody?: string;
+  commenter_ProfilePic?: string;
   postId?: string;
+  timestamps?: string;
 }
+
+export interface Reaction{
+  reactId?: string;
+  reacter?: string;
+  reactionType?: string;
+  icon_URL?: string;
+  postId?: string;
+  timestamps?: string;
+ }
