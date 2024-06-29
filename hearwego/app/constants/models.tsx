@@ -269,13 +269,15 @@ export interface ClubPost {
   postDescription?: string;
   postpublisher?: string;
   postImage_URL?: string;
-  reactions?: Reaction[];
   clubId?: string;
+  reacts?: string;
+  comments?: string;
   timestamps?: string;
-  comments?: Comment[];
+
+
 }
 
-export interface Comment {
+export interface comments {
   commentId?: string;
   commenter?: string;
   commentBody?: string;
@@ -284,7 +286,7 @@ export interface Comment {
   timestamps?: string;
 }
 
-export interface Reaction{
+export interface reacts{
   reactId?: string;
   reacter?: string;
   reactionType?: string;

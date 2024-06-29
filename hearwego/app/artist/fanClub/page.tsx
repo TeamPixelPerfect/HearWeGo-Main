@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Dialog,
@@ -21,12 +21,11 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
 import { useRouter } from "next/navigation";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import FeedTab from "./FeedTab";
 import PhotosTab from "./PhotosTab";
-import VideosTab from "./VideosTab";
 import DropFile from "../../components/DropFile";
 import NewsPage from "./NewsTab";
 import EventsTab from "./EventsTab";
@@ -35,13 +34,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ClubPost } from "../../constants/models";
 import { addPost } from "../../services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
-import { Artist, Comment, Reaction } from "../../constants/models";
-import { add } from "date-fns";
 
 const validationSchema = Yup.object().shape({
-  title: Yup.string().required("Title is required"),
-  content: Yup.string().required("Content is required"),
-  image: Yup.mixed().nullable().required("Image is required"),
+  postDescription: Yup.string().required("Description is required"),
 });
 
 const ArtistPage = () => {
@@ -49,38 +44,42 @@ const ArtistPage = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [selectedPost, setSelectedPost] = useState<ClubPost | null>(null);
   const [posts, setPosts] = useState<ClubPost[]>([]);
-  const [artistData, setArtistData] = useState<Artist | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [artistData, setArtistData] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
   const [open, setOpen] = useState(false);
+  const [postImage, setPostImage] = useState<File | null>(null);
+  
 
-  const[postImage, setPostImage] = useState<string | null>(null);
+  const initialValues: ClubPost = {
+    postType: "",
+    postDescription: "",
+    postpublisher: "ar4",
+    postImage_URL: "",
+    reacts: "",
+    comments: "",
+    clubId: "fc0",
+    timestamps: "",
+  };
 
+  useEffect(() => {
+    if (postImage) {
+      setPostImage(postImage)
+    }
+  }, [postImage]);
 
+  const submitData = async (values: ClubPost) => {
+    try {
+      await addPost(artist.token, values);
+      setPosts([...posts, values]);
+      setOpen(false);
+      setPostImage(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-
-
-
-  const [file, setFile] = useState(null);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const handleCardClick = (post: ClubPost) => {
-    setSelectedPost(post);
-  };
-
-  const handleAddComment = (postId: number, comment: Comment) => {
-    const updatedPosts = posts.map((post) => {
-      if (post.postId === String(postId)) {
-        return {
-          ...post,
-          comments: [...comments, comment],
-        };
-      }
-      return post;
-    });
-    setPosts(updatedPosts);
   };
 
   const handleClickOpen = () => {
@@ -90,33 +89,15 @@ const ArtistPage = () => {
 
   const handleClosePostDialog = () => {
     setOpen(false);
-    setFile(null);
-  };
-
-  const handleSubmit = (values: any) => {
-    const newPost = {
-      id: posts.length + 1,
-      title: selectedPost?.postpublisher || artistData?.user.artistName,
-      content: selectedPost?.postDescription || values.content,
-      image: selectedPost?.postImage_URL || "",
-      likes: 0,
-      comments: [],
-      user: artistData?.user.artistName,
-      profilePicture: artistData?.user.profilePicture,
-      timestamp: new Date().toISOString(),
-    };
-
-    setPosts([...posts, newPost]);
-    setOpen(false);
-    setFile(null);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setFile(null);
   };
 
-
+  const handleCardClick = (post: ClubPost) => {
+    setSelectedPost(post);
+  };
 
   return (
     <Container maxWidth="lg">
@@ -125,8 +106,7 @@ const ArtistPage = () => {
           Artist Page
         </Typography>
         <Typography variant="body1" component="p" sx={{ mb: 2 }}>
-          This is a place where you can share your latest posts, updates, and
-          news with your audience.
+          This is a place where you can share your latest posts, updates, and news with your audience.
         </Typography>
         <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Feed" />
@@ -138,10 +118,7 @@ const ArtistPage = () => {
 
       <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
         <div>
-          <Card
-            sx={{ marginBottom: 2, cursor: "pointer" }}
-            onClick={handleClickOpen}
-          >
+          <Card sx={{ marginBottom: 2, cursor: "pointer" }} onClick={handleClickOpen}>
             <CardHeader
               title={
                 <Typography variant="body1" color="textSecondary">
@@ -159,6 +136,7 @@ const ArtistPage = () => {
           </Card>
         </div>
       </Box>
+
       <FeedTab
         posts={posts}
         onAddPost={(newPost) => {}}
@@ -168,6 +146,7 @@ const ArtistPage = () => {
         onEditComment={(postId, commentId, updatedContent) => {}}
         onDeleteComment={(postId, commentId) => {}}
       />
+
       <Dialog
         open={open}
         onClose={handleClosePostDialog}
@@ -195,43 +174,37 @@ const ArtistPage = () => {
 
         <DialogContent dividers>
           <Formik
-            initialValues={{ 
-              content: "", 
-              image: "" ,
-              title: "",
-              
-            }}
+            initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={(values) => {
-              handleSubmit({ ...values, image: file });
+            onSubmit={(values, { resetForm }) => {
+              submitData(values);
+              resetForm();
             }}
           >
-            {({ errors, touched }) => (
-              <Form>
+            {({ handleSubmit, setFieldValue, errors, touched }) => (
+              <Form onSubmit={handleSubmit}>
                 <Box mb={2}>
                   <Field
-                    name="content"
                     as={TextField}
+                    label="Description"
                     variant="outlined"
-                    label="Content"
                     multiline
                     rows={4}
-                    error={errors.content && touched.content}
-                    helperText={
-                      errors.content && touched.content ? errors.content : ""
-                    }
+                    name="postDescription"
+                    error={touched.postDescription && Boolean(errors.postDescription)}
+                    helperText={touched.postDescription && errors.postDescription}
                     sx={{ width: "100%" }}
                   />
                 </Box>
                 <Box mb={2}>
                   <DropFile
-                    file={file}
-                    setFile={setFile}
                     fileTypes="image"
                     fileExtensions=".jpg,.png,.jpeg"
                     isCircular={false}
                     width="100%"
                     height="200px"
+                    file={postImage}
+                    setFile={setPostImage}
                     aspectX={4}
                     aspectY={3}
                     shape="rect"
@@ -241,12 +214,7 @@ const ArtistPage = () => {
                   <Button onClick={handleClosePostDialog} variant="outlined">
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit}
-                  >
+                  <Button type="submit" variant="contained" color="primary">
                     Add Post
                   </Button>
                 </DialogActions>
@@ -259,27 +227,22 @@ const ArtistPage = () => {
       <Box sx={{ display: tabValue === 1 ? "block" : "none" }}>
         <PhotosTab posts={posts} handleCardClick={handleCardClick} />
       </Box>
-    
+
       <Box sx={{ display: tabValue === 2 ? "block" : "none" }}>
         <EventsTab />
       </Box>
-  
 
       <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
         <NewsPage />
       </Box>
 
-     
-
-      <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
+      {/* <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
         <DialogContent>
           <Card>
             <CardHeader
-              avatar={<Avatar src={"artistData?.user.profilePicture"} />}
+              avatar={<Avatar src={artistData?.user?.profilePicture} />}
               title={selectedPost?.postpublisher}
-              subheader={new Date(
-                selectedPost?.timestamps || ""
-              ).toLocaleString()}
+              subheader={new Date(selectedPost?.timestamps || "").toLocaleString()}
             />
             {selectedPost?.postImage_URL && (
               <CardMedia
@@ -295,32 +258,23 @@ const ArtistPage = () => {
                 {selectedPost?.postDescription}
               </Typography>
               <Typography variant="body2" color="textSecondary" component="p">
-                Likes: {selectedPost?.reactions?.length ?? 0}
+                Likes: {Array.isArray(selectedPost?.reacts) ? selectedPost?.reacts.length : 0}
               </Typography>
               <Typography variant="body2" color="textSecondary" component="p">
                 Comments:
               </Typography>
-              {selectedPost?.comments?.map((comment) => (
+              {Array.isArray(selectedPost?.comments) && selectedPost?.comments.map((comment: any) => (
                 <Box key={comment.commentId} sx={{ display: "flex", mb: 1 }}>
                   <Avatar src={comment.commenter_ProfilePic} sx={{ mr: 2 }} />
                   <Box>
                     <Typography variant="body2" component="p">
                       {comment.commenter}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
+                    <Typography variant="body2" color="textSecondary" component="p">
                       {comment.commentBody}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {comment.timestamps &&
-                        new Date(comment.timestamps).toLocaleString()}
+                    <Typography variant="body2" color="textSecondary" component="p">
+                      {comment.timestamps && new Date(comment.timestamps).toLocaleString()}
                     </Typography>
                   </Box>
                 </Box>
@@ -331,7 +285,7 @@ const ArtistPage = () => {
         <DialogActions>
           <Button onClick={handleClosePostDialog}>Close</Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </Container>
   );
 };
