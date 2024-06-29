@@ -31,39 +31,63 @@ import NewsPage from "./NewsTab";
 import EventsTab from "./EventsTab";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import { ClubPost } from "../../constants/models";
-import { addPost } from "../../services/FanClubServices";
+import { ClubPost, ClubNews } from "../../constants/models";
+import { addNews, addPost } from "../../services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
 
 const validationSchema = Yup.object().shape({
   postDescription: Yup.string().required("Description is required"),
 });
-
+const newsValidationSchema = Yup.object().shape({
+  newsTitle: Yup.string().required("Title is required"),
+  newsBody: Yup.string().required("Description is required"),
+});
 const ArtistPage = () => {
   const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
+  const artistId = artist?.user.artist_id ?? "";
   const [selectedPost, setSelectedPost] = useState<ClubPost | null>(null);
   const [posts, setPosts] = useState<ClubPost[]>([]);
+  const [news, setNews] = useState<ClubNews[]>([]);
   const [artistData, setArtistData] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [open, setOpen] = useState(false);
+  const [openPostDialog, setOpenPostDialog] = useState(false);
+  const [openNewsDialog, setOpenNewsDialog] = useState(false);
+
   const [postImage, setPostImage] = useState<File | null>(null);
-  
+  const [newsImage, setNewsImage] = useState<File | null>(null);
 
   const initialValues: ClubPost = {
     postType: "",
     postDescription: "",
-    postpublisher: "ar4",
+    postpublisher: artist ? artist.user.artist_id : "",
     postImage_URL: "",
     reacts: "",
     comments: "",
     clubId: "fc0",
+    artistId: artist ? artist.user.artist_id : "",
+    timestamps: "",
+  };
+
+  const initialValuesNews: ClubNews = {
+    newsTitle: "",
+    newsBody: "",
+    newsPublisher: artist ? artist.user.artist_id : "",
+    newsImage_URL: "",
+    clubId: "fc0",
+    artistId: artist ? artist.user.artist_id : "",
     timestamps: "",
   };
 
   useEffect(() => {
+    if (newsImage) {
+      setNewsImage(newsImage);
+    }
+  }, [newsImage]);
+
+  useEffect(() => {
     if (postImage) {
-      setPostImage(postImage)
+      setPostImage(postImage);
     }
   }, [postImage]);
 
@@ -71,8 +95,20 @@ const ArtistPage = () => {
     try {
       await addPost(artist.token, values);
       setPosts([...posts, values]);
-      setOpen(false);
+      setOpenPostDialog(false);
       setPostImage(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const submitNewsData = async (values: ClubNews) => {
+    try {
+      await addNews(artist.token, values);
+      setNews([...news, values]);
+
+      setOpenNewsDialog(false);
+      setNewsImage(null);
     } catch (error) {
       console.log(error);
     }
@@ -82,19 +118,21 @@ const ArtistPage = () => {
     setTabValue(newValue);
   };
 
-  const handleClickOpen = () => {
+  const handleClickOpenPostDialog = () => {
     setSelectedPost(null);
-    setOpen(true);
+    setOpenPostDialog(true);
   };
 
   const handleClosePostDialog = () => {
-    setOpen(false);
+    setOpenPostDialog(false);
+  };
+  const handleClickOpenNewsDialog = () => {
+    setOpenNewsDialog(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseNewsDialog = () => {
+    setOpenNewsDialog(false);
   };
-
   const handleCardClick = (post: ClubPost) => {
     setSelectedPost(post);
   };
@@ -106,19 +144,22 @@ const ArtistPage = () => {
           Artist Page
         </Typography>
         <Typography variant="body1" component="p" sx={{ mb: 2 }}>
-          This is a place where you can share your latest posts, updates, and news with your audience.
+          This is a place where you can share your latest posts, updates, and
+          news with your audience.
         </Typography>
         <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Feed" />
-          <Tab label="Photos" />
           <Tab label="Events" />
           <Tab label="News" />
         </Tabs>
       </Paper>
 
-      <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
-        <div>
-          <Card sx={{ marginBottom: 2, cursor: "pointer" }} onClick={handleClickOpen}>
+      {tabValue === 0 && (
+        <Box>
+          <Card
+            sx={{ marginBottom: 2, cursor: "pointer" }}
+            onClick={handleClickOpenPostDialog}
+          >
             <CardHeader
               title={
                 <Typography variant="body1" color="textSecondary">
@@ -127,28 +168,27 @@ const ArtistPage = () => {
               }
               action={
                 <Tooltip title="Create Post">
-                  <IconButton onClick={handleClickOpen}>
+                  <IconButton onClick={handleClickOpenPostDialog}>
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
               }
             />
           </Card>
-        </div>
-      </Box>
 
-      <FeedTab
-        posts={posts}
-        onAddPost={(newPost) => {}}
-        onDeletePost={(postId) => {}}
-        onEditPost={(postId, updatedPost) => {}}
-        onAddComment={(postId, comment) => {}}
-        onEditComment={(postId, commentId, updatedContent) => {}}
-        onDeleteComment={(postId, commentId) => {}}
-      />
-
+          <FeedTab
+            posts={posts}
+            onAddPost={(newPost) => {}}
+            onDeletePost={(postId) => {}}
+            onEditPost={(postId, updatedPost) => {}}
+            onAddComment={(postId, comment) => {}}
+            onEditComment={(postId, commentId, updatedContent) => {}}
+            onDeleteComment={(postId, commentId) => {}}
+          />
+        </Box>
+      )}
       <Dialog
-        open={open}
+        open={openPostDialog}
         onClose={handleClosePostDialog}
         maxWidth="lg"
         fullWidth
@@ -164,7 +204,7 @@ const ArtistPage = () => {
           <IconButton
             edge="end"
             color="inherit"
-            onClick={handleClose}
+            onClick={handleClosePostDialog}
             aria-label="close"
             sx={{ position: "absolute", right: 8, top: 8 }}
           >
@@ -191,8 +231,12 @@ const ArtistPage = () => {
                     multiline
                     rows={4}
                     name="postDescription"
-                    error={touched.postDescription && Boolean(errors.postDescription)}
-                    helperText={touched.postDescription && errors.postDescription}
+                    error={
+                      touched.postDescription && Boolean(errors.postDescription)
+                    }
+                    helperText={
+                      touched.postDescription && errors.postDescription
+                    }
                     sx={{ width: "100%" }}
                   />
                 </Box>
@@ -224,68 +268,125 @@ const ArtistPage = () => {
         </DialogContent>
       </Dialog>
 
-      <Box sx={{ display: tabValue === 1 ? "block" : "none" }}>
-        <PhotosTab posts={posts} handleCardClick={handleCardClick} />
-      </Box>
+      {tabValue === 1 && (
+        <Box>
+          <EventsTab />
+        </Box>
+      )}
 
-      <Box sx={{ display: tabValue === 2 ? "block" : "none" }}>
-        <EventsTab />
-      </Box>
+      {tabValue === 2 && (
+        <Box sx={{ position: "relative" }}>
+          <NewsPage
+           news={news}
+            onAddNews={(newNews) => {}}
+            onDeleteNews={(newsId) => {}}
+            onEditNews={(newsId, updatedNews) => {}}
+           />
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            sx={{ position: "absolute", top: 5, right: 16 }}
+            onClick={handleClickOpenNewsDialog} // Replace with the actual handler for adding news
+          >
+            Add News
+          </Button>
+        </Box>
+      )}
 
-      <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
-        <NewsPage />
-      </Box>
+      {/* News Dialog */}
+      <Dialog
+        open={openNewsDialog}
+        onClose={handleCloseNewsDialog}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          style: {
+            height: "60vh",
+            width: "60vw",
+          },
+        }}
+      >
+        <DialogTitle>
+          Create News
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleCloseNewsDialog}
+            aria-label="close"
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
 
-      {/* <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
-        <DialogContent>
-          <Card>
-            <CardHeader
-              avatar={<Avatar src={artistData?.user?.profilePicture} />}
-              title={selectedPost?.postpublisher}
-              subheader={new Date(selectedPost?.timestamps || "").toLocaleString()}
-            />
-            {selectedPost?.postImage_URL && (
-              <CardMedia
-                component="img"
-                height="500"
-                sx={{ width: "600px" }}
-                image={selectedPost?.postImage_URL}
-                alt={selectedPost?.postDescription}
-              />
-            )}
-            <CardContent>
-              <Typography variant="body2" color="textSecondary" component="p">
-                {selectedPost?.postDescription}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Likes: {Array.isArray(selectedPost?.reacts) ? selectedPost?.reacts.length : 0}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Comments:
-              </Typography>
-              {Array.isArray(selectedPost?.comments) && selectedPost?.comments.map((comment: any) => (
-                <Box key={comment.commentId} sx={{ display: "flex", mb: 1 }}>
-                  <Avatar src={comment.commenter_ProfilePic} sx={{ mr: 2 }} />
-                  <Box>
-                    <Typography variant="body2" component="p">
-                      {comment.commenter}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                      {comment.commentBody}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                      {comment.timestamps && new Date(comment.timestamps).toLocaleString()}
-                    </Typography>
-                  </Box>
+        <DialogContent dividers>
+          <Formik
+            initialValues={initialValuesNews}
+            validationSchema={newsValidationSchema}
+            onSubmit={(values, { resetForm }) => {
+              submitNewsData(values);
+              resetForm();
+            }}
+          >
+            {({ handleSubmit, setFieldValue, errors, touched }) => (
+              <Form onSubmit={handleSubmit}>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Title"
+                    variant="outlined"
+                    name="newsTitle"
+                    error={touched.newsTitle && Boolean(errors.newsTitle)}
+                    helperText={touched.newsTitle && errors.newsTitle}
+                    sx={{ width: "100%" }}
+                  />
                 </Box>
-              ))}
-            </CardContent>
-          </Card>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Description"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    
+                    name="newsBody"
+                    error={
+                      touched.newsBody && Boolean(errors.newsBody)
+                    }
+                    helperText={
+                      touched.newsBody && errors.newsBody
+                    }
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box mb={2}>
+                  <DropFile
+                    fileTypes="image"
+                    fileExtensions=".jpg,.png,.jpeg"
+                    isCircular={false}
+                    width="100%"
+                    height="200px"
+                    file={newsImage}
+                    setFile={setNewsImage}
+                    aspectX={4}
+                    aspectY={3}
+                    shape="rect"
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={handleCloseNewsDialog} variant="outlined">
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="contained" color="primary">
+                    Add News
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePostDialog}>Close</Button>
-        </DialogActions>
-      </Dialog> */}
+      </Dialog>
     </Container>
   );
 };

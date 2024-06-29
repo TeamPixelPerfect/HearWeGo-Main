@@ -270,13 +270,22 @@ export interface ClubPost {
   postpublisher?: string;
   postImage_URL?: string;
   clubId?: string;
+  artistId?: string;
   reacts?: string;
   comments?: string;
   timestamps?: string;
-
-
 }
 
+export interface ClubNews {
+  newsId?: string;
+  newsTitle?: string;
+  newsBody?: string;
+  newsImage_URL?: string;
+  newsPublisher?: string;
+  clubId?: string;
+  artistId?: string;
+  timestamps?: string;
+}
 export interface comments {
   commentId?: string;
   commenter?: string;
