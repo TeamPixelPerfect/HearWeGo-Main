@@ -3154,43 +3154,7 @@ function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
   );
 }
 
-function ManualTicketForm() {
-  return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "3em",
-        }}
-      >
-        {/* <ManualTicketTable /> */}
-      </Box>
 
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "1em",
-        }}
-      >
-        <TextField
-          id="ticket-des"
-          label="Description"
-          multiline
-          rows={4}
-          variant="filled"
-          sx={{ width: "100%" }}
-        />
-      </Box>
-    </Paper>
-  );
-}
 
 const autoTicketModalStyle = {
   position: "absolute" as "absolute",

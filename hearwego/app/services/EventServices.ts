@@ -80,6 +80,7 @@ export const getEvent = async (id: string) => {
     }
 
     const data = await res.json();
+    console.log("Event data in service...:", data);
     return data;
   } catch (error) {
     console.error("Failed to fetch event:", error);
@@ -146,6 +147,69 @@ export const addAutoTicket = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
+
+export const getTicketTypeByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/ticketTypes/events/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+}
+
+export const getAutoTicketByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/autoTickets?event_id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; 
+  }
+}
+
+export const getManualTicketByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/manualTickets?event_id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; 
+  }
+}
 
 export const addManualTicket = async (token: string, data: any) => {
   console.log("Sending manual ticket data:", data); 
