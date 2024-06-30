@@ -14,7 +14,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import SaveIcon from "@mui/icons-material/Save";
 import DropFile from "../../components/DropFile";
 import { useAppSelector } from "@/lib/hooks";
-import { addPressRelease } from "../../services/PressReleaseServices";
+import {
+  addPressRelease,
+  sendEmailWithPDF,
+} from "../../services/PressReleaseServices";
 import {
   Container,
   Dialog,

@@ -291,4 +291,5 @@ export interface PressReleaseData{
   ReleaseDate?: Date;
   ArtistID?: string;
   Status?: string;
+  emails?: string[];
 }

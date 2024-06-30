@@ -1,146 +1,110 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { jsPDF } from "jspdf";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
+import {
+  Button,
+  IconButton,
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Chip,
+} from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  getPressReleasesByArtist,
-  deletePressRelease,
-} from "../../services/PressReleaseServices";
+import CloseIcon from "@mui/icons-material/Close";
 import { useAppSelector } from "@/lib/hooks";
 import { formatDate } from "@/app/constants/functions";
 import { PressReleaseData } from "@/app/constants/models";
+import {
+  getPressReleasesByArtist,
+  deletePressRelease,
+  sendEmailWithPDF,
+  DownloadPDF,
+} from "../../services/PressReleaseServices";
 
-const SavedOnesTab = () => {
+const SavedOnesTab: React.FC = () => {
   const artist = useAppSelector((state) => state.artist.user);
-  const [IsChanged, setIsChanged] = useState<boolean>(false);
+  const [isChanged, setIsChanged] = useState<boolean>(false);
   const [savedPressReleases, setSavedPressReleases] = useState<
     PressReleaseData[]
   >([]);
+  const [shareDialogOpen, setShareDialogOpen] = useState<boolean>(false);
+  const [selectedPressRelease, setSelectedPressRelease] =
+    useState<PressReleaseData | null>(null);
+  const [email, setEmail] = useState<string>("");
+  const [emailList, setEmailList] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (artist?.token) {
-      getPressReleasesByArtist(
-        artist.token,
-        artist?.user?.artist_id ? artist.user.artist_id : ""
-      )
+      getPressReleasesByArtist(artist.token, artist?.user?.artist_id || "")
         .then((response) => {
           const savedPressReleases = response.data.filter(
-            (pr:any) => pr.Status === "Saved"
+            (pr: any) => pr.Status === "Saved"
           );
           setSavedPressReleases(savedPressReleases);
-          if (IsChanged) setIsChanged(false);
+          if (isChanged) setIsChanged(false);
         })
         .catch((error) => console.error(error));
     }
-  }, [artist?.token, artist?.user?.artist_id, IsChanged]);
-
-  const generatePDF = async (data: PressReleaseData) => {
-    const doc = new jsPDF();
-
-    // Adding Artist Logo (Top Left)
-    if (data.ArtistLogo_URL) {
-      try {
-        const imgLogo = await loadImage(data.ArtistLogo_URL);
-        doc.addImage(imgLogo as string, 20, 10, 30, 30); // Adjust positioning as needed
-      } catch (error) {
-        console.error("Error loading artist logo:", error);
-      }
-    }
-
-    // Header Section
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("FOR IMMEDIATE RELEASE", 20, 70); // Left aligned
-
-    // Title Section
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text(data.Headline as string, 20, 80); // Left aligned
-
-    // Subtitle Section
-    doc.setFont("Helvetica", "italic");
-    doc.setFontSize(16);
-    doc.text(data.SubHeadline as string, 20, 90); // Left aligned
-
-    // Date and Location Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`${formatDate(data.EventDate)} | ${data.Venue}`, 20, 100); // Left aligned
-
-    // Line Separator
-    doc.setLineWidth(0.5);
-    doc.line(20, 110, 190, 110);
-
-    // Body Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    const descriptionLines = doc.splitTextToSize(data.Description as string, 170);
-    doc.text(descriptionLines, 20, 120);
-
-    // Release Date
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`Release Date: ${formatDate(data.ReleaseDate)}`, 20, 180);
-
-    // Adding Signature
-    if (data.Signature) {
-      try {
-        const imgSignature = await loadImage(data.Signature);
-        doc.addImage(imgSignature as string, 20, 190, 30, 30);
-      } catch (error) {
-        console.error("Error loading signature:", error);
-      }
-    }
-
-    // Contact Information Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    const contactY = data.Signature ? 230 : 200;
-    doc.text("Contact Information", 20, contactY);
-    doc.setFont("Helvetica", "bold");
-    doc.text(artist?.user.artistName as string, 20, contactY + 10);
-    doc.setFont("Helvetica", "normal");
-    doc.text(`Phone: ${artist?.user.mobileNumber}`, 20, contactY + 20);
-    doc.text(`Email: ${artist?.user.email}`, 20, contactY + 30);
-
-    // Footer Section
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setFontSize(10);
-    doc.text(
-      `Press Release generated on ${new Date().toLocaleDateString()}`,
-      105,
-      pageHeight - 10,
-      { align: "center" }
-    );
-
-    // Save the PDF
-    doc.save(`${data.Headline}_press_release.pdf`);
-  };
-
-  const loadImage = (url: string) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = url;
-      img.onload = () => resolve(img);
-      img.onerror = (error) => reject(error);
-    });
-  };
+  }, [artist?.token, artist?.user?.artist_id, isChanged]);
 
   const handleDelete = (id: string | undefined) => {
     deletePressRelease(artist ? artist.token : "", id as string)
-      .then((res) => {
+      .then(() => {
         setIsChanged(true);
       })
       .catch((error) => console.error(error));
+  };
+
+  const handleShare = (data: PressReleaseData) => {
+    setSelectedPressRelease(data);
+    setShareDialogOpen(true);
+  };
+
+  const handleShareDialogClose = () => {
+    setShareDialogOpen(false);
+    setSelectedPressRelease(null);
+    setEmailList([]);
+    setEmail("");
+    setError(null);
+  };
+
+  const handleShareDialogShare = (emails: string[]) => {
+    if (selectedPressRelease) {
+      sendEmailWithPDF(
+        { ...selectedPressRelease, email: emails },
+        artist?.token as string,
+        selectedPressRelease.PressReleaseID as string
+      )
+        .then((result) => {
+          console.log("Email sent successfully:", result);
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+        });
+    }
+    handleShareDialogClose();
+  };
+
+  const handleAddEmail = () => {
+    if (email && email.includes("@")) {
+      setEmailList([...emailList, email]);
+      setEmail("");
+      setError(null);
+    } else {
+      setError("Please enter a valid email address.");
+    }
+  };
+
+  const handleDeleteEmail = (emailToDelete: string) => {
+    setEmailList(emailList.filter((e) => e !== emailToDelete));
   };
 
   return (
@@ -204,24 +168,27 @@ const SavedOnesTab = () => {
                     mt: 2,
                   }}
                 >
-                  <Button
-                    variant="contained"
+                  <IconButton
                     color="primary"
-                    onClick={() => generatePDF(item)}
-                    startIcon={<DownloadIcon />}
-                    sx={{ textTransform: "none" }}
+                    onClick={() =>
+                      DownloadPDF(
+                        {...item, ...artist?.user},
+                        artist.token,
+                        item.PressReleaseID as string
+                      )
+                    }
                   >
-                    Download
-                  </Button>
-                  <IconButton color="secondary" sx={{ textTransform: "none" }}>
+                    <DownloadIcon />
+                  </IconButton>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => handleShare(item)}
+                  >
                     <ShareIcon />
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() => {
-                      handleDelete(item?.PressReleaseID);
-                    }}
-                    sx={{ textTransform: "none" }}
+                    onClick={() => handleDelete(item?.PressReleaseID)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -235,6 +202,60 @@ const SavedOnesTab = () => {
           No press releases saved.
         </Typography>
       )}
+
+      <Dialog open={shareDialogOpen} onClose={handleShareDialogClose}>
+        <DialogTitle>
+          Share Press Release
+          <IconButton
+            aria-label="close"
+            onClick={handleShareDialogClose}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            margin="normal"
+            error={!!error}
+            helperText={error}
+          />
+          <Button onClick={handleAddEmail} variant="contained" color="primary">
+            Add Email
+          </Button>
+          <Box mt={2}>
+            {emailList.map((email, index) => (
+              <Chip
+                key={index}
+                label={email}
+                onDelete={() => handleDeleteEmail(email)}
+                color="primary"
+                sx={{ marginRight: 1, marginBottom: 1 }}
+              />
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleShareDialogClose} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleShareDialogShare(emailList)}
+            color="primary"
+          >
+            Share
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

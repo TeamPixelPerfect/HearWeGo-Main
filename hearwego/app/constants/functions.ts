@@ -1,5 +1,5 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 // Count the number of commas in a string
 export function countCommas(str: string): number {
@@ -11,7 +11,6 @@ export function countCommas(str: string): number {
   }
   return count;
 }
-
 
 // Count non empty items in a array
 export function countNonEmptyItems(arr: string[]): number {
@@ -34,5 +33,5 @@ dayjs.extend(utc);
 
 export const formatDate = (dateString: string) => {
   // Parse the date string as UTC and format it as "YYYY MMMM DD"
-  return dayjs.utc(dateString).format('YYYY MMMM DD');
+  return dayjs.utc(dateString).format("YYYY MMMM DD");
 };
