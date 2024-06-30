@@ -96,6 +96,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }));
 
+let sessionCount : number = 0;
 
 const BudgetManager = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
@@ -120,6 +121,7 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
 
   React.useEffect(() => {
     getEvent(event_id).then((event) => {
+      console.log("Event......", event);
       setEvent(event);
     });
 
@@ -137,6 +139,10 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
       console.log("Budgets......", budgets);
     });
   }, []);
+
+  React.useEffect(() => {
+    sessionCount = event?.sessions?.length;
+  }, [event]);
 
   React.useEffect(() => {
     setBudgets({
@@ -539,7 +545,7 @@ function BudgetTable({ budgetRows, setBudgetRows, event }) {
                   error={budgetSessionError}
                   variant="filled"
                 >
-                  {Array.from(Array(3)).map((_, index) => (
+                  {Array.from(Array(sessionCount)).map((_, index) => (
                     <MenuItem value={"session" + (index + 1)}>
                       Session {index + 1}
                     </MenuItem>
