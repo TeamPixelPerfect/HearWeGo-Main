@@ -75,7 +75,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 }) => {
   return (
     <div>
-      <FormControl sx={{ m: 1, color: "white" }} size="small">
+      <FormControl sx={{ color: "white" }} size="small">
         <InputLabel id={labelId}>{label}</InputLabel>
         <Select
           labelId={labelId}
@@ -110,6 +110,7 @@ export const Maindiv = styled("div")(({ theme }) => ({
   height: "100%",
   paddingLeft: "30px",
   paddingRight: "10px",
+  paddingBottom: "50px",
 }));
 
 //created the styled component for the search paper
@@ -137,14 +138,15 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
     <Card
       sx={{
         position: "relative",
-        width: "190px",
-        height: "230px",
+        width: "200px",
+        height: "240px",
         marginBottom: 0,
         borderRadius: "30px",
         transition: "transform 0.2s ease-in-out",
         transform: isHovered ? "scale(1.10)" : "scale(1)",
         marginRight: "20px",
         marginTop: "20px",
+        flexShrink: 0,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -222,7 +224,7 @@ export const TrendingRow: React.FC<tableRow> = ({
           <Stack
             direction={"row"}
             spacing={2}
-            sx={{ justifyContent: "center", alignItems: "left " }}
+            sx={{ justifyContent: "left", alignItems: "center " }}
           >
             <div
               style={{

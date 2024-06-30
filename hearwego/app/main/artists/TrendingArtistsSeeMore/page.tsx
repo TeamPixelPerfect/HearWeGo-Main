@@ -72,16 +72,16 @@ export default function TrendingArtistsMore() {
       >
         <Box
           sx={{
-            alignItems: "baseline",
+            // alignItems: "baseline",
             width: "100%",
             flex: 1,
-            position: "relative",
-            marginTop: "30px",
+            // position: "relative",
+            marginTop: "20px",
           }}
         >
           <SearchPaper>
             <InputBase
-              sx={{ ml: 1, flex: 1 }}
+              sx={{ ml: 1, flex: 1, p: "10px" }}
               placeholder="Search for an Artist"
               inputProps={{ "aria-label": "search google maps" }}
             />
@@ -90,7 +90,7 @@ export default function TrendingArtistsMore() {
             </IconButton>
           </SearchPaper>
         </Box>
-        <Stack direction="row" spacing={5}>
+        <Stack direction="row" spacing={1}>
           <CustomSelect
             labelId="genre-select-label"
             id="genre-select"
