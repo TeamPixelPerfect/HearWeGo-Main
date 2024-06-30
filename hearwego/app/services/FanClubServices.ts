@@ -1,5 +1,5 @@
 import { base_url } from "../constants/keys";
-import { ClubMember, ClubPost, FanClub, Comment,ClubNews } from "../constants/models";
+import { ClubMember, ClubPost, FanClub } from "../constants/models";
 // import { FanClub } from "../constants/models";
 
 export const getAllFanClubs = async (): Promise<FanClub[]> => {
@@ -99,8 +99,8 @@ export const addPost = async (token: string, data: any) => {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),}
-  );
+    body: JSON.stringify(data),
+  });
 
   if (res.ok) {
     const post = await res.json();
@@ -109,7 +109,7 @@ export const addPost = async (token: string, data: any) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
+};
 
 export const addNews = async (token: string, data: any) => {
   console.log("Sending news data:", data);
@@ -129,23 +129,46 @@ export const addNews = async (token: string, data: any) => {
     const error = await res.json();
     throw new Error(error.message);
   }
-}
- export const getClubPostsByArtist = async (token: string, artistId: string): Promise<ClubPost[]> => {
-  const res = await fetch(`${base_url}/FanClubManager/clubposts/${artistId}`, {
+};
+export const getClubPostsByArtist = async (token: string, artistId: string) => {
+  const res = await fetch(`${base_url}/FanClubManager/clubposts/Artist/${artistId}`, {
     method: "GET",
     headers: {
-       "Content-Type": "application/json",
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
 
   if (res.ok) {
     const post = await res.json();
+    console.log("Club Posts Services: ", post);
     return post;
   } else {
     const error = await res.json();
+    console.log("Club Posts Services Error: ", error);
     throw new Error(error.message);
   }
-}
+};
 
+export const getClubNewsByArtist = async (token: string, artistId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/clubNews/Artist/${artistId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
+  if (res.ok) {
+    const news = await res.json();
+    console.log("Club News Services: ", news);
+    return news;
+  } else {
+    const error = await res.json();
+    console.log("Club News Services Error: ", error);
+    throw new Error(error.message);
+  }
+};

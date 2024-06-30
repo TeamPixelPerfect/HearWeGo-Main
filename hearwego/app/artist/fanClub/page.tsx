@@ -14,10 +14,7 @@ import {
   Tabs,
   Box,
   Card,
-  CardMedia,
   CardHeader,
-  Avatar,
-  CardContent,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -93,7 +90,11 @@ const ArtistPage = () => {
 
   const submitData = async (values: ClubPost) => {
     try {
-      await addPost(artist.token, values);
+      const updatedPost = {
+        ...values,
+        postImage_URL: postImage ? postImage : "",
+      };
+      await addPost(artist.token, updatedPost);
       setPosts([...posts, values]);
       setOpenPostDialog(false);
       setPostImage(null);
@@ -104,9 +105,12 @@ const ArtistPage = () => {
 
   const submitNewsData = async (values: ClubNews) => {
     try {
-      await addNews(artist.token, values);
+      const updatedNews = {
+        ...values,
+        newsImage_URL: newsImage ? newsImage : "",
+      };
+      await addNews(artist.token, updatedNews);
       setNews([...news, values]);
-
       setOpenNewsDialog(false);
       setNewsImage(null);
     } catch (error) {
@@ -191,11 +195,11 @@ const ArtistPage = () => {
         open={openPostDialog}
         onClose={handleClosePostDialog}
         maxWidth="lg"
-        fullWidth
+        // fullWidth
         PaperProps={{
           style: {
             height: "60vh",
-            width: "60vw",
+            width: "30vw",
           },
         }}
       >
@@ -277,11 +281,11 @@ const ArtistPage = () => {
       {tabValue === 2 && (
         <Box sx={{ position: "relative" }}>
           <NewsPage
-           news={news}
+            news={news}
             onAddNews={(newNews) => {}}
             onDeleteNews={(newsId) => {}}
             onEditNews={(newsId, updatedNews) => {}}
-           />
+          />
           <Button
             variant="contained"
             color="primary"
@@ -303,7 +307,7 @@ const ArtistPage = () => {
         PaperProps={{
           style: {
             height: "60vh",
-            width: "60vw",
+            width: "30vw",
           },
         }}
       >
@@ -349,14 +353,9 @@ const ArtistPage = () => {
                     variant="outlined"
                     multiline
                     rows={4}
-                    
                     name="newsBody"
-                    error={
-                      touched.newsBody && Boolean(errors.newsBody)
-                    }
-                    helperText={
-                      touched.newsBody && errors.newsBody
-                    }
+                    error={touched.newsBody && Boolean(errors.newsBody)}
+                    helperText={touched.newsBody && errors.newsBody}
                     sx={{ width: "100%" }}
                   />
                 </Box>
