@@ -31,8 +31,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "@/lib/hooks";
 import { getCartByUser, getCartItems } from "@/app/services/StoreServices";
 import { CartItem } from "@/app/constants/models";
-import "payhere-embed-sdk/dist/react.css";
-import Payhere from "payhere-embed-sdk/dist/react";
+import Checkout from "@/app/components/Checkout";
 
 const Payment = () => {
   const user = useAppSelector((state) => state?.user?.user);
@@ -51,6 +50,8 @@ const Payment = () => {
   const [country, setCountry] = useState<string>("");
   const [postalCode, setPostalCode] = useState<string>("");
   const [shippingMethod, setShippingMethod] = useState<string | null>(null);
+
+  const [stripOpen, setStripeOpen] = useState(false);
 
   const handleAddShippingAddress = () => {
     setAddressDialogOpen(true);
@@ -80,15 +81,20 @@ const Payment = () => {
 
   const handleConfirmOrder = () => {
     setOrderDialogOpen(false);
-    setShowPayhere(true);
+    handleClickStripeOpen();
   };
 
   const handleCloseConfirmationDialog = () => {
     setConfirmationDialogOpen(false);
   };
 
-  const [success, setSuccess] = useState(false);
-  const [showPayhere, setShowPayhere] = useState(false);
+  const handleClickStripeOpen = () => {
+    setStripeOpen(true);
+  };
+
+  const handleStripeClose = () => {
+    setStripeOpen(false);
+  };
 
   const fetchCart = () => {
     getCartByUser(user?.user_id as string).then((res) => {
@@ -118,29 +124,21 @@ const Payment = () => {
 
   return (
     <>
-      <div id="payhere-modal"></div>
-      <Payhere
-        selector="#payhere-modal"
-        embedURL={"https://app.payhere.co/altlabs/coffee"}
-        open={showPayhere}
-        onSuccess={(data) => {
-          console.log("Payhere success", data);
-          setSuccess(true);
-        }}
-        onFailure={(err) => {
-          console.log("Payhere failed", err);
-          setSuccess(true);
-        }}
-        onClose={() => {
-          setShowPayhere(false);
-          
-          if (success) {
-            console.log("Payment success");
-          } else {
-            console.log("Payment failed");
-          }
-        }}
-      />
+      <Dialog
+        open={stripOpen}
+        onClose={handleStripeClose}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Checkout</DialogTitle>
+        <DialogContent>
+          <Checkout />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleStripeClose}>Cancel</Button>
+          <Button onClick={handleStripeClose}>Submit</Button>
+        </DialogActions>
+      </Dialog>
       <h1 style={{ marginLeft: "40px" }}>
         <ArrowBackIosNewIcon sx={{ marginRight: "10px" }} />
         Payment Information

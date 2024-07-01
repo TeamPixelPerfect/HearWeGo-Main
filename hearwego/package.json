@@ -23,6 +23,8 @@
     "@pqina/react-pintura": "^9.0.3",
     "@react-pdf/renderer": "^3.4.4",
     "@reduxjs/toolkit": "^2.0.1",
+    "@stripe/react-stripe-js": "^2.7.2",
+    "@stripe/stripe-js": "^4.0.0",
     "aws-sdk": "^2.1569.0",
     "axios": "^1.6.7",
     "country-flag-icons": "^1.5.9",
