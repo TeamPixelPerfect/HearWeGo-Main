@@ -7,7 +7,6 @@ interface Banner {
   id: number;
   image: string;
   title: string;
- 
 }
 
 interface SwipeableBannerProps {
@@ -16,10 +15,14 @@ interface SwipeableBannerProps {
 
 const SwipeableBanner: React.FC<SwipeableBannerProps> = ({ banners }) => {
   return (
-    <Carousel autoPlay={true} indicators={false} >
+    <Carousel autoPlay={true} indicators={false}>
       {banners.map((banner) => (
-       <Paper key={banner.id} style={{ position: 'relative' }}>
-       <img src={banner.image} alt={banner.title} style={{ width: '100%', height: '600px',borderRadius:'10px' }} />
+        <Paper key={banner.id} style={{ position: "relative", margin: 0, padding: 0 }}>
+          <img
+            src={banner.image}
+            alt={banner.title}
+            style={{ width: "100%", height: "600px", objectFit: "cover" }}
+          />
         </Paper>
       ))}
     </Carousel>

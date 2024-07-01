@@ -36,6 +36,7 @@ export interface Address {
 }
 
 export interface User {
+  user_id?: string;
   email: string;
   password: string;
   name: string;
@@ -50,6 +51,7 @@ export interface User {
   isMobileVerified: boolean;
   role: string;
   joinedDate: string;
+  token?: string;
 }
 
 export interface SocialMediaLink {
@@ -128,6 +130,7 @@ export interface Song {
 }
 
 export interface Album {
+  album_id?: string;
   album_title?: string;
   artist?: { artist_id: string; artist_name: string }[];
   album_img?: string;
@@ -194,7 +197,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
+  SocialMedias?: string[];
 }
 
 export interface Ticket {
@@ -244,8 +247,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
-  
+  SocialMedias?: string[];
 }
 
 export interface FanClub {
@@ -254,7 +256,6 @@ export interface FanClub {
   coverImage_URL?: string;
   visibility?: boolean;
 }
-
 
 export interface ClubMember {
   memberId?: string;
@@ -277,4 +278,89 @@ export interface Comment {
   commenter?: string;
   commentBody?: string;
   postId?: string;
+}
+
+export interface MerchStore {
+  store_id?: string;
+  store_banner?: string;
+  promo_banner?: string[];
+  store_description?: string;
+  shipping_fees?: string;
+  delivery_services?: string;
+  artist_id?: string;
+}
+
+export interface MerchCategory {
+  store_id?: string;
+  category_id?: string;
+  category_name?: string;
+  category_description?: string;
+  subCategories?: string[];
+  image?: string;
+}
+
+
+ export interface MerchProduct {
+      product_id?: string,
+      product_name?: string,
+      product_description?: string,
+      product_Main_image?: string,
+      product_Additional_image?: string,
+      catagory_name?: string,
+      product_price?: string,
+      product_quantity?: string,
+      product_rating?: string,
+      store_id?: string,
+      rating_count?: number
+      product_variations?: ProductVariant[]
+      review_count?: number
+      product_sold?: number
+}
+
+export interface MerchPromo{
+  promo_id?: string,
+  promo_code?: string,
+  promo_description?: string,
+  promo_image?: string,
+  promo_start?: string,
+  promo_end?: string,
+  promo_status?: string,
+  store_id?: string,
+}
+
+export interface Product {
+  product_id?: string;
+  product_name?: string;
+  product_description?: string;
+  product_Main_image?: string;
+  product_Additional_image?: string;
+  category_name?: string;
+  product_price?: string; 
+  product_quantity?: string;
+  product_rating?: string;
+  store_id?: string;
+}
+
+export interface Cart {
+  cart_id?: string;
+  user_id?: string;
+  cart_total?: number;
+}
+
+export interface CartItem {
+  cart_item_id?: string;
+  product_id?: string;
+  product_variation?: string;
+  product_quantity?: number;
+  product_price?: number;
+  cart_id?: string;
+  cart_item_image?: string;
+  cart_item_name?: string;
+}
+
+export interface ProductVariant {
+  variation_name?: string;
+  variation_value?: string; 
+  variation_price?: Number;
+  variation_quantity?: Number;
 }
