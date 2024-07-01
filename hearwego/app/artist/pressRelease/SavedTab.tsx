@@ -28,7 +28,7 @@ import {
   DownloadPDF,
 } from "../../services/PressReleaseServices";
 
-const SavedOnesTab: React.FC = () => {
+const SavedOnesTab = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [isChanged, setIsChanged] = useState<boolean>(false);
   const [savedPressReleases, setSavedPressReleases] = useState<
@@ -79,9 +79,9 @@ const SavedOnesTab: React.FC = () => {
   const handleShareDialogShare = (emails: string[]) => {
     if (selectedPressRelease) {
       sendEmailWithPDF(
-        { ...selectedPressRelease, email: emails },
+        selectedPressRelease.PressReleaseID as string,
         artist?.token as string,
-        selectedPressRelease.PressReleaseID as string
+        { ...selectedPressRelease, emails: emailList }
       )
         .then((result) => {
           console.log("Email sent successfully:", result);
@@ -172,8 +172,8 @@ const SavedOnesTab: React.FC = () => {
                     color="primary"
                     onClick={() =>
                       DownloadPDF(
-                        {...item, ...artist?.user},
-                        artist.token,
+                        { ...item, ...artist?.user },
+                        artist?.token,
                         item.PressReleaseID as string
                       )
                     }

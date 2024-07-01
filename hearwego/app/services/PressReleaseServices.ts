@@ -72,7 +72,7 @@ export const sendEmailWithPDF = async (
 ) => {
   try {
     const response = await fetch(
-      `${base_url}/PressRelease/PressRelease/sendEmailWithPDF/${PressReleaseID}}`,
+      `${base_url}/PressRelease/PressRelease/sendEmailWithPDF/${PressReleaseID}`,
       {
         method: "POST",
         headers: {
