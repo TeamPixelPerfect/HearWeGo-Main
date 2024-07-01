@@ -28,7 +28,7 @@ import NewsPage from "./NewsTab";
 import EventsTab from "./EventsTab";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import { ClubPost, ClubNews } from "../../constants/models";
+import { ClubPost, ClubNews ,Event } from "../../constants/models";
 import { addNews, addPost } from "../../services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
 
@@ -141,9 +141,15 @@ const ArtistPage = () => {
     setSelectedPost(post);
   };
 
+  const handleGoToProfile = () => {
+    router.push("/artist/fanClub/Profile");
+  }
+
   return (
     <Container maxWidth="lg">
-      <Paper sx={{ p: 2, marginBottom: 2 }}>
+      <Paper sx={{ p: 5, marginBottom: 2 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box>
         <Typography variant="h5" component="div">
           Artist Page
         </Typography>
@@ -151,12 +157,17 @@ const ArtistPage = () => {
           This is a place where you can share your latest posts, updates, and
           news with your audience.
         </Typography>
+        </Box>
+        {/* <Button variant="contained" color="primary" onClick={handleGoToProfile}>
+          Go to Profile
+        </Button> */}
+        </Box>
         <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Feed" />
           <Tab label="Events" />
           <Tab label="News" />
         </Tabs>
-      </Paper>
+        </Paper>
 
       {tabValue === 0 && (
         <Box>

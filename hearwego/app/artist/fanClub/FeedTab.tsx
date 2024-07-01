@@ -64,7 +64,7 @@ const FeedTab = () => {
   return (
     <Box>
       {clubPost.map((ClubPost) => (
-        <Card key={ClubPost.createdAt} sx={{ marginBottom: 2 }}>
+        <Card key={ClubPost.createdAt} sx={{ marginBottom: 2,alignItems:"center",justifyContent:"center",width: "100%" }}>
           <CardHeader
             avatar={<Avatar src={artist?.user?.profilePicture? artist?.user?.profilePicture:""} />}
             action={
@@ -91,9 +91,9 @@ const FeedTab = () => {
             subheader=   {new Date(ClubPost.createdAt).toLocaleString()}
           />
           <CardContent sx={{
-            width: "90%",
+            // width: "90%",
          
-            height: "500px",
+            // height: "500px",
           }}>
             <Typography variant="body2" color="textSecondary" component="p">
               {ClubPost.postDescription}
@@ -102,7 +102,7 @@ const FeedTab = () => {
               <img
                 src={ClubPost.postImage_URL}
                 alt="Post image"
-                style={{ width: "100%", marginTop: "1rem" }}
+                style={{ width: "100%", marginTop: "1rem",maxHeight: "400px", objectFit: "cover"  }}
               />
             )}
             <Box sx={{ display: "flex", marginTop: "1rem" }}>

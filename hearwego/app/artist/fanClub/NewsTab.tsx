@@ -96,7 +96,7 @@ const NewsPage = () => {
               <Typography variant="h6">
                     {ClubNews.newsTitle? ClubNews.newsTitle:""}
                   </Typography>
-                <Typography variant="body1" sx={{ padding: "10px" }}>
+                <Typography variant="body1">
                   {ClubNews.newsBody? ClubNews.newsBody:""}
                 </Typography>
                 <img
