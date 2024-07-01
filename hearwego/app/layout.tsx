@@ -9,6 +9,7 @@ import { base_url } from "./constants/keys";
 import React from "react";
 import CustomeThemeProvider from "./styles/CustomeTheme";
 import UserAuthProvider from "./auth/AuthProviders/UserAuthProvider";
+import NextTopLoader from 'nextjs-toploader';
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -34,6 +35,7 @@ export default async function RootLayout({
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <StoreProvider>
               <UserAuthProvider>
+                <NextTopLoader color="#7e22ce"/>
                 <Wrapper app={app} children={children} />
               </UserAuthProvider>
             </StoreProvider>
