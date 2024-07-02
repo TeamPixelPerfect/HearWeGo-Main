@@ -7,54 +7,68 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { handleLogin } from "@/app/services/AuthServices";
-import { useAppDispatch } from "@/lib/hooks";
-import { logInUser } from "@/lib/features/user.slice";
+import {
+  handleForgotPassword,
+  handlePasswordReset,
+} from "@/app/services/AuthServices";
 import Logo from "@/app/components/Logo";
 
-const SignIn = () => {
+interface Props {
+  params: { token: string };
+}
+
+const ForgotPassword = ({ params: { token } }: Props) => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-
   const theme = useTheme();
-
   const matches = useMediaQuery("(max-width:960px)");
 
-  // State to store user details
-  const [userDetails, setUserDetails] = React.useState({
-    email: "",
-    password: "",
-  });
-
-  // State to store error status of email and password fields
+  // State to store user email
+  const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState(false);
-  const [passwordError, setPasswordError] = React.useState(false);
 
-  // Function to handle sign in
-  const handleSignIn = () => {
-    const errors = [false, false];
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
-    if (userDetails.email === "") {
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  // Function to handle password reset
+  const handleReset = () => {
+    if (email === "") {
       setEmailError(true);
-      errors[0] = true;
-    }
-    if (userDetails.password === "") {
-      setPasswordError(true);
-      errors[1] = true;
+      return;
     }
 
-    if (errors.includes(true)) return;
-
-    handleLogin(userDetails).then((res) => {
+    handleForgotPassword(email).then((res) => {
       if (res) {
-        dispatch(logInUser(res?.user));
-        sessionStorage.setItem("hwg-user", JSON.stringify(res));
-        router.replace("/");
+        // Handle successful password reset (e.g., show notification, redirect)
+        setSnackbarOpen(true);
+        setSnackbarMessage("Password reset email sent successsfully!");
+        setSnackbarSeverity("success");
+        setTimeout(() => {
+          router.replace("/auth/signIn");
+        }, 2000);
+      } else {
+        setSnackbarOpen(true);
+        setSnackbarMessage("Failed to send password reset email!");
+        setSnackbarSeverity("error");
       }
     });
   };
@@ -83,7 +97,7 @@ const SignIn = () => {
         ></Box>
 
         <Box
-          id="artist-sign-in"
+          id="password-reset"
           sx={{
             flex: "0 0 auto",
             width: matches ? "100%" : "50%",
@@ -93,7 +107,6 @@ const SignIn = () => {
             justifyContent: "center",
             marginLeft: "2em",
             padding: "80px 0",
-            // background: "magenta"
           }}
         >
           {/* Logo */}
@@ -105,7 +118,7 @@ const SignIn = () => {
             }
           />
 
-          {/* Sign in text */}
+          {/* Reset password text */}
           <Typography
             variant="h4"
             sx={{
@@ -114,7 +127,7 @@ const SignIn = () => {
               marginBottom: "20px",
             }}
           >
-            Sign into HearWeGo
+            Reset Your Password
           </Typography>
 
           {/* Email */}
@@ -125,31 +138,15 @@ const SignIn = () => {
             type="email"
             color={emailError ? "error" : "primary"}
             style={{ boxSizing: "initial" }}
-            defaultValue={userDetails.email}
+            defaultValue={email}
             onChange={(e) => {
-              setUserDetails({ ...userDetails, email: e.target.value });
+              setEmail(e.target.value);
             }}
             helperText={emailError ? "Email is required" : ""}
             FormHelperTextProps={{ style: { color: "red" } }}
           />
 
-          {/* Password */}
-          <AuthTextField
-            id="password"
-            label="Password*"
-            variant="outlined"
-            type="password"
-            color={passwordError ? "error" : "primary"}
-            style={{ boxSizing: "initial" }}
-            defaultValue={userDetails.password}
-            onChange={(e) => {
-              setUserDetails({ ...userDetails, password: e.target.value });
-            }}
-            helperText={passwordError ? "Password is required" : ""}
-            FormHelperTextProps={{ style: { color: "red" } }}
-          />
-
-          {/* Sign in button */}
+          {/* Reset button */}
           <Stack spacing={1} direction="row" sx={{ marginTop: "50px" }}>
             <Button
               size="large"
@@ -161,28 +158,32 @@ const SignIn = () => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={handleSignIn}
+              onClick={handleReset}
             >
-              Login
+              Reset Password
             </Button>
           </Stack>
 
-          {/* Sign up link */}
+          {/* Back to sign in link */}
           <Typography variant="body1" sx={{ marginTop: "40px" }}>
-            <Link href="/auth/forgot" style={{ color: "#C084FC" }}>
-              Forgot Password?
-            </Link>
-          </Typography>
-          <Typography variant="body1" sx={{ marginTop: "20px" }}>
-            Don't have an account?{" "}
-            <Link href="/auth/signUp" style={{ color: "#C084FC" }}>
-              Sign Up
+            Remember your password?{" "}
+            <Link href="/auth/signIn" style={{ color: "#C084FC" }}>
+              Sign In
             </Link>
           </Typography>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </AuthContainer>
   );
 };
 
-export default SignIn;
+export default ForgotPassword;
