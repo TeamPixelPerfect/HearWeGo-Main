@@ -32,6 +32,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import QRCode from 'qrcode.react';
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { getEventById } from "@/app/services/EventServices";
@@ -94,6 +95,14 @@ let sessionCount = 0;
 interface Props {
   params: { event_id: string };
 }
+
+const QRCodeComponent = ({ value }) => {
+  return (
+    <div>
+      <QRCode value={value} />
+    </div>
+  );
+};
 
 function switchStatus(status: string) {
   switch (status) {
@@ -755,25 +764,6 @@ function AutoTicketTable({ autoTicketRows, setAutoTicketRows }) {
   );
 }
 
-function ShowTicketDetails(
-  ticketType: string,
-  setAutoTicketRows,
-  autoTicketRows
-) {
-  switch (ticketType) {
-    case "Auto":
-      return (
-        <AutoTicketTable
-          autoTicketRows={autoTicketRows}
-          setAutoTicketRows={setAutoTicketRows}
-        />
-      );
-    case "Manual":
-      return <Chip color="secondary" label="Paid" />;
-    default:
-      return <Chip label="Free" />;
-  }
-}
 const TicketDetails = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
   const artist = useAppSelector((state) => state.artist.user);
@@ -927,7 +917,10 @@ const TicketDetails = ({ params: { event_id } }: Props) => {
         <Box sx={{ m: 3 }}>
           {ticketType?.ticket_type === "Auto" ? (
             <Box sx={{width: "100%"}}>
-                <Paper sx={{width: "100%", display: "flex"}}>
+                <Typography variant="h6" color="secondary" sx={{ fontSize: "20px", fontWeight: 700, marginBottom: 2 }}>
+                    Ticket Preview
+                </Typography>
+                <Paper sx={{width: "100%", display: "flex", border: "1px #000 solid", marginBottom: 2}}>
                     <Box sx={{width: "20%"}}>
                         <CardMedia
                             component="img"
@@ -935,13 +928,44 @@ const TicketDetails = ({ params: { event_id } }: Props) => {
                             image={ticketType?.ticket_img? ticketType?.ticket_img : "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg"}
                         />
                     </Box>
-                    <Box sx={{width: "40%"}}>
-                        <Typography variant="h6" sx={{ fontSize: "20px" }}>
-                            Ticket ID: -
+                    <Box sx={{width: "40%", display: "flex"}}>
+                      <Box sx={{width: "50%", display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+                            Ticket ID: - sd123456
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ fontSize: "20px" }}>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
                             Ticket Type: Gold
                         </Typography>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+                            Event: {event?.event_name}
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+                            Session: Session 1
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{width: "50%",display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+                            Date: 2024-12-12
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+                            Time: 20.00 - 22.00
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+                            Venue: ABC
+                        </Typography>
+
+                        <Typography variant="subtitle2" color="primary" sx={{ fontSize: "24px" }}>
+                            LKR 1000.00
+                        </Typography>
+                      </Box>  
+                    </Box>
+
+                    <Box sx={{width: "40%", display: "flex", justifyContent: "center", alignItems: "center"}}>
+                      <QRCodeComponent value={JSON.stringify({
+                        ticketId: "sd123456",
+                        ticketType: "Gold",
+                      })} />
                     </Box>
                 </Paper>
                 <AutoTicketTable
