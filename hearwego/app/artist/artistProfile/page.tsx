@@ -32,7 +32,7 @@ import Link from "next/link";
 import { FaCopy, FaFacebook } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
 import { FaSquareXTwitter } from "react-icons/fa6";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   ADArtistInfo,
   ADArtistPageUrl,
@@ -62,6 +62,7 @@ import HelpIcon from "@mui/icons-material/Help";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { logOutArtist } from "@/lib/features/artist.slice";
 
 interface SocialMediaType {
   label: string;
@@ -145,6 +146,8 @@ const genres = [
 ];
 
 const ADHomePage = () => {
+  const dispatch = useAppDispatch();
+
   const matches = useMediaQuery("(max-width:960px)");
 
   const [profilePic, setProfilePic] = useState<string>(
@@ -185,13 +188,13 @@ const ADHomePage = () => {
   const [artistBio, setArtistBio] = useState(artist?.user.artistBio || "");
 
   // Placeholder function to simulate an API call to save the artist name
-  const saveArtistName = (name) => {
+  const saveArtistName = (name: string) => {
     console.log("Saving artist name:", name);
     // Implement your API call here
   };
 
   // Placeholder function to simulate an API call to save the artist bio
-  const saveArtistBio = (bio) => {
+  const saveArtistBio = (bio: string) => {
     console.log("Saving artist bio:", bio);
     // Implement your API call here
   };
@@ -202,10 +205,10 @@ const ADHomePage = () => {
 
   const handleNameSave = () => {
     setIsEditingName(false);
-    saveArtistName(artistName); // Call the save function when saving
+    saveArtistName(artistName as string); // Call the save function when saving
   };
 
-  const handleNameChange = (event) => {
+  const handleNameChange = (event: any) => {
     setArtistName(event.target.value);
   };
 
@@ -215,11 +218,18 @@ const ADHomePage = () => {
 
   const handleBioSave = () => {
     setIsEditingBio(false);
-    saveArtistBio(artistBio); // Call the save function when saving
+    saveArtistBio(artistBio as string); // Call the save function when saving
   };
 
-  const handleBioChange = (event) => {
+  const handleBioChange = (event: any) => {
     setArtistBio(event.target.value);
+  };
+
+  const handleLogOut = () => {
+    // Implement your log out logic here
+    sessionStorage.removeItem("hwg-artist");
+    dispatch(logOutArtist());
+    location.reload();
   };
 
   //social media profile
@@ -307,7 +317,6 @@ const ADHomePage = () => {
     setSelectedOptions([]);
   };
 
-  
   const handleDelete = (label: string) => {
     setSocialMediaOptions((prevOptions) =>
       prevOptions.filter((option) => option.label !== label)
@@ -911,69 +920,68 @@ const ADHomePage = () => {
         >
           Social media
           <IconButton onClick={toggleEditMode} aria-label="edit">
-        <EditIcon />
-      </IconButton>
+            <EditIcon />
+          </IconButton>
         </Typography>
         <div>
-         <div>
-     
-      <List>
-        {socialMediaOptions.map((option) => (
-          <div key={option.label}>
-            <Grid container alignItems="center" spacing={1}>
-              <Grid item>
-                <ListItemIcon sx={{ marginLeft: "20px" }}>
-                  {option.icon}
-                </ListItemIcon>
-              </Grid>
-              <Grid item xs>
-                <ListItemText
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                  primary={
-                    <Typography variant="body1" component="span">
-                      {option.label}
-                    </Typography>
-                  }
-                  secondary={
-                    <Link
-                      style={{ marginLeft: "10px" }}
-                      href={option.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {option.url}
-                    </Link>
-                  }
-                />
-              </Grid>
-              {isEditMode && (
-                <Grid item>
-                  <Checkbox
-                    checked={selectedOptions.includes(option.label)}
-                    onChange={() => handleSelect(option.label)}
-                    inputProps={{ 'aria-label': option.label }}
-                  />
-                </Grid>
-              )}
-            </Grid>
+          <div>
+            <List>
+              {socialMediaOptions.map((option) => (
+                <div key={option.label}>
+                  <Grid container alignItems="center" spacing={1}>
+                    <Grid item>
+                      <ListItemIcon sx={{ marginLeft: "20px" }}>
+                        {option.icon}
+                      </ListItemIcon>
+                    </Grid>
+                    <Grid item xs>
+                      <ListItemText
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                        primary={
+                          <Typography variant="body1" component="span">
+                            {option.label}
+                          </Typography>
+                        }
+                        secondary={
+                          <Link
+                            style={{ marginLeft: "10px" }}
+                            href={option.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {option.url}
+                          </Link>
+                        }
+                      />
+                    </Grid>
+                    {isEditMode && (
+                      <Grid item>
+                        <Checkbox
+                          checked={selectedOptions.includes(option.label)}
+                          onChange={() => handleSelect(option.label)}
+                          inputProps={{ "aria-label": option.label }}
+                        />
+                      </Grid>
+                    )}
+                  </Grid>
+                </div>
+              ))}
+            </List>
+            {isEditMode && selectedOptions.length > 0 && (
+              <Button
+                sx={{ marginLeft: "10px" }}
+                variant="contained"
+                startIcon={<DeleteIcon />}
+                onClick={handleDeleteSelected}
+              >
+                Delete Selected
+              </Button>
+            )}
           </div>
-        ))}
-      </List>
-      {isEditMode && selectedOptions.length > 0 && (
-        <Button sx={{marginLeft:'10px'}}
-          variant="contained"
-          
-          startIcon={<DeleteIcon />}
-          onClick={handleDeleteSelected}
-        >
-          Delete Selected
-        </Button>
-      )}
-    </div>
           {profiles.map((profile) => (
             <div key={profile.id}>
               <Grid container alignItems="center" spacing={1}>
@@ -1065,6 +1073,9 @@ const ADHomePage = () => {
             marginRight: "30px",
           }}
         >
+          <Button variant="outlined" color="error" onClick={handleLogOut}>
+            Log Out
+          </Button>
           <Button variant="outlined">Close</Button>
           <Button variant="contained">Save</Button>
         </Stack>
