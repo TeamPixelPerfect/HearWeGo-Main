@@ -156,4 +156,9 @@
   .react-calendar--selectRange .react-calendar__tile--hover {
     background-color: #e6e6e6;
   }
+
+  .highlight {
+    background: #521786; /* Highlight color */
+    color: white; /* Text color */
+  }
   

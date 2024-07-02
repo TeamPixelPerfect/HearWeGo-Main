@@ -188,7 +188,7 @@ function EventArea() {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
-      getEvents(page, limit, filter, artist.artist_id).then((events) => {
+      getEvents(page, limit, "event_created_by", artist.artist_id).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
         setPageCount(Math.ceil(events.total / limit));

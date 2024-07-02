@@ -1,8 +1,19 @@
 "use client";
-import { Box, Card, Grid, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Card,
+  Grid,
+  Pagination,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "./eventCalendar.css";
+import { Event } from "../../constants/models";
+import { getEvents } from "../../services/EventServices";
+import { useEffect } from "react";
+import { useAppSelector } from "@/lib/hooks";
 
 type ValuePiece = Date | null;
 
@@ -54,7 +65,41 @@ const EventCard = ({ date, day, month, eventName }: EventCardProps) => {
 
 const ArtistEventCalendar = () => {
   const theme = useTheme();
+  const artist = useAppSelector((state) => state.artist.user);
+  const [page, setPage] = useState(1);
+  const eventsPerPage = 4;
+  const [limit, setLimit] = useState(5);
   const [value, onChange] = useState<Value>(new Date());
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [highlightDates, setHighlightDates] = useState<Date[]>([]);
+
+  useEffect(() => {
+    if (artist?.token) {
+      getEvents(page, limit, "event_created_by", artist.artist_id).then(
+        (events) => {
+          setUpcomingEvents(events.data);
+          setHighlightDates(
+            events.data.flatMap((event) =>
+              event.sessions.map((session) => new Date(session.session_date))
+            )
+          );
+        }
+      );
+    }
+  }, [artist]);
+
+  const indexOfLastEvent = page * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = upcomingEvents
+    .flatMap((event) => event.sessions)
+    .slice(indexOfFirstEvent, indexOfLastEvent);
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
+  };
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -97,7 +142,18 @@ const ArtistEventCalendar = () => {
               alignItems: "flex-start",
             }}
           >
-            <Calendar onChange={onChange} value={value} style={{background:"#000"}}/>
+            <Calendar
+              onChange={onChange}
+              value={value}
+              tileClassName={({ date, view }) =>
+                view === "month" &&
+                highlightDates.some(
+                  (d) => d.toDateString() === date.toDateString()
+                )
+                  ? "highlight"
+                  : ""
+              }
+            />
           </Grid>
           <Grid item xs={12} md={6} sx={{ padding: "1em 2em" }}>
             <Typography
@@ -112,31 +168,26 @@ const ArtistEventCalendar = () => {
               Upcoming Events
             </Typography>
             <Grid container>
-              <EventCard
-                date="05"
-                day="Monday"
-                eventName="Event Name"
-                month="January 2024"
-              />
-              <EventCard
-                date="08"
-                day="Thursday"
-                eventName="Event Name"
-                month="January 2024"
-              />
-              <EventCard
-                date="10"
-                day="Sunday"
-                eventName="Event Name"
-                month="January 2024"
-              />
-              <EventCard
-                date="01"
-                day="Saturday"
-                eventName="Event Name"
-                month="February   2024"
-              />
+            {currentEvents.map(session => (
+    <EventCard
+      key={session.session_id}
+      date={new Date(session.session_date).getDate().toString()}
+      day={new Date(session.session_date).toLocaleString('en-US', { weekday: 'long' })}
+      month={new Date(session.session_date).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+      eventName={session.session_name}
+    />
+  ))}
             </Grid>
+            <Pagination
+              count={Math.ceil(
+                upcomingEvents.flatMap((event) => event.sessions).length /
+                  eventsPerPage
+              )}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              sx={{ marginTop: "1em" }}
+            />
           </Grid>
         </Grid>
       </Card>
