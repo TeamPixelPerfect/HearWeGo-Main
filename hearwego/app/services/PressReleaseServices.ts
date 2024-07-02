@@ -125,3 +125,51 @@ export const DownloadPDF = (
     })
     .catch((error) => console.error("Error downloading PDF:", error));
 };
+
+export const updatePressRelease = async (
+  token: string,
+  PressReleaseID: string,
+  data: any
+) => {
+  const res = await fetch(
+    `${base_url}/PressRelease/PressRelease/${PressReleaseID}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  if (res.ok) {
+    const press = await res.json();
+    return press;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getPressReleaseById = async (
+  token: string,
+  PressReleaseID: string
+) => {
+  const res = await fetch(
+    `${base_url}/PressRelease/PressRelease/${PressReleaseID}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const press = await res.json();
+    return press;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};

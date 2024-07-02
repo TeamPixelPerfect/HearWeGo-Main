@@ -13,6 +13,8 @@ import {
   DialogActions,
   TextField,
   Chip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import ShareIcon from "@mui/icons-material/Share";
@@ -26,6 +28,7 @@ import {
   deletePressRelease,
   sendEmailWithPDF,
   DownloadPDF,
+  updatePressRelease,
 } from "../../services/PressReleaseServices";
 
 const SavedOnesTab = () => {
@@ -40,6 +43,11 @@ const SavedOnesTab = () => {
   const [email, setEmail] = useState<string>("");
   const [emailList, setEmailList] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
   useEffect(() => {
     if (artist?.token) {
@@ -59,8 +67,20 @@ const SavedOnesTab = () => {
     deletePressRelease(artist ? artist.token : "", id as string)
       .then(() => {
         setIsChanged(true);
+        setSnackbar({
+          open: true,
+          message: "Press release deleted successfully.",
+          severity: "success",
+        });
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        setSnackbar({
+          open: true,
+          message: "Error deleting press release.",
+          severity: "error",
+        });
+      });
   };
 
   const handleShare = (data: PressReleaseData) => {
@@ -76,19 +96,38 @@ const SavedOnesTab = () => {
     setError(null);
   };
 
-  const handleShareDialogShare = (emails: string[]) => {
+  const handleShareDialogShare = async (emails: string[]) => {
     if (selectedPressRelease) {
-      sendEmailWithPDF(
-        selectedPressRelease.PressReleaseID as string,
-        artist?.token as string,
-        { ...selectedPressRelease, emails: emailList }
-      )
-        .then((result) => {
-          console.log("Email sent successfully:", result);
-        })
-        .catch((error) => {
-          console.error("Error sending email:", error);
+      try {
+        await sendEmailWithPDF(
+          selectedPressRelease.PressReleaseID as string,
+          artist?.token as string,
+          { ...selectedPressRelease, emails: emailList }
+        );
+
+        // Update the status of the press release to "Shared"
+        await updatePressRelease(
+          artist?.token as string,
+          selectedPressRelease.PressReleaseID as string,
+          { Status: "Shared" }
+        );
+
+        // Refresh the list of saved press releases
+        setIsChanged(true);
+
+        setSnackbar({
+          open: true,
+          message: "Email sent successfully.",
+          severity: "success",
         });
+      } catch (error) {
+        console.error("Error sending email or updating status:", error);
+        setSnackbar({
+          open: true,
+          message: "Error sending email or updating status.",
+          severity: "error",
+        });
+      }
     }
     handleShareDialogClose();
   };
@@ -176,10 +215,26 @@ const SavedOnesTab = () => {
                         artist?.token,
                         item.PressReleaseID as string
                       )
+                        .then(() => {
+                          setSnackbar({
+                            open: true,
+                            message: "PDF downloaded successfully.",
+                            severity: "success",
+                          });
+                        })
+                        .catch((error: any) => {
+                          console.error(error);
+                          setSnackbar({
+                            open: true,
+                            message: "Error downloading PDF.",
+                            severity: "error",
+                          });
+                        })
                     }
                   >
                     <DownloadIcon />
                   </IconButton>
+
                   <IconButton
                     color="secondary"
                     onClick={() => handleShare(item)}
@@ -256,6 +311,20 @@ const SavedOnesTab = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

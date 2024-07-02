@@ -1,22 +1,36 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { jsPDF } from "jspdf";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import DownloadIcon from "@mui/icons-material/Download";
-import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
+import TextField, {
+  FilledTextFieldProps,
+  OutlinedTextFieldProps,
+  StandardTextFieldProps,
+  TextFieldVariants,
+} from "@mui/material/TextField";
+import SaveIcon from "@mui/icons-material/Save";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
   getPressReleasesByArtist,
   deletePressRelease,
+  updatePressRelease,
 } from "../../services/PressReleaseServices";
 import { useAppSelector } from "@/lib/hooks";
 import { formatDate } from "@/app/constants/functions";
 import { PressReleaseData } from "@/app/constants/models";
+import DropFile from "@/app/components/DropFile";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 
 const DraftsTab = () => {
   const artist = useAppSelector((state) => state.artist.user);
@@ -24,6 +38,50 @@ const DraftsTab = () => {
     PressReleaseData[]
   >([]);
   const [IsChanged, setIsChanged] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [currentPressRelease, setCurrentPressRelease] =
+    useState<PressReleaseData | null>(null);
+
+  const formik = useFormik({
+    initialValues: {
+      ArtistLogo_URL: "",
+      Headline: "",
+      SubHeadline: "",
+      EventDate: null,
+      Venue: "",
+      Description: "",
+      Signature: "",
+      ReleaseDate: null,
+    },
+    validationSchema: Yup.object({
+      ArtistLogo_URL: Yup.string().required("Artist logo is required"),
+      Headline: Yup.string().required("Headline is required"),
+      SubHeadline: Yup.string().required("SubHeadline is required"),
+      EventDate: Yup.date().required("Event Date is required"),
+      Venue: Yup.string().required("Venue is required"),
+      Description: Yup.string().required("Description is required"),
+      Signature: Yup.string().required("Signature is required"),
+      ReleaseDate: Yup.date().required("Release Date is required"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const updatedPressRelease = {
+          ...currentPressRelease,
+          ...values,
+          Status: "Saved",
+        };
+        await updatePressRelease(
+          artist ? artist.token : "",
+          updatedPressRelease.PressReleaseID as string,
+          updatedPressRelease
+        );
+        setOpenDialog(false);
+        setIsChanged(true);
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    },
+  });
 
   useEffect(() => {
     if (artist?.token) {
@@ -42,105 +100,51 @@ const DraftsTab = () => {
     }
   }, [artist?.token, artist?.user?.artist_id, IsChanged]);
 
-  const generatePDF = async (data: any) => {
-    const doc = new jsPDF();
-
-    // Adding Artist Logo (Top Left)
-    if (data.ArtistLogo_URL) {
-      try {
-        const imgLogo = await loadImage(data.ArtistLogo_URL);
-        doc.addImage(imgLogo as string, 20, 10, 30, 30); // Adjust positioning as needed
-      } catch (error) {
-        console.error("Error loading artist logo:", error);
-      }
-    }
-
-    // Header Section
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("FOR IMMEDIATE RELEASE", 20, 70); // Left aligned
-
-    // Title Section
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text(data.Headline, 20, 80); // Left aligned
-
-    // Subtitle Section
-    doc.setFont("Helvetica", "italic");
-    doc.setFontSize(16);
-    doc.text(data.SubHeadline, 20, 90); // Left aligned
-
-    // Date and Location Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`${formatDate(data.EventDate)} | ${data.Venue}`, 20, 100); // Left aligned
-
-    // Line Separator
-    doc.setLineWidth(0.5);
-    doc.line(20, 110, 190, 110);
-
-    // Body Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    const descriptionLines = doc.splitTextToSize(data.Description, 170);
-    doc.text(descriptionLines, 20, 120);
-
-    // Release Date
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`Release Date: ${formatDate(data.ReleaseDate)}`, 20, 180);
-
-    // Adding Signature
-    if (data.Signature) {
-      try {
-        const imgSignature = await loadImage(data.Signature);
-        doc.addImage(imgSignature as string, 20, 190, 30, 30);
-      } catch (error) {
-        console.error("Error loading signature:", error);
-      }
-    }
-
-    // Contact Information Section
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(12);
-    const contactY = data.Signature ? 230 : 200;
-    doc.text("Contact Information", 20, contactY);
-    doc.setFont("Helvetica", "bold");
-    doc.text(artist?.user.artistName as string, 20, contactY + 10);
-    doc.setFont("Helvetica", "normal");
-    doc.text(`Phone: ${artist?.user.mobileNumber}`, 20, contactY + 20);
-    doc.text(`Email: ${artist?.user.email}`, 20, contactY + 30);
-
-    // Footer Section
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setFontSize(10);
-    doc.text(
-      `Press Release generated on ${new Date().toLocaleDateString()}`,
-      105,
-      pageHeight - 10,
-      { align: "center" }
-    );
-
-    // Save the PDF
-    doc.save(`${data.Headline}_press_release.pdf`);
-  };
-
-  const loadImage = (url: string) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = url;
-      img.onload = () => resolve(img);
-      img.onerror = (error) => reject(error);
-    });
-  };
-
   const handleDelete = (id: any) => {
     deletePressRelease(artist ? artist.token : "", id)
       .then((res) => {
         setIsChanged(true);
       })
       .catch((error) => console.error(error));
+  };
+
+  const handleEdit = (pressRelease: PressReleaseData) => {
+    setCurrentPressRelease(pressRelease);
+    formik.setValues({
+      ArtistLogo_URL: pressRelease.ArtistLogo_URL || "",
+      Headline: pressRelease.Headline || "",
+      SubHeadline: pressRelease.SubHeadline || "",
+      EventDate: pressRelease.EventDate || null,
+      Venue: pressRelease.Venue || "",
+      Description: pressRelease.Description || "",
+      Signature: pressRelease.Signature || "",
+      ReleaseDate: pressRelease.ReleaseDate || null,
+    });
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = async (values: any, isCancel = false) => {
+    try {
+      if (!isCancel) {
+        const updatedPressRelease = {
+          ...currentPressRelease,
+          ...values,
+          Status: "Draft",
+        };
+        await updatePressRelease(
+          artist ? artist.token : "",
+          updatedPressRelease.PressReleaseID as string,
+          updatedPressRelease
+        );
+        setIsChanged(true);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    } finally {
+      setOpenDialog(false);
+      setCurrentPressRelease(null);
+      formik.resetForm();
+    }
   };
 
   return (
@@ -204,17 +208,8 @@ const DraftsTab = () => {
                     mt: 2,
                   }}
                 >
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => generatePDF(item)}
-                    startIcon={<DownloadIcon />}
-                    sx={{ textTransform: "none" }}
-                  >
-                    Download
-                  </Button>
-                  <IconButton color="secondary" sx={{ textTransform: "none" }}>
-                    <ShareIcon />
+                  <IconButton color="primary" onClick={() => handleEdit(item)}>
+                    <EditIcon />
                   </IconButton>
                   <IconButton
                     color="error"
@@ -235,6 +230,227 @@ const DraftsTab = () => {
           No drafted press releases saved.
         </Typography>
       )}
+
+      <Dialog
+        open={openDialog}
+        onClose={() => handleCloseDialog({ isCancel: true })}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Edit Press Release</DialogTitle>
+        <DialogContent>
+          <form onSubmit={formik.handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <Box>
+                  <DropFile
+                    fileTypes="Logo"
+                    fileExtensions=".jpg, .jpeg, .png"
+                    isCircular={false}
+                    width="100%"
+                    height="250px"
+                    file={formik.values.ArtistLogo_URL}
+                    setFile={(file) =>
+                      formik.setFieldValue("ArtistLogo_URL", file)
+                    }
+                    aspectX={1}
+                    aspectY={1}
+                    shape="rect"
+                  />
+                  {formik.touched.ArtistLogo_URL &&
+                  formik.errors.ArtistLogo_URL ? (
+                    <Typography color="error">
+                      {formik.errors.ArtistLogo_URL}
+                    </Typography>
+                  ) : null}
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      value={formik.values.Headline}
+                      onChange={formik.handleChange}
+                      label="Headline"
+                      name="Headline"
+                      onBlur={formik.handleBlur}
+                      sx={{ marginTop: "20px" }}
+                    />
+                    {formik.touched.Headline && formik.errors.Headline ? (
+                      <Typography color="error">
+                        {formik.errors.Headline}
+                      </Typography>
+                    ) : null}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      value={formik.values.SubHeadline}
+                      onChange={formik.handleChange}
+                      label="SubHeadline"
+                      name="SubHeadline"
+                      onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.SubHeadline && formik.errors.SubHeadline ? (
+                      <Typography color="error">
+                        {formik.errors.SubHeadline}
+                      </Typography>
+                    ) : null}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Event Date"
+                        onChange={(date) =>
+                          formik.setFieldValue("EventDate", date)
+                        }
+                        renderInput={(
+                          params: React.JSX.IntrinsicAttributes & {
+                            variant?: TextFieldVariants | undefined;
+                          } & Omit<
+                              | OutlinedTextFieldProps
+                              | FilledTextFieldProps
+                              | StandardTextFieldProps,
+                              "variant"
+                            >
+                        ) => (
+                          <TextField
+                            fullWidth
+                            {...params}
+                            name="EventDate"
+                            onBlur={formik.handleBlur}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                    {formik.touched.EventDate && formik.errors.EventDate ? (
+                      <Typography color="error">
+                        {formik.errors.EventDate}
+                      </Typography>
+                    ) : null}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      value={formik.values.Venue}
+                      onChange={formik.handleChange}
+                      label="Venue"
+                      name="Venue"
+                      sx={{ width: "100%" }}
+                      onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.Venue && formik.errors.Venue ? (
+                      <Typography color="error">
+                        {formik.errors.Venue}
+                      </Typography>
+                    ) : null}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      value={formik.values.Description}
+                      onChange={formik.handleChange}
+                      label="Description"
+                      name="Description"
+                      onBlur={formik.handleBlur}
+                      multiline
+                      rows={4}
+                      sx={{ width: "100%" }}
+                    />
+                    {formik.touched.Description && formik.errors.Description ? (
+                      <Typography color="error">
+                        {formik.errors.Description}
+                      </Typography>
+                    ) : null}
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Box>
+                      <DropFile
+                        fileTypes="Signature"
+                        fileExtensions=".jpg, .jpeg, .png"
+                        isCircular={false}
+                        width="100%"
+                        height="160px"
+                        file={formik.values.Signature}
+                        setFile={(file) =>
+                          formik.setFieldValue("Signature", file)
+                        }
+                        aspectX={1}
+                        aspectY={1}
+                        shape="rect"
+                      />
+                      {formik.touched.Signature && formik.errors.Signature ? (
+                        <Typography color="error">
+                          {formik.errors.Signature}
+                        </Typography>
+                      ) : null}
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box sx={{ width: "100%" }}>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Release Date"
+                          value={formik.values.ReleaseDate}
+                          onChange={(date) =>
+                            formik.setFieldValue("ReleaseDate", date)
+                          }
+                          renderInput={(
+                            params: React.JSX.IntrinsicAttributes & {
+                              variant?: TextFieldVariants | undefined;
+                            } & Omit<
+                                | OutlinedTextFieldProps
+                                | FilledTextFieldProps
+                                | StandardTextFieldProps,
+                                "variant"
+                              >
+                          ) => (
+                            <TextField
+                              fullWidth
+                              {...params}
+                              name="ReleaseDate"
+                              onBlur={formik.handleBlur}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                      {formik.touched.ReleaseDate &&
+                      formik.errors.ReleaseDate ? (
+                        <Typography color="error">
+                          {formik.errors.ReleaseDate}
+                        </Typography>
+                      ) : null}
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Box
+              sx={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "flex-end",
+                p: 2,
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<SaveIcon />}
+                type="submit"
+                sx={{ mr: 2 }}
+              >
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => handleCloseDialog({ isCancel: true })}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

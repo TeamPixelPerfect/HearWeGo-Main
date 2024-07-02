@@ -6,7 +6,12 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
+import TextField, {
+  FilledTextFieldProps,
+  OutlinedTextFieldProps,
+  StandardTextFieldProps,
+  TextFieldVariants,
+} from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -14,34 +19,34 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import SaveIcon from "@mui/icons-material/Save";
 import DropFile from "../../components/DropFile";
 import { useAppSelector } from "@/lib/hooks";
+import { addPressRelease } from "../../services/PressReleaseServices";
 import {
-  addPressRelease,
-  sendEmailWithPDF,
-} from "../../services/PressReleaseServices";
-import {
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Snackbar,
 } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 
 const SchedulingTab = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [logoImg, setLogoImg] = useState<File | null>(null);
   const [signatureImg, setSignatureImg] = useState<File | null>(null);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [draftSavedDialogOpen, setDraftSavedDialogOpen] =
+  const [draftSavedSnackbarOpen, setDraftSavedSnackbarOpen] =
+    useState<boolean>(false);
+  const [successSnackbarOpen, setSuccessSnackbarOpen] =
     useState<boolean>(false);
   const [IsChanged, setIsChanged] = useState<boolean>(false);
+  const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
 
-  const handleDialogClose = () => {
-    setOpenDialog(false);
-  };
-
-  const handleDraftSavedDialogClose = () => {
-    setDraftSavedDialogOpen(false);
+  const handleSnackbarClose = (event: any, reason: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setDraftSavedSnackbarOpen(false);
+    setSuccessSnackbarOpen(false);
   };
 
   const formik = useFormik({
@@ -70,7 +75,7 @@ const SchedulingTab = () => {
     onSubmit: async (values, { resetForm }) => {
       try {
         await addPressRelease(artist ? artist.token : "", values);
-        setOpenDialog(true);
+        setSuccessSnackbarOpen(true);
         resetForm();
         setLogoImg(null);
         setSignatureImg(null);
@@ -104,6 +109,7 @@ const SchedulingTab = () => {
   };
 
   const handleCancel = async () => {
+    setShowCancelDialog(false); // close dialog
     try {
       const draftData = {
         ...formik.values,
@@ -111,7 +117,7 @@ const SchedulingTab = () => {
       };
       await addPressRelease(artist ? artist.token : "", draftData);
       setIsChanged(true);
-      setDraftSavedDialogOpen(true);
+      setDraftSavedSnackbarOpen(true);
       formik.resetForm();
       setLogoImg(null);
       setSignatureImg(null);
@@ -207,7 +213,16 @@ const SchedulingTab = () => {
                     label="Event Date"
                     value={formik.values.EventDate}
                     onChange={(date) => formik.setFieldValue("EventDate", date)}
-                    renderInput={(params) => (
+                    renderInput={(
+                      params: React.JSX.IntrinsicAttributes & {
+                        variant?: TextFieldVariants | undefined;
+                      } & Omit<
+                          | OutlinedTextFieldProps
+                          | FilledTextFieldProps
+                          | StandardTextFieldProps,
+                          "variant"
+                        >
+                    ) => (
                       <TextField
                         fullWidth
                         {...params}
@@ -321,45 +336,63 @@ const SchedulingTab = () => {
             Save
           </Button>
           {isFormFilled() && (
-            <Button variant="outlined" onClick={handleCancel}>
+            <Button
+              variant="outlined"
+              onClick={() => setShowCancelDialog(true)}
+            >
               Cancel
             </Button>
           )}
         </Box>
       </form>
+
+      <Snackbar
+        open={successSnackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity="success"
+        >
+          Press Release successfully created!
+        </MuiAlert>
+      </Snackbar>
+      <Snackbar
+        open={draftSavedSnackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity="info"
+        >
+          Press Release saved as draft.
+        </MuiAlert>
+      </Snackbar>
+
       <Dialog
-        open={openDialog}
-        onClose={handleDialogClose}
+        open={showCancelDialog}
+        onClose={() => setShowCancelDialog(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Success"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Are you sure?"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Press Release successfully created!
+            Are you sure you want to cancel? Any unsaved changes will be lost.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} autoFocus>
-            OK
+          <Button onClick={() => setShowCancelDialog(false)} color="primary">
+            No, keep editing
           </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={draftSavedDialogOpen}
-        onClose={handleDraftSavedDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Draft Saved"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Press Release saved as draft.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDraftSavedDialogClose} autoFocus>
-            OK
+          <Button onClick={handleCancel} color="primary" autoFocus>
+            Yes, cancel
           </Button>
         </DialogActions>
       </Dialog>
