@@ -172,3 +172,91 @@ export const getClubNewsByArtist = async (token: string, artistId: string) => {
     throw new Error(error.message);
   }
 };
+
+
+export const addComments = async (token: string, data: any) => {
+  console.log("Sending comments data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/comments`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const comments = await res.json();
+    return comments;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getCommentsByPost = async (token: string, postId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/comments/Post/${postId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const comments = await res.json();
+    console.log("Club comments Services: ", comments);
+    return comments;
+  } else {
+    const error = await res.json();
+    console.log("Club comments Services Error: ", error);
+    throw new Error(error.message);
+  }
+};
+
+export const addReplies = async (token: string, data: any) => {
+  console.log("Sending replies data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/replies`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const replies = await res.json();
+    return replies;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getRepliesByComment = async (token: string,  commentId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/replies/Comment/${commentId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const replies = await res.json();
+    console.log("Club replies Services: ", replies);
+    return replies;
+  } else {
+    const error = await res.json();
+    console.log("Club replies Services Error: ", error);
+    throw new Error(error.message);
+  }
+};
+

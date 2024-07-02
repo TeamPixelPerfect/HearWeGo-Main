@@ -194,7 +194,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
+  SocialMedias?: string[];
 }
 
 export interface Ticket {
@@ -244,8 +244,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
-  
+  SocialMedias?: string[];
 }
 
 export interface FanClub {
@@ -254,7 +253,6 @@ export interface FanClub {
   coverImage_URL?: string;
   visibility?: boolean;
 }
-
 
 export interface ClubMember {
   memberId?: string;
@@ -293,13 +291,25 @@ export interface comments {
   commenter_ProfilePic?: string;
   postId?: string;
   timestamps?: string;
+  parentCommentId?: string;
 }
 
-export interface reacts{
+export interface replies {
+  replyId?: string;
+  replier?: string;
+  replyBody?: string;
+  postId?: string;
+  replier_ProfilePic?: string;
+  commenter_ProfilePic?: string;
+  commentId?: string;
+  timestamps?: string;
+}
+
+export interface reacts {
   reactId?: string;
   reacter?: string;
   reactionType?: string;
   icon_URL?: string;
   postId?: string;
   timestamps?: string;
- }
+}
