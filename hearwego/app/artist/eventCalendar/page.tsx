@@ -99,19 +99,25 @@ const ArtistEventCalendar = () => {
     }
   }, [artist]);
 
-  // Filter sessions based on selectedDate
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Filter and sort sessions based on selectedDate and exclude past dates
   const filteredSessions = upcomingEvents
     .flatMap((event) =>
       event.sessions?.filter(
-        (session) =>
-          selectedDate &&
-          new Date(session.session_date).toDateString() ===
-            selectedDate.toDateString()
+        (session) => {
+          const sessionDate = new Date(session.session_date);
+          return selectedDate &&
+            sessionDate.toDateString() === selectedDate.toDateString() &&
+            sessionDate >= today;
+        }
       )?.map((session) => ({
         ...session,
         eventName: event.event_name,
       })) || []
-    );
+    )
+    .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
 
   const handleDateChange = (date: Date | Date[]) => {
     if (Array.isArray(date)) {
@@ -178,10 +184,12 @@ const ArtistEventCalendar = () => {
               onChange={onChange}
               value={value}
               tileClassName={({ date, view }) =>
-                view === "month" &&
-                highlightDates.some(
-                  (d) => d.toDateString() === date.toDateString()
-                )
+                view === "month" && date < today
+                  ? "past"
+                  : view === "month" &&
+                    highlightDates.some(
+                      (d) => d.toDateString() === date.toDateString()
+                    )
                   ? "highlight"
                   : ""
               }
@@ -202,28 +210,16 @@ const ArtistEventCalendar = () => {
                 ? `Sessions on ${selectedDate.toLocaleDateString()}`
                 : "Upcoming Events"}
             </Typography>
-            <Grid container>
-              {selectedDate
-                ? filteredSessions.map((session) => (
-                    <EventCard
-                      key={session.session_id}
-                      date={new Date(session.session_date)
-                        .getDate()
-                        .toString()}
-                      day={new Date(session.session_date).toLocaleString(
-                        "en-US",
-                        { weekday: "long" }
-                      )}
-                      month={new Date(session.session_date).toLocaleString(
-                        "en-US",
-                        { month: "long", year: "numeric" }
-                      )}
-                      eventName={session.eventName}
-                      sessionName={session.session_name}
-                    />
-                  ))
-                : upcomingEvents.map((event) =>
-                    event.sessions.map((session) => (
+            <Box
+              sx={{
+                maxHeight: "calc(100vh - 250px)", // Adjust this value as needed
+                overflowY: "auto",
+                paddingRight: "1em", // Add padding for scrollbar space
+              }}
+            >
+              <Grid container>
+                {selectedDate
+                  ? filteredSessions.map((session) => (
                       <EventCard
                         key={session.session_id}
                         date={new Date(session.session_date)
@@ -237,12 +233,34 @@ const ArtistEventCalendar = () => {
                           "en-US",
                           { month: "long", year: "numeric" }
                         )}
-                        eventName={event.event_name}
+                        eventName={session.eventName}
                         sessionName={session.session_name}
                       />
                     ))
-                  )}
-            </Grid>
+                  : upcomingEvents
+                      .flatMap(event => event.sessions)
+                      .filter(session => new Date(session.session_date) >= today)
+                      .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime())
+                      .map((session) => (
+                        <EventCard
+                          key={session.session_id}
+                          date={new Date(session.session_date)
+                            .getDate()
+                            .toString()}
+                          day={new Date(session.session_date).toLocaleString(
+                            "en-US",
+                            { weekday: "long" }
+                          )}
+                          month={new Date(session.session_date).toLocaleString(
+                            "en-US",
+                            { month: "long", year: "numeric" }
+                          )}
+                          eventName={upcomingEvents.find(event => event.sessions.includes(session))?.event_name}
+                          sessionName={session.session_name}
+                        />
+                      ))}
+              </Grid>
+            </Box>
           </Grid>
         </Grid>
       </Card>

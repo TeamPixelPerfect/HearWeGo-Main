@@ -11,11 +11,11 @@
 }
 
 .react-calendar__tile {
-  max-width: 100%;
-  padding: 10px 6.6667px;
+  width: 40px; /* Fixed width */
+  height: 40px; /* Fixed height to match width */
   background: none;
   text-align: center;
-  line-height: 1.25em;
+  line-height: 40px; /* Center text vertically */
   font-size: 0.875em;
   border-radius: 50%; /* Circle shape */
   cursor: pointer;
@@ -103,3 +103,5 @@
   background-color: orange !important; /* Orange background for selected date */
   color: white; /* Text color */
 }
+
+
