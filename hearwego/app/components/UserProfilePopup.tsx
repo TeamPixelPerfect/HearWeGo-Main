@@ -35,6 +35,7 @@ import { countries } from "country-flag-icons";
 import ReactCountryFlag from "react-country-flag";
 
 import "react-phone-input-2/lib/bootstrap.css";
+import { logOutUser } from "@/lib/features/user.slice";
 
 // Styled dialog component
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -98,6 +99,11 @@ const UserProfilePopup = ({
   const handleCountryChange = (event: SelectChangeEvent) => {
     setSelectedCountry(event.target.value);
     setUserDetails({ ...userDetails, country: event.target.value });
+  };
+
+  const handleLogOut = () => {
+    sessionStorage.removeItem("hwg-user");
+    dispatch(logOutUser());
   };
 
   // State for user details
@@ -420,7 +426,7 @@ const UserProfilePopup = ({
                   </IconButton>
                   <DialogActions>
                     <Button autoFocus onClick={handleClose2}>
-                      Save changes
+                      Save Changes
                     </Button>
                   </DialogActions>
                 </Box>
@@ -431,7 +437,10 @@ const UserProfilePopup = ({
 
         <DialogActions>
           <Button variant="text" autoFocus onClick={handleClose}>
-            <div style={{ color: "white" }}>Save changes</div>
+            Save Changes
+          </Button>
+          <Button variant="text" color="error" autoFocus onClick={handleLogOut}>
+            Log Out
           </Button>
         </DialogActions>
       </Box>
