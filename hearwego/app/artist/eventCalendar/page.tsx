@@ -44,6 +44,7 @@ const EventCard = ({
         background: theme.palette.primary.main,
         padding: "1em",
         marginBottom: "1em",
+        borderRadius: "8px",
       }}
     >
       <Box sx={{ width: "20%" }}>
@@ -221,6 +222,7 @@ const ArtistEventCalendar = () => {
                 {selectedDate
                   ? filteredSessions.map((session) => (
                       <EventCard
+                      
                         key={session.session_id}
                         date={new Date(session.session_date)
                           .getDate()

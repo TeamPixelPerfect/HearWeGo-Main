@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   CardMedia,
+  Chip,
   Divider,
   Grid,
   Stack,
@@ -23,8 +24,21 @@ import BlockIcon from "@mui/icons-material/Block";
 import EditIcon from "@mui/icons-material/Edit";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import PaidIcon from "@mui/icons-material/Paid";
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import { Artist } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
+
+function switchStatus (status: string) {
+  switch(status) {
+    case "public":
+      return <Chip color="success" icon={<PublicIcon />} label="Public" />;
+    case "private":
+      return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
+    default:
+      return <Chip icon={<LockIcon />} label="Private" />;
+  }
+}
 
 const ArtistSingleEventPage = () => {
     const theme = useTheme();
@@ -183,7 +197,7 @@ const ArtistSingleEventPage = () => {
                       </Box>
                       <Box sx={{ width: "50%" }}>
                         <Typography variant="subtitle1">
-                          {event.event_status}
+                          {switchStatus(event.event_status)}
                         </Typography>
                       </Box>
                     </Box>

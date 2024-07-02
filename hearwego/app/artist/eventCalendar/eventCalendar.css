@@ -17,7 +17,8 @@
   text-align: center;
   line-height: 40px; /* Center text vertically */
   font-size: 0.875em;
-  border-radius: 50%; /* Circle shape */
+  border-radius: 10px;
+  /* border-radius: 50%; Circle shape */
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease; /* Added color transition */
   border: none; /* Remove default border */
@@ -29,7 +30,7 @@
 }
 
 .react-calendar__tile--now {
-  background: #ffff76;
+  background: #9a52d9;
 }
 
 .react-calendar__tile:enabled:hover,
@@ -81,6 +82,7 @@
   font-weight: bold;
   font-size: 0.75em;
   margin-bottom: 0.5em;
+  color: #521786;
 }
 
 .react-calendar__month-view__weekdays__weekday {
@@ -100,7 +102,7 @@
 }
 
 .react-calendar__tile--active {
-  background-color: orange !important; /* Orange background for selected date */
+  background-color: rgb(171, 11, 11) !important; /* Orange background for selected date */
   color: white; /* Text color */
 }
 
