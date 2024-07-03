@@ -1,13 +1,14 @@
 "use client";
 
 import { useAppSelector } from "@/lib/hooks";
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 
 const MusicPlayer = () => {
   const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down("md"));
 
   const playerRef = useRef();
 
@@ -32,7 +33,7 @@ const MusicPlayer = () => {
   return (
     <Box
       sx={{
-        width: "86%",
+        width: matches ? "100%" : "86%",
         height: "100px",
         background: theme.palette.mode === "dark" ? "#0f0f0f" : "#ccc",
         position: "fixed",
@@ -50,27 +51,33 @@ const MusicPlayer = () => {
           sx={{ alignItems: "center", padding: "0 1em" }}
           spacing={2}
         >
-          <Box>
-            <img
-              src={
-                song?.cover_art ||
-                "https://img.freepik.com/premium-vector/photo-icon-picture-icon-image-sign-symbol-vector-illustration_64749-4409.jpg"
-              }
-              alt={song?.song_name}
-              style={{ width: "60px", height: "60px", borderRadius: "10px" }}
-            />
-          </Box>
-          <Box sx={{ width: "20%" }}>
-            <Typography
-              variant="h6"
-              sx={{ fontSize: "16px", fontWeight: "700" }}
-            >
-              {song?.song_name}
-            </Typography>
-            <Typography variant="subtitle1" sx={{ fontSize: "14px" }}>
-              {song?.artist}
-            </Typography>
-          </Box>
+          <Stack
+            direction="row"
+            sx={{ width: matches ? "40%" : "25%", alignItems: "center" }}
+            spacing={2}
+          >
+            <Box>
+              <img
+                src={
+                  song?.cover_art ||
+                  "https://img.freepik.com/premium-vector/photo-icon-picture-icon-image-sign-symbol-vector-illustration_64749-4409.jpg"
+                }
+                alt={song?.song_name}
+                style={{ width: "60px", height: "60px", borderRadius: "10px" }}
+              />
+            </Box>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{ fontSize: "16px", fontWeight: "700" }}
+              >
+                {song?.song_name}
+              </Typography>
+              <Typography variant="subtitle1" sx={{ fontSize: "14px" }}>
+                {song?.artist}
+              </Typography>
+            </Box>
+          </Stack>
           <AudioPlayer
             ref={playerRef}
             style={{

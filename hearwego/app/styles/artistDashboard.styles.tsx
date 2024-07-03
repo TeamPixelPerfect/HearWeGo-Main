@@ -25,7 +25,7 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
     },
     ".ad-right": {
       width: "100%",
-      padding: "1em",
+      padding: "0",
       margin: "0",
     },
   },
