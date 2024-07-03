@@ -1,3 +1,4 @@
+import { comment } from "postcss";
 import { base_url } from "../constants/keys";
 import { ClubMember, ClubPost, FanClub } from "../constants/models";
 // import { FanClub } from "../constants/models";
@@ -260,3 +261,65 @@ export const getRepliesByComment = async (token: string,  commentId: string) => 
   }
 };
 
+export const deleteComment = async (token: string, commentId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/comments/${commentId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const comments = await res.json();
+    return comments;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deletePost = async (token: string, postId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/clubposts/${postId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const clubposts = await res.json();
+    return clubposts;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+
+export const updatePost = async (token: string, postId: string, data: any) => {
+  console.log("Sending post data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/clubposts/${postId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const post = await res.json();
+    return post;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}

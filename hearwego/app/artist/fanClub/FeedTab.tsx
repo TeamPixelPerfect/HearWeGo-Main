@@ -15,35 +15,59 @@ import {
   InputAdornment,
   Button,
   Divider,
+  Paper,
+  Snackbar,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import CommentIcon from "@mui/icons-material/Comment";
 import SendIcon from "@mui/icons-material/Send";
-import { ClubPost, comments } from "../../constants/models";
+import ReplyIcon from "@mui/icons-material/Reply";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import { ClubPost, comments, replies } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import {
   getClubPostsByArtist,
   addComments,
   getCommentsByPost,
+  getRepliesByComment,
+  addReplies,
+  deleteComment,
+  deletePost,
+  updatePost,
 } from "@/app/services/FanClubServices";
 
 const FeedTab = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuPostId, setMenuPostId] = useState<string | null>(null);
   const [clubPost, setClubPost] = useState<ClubPost[]>([]);
-  const [newComment, setNewComment] = useState("");
   const artist = useAppSelector((state) => state.artist.user);
   const [selectedPost, setSelectedPost] = useState<ClubPost | null>(null);
   const [commentsData, setCommentsData] = useState<comments[]>([]);
+  const [repliesData, setRepliesData] = useState<{ [key: string]: replies[] }>(
+    {}
+  );
   const user = useAppSelector((state) => state.user.user);
   const [commentFormData, setCommentFormData] = useState({
-    commenter: user?.username || "",
+    commenter: "",
     commentBody: "",
     commenter_ProfilePic: user?.profilePicture || "",
     postId: "",
     timestamps: new Date().toISOString(),
   });
 
+  const [replyFormData, setReplyFormData] = useState({
+    replier: "",
+    replyBody: "",
+    replier_ProfilePic: user?.profilePicture || "",
+    commentId: "",
+    timestamps: new Date().toISOString(),
+  });
+
+  const [selectedComment, setSelectedComment] = useState<comments | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState<string>("");
   useEffect(() => {
     if (artist?.token) {
       getClubPostsByArtist(
@@ -74,18 +98,47 @@ const FeedTab = () => {
     post: ClubPost
   ) => {
     setAnchorEl(event.currentTarget);
+    setMenuPostId(post.postId);
   };
 
   const handleMoreClose = () => {
     setAnchorEl(null);
+    setMenuPostId(null);
   };
 
   const handleEditClick = () => {
     handleMoreClose();
   };
 
-  const handleDeleteClick = () => {
-    handleMoreClose();
+  const handleDeleteClick = (commentId: string | undefined) => {
+    deleteComment(artist?.token, commentId || "")
+      .then(() => {
+        console.log("Comment deleted successfully");
+        setDeleteSuccessMessage("Comment deleted successfully");
+        setSnackbarOpen(true);
+        // Remove deleted comment from state
+        setCommentsData(
+          commentsData.filter((comment) => comment.commentId !== commentId)
+        );
+      })
+      .catch((error) => console.log(error));
+  };
+  const handleDeletePostClick = () => {
+    deletePost(artist?.token, menuPostId || "")
+      .then(() => {
+        console.log("Post deleted successfully");
+        setDeleteSuccessMessage("Post deleted successfully");
+        setSnackbarOpen(true);
+        // Remove deleted post from state
+        setClubPost(clubPost.filter((post) => post.postId !== menuPostId));
+        setSelectedPost(null); // Reset selected post to null after deletion
+        handleMoreClose(); // Close the menu after deletion
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   const handleCommentClick = (post: ClubPost) => {
@@ -116,6 +169,52 @@ const FeedTab = () => {
       }
     } catch (error) {
       console.error("Error adding comment:", error);
+    }
+  };
+
+  const handleReplyClick = async (comment: comments) => {
+    if (selectedComment && selectedComment.commentId === comment.commentId) {
+      setSelectedComment(null);
+    } else {
+      setSelectedComment(comment);
+      try {
+        const replies = await getRepliesByComment(
+          artist.token,
+          comment.commentId || ""
+        );
+        setRepliesData((prevReplies) => ({
+          ...prevReplies,
+          [comment.commentId]: replies.data,
+        }));
+      } catch (error) {
+        console.error("Error fetching replies:", error);
+      }
+    }
+  };
+
+  const handleReplySubmit = async () => {
+    try {
+      await addReplies(artist.token, {
+        ...replyFormData,
+        commentId: selectedComment?.commentId || "",
+      });
+      setReplyFormData({
+        ...replyFormData,
+        replyBody: "",
+      });
+      if (selectedComment) {
+        getRepliesByComment(artist.token, selectedComment.commentId || "")
+          .then((replies) => {
+            console.log("Updated Replies: ", replies);
+            setRepliesData((prevReplies) => ({
+              ...prevReplies,
+              [selectedComment.commentId]: replies.data,
+            }));
+          })
+          .catch((error) => console.log(error));
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
     }
   };
 
@@ -157,7 +256,7 @@ const FeedTab = () => {
                   onClose={handleMoreClose}
                 >
                   <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-                  <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+                  <MenuItem onClick={handleDeletePostClick}>Delete</MenuItem>
                 </Menu>
               </>
             }
@@ -195,24 +294,125 @@ const FeedTab = () => {
               <>
                 <Divider sx={{ my: 2 }} />
                 {commentsData.map((comment, index) => (
-                  <Box key={index} sx={{ display: "flex", flexDirection: "column", mb: 2 }}>
-                    <Box sx={{ display: "flex", mb: 1 }}>
-                      <Avatar
-                        src={comment.commenter_ProfilePic}
-                        sx={{ marginRight: 2 }}
-                      />
-                      <Box>
-                        <Typography variant="subtitle2">
-                          {comment.commenter}
-                        </Typography>
-                        <Typography variant="body2">
-                          {comment.commentBody}
-                        </Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          {new Date(comment.timestamps).toLocaleString()}
-                        </Typography>
+                  <Box key={index} sx={{ mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 1,
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Avatar
+                          src={user?.profilePicture}
+                          sx={{ marginRight: 2 }}
+                        />
+                        <Box>
+                          <Typography variant="subtitle2">
+                            {user?.name ? user?.name : ""}
+                          </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </Typography>
+                          <Typography variant="body2">
+                            {comment.commentBody}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "right",
+                        }}
+                      >
+                        <IconButton
+                          onClick={() => handleDeleteClick(comment.commentId)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <IconButton onClick={() => handleReplyClick(comment)}>
+                          <ReplyIcon />
+                        </IconButton>
                       </Box>
                     </Box>
+                    {selectedComment &&
+                      selectedComment.commentId === comment.commentId && (
+                        <Box sx={{ ml: 4 }}>
+                          {repliesData[comment.commentId]?.map(
+                            (reply, index) => (
+                              <Box key={index} sx={{ display: "flex", mb: 1 }}>
+                                <Avatar
+                                  src={artist?.user.profilePicture}
+                                  sx={{
+                                    marginRight: 2,
+                                    marginTop: "8px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                                <Box sx={{ marginTop: "5px" }}>
+                                  <Typography variant="subtitle1">
+                                    {artist?.user.artistName}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    color="textSecondary"
+                                  >
+                                    {new Date(reply.createdAt).toLocaleString()}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {reply.replyBody}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            )
+                          )}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              p: 1,
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Avatar
+                              src={artist?.user.profilePicture}
+                              sx={{ marginRight: 2 }}
+                            />
+                            <TextField
+                              placeholder="Write your reply..."
+                              fullWidth
+                              value={replyFormData.replyBody}
+                              onChange={(e) =>
+                                setReplyFormData({
+                                  ...replyFormData,
+                                  replyBody: e.target.value,
+                                })
+                              }
+                              variant="outlined"
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    <IconButton
+                                      onClick={handleReplySubmit}
+                                      color="primary"
+                                    >
+                                      <SendIcon />
+                                    </IconButton>
+                                  </InputAdornment>
+                                ),
+                              }}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  "& fieldset": {
+                                    borderRadius: "20px",
+                                  },
+                                },
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      )}
                   </Box>
                 ))}
                 <Divider sx={{ my: 2 }} />
@@ -224,7 +424,10 @@ const FeedTab = () => {
                     borderRadius: 1,
                   }}
                 >
-                  <Avatar src={user?.profilePicture} sx={{ marginRight: 2 }} />
+                  <Avatar
+                    src={artist?.user.profilePicture}
+                    sx={{ marginRight: 2 }}
+                  />
                   <TextField
                     placeholder="Write your comment..."
                     fullWidth
@@ -262,6 +465,21 @@ const FeedTab = () => {
           </CardContent>
         </Card>
       ))}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000} // Adjust as per your requirement
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity="success"
+        >
+          {deleteSuccessMessage}
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 };

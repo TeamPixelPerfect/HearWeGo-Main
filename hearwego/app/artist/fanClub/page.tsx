@@ -94,8 +94,8 @@ const ArtistPage = () => {
         ...values,
         postImage_URL: postImage ? postImage : "",
       };
-      await addPost(artist.token, updatedPost);
-      setPosts([...posts, values]);
+      const newPost = await addPost(artist.token, updatedPost);
+      setPosts([...posts, newPost]); // Update the state with the new post
       setOpenPostDialog(false);
       setPostImage(null);
     } catch (error) {
@@ -109,8 +109,8 @@ const ArtistPage = () => {
         ...values,
         newsImage_URL: newsImage ? newsImage : "",
       };
-      await addNews(artist.token, updatedNews);
-      setNews([...news, values]);
+      const newNews = await addNews(artist.token, updatedNews);
+      setNews([...news, newNews]); // Update the state with the new news
       setOpenNewsDialog(false);
       setNewsImage(null);
     } catch (error) {
