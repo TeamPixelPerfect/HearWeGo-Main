@@ -108,7 +108,7 @@ const Language = [
 ];
 
 const AddSongData = () => {
-  //reads the global song file 
+  //reads the global song file
   const songTrack = useAppSelector((state) => state.song.song_track);
   //reads the artist details from global
   const artist = useAppSelector((state) => state.artist.user);
@@ -119,7 +119,7 @@ const AddSongData = () => {
     if (songTrack === "") {
       Router.push("add");
     }
-  }, [])
+  }, []);
 
   const theme = useTheme();
 
@@ -276,8 +276,17 @@ const AddSongData = () => {
     addSong(artist ? artist.token : "", songData).then((res) => {
       console.log("Response:::", res);
       setUploading(false);
-      dispatch(setSong({ song_track: "" }));
-      Router.push("/artist/songs/addSongPreview/"+res.song_id);
+      dispatch(
+        setSong({
+          song_track: "",
+          current_song: "",
+          playing: false,
+          song_name: "",
+          cover_art: "",
+          artist: "",
+        })
+      );
+      Router.push("/artist/songs/addSongPreview/" + res.song_id);
     });
   };
 
@@ -419,7 +428,7 @@ const AddSongData = () => {
                           filterOptions={handleTagFilter}
                           style={{ boxSizing: "initial", maxWidth: "82%" }}
                           onChange={(e, value) => {
-                            setSongData((data) => {
+                            setSongData((data: any) => {
                               return { ...data, additional_tags: value };
                             });
                           }}
@@ -594,11 +603,7 @@ function SongMetaData({
         }}
         elevation={3}
       >
-        <Grid
-          container
-          rowSpacing={1}
-          columnSpacing={{ xs: 1, sm: 2, md: 3 }} 
-        >
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid xs={6}>
             <FormGroup>
               <FormControlLabel
@@ -928,7 +933,7 @@ function GenreSelect({ songData, setSongData, error }: InputProps) {
 function ElectrinocGenreSelect({ songData, setSongData }: InputProps) {
   const handleChange = (event: SelectChangeEvent) => {
     console.log(event.target.value);
-    setSongData((data) => {
+    setSongData((data: any) => {
       return { ...data, electronic_sub_genre: event.target.value };
     });
   };
@@ -1136,7 +1141,7 @@ function ComposerTags({ songData, setSongData, error }: InputProps) {
     const composers = value.map((artist) => ({
       artist_name: artist.label,
     }));
-    setSongData((data) => {
+    setSongData((data: any) => {
       return { ...data, composer: composers };
     });
   };
@@ -1183,10 +1188,13 @@ function SongWriterTags({ songData, setSongData, error }: InputProps) {
 
   const getArtists = () => {
     getAllArtists().then((res) => {
-      const data = res?.data.map((opt: any) => ({label: opt.artistName, _id: opt.artist_id}))
+      const data = res?.data.map((opt: any) => ({
+        label: opt.artistName,
+        _id: opt.artist_id,
+      }));
       setWriters(data);
-    })
-  }
+    });
+  };
 
   const handleChange = (
     event: React.SyntheticEvent<Element>,
@@ -1202,7 +1210,7 @@ function SongWriterTags({ songData, setSongData, error }: InputProps) {
 
   useEffect(() => {
     getArtists();
-  } ,[])
+  }, []);
 
   return (
     <>
@@ -1261,13 +1269,13 @@ function a11yProps(index: number) {
 
 const filter = createFilterOptions();
 
-const handleFilter = (options, params) => {
+const handleFilter = (options: any, params: any) => {
   const filtered = filter(options, params);
   const { inputValue } = params;
 
   if (
     inputValue !== "" &&
-    !options.some((option) => option.label === inputValue)
+    !options.some((option: any) => option.label === inputValue)
   ) {
     filtered.push({ label: inputValue, _id: "" });
   }
@@ -1275,11 +1283,14 @@ const handleFilter = (options, params) => {
   return filtered;
 };
 
-const handleTagFilter = (options, params) => {
+const handleTagFilter = (options: any, params: any) => {
   const filtered = filter(options, params);
   const { inputValue } = params;
 
-  if (inputValue !== "" && !options.some((option) => option === inputValue)) {
+  if (
+    inputValue !== "" &&
+    !options.some((option: any) => option === inputValue)
+  ) {
     filtered.push(inputValue);
   }
 
