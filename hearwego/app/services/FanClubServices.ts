@@ -323,3 +323,69 @@ export const updatePost = async (token: string, postId: string, data: any) => {
     throw new Error(error.message);
   }
 }
+
+export const addReacts = async (token: string, data: any) => {
+  console.log("Sending reacts data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/reacts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const reacts = await res.json();
+    return reacts;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getReactsByPost = async (token: string, postId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/reacts/Post/${postId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const reacts = await res.json();
+    console.log("Club reacts Services: ", reacts);
+    return reacts;
+  } else {
+    const error = await res.json();
+    console.log("Club reacts Services Error: ", error);
+    throw new Error(error.message);
+  }
+};
+
+export const getReactsByNews = async (token: string, newsId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/reacts/News/${newsId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const reacts = await res.json();
+    console.log("Club reacts Services: ", reacts);
+    return reacts;
+  } else {
+    const error = await res.json();
+    console.log("Club reacts Services Error: ", error);
+    throw new Error(error.message);
+  }
+};

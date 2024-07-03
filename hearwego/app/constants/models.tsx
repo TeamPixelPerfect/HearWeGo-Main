@@ -308,8 +308,6 @@ export interface replies {
 export interface reacts {
   reactId?: string;
   reacter?: string;
-  reactionType?: string;
-  icon_URL?: string;
   postId?: string;
   timestamps?: string;
 }

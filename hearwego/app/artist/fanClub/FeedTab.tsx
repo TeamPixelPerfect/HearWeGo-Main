@@ -13,10 +13,9 @@ import {
   MenuItem,
   TextField,
   InputAdornment,
-  Button,
   Divider,
-  Paper,
   Snackbar,
+
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -25,7 +24,7 @@ import SendIcon from "@mui/icons-material/Send";
 import ReplyIcon from "@mui/icons-material/Reply";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
-import { ClubPost, comments, replies } from "../../constants/models";
+import { ClubPost, comments, replies, reacts } from "../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import {
   getClubPostsByArtist,
@@ -36,6 +35,8 @@ import {
   deleteComment,
   deletePost,
   updatePost,
+  addReacts,
+  getReactsByPost,
 } from "@/app/services/FanClubServices";
 
 const FeedTab = () => {
@@ -45,6 +46,7 @@ const FeedTab = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [selectedPost, setSelectedPost] = useState<ClubPost | null>(null);
   const [commentsData, setCommentsData] = useState<comments[]>([]);
+  const [reactsCount, setReactsCount] = useState<{ [key: string]: number }>({});
   const [repliesData, setRepliesData] = useState<{ [key: string]: replies[] }>(
     {}
   );
@@ -65,9 +67,16 @@ const FeedTab = () => {
     timestamps: new Date().toISOString(),
   });
 
+  const [reactsData, setReactsData] = useState({
+    reacter: "",
+    postId: "",
+    timestamps: new Date().toISOString(),
+  });
+
   const [selectedComment, setSelectedComment] = useState<comments | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState<string>("");
+
   useEffect(() => {
     if (artist?.token) {
       getClubPostsByArtist(
@@ -84,21 +93,21 @@ const FeedTab = () => {
 
   useEffect(() => {
     if (selectedPost) {
-      getCommentsByPost(artist.token, selectedPost.postId || "")
+      getCommentsByPost(artist?.token, selectedPost.postId || "")
         .then((comments) => {
           console.log("Comments: ", comments);
           setCommentsData(comments.data);
         })
         .catch((error) => console.log(error));
     }
-  }, [selectedPost, artist.token]);
+  }, [selectedPost, artist?.token]);
 
   const handleMoreClick = (
     event: React.MouseEvent<HTMLElement>,
     post: ClubPost
   ) => {
     setAnchorEl(event.currentTarget);
-    setMenuPostId(post.postId);
+    setMenuPostId(post?.postId || "");
   };
 
   const handleMoreClose = () => {
@@ -116,7 +125,6 @@ const FeedTab = () => {
         console.log("Comment deleted successfully");
         setDeleteSuccessMessage("Comment deleted successfully");
         setSnackbarOpen(true);
-        // Remove deleted comment from state
         setCommentsData(
           commentsData.filter((comment) => comment.commentId !== commentId)
         );
@@ -129,10 +137,9 @@ const FeedTab = () => {
         console.log("Post deleted successfully");
         setDeleteSuccessMessage("Post deleted successfully");
         setSnackbarOpen(true);
-        // Remove deleted post from state
         setClubPost(clubPost.filter((post) => post.postId !== menuPostId));
-        setSelectedPost(null); // Reset selected post to null after deletion
-        handleMoreClose(); // Close the menu after deletion
+        setSelectedPost(null);
+        handleMoreClose();
       })
       .catch((error) => console.log(error));
   };
@@ -151,7 +158,7 @@ const FeedTab = () => {
 
   const handleCommentSubmit = async () => {
     try {
-      await addComments(artist.token, {
+      await addComments(artist?.token, {
         ...commentFormData,
         postId: selectedPost?.postId || "",
       });
@@ -160,7 +167,7 @@ const FeedTab = () => {
         commentBody: "",
       });
       if (selectedPost) {
-        getCommentsByPost(artist.token, selectedPost.postId || "")
+        getCommentsByPost(artist?.token, selectedPost.postId || "")
           .then((comments) => {
             console.log("Updated Comments: ", comments);
             setCommentsData(comments.data);
@@ -179,12 +186,12 @@ const FeedTab = () => {
       setSelectedComment(comment);
       try {
         const replies = await getRepliesByComment(
-          artist.token,
+          artist?.token,
           comment.commentId || ""
         );
         setRepliesData((prevReplies) => ({
           ...prevReplies,
-          [comment.commentId]: replies.data,
+          [comment?.commentId || ""]: replies.data,
         }));
       } catch (error) {
         console.error("Error fetching replies:", error);
@@ -194,7 +201,7 @@ const FeedTab = () => {
 
   const handleReplySubmit = async () => {
     try {
-      await addReplies(artist.token, {
+      await addReplies(artist?.token, {
         ...replyFormData,
         commentId: selectedComment?.commentId || "",
       });
@@ -203,18 +210,30 @@ const FeedTab = () => {
         replyBody: "",
       });
       if (selectedComment) {
-        getRepliesByComment(artist.token, selectedComment.commentId || "")
+        getRepliesByComment(artist?.token, selectedComment.commentId || "")
           .then((replies) => {
             console.log("Updated Replies: ", replies);
             setRepliesData((prevReplies) => ({
               ...prevReplies,
-              [selectedComment.commentId]: replies.data,
+              [selectedComment?.commentId || ""]: replies.data,
             }));
           })
           .catch((error) => console.log(error));
       }
     } catch (error) {
       console.error("Error adding reply:", error);
+    }
+  };
+
+  const handleReactClick = async (post: ClubPost) => {
+    try {
+      const reacts = await getReactsByPost(artist?.token, post.postId || "");
+      setReactsCount((prevCount) => ({
+        ...prevCount,
+        [post.postId || ""]: reacts.data.length,
+      }));
+    } catch (error) {
+      console.error("Error fetching reacts:", error);
     }
   };
 
@@ -282,10 +301,11 @@ const FeedTab = () => {
             <Box
               sx={{ display: "flex", marginTop: "1rem", alignItems: "center" }}
             >
-              <IconButton>
+              <IconButton onClick={() => handleReactClick(post)}>
                 <ThumbUpIcon />
               </IconButton>
-              <IconButton onClick={() => handleCommentClick(post)}>
+              <Typography> : {reactsCount[post.postId || ""] || 0}</Typography>
+              <IconButton onClick={() => handleCommentClick(post)} sx={{marginLeft:"10px"}}>
                 <CommentIcon />
               </IconButton>
             </Box>
@@ -339,7 +359,7 @@ const FeedTab = () => {
                     {selectedComment &&
                       selectedComment.commentId === comment.commentId && (
                         <Box sx={{ ml: 4 }}>
-                          {repliesData[comment.commentId]?.map(
+                          {repliesData[comment.commentId || ""]?.map(
                             (reply, index) => (
                               <Box key={index} sx={{ display: "flex", mb: 1 }}>
                                 <Avatar
@@ -465,6 +485,7 @@ const FeedTab = () => {
           </CardContent>
         </Card>
       ))}
+      
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000} // Adjust as per your requirement

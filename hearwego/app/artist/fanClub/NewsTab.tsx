@@ -15,20 +15,24 @@ import {
   Paper,
   Menu,
   MenuItem,
+
 } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
-import { getClubNewsByArtist } from "@/app/services/FanClubServices";
+import { getClubNewsByArtist ,getReactsByNews} from "@/app/services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
 import { ClubNews } from "@/app/constants/models";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
 const NewsPage = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [clubNews, setClubNews] = useState<ClubNews[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedClubNewsId, setselectedClubNewsId] = useState<String | null>(null);
+  const [reactsCount, setReactsCount] = useState<{ [key: string]: number }>({});
+  const [ news, setNews] = useState<ClubNews[]>([]);
 
   useEffect(() => {
     if (artist?.token){
@@ -62,6 +66,18 @@ const NewsPage = () => {
         ClubNews.newsId === newsId ? { ...ClubNews, imageUrl } : ClubNews
       )
     );
+  };
+
+  const handleReactClick = async (news: ClubNews) => {
+    try {
+      const reacts = await getReactsByNews(artist?.token, news.newsId || "");
+      setReactsCount((prevCount) => ({
+        ...prevCount,
+        [news.newsId || ""]: reacts.data.length,
+      }));
+    } catch (error) {
+      console.error("Error fetching reacts:", error);
+    }
   };
   return (
     <Container>
@@ -118,8 +134,21 @@ const NewsPage = () => {
                   </Typography>
                 </Box>
               </Box>
+             
               <CardActions>
-                <Box sx={{ marginLeft: "auto" }}>
+              <Box
+              sx={{ display: "flex", alignItems: "center",backgroundColor:"red" }}
+            >
+              <IconButton onClick={() => handleReactClick(news)}>
+                <ThumbUpIcon />
+              </IconButton>
+              <Typography> : {reactsCount[news.newsId || ""] || 0}</Typography>
+             
+            </Box>
+            </CardActions>
+            <CardActions>
+      
+                <Box sx={{ marginLeft:"auto",backgroundColor:"blue"}}>
                   <IconButton
                     aria-label="more"
                     aria-controls={`post-menu-${ClubNews.newsId}`}
