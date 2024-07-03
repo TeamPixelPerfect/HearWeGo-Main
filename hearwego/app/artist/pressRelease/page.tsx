@@ -52,7 +52,7 @@ const PressRelease = () => {
                   onChange={handleTabChange}
                   aria-label="Press Release Tabs"
                 >
-                  <Tab label="Scheduling" value="1" />
+                  <Tab label="Creation  " value="1" />
                   <Tab label="Saved Ones" value="2" />
                   <Tab label="Drafts" value="3" />
                   <Tab label="Already Shared" value="4" />
