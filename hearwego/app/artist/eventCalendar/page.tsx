@@ -1,8 +1,17 @@
 "use client";
-import { Box, Card, Grid, Typography, useTheme } from "@mui/material";
-import React, { useState } from "react";
+import {
+  Box,
+  Card,
+  Grid,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "./eventCalendar.css";
+import { Event } from "../../constants/models";
+import { getEvents } from "../../services/EventServices";
+import { useAppSelector } from "@/lib/hooks";
 
 type ValuePiece = Date | null;
 
@@ -12,10 +21,17 @@ interface EventCardProps {
   date: string;
   day: string;
   eventName: string;
+  sessionName: string;
   month: string;
 }
 
-const EventCard = ({ date, day, month, eventName }: EventCardProps) => {
+const EventCard = ({
+  date,
+  day,
+  month,
+  eventName,
+  sessionName,
+}: EventCardProps) => {
   const theme = useTheme();
 
   return (
@@ -28,10 +44,14 @@ const EventCard = ({ date, day, month, eventName }: EventCardProps) => {
         background: theme.palette.primary.main,
         padding: "1em",
         marginBottom: "1em",
+        borderRadius: "8px",
       }}
     >
       <Box sx={{ width: "20%" }}>
-        <Typography variant="h4" sx={{ color: "#fff", textAlign: "center" }}>
+        <Typography
+          variant="h4"
+          sx={{ color: "#fff", textAlign: "center" }}
+        >
           {date}
         </Typography>
       </Box>
@@ -47,6 +67,9 @@ const EventCard = ({ date, day, month, eventName }: EventCardProps) => {
         <Typography variant="h5" sx={{ color: "#fff" }}>
           {eventName}
         </Typography>
+        <Typography variant="subtitle2" sx={{ color: "#fff" }}>
+          {sessionName}
+        </Typography>
       </Box>
     </Grid>
   );
@@ -54,7 +77,60 @@ const EventCard = ({ date, day, month, eventName }: EventCardProps) => {
 
 const ArtistEventCalendar = () => {
   const theme = useTheme();
+  const artist = useAppSelector((state) => state.artist.user);
   const [value, onChange] = useState<Value>(new Date());
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [highlightDates, setHighlightDates] = useState<Date[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (artist?.token) {
+      getEvents(1, 5, "event_created_by", artist.artist_id).then(
+        (events) => {
+          setUpcomingEvents(events.data);
+          setHighlightDates(
+            events.data.flatMap((event) =>
+              event.sessions.map(
+                (session) => new Date(session.session_date)
+              )
+            )
+          );
+        }
+      );
+    }
+  }, [artist]);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Filter and sort sessions based on selectedDate and exclude past dates
+  const filteredSessions = upcomingEvents
+    .flatMap((event) =>
+      event.sessions?.filter(
+        (session) => {
+          const sessionDate = new Date(session.session_date);
+          return selectedDate &&
+            sessionDate.toDateString() === selectedDate.toDateString() &&
+            sessionDate >= today;
+        }
+      )?.map((session) => ({
+        ...session,
+        eventName: event.event_name,
+      })) || []
+    )
+    .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
+
+  const handleDateChange = (date: Date | Date[]) => {
+    if (Array.isArray(date)) {
+      setSelectedDate(date[0]);
+    } else {
+      setSelectedDate(date);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedDate(null);
+  };
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
@@ -62,7 +138,6 @@ const ArtistEventCalendar = () => {
         sx={{
           width: "100%",
           minHeight: "100vh",
-          // background: theme.palette.background.default,
         }}
       >
         <Box
@@ -84,6 +159,15 @@ const ArtistEventCalendar = () => {
           >
             Event Calendar
           </Typography>
+          {selectedDate && (
+            <Typography
+              variant="body1"
+              sx={{ cursor: "pointer", color: theme.palette.primary.main }}
+              onClick={handleClearSelection}
+            >
+              Clear Selection
+            </Typography>
+          )}
         </Box>
         <Grid container sx={{ width: "100%" }}>
           <Grid
@@ -97,7 +181,21 @@ const ArtistEventCalendar = () => {
               alignItems: "flex-start",
             }}
           >
-            <Calendar onChange={onChange} value={value} style={{background:"#000"}}/>
+            <Calendar
+              onChange={onChange}
+              value={value}
+              tileClassName={({ date, view }) =>
+                view === "month" && date < today
+                  ? "past"
+                  : view === "month" &&
+                    highlightDates.some(
+                      (d) => d.toDateString() === date.toDateString()
+                    )
+                  ? "highlight"
+                  : ""
+              }
+              onClickDay={handleDateChange}
+            />
           </Grid>
           <Grid item xs={12} md={6} sx={{ padding: "1em 2em" }}>
             <Typography
@@ -109,34 +207,62 @@ const ArtistEventCalendar = () => {
                 marginBottom: "1em",
               }}
             >
-              Upcoming Events
+              {selectedDate
+                ? `Sessions on ${selectedDate.toLocaleDateString()}`
+                : "Upcoming Events"}
             </Typography>
-            <Grid container>
-              <EventCard
-                date="05"
-                day="Monday"
-                eventName="Event Name"
-                month="January 2024"
-              />
-              <EventCard
-                date="08"
-                day="Thursday"
-                eventName="Event Name"
-                month="January 2024"
-              />
-              <EventCard
-                date="10"
-                day="Sunday"
-                eventName="Event Name"
-                month="January 2024"
-              />
-              <EventCard
-                date="01"
-                day="Saturday"
-                eventName="Event Name"
-                month="February   2024"
-              />
-            </Grid>
+            <Box
+              sx={{
+                maxHeight: "calc(100vh - 250px)", // Adjust this value as needed
+                overflowY: "auto",
+                paddingRight: "1em", // Add padding for scrollbar space
+              }}
+            >
+              <Grid container>
+                {selectedDate
+                  ? filteredSessions.map((session) => (
+                      <EventCard
+                      
+                        key={session.session_id}
+                        date={new Date(session.session_date)
+                          .getDate()
+                          .toString()}
+                        day={new Date(session.session_date).toLocaleString(
+                          "en-US",
+                          { weekday: "long" }
+                        )}
+                        month={new Date(session.session_date).toLocaleString(
+                          "en-US",
+                          { month: "long", year: "numeric" }
+                        )}
+                        eventName={session.eventName}
+                        sessionName={session.session_name}
+                      />
+                    ))
+                  : upcomingEvents
+                      .flatMap(event => event.sessions)
+                      .filter(session => new Date(session.session_date) >= today)
+                      .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime())
+                      .map((session) => (
+                        <EventCard
+                          key={session.session_id}
+                          date={new Date(session.session_date)
+                            .getDate()
+                            .toString()}
+                          day={new Date(session.session_date).toLocaleString(
+                            "en-US",
+                            { weekday: "long" }
+                          )}
+                          month={new Date(session.session_date).toLocaleString(
+                            "en-US",
+                            { month: "long", year: "numeric" }
+                          )}
+                          eventName={upcomingEvents.find(event => event.sessions.includes(session))?.event_name}
+                          sessionName={session.session_name}
+                        />
+                      ))}
+              </Grid>
+            </Box>
           </Grid>
         </Grid>
       </Card>
