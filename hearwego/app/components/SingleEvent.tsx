@@ -6,20 +6,16 @@ interface Props {
   eventID: string;
   eventName: string;
   eventImg: string;
-  eventDate: string;
-  eventDay: string;
-  eventTime: string;
   artistName: string;
+  noOfSessions: number;
 }
 
 export default function SingleEvent({
   eventID,
   eventName,
   eventImg,
-  eventDate,
-  eventDay,
-  eventTime,
   artistName,
+  noOfSessions,
 }: Props) {
   return (
     <Link href={`/main/events/` + eventID}>
@@ -85,7 +81,7 @@ export default function SingleEvent({
                 // opacity: "0.9",
               }}
             >
-              {eventDate}
+              No. of Sessions: {noOfSessions}
             </Box>
 
             <Box
@@ -202,7 +198,7 @@ export default function SingleEvent({
                       // margin: "0px 0px 0px 10px",
                     }}
                   >
-                    {eventTime}
+                    {/* {eventTime} */}
                   </Box>
                   <Box
                     sx={{
@@ -220,7 +216,7 @@ export default function SingleEvent({
                       display: "flex",
                     }}
                   >
-                    {eventDay}
+                    {/* {eventDay} */}
                   </Box>
                 </Box>
               </Box>

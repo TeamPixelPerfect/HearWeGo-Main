@@ -45,6 +45,23 @@ export const getAllEvents = async (): Promise<Event[]> => {
   }
 };
 
+export const getUpcomingEventsSortByDate = async (page?: number, limit?: number) => {
+  const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&sort=-updatedAt&limit=${limit}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const events = await res.json();
+    return events;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
 export const getEventById = async (id: string) => {
   try {
     const res = await fetch(`${base_url}/EventsManager/events?event_id=${id}`, {
@@ -154,6 +171,48 @@ export const getInterestedEventsForGivenArtist = async (page?: number, limit?: n
 export const getPrivateEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
   try {
     const res = await fetch(`${base_url}/EventsManager/events?page=${page}&limit=${limit}&event_created_by=${artist_id}&event_status=private`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getInterestedEventsByUser = async (page?: number, limit?: number, user_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/interested-events/${user_id}?page=${page}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getUpcomingEventsByInterest = async (page?: number, limit?: number) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events-sorted-by-interests?page=${page}&limit=${limit}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

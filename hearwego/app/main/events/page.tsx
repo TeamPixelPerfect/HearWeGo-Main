@@ -10,6 +10,13 @@ import Grid from "@mui/material/Grid";
 import SingleEvent from "@/app/components/SingleEvent";
 import { Button } from "@mui/material";
 import CardActions from "@mui/material/CardActions";
+import { useAppSelector } from "@/lib/hooks";
+import { getInterestedEventsByUser } from "@/app/services/EventServices";
+import { Event } from "@/app/constants/models";
+import { Artist } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { getUpcomingEventsByInterest } from "@/app/services/EventServices";
+import { getUpcomingEventsSortByDate } from "@/app/services/EventServices";
 
 import {
   Maindiv,
@@ -21,6 +28,7 @@ import {
   SearchPaper,
 } from "@/app/styles/eventsMW.styles";
 import { CustomSelect } from "@/app/components/eventsDropDown";
+import { get } from "http";
 
 const interestEvents = [
   {
@@ -217,9 +225,51 @@ export const ArtistOptions = [
 ];
 
 export default function EventsPage() {
+  const user = useAppSelector((state) => state.user.user);
   const [Type, setType] = React.useState("");
   const [Location, setLocation] = React.useState("");
   const [Artist, setArtist] = React.useState("");
+  const [interestEvents, setInterestEvents] = React.useState<Event[]>([]);
+  const [trendingEvents, setTrendingEvents] = React.useState<Event[]>([]);
+  const [allEvents, setAllEvents] = React.useState<Event[]>([]);
+  const [artists, setArtists] = React.useState<Artist[]>([]);
+
+  React.useEffect(() => {
+    getInterestedEventsByUser(1, 5, user?.user_id).then((events) => {
+      console.log("Events......",events);
+      setInterestEvents(events);
+    });
+  }
+  , [user]);
+
+  React.useEffect(() => {
+    getUpcomingEventsByInterest(1, 5).then((events) => {
+      console.log("Events Trending......",events);
+      setTrendingEvents(events);
+    });
+  }
+  , [user]);
+
+  React.useEffect(() => {
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
+    });
+  }
+  , []);
+
+  React.useEffect(() => {
+    getUpcomingEventsSortByDate(1, 5).then((events) => {
+      console.log("Events......",events);
+      setAllEvents(events.data);
+    });
+  }
+  , [user]);
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
 
   const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setType(event.target.value as string);
@@ -353,7 +403,9 @@ export default function EventsPage() {
         }}
       ></Divider>
 
-      <Box
+      {(user ? 
+        <>
+          <Box
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -390,16 +442,14 @@ export default function EventsPage() {
 
       <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
         {interestEvents.map(
-          ({ name, img, date, day, time, artist, event_id }) => (
+          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
             <Grid item xs={6} md={3}>
               <SingleEvent
                 eventID={event_id}
-                eventName={name}
-                eventImg={img}
-                eventDate={date}
-                eventDay={day}
-                eventTime={time}
-                artistName={artist}
+                eventName={event_name}
+                eventImg={event_img}
+                artistName={getArtistName(event_created_by)}
+                noOfSessions={sessions?.length}
               ></SingleEvent>
             </Grid>
           )
@@ -442,22 +492,25 @@ export default function EventsPage() {
       </Box>
 
       <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-        {trendingEvents.map(
-          ({ name, img, date, day, time, artist, event_id }) => (
+      {trendingEvents.map(
+          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
             <Grid item xs={6} md={3}>
               <SingleEvent
                 eventID={event_id}
-                eventName={name}
-                eventImg={img}
-                eventDate={date}
-                eventDay={day}
-                eventTime={time}
-                artistName={artist}
+                eventName={event_name}
+                eventImg={event_img}
+                artistName={getArtistName(event_created_by)}
+                noOfSessions={sessions?.length}
               ></SingleEvent>
             </Grid>
           )
         )}
       </Grid>
+        </> 
+        : <></>) 
+    }
+
+      
 
       <Box
         sx={{
@@ -495,19 +548,19 @@ export default function EventsPage() {
       </Box>
 
       <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-        {allEvents.map(({ name, img, date, day, time, artist, event_id }) => (
-          <Grid item xs={6} md={3}>
-            <SingleEvent
-              eventID={event_id}
-              eventName={name}
-              eventImg={img}
-              eventDate={date}
-              eventDay={day}
-              eventTime={time}
-              artistName={artist}
-            ></SingleEvent>
-          </Grid>
-        ))}
+      {allEvents.map(
+          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
+            <Grid item xs={6} md={3}>
+              <SingleEvent
+                eventID={event_id}
+                eventName={event_name}
+                eventImg={event_img}
+                artistName={getArtistName(event_created_by)}
+                noOfSessions={sessions?.length}
+              ></SingleEvent>
+            </Grid>
+          )
+        )}
       </Grid>
     </Maindiv>
   );
