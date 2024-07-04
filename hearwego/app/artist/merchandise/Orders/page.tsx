@@ -1,6 +1,6 @@
 // Required Imports
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -24,6 +24,7 @@ import {
   SearchBar,
 } from "@/app/styles/MerchOrdersArtistStyles";
 import { useRouter } from "next/navigation";
+import { getOrdersForStore } from "@/app/services/StoreServices";
 
 export const orders = [
   {
@@ -99,8 +100,12 @@ export const orders = [
   // Add more orders as needed
 ];
 
+interface Props {
+  store_id: string;
+}
+
 // Main Component
-const Orders: React.FC = () => {
+const Orders = ({ store_id }: Props) => {
   const [orderList, setOrderList] = useState(orders);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -116,6 +121,19 @@ const Orders: React.FC = () => {
       order.product.toLowerCase().includes(searchTerm.toLowerCase());
     return statusMatches && searchMatches;
   });
+
+  const fetchOrders = () => {
+    getOrdersForStore(store_id).then((res) => {
+      setOrderList(res);
+    }
+    ).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

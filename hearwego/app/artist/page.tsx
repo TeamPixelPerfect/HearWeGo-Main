@@ -71,7 +71,9 @@ const HomeSongCard = ({
   songUrl,
   coverArt,
 }: HomeSongCardProps) => {
-  const { playing, toggle } = useAudio({ url: songUrl });
+  const artist = useAppSelector((state) => state.artist.user);
+
+  const { playing, toggle } = useAudio({ url: songUrl, songName, artist: artist?.user?.artistName as string, coverArt});
   const matches = useMediaQuery("(max-width:960px)");
 
   return (
@@ -90,12 +92,14 @@ const HomeSongCard = ({
         <MdAlbum />
         <Typography variant="body1">{albumName}</Typography>
       </SongCardItem>
-      {!matches && <SongCardItem width="10%">
-        <GiSoundWaves />
-        <Typography variant="body2">{duration}</Typography>
-      </SongCardItem>}
+      {!matches && (
+        <SongCardItem width="10%">
+          <GiSoundWaves />
+          <Typography variant="body2">{duration}</Typography>
+        </SongCardItem>
+      )}
 
-      <Box sx={{ width:matches? "10%" :"5%" }}>
+      <Box sx={{ width: matches ? "10%" : "5%" }}>
         <SongCardPlayButton onClick={toggle}>
           {playing ? <IoIosPause /> : <IoIosPlay />}
         </SongCardPlayButton>
@@ -151,12 +155,18 @@ const ADHomePage = () => {
   };
 
   useEffect(() => {
-    getSongsForArtist(artist?.token, artist?.user.artist_id).then((songs) => {
+    getSongsForArtist(
+      artist?.token as string,
+      artist?.user.artist_id as string
+    ).then((songs) => {
       console.log(songs);
       setPopularSongs(songs.data);
     });
 
-    getAlbumForArtists(artist?.token, artist?.user.artist_id).then((albums) => {
+    getAlbumForArtists(
+      artist?.token as string,
+      artist?.user.artist_id as string
+    ).then((albums) => {
       console.log(albums);
       setAlbums(albums.data);
     });
@@ -170,7 +180,7 @@ const ADHomePage = () => {
         md={12}
         sx={{ height: matches ? "600px" : "400px", margin: "0" }}
       >
-        <ADHomeCoverBox imgUrl={artist?.user.artistCovers[0]}>
+        <ADHomeCoverBox imgUrl={artist?.user.artistCovers[0] as string}>
           <ADHomeNameArea>
             <Box
               sx={{
@@ -195,7 +205,11 @@ const ADHomePage = () => {
                 }
               >
                 <ADHomeName>{artist?.user.artistName}</ADHomeName>
-                {artist.user.artistBio && <ADArtistInfo>{artist?.user.artistBio.split(".")[0]}</ADArtistInfo>}
+                {artist?.user.artistBio && (
+                  <ADArtistInfo>
+                    {artist?.user.artistBio.split(".")[0]}
+                  </ADArtistInfo>
+                )}
 
                 <ADArtistPageUrl>
                   <Link href="">http://www.hearwego.com/wq23s</Link>
@@ -257,14 +271,14 @@ const ADHomePage = () => {
             </Tabs>
           </ADHomeTabBox>
           <CustomTabPanel value={tabValue} index={0} fullWidth={false}>
-            {popularSongs?.length > 0 ? (
+            {popularSongs && popularSongs?.length > 0 ? (
               popularSongs.map((song) => (
                 <HomeSongCard
-                  songName={song.song_title}
-                  albumName={song.album_title}
-                  duration={song.song_length}
-                  songUrl={song.song_track}
-                  coverArt={song.song_img}
+                  songName={song.song_title as string}
+                  albumName={song.album_title as string}
+                  duration={song.song_length as number}
+                  songUrl={song.song_track as string}
+                  coverArt={song.song_img as string}
                 />
               ))
             ) : (
@@ -274,14 +288,14 @@ const ADHomePage = () => {
             )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1} fullWidth={false}>
-            {recentSongs?.length > 0 ? (
+            {recentSongs && recentSongs?.length > 0 ? (
               recentSongs.map((song) => (
                 <HomeSongCard
-                  songName={song.song_title}
-                  albumName={song.album_title}
-                  duration={song.song_length}
-                  songUrl={song.song_track}
-                  coverArt={song.song_img}
+                  songName={song.song_title as string}
+                  albumName={song.album_title as string}
+                  duration={song.song_length as number}
+                  songUrl={song.song_track as string}
+                  coverArt={song.song_img as string}
                 />
               ))
             ) : (
@@ -291,14 +305,14 @@ const ADHomePage = () => {
             )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2} fullWidth={false}>
-            {upcomingSongs?.length > 0 ? (
+            {upcomingSongs && upcomingSongs?.length > 0 ? (
               upcomingSongs.map((song) => (
                 <HomeSongCard
-                  songName={song.song_title}
-                  albumName={song.album_title}
-                  duration={song.song_length}
-                  songUrl={song.song_track}
-                  coverArt={song.song_img}
+                  songName={song.song_title as string}
+                  albumName={song.album_title as string}
+                  duration={song.song_length as number}
+                  songUrl={song.song_track as string}
+                  coverArt={song.song_img as string}
                 />
               ))
             ) : (
@@ -316,13 +330,13 @@ const ADHomePage = () => {
           </Typography>
 
           <Box sx={{ m: 3 }}>
-            {albums?.length > 0 ? (
+            {albums && albums?.length > 0 ? (
               albums.map((album) => (
                 <HomeAlbumCard
-                  albumCoverArt={album.album_img}
-                  albumName={album.album_title}
-                  albumTracks={album.album_tracks}
-                  albumLength={album.album_length}
+                  albumCoverArt={album.album_img as string}
+                  albumName={album.album_title as string}
+                  albumTracks={album.no_of_tracks as number}
+                  albumLength={album.album_length as number}
                 />
               ))
             ) : (

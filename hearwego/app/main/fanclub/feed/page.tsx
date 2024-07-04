@@ -122,7 +122,7 @@ const ArtistPage: React.FC = () => {
     <Container maxWidth="lg">
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h4" component="h1" sx={{fontWeight:"bold"}}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold"}}>
             Feed
           </Typography>
           {/* <Paper sx={{ p: 2 }}>
