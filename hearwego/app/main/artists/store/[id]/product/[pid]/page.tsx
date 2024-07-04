@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -12,12 +12,28 @@ import {
   CardContent,
   LinearProgress,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { Add, Remove, ShoppingCart, ArrowBackIos } from "@mui/icons-material";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import Link from "next/link";
 import ArrowForwardIos from "@mui/icons-material/ArrowForwardIos";
+import { MerchProduct, ProductVariant } from "@/app/constants/models";
+import {
+  addItemToCart,
+  getCartByUser,
+  getProduct,
+} from "@/app/services/StoreServices";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CloseIcon from "@mui/icons-material/Close";
+import InfoIcon from "@mui/icons-material/Info";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/hooks";
 
 interface Comment {
   id: number;
@@ -80,7 +96,15 @@ export const products: Product[] = [
   },
 ];
 
-const ProductDetail: React.FC = () => {
+interface Props {
+  params: { pid: string; id: string };
+}
+
+const ProductDetail = ({ params: { id, pid } }: Props) => {
+  const router = useRouter();
+
+  const user = useAppSelector((state) => state.user.user);
+
   const [quantity, setQuantity] = useState(1);
   const [commentInput, setCommentInput] = useState("");
   const [previousComments, setPreviousComments] = useState<Comment[]>(
@@ -90,15 +114,40 @@ const ProductDetail: React.FC = () => {
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [selectedSize, setSelectedSize] = useState(products[0].sizes[0]);
   const [selectedColor, setSelectedColor] = useState(products[0].colors[0]);
+  const [selectedVariation, setSelectedVariation] = useState<string>();
 
-  const product = products[0];
+  const [product, setProduct] = useState<MerchProduct>();
   const productImages = [
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6gzjk8O3ZsaAAZMgIzZpZ8XTm_Az-JPOCIA&s",
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxVUpd37ROVc_7LEW291Ql0HkBUUNUjEqjaA&s",
   ];
 
   const handleAddToCart = () => {
-    alert("Added to cart!");
+    if (user?.user_id) {
+      getCartByUser(user?.user_id).then((res) => {
+        const cart_id = res?.cart_id;
+
+        const data = {
+          product_id: product?.product_id,
+          product_variation: selectedVariation,
+          product_quantity: quantity,
+          product_price: product?.product_price,
+          cart_id: cart_id,
+          cart_item_image: product?.product_Main_image,
+          cart_Item_name: product?.product_name,
+        };
+
+        addItemToCart(user?.token as string, data).then((res) => {
+          console.log("Item added to cart: ", res);
+
+          handleClickOpen();
+        });
+      });
+
+      handleClickOpen();
+    } else {
+      handleClickOpenLogIn();
+    }
   };
 
   const handleQuantityChange = (type: string) => {
@@ -147,8 +196,149 @@ const ProductDetail: React.FC = () => {
     setSelectedColor(color);
   };
 
+  const handleSelectVariation = (variation: ProductVariant) => {
+    setSelectedVariation(variation?.variation_name);
+  };
+
+  const fetchProduct = async () => {
+    getProduct(pid).then((res) => {
+      console.log("Product fetched: ", res);
+      setProduct(res);
+    });
+  };
+
+  const [open, setOpen] = useState(false);
+  const [openLogIn, setOpenLogIn] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleClickOpenLogIn = () => {
+    setOpenLogIn(true);
+  };
+
+  const handleCloseLogIn = () => {
+    setOpenLogIn(false);
+  };
+
+  useEffect(() => {
+    fetchProduct();
+  }, [pid]);
+
   return (
     <>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          sx: {
+            padding: 2,
+            borderRadius: 2,
+            boxShadow: 3,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box display="flex" alignItems="center">
+            <CheckCircleIcon sx={{ color: "green", mr: 1 }} />
+            <Typography variant="h6">Add to Cart Success</Typography>
+          </Box>
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            The item has been added to your cart successfully.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary" variant="text">
+            OK
+          </Button>
+          <Button
+            onClick={() => {
+              router.push("/main/user/cart");
+            }}
+            color="primary"
+            variant="text"
+          >
+            Go To Cart
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openLogIn}
+        onClose={handleClickOpenLogIn}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          sx: {
+            padding: 2,
+            borderRadius: 2,
+            boxShadow: 3,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box display="flex" alignItems="center">
+            <InfoIcon sx={{ color: "blue", mr: 1 }} />
+            <Typography variant="h6">Login Required</Typography>
+          </Box>
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleCloseLogIn}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            You need to be logged in to add items to the cart. Please log in to
+            continue.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseLogIn} color="primary" variant="text">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              router.push("/auth/signIn");
+            }}
+            color="secondary"
+            variant="text"
+          >
+            Log In
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box
         sx={{
           display: "flex",
@@ -181,38 +371,43 @@ const ProductDetail: React.FC = () => {
                 Product Details
               </Typography>
             </div>
-            <Box sx={{marginTop:"30px"}}>
-            <ImageGallery
-              items={productImages.map((image) => ({
-                original: image,
-                thumbnail: image,
-              }))}
-              showNav={false}
-              showBullets={true}
-              showThumbnails={true}
-              showFullscreenButton={true}
-              showPlayButton={true}
+            <Box sx={{ marginTop: "30px" }}>
+              <ImageGallery
+                items={[
+                  product?.product_Main_image,
+                  product?.product_Additional_image,
+                ].map((image) => ({
+                  original: image,
+                  thumbnail: image,
+                  originalWidth: "480px",
+                  originalHeight: "320px",
+                }))}
+                showNav={false}
+                showBullets={true}
+                showThumbnails={true}
+                showFullscreenButton={true}
+                showPlayButton={true}
 
-              // showIndex={false}
-              // renderLeftNav={(onClick, disabled) => (
-              //   <IconButton
-              //     onClick={onClick}
-              //     disabled={disabled}
-              //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
-              //   >
-              //     <ArrowBackIos />
-              //   </IconButton>
-              // )}
-              // renderRightNav={(onClick, disabled) => (
-              //   <IconButton
-              //     onClick={onClick}
-              //     disabled={disabled}
-              //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
-              //   >
-              //     <ArrowForwardIos />
-              //   </IconButton>
-              // )}
-            />
+                // showIndex={false}
+                // renderLeftNav={(onClick, disabled) => (
+                //   <IconButton
+                //     onClick={onClick}
+                //     disabled={disabled}
+                //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
+                //   >
+                //     <ArrowBackIos />
+                //   </IconButton>
+                // )}
+                // renderRightNav={(onClick, disabled) => (
+                //   <IconButton
+                //     onClick={onClick}
+                //     disabled={disabled}
+                //     style={{ width: '24px', height: '24px' }} // Adjust the width and height as needed
+                //   >
+                //     <ArrowForwardIos />
+                //   </IconButton>
+                // )}
+              />
             </Box>
 
             <Typography
@@ -223,7 +418,7 @@ const ProductDetail: React.FC = () => {
                 textAlign: "left",
               }}
             >
-              {product.description}
+              {product?.product_description}
             </Typography>
           </Box>
         </Box>
@@ -251,12 +446,12 @@ const ProductDetail: React.FC = () => {
                 fontSize: { xs: "32px", md: "40px", fontWeight: "bold" },
               }}
             >
-              {product.name}
+              {product?.product_name}
             </Typography>
             <Typography variant="body1" sx={{ marginBottom: "10px" }}>
               <Rating
                 name="read-only-rating"
-                value={product.rating}
+                value={Number(product?.product_rating)}
                 readOnly
                 precision={0.5}
               />
@@ -269,36 +464,20 @@ const ProductDetail: React.FC = () => {
                 color: "red",
               }}
             >
-              Rs.{product.price}
+              Rs.{product?.product_price}
             </Typography>
             <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-              Size
+              Variations
             </Typography>
             <Box sx={{ display: "flex", marginBottom: "20px" }}>
-              {product.sizes.map((size) => (
-                <Button
-                  key={size}
-                  variant={selectedSize === size ? "contained" : "outlined"}
-                  onClick={() => handleSizeChange(size)}
-                  sx={{ margin: "0 5px", textTransform: "none" }}
-                >
-                  {size}
-                </Button>
-              ))}
-            </Box>
-            <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-              Color
-            </Typography>
-            <Box sx={{ display: "flex", marginBottom: "20px" }}>
-              {product.colors.map((color) => (
+              {product?.product_variations?.map((v) => (
                 <Chip
-                  key={color}
-                  label={color}
-                  onClick={() => handleColorChange(color)}
+                  key={v?.variation_name}
+                  label={v?.variation_name}
+                  onClick={() => handleSelectVariation(v)}
                   sx={{
                     margin: "0 5px",
-                    backgroundColor:
-                      selectedColor === color ? color.toLowerCase() : "gray",
+                    backgroundColor: "gray",
                     color: "white",
                   }}
                 />
@@ -333,7 +512,11 @@ const ProductDetail: React.FC = () => {
               <Box sx={{ position: "relative" }}>
                 <LinearProgress
                   variant="determinate"
-                  value={(product.sold / product.productCount) * 100}
+                  value={
+                    (Number(product?.product_sold) /
+                      Number(product?.product_quantity)) *
+                    100
+                  }
                   sx={{ height: "15px", borderRadius: "15px" }}
                 />
                 <Typography
@@ -342,12 +525,16 @@ const ProductDetail: React.FC = () => {
                     position: "relative",
                     top: "50%",
                     fontSize: "12px",
-                    left: `${(product.sold / product.productCount) * 100}%`,
+                    left: `${
+                      (Number(product?.product_sold) /
+                        Number(product?.product_quantity)) *
+                      100
+                    }%`,
                     transform: "translate(-70%, -90%)",
                     color: "white",
                   }}
                 >
-                  {product.sold} sold
+                  {product?.product_sold} sold
                 </Typography>
               </Box>
             </Box>

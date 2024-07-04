@@ -9,7 +9,7 @@ interface Props {
   //index: number;
   songImg: string;
   songName: string;
-  noOfFollowers: string;
+  noOfFollowers: number;
   song_id: string;
 }
 

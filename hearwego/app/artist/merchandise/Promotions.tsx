@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -19,7 +19,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Tooltip,
+  Snackbar,
+  SnackbarContent,
   IconButton,
   Container,
   Fade,
@@ -31,30 +32,44 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
 import EventIcon from "@mui/icons-material/Event";
+import CloseIcon from "@mui/icons-material/Close";
+import { addMerchPromo, deletePromo, getPromosForStore } from "../../services/StoreServices";
+import { useAppSelector } from "@/lib/hooks";
+import { String } from "aws-sdk/clients/apigateway";
+import { ar } from "date-fns/locale";
 
 interface Promotion {
-  id: number;
-  code: string;
-  description: string;
-  startDate: string;
-  endDate: string;
+  promo_id: number;
+  promo_code: string;
+  promo_description: string;
+  promo_start: string;
+  promo_end: string;
 }
 
-const Promotions = () => {
+interface Props {
+  store_id: String
+}
+
+const Promotions = ({ store_id }: Props) => {
+  const artist = useAppSelector((state) => state.artist.user);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(
     null
   );
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+
+  const initialValues = {
+    code: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+  };
 
   const formik = useFormik({
-    initialValues: {
-      code: "",
-      description: "",
-      startDate: "",
-      endDate: "",
-    },
+    initialValues,
     validationSchema: Yup.object({
       code: Yup.string().required("Promo Code is required"),
       description: Yup.string().required("Description is required"),
@@ -66,13 +81,25 @@ const Promotions = () => {
         .typeError("Invalid date")
         .min(Yup.ref("startDate"), "End Date cannot be before Start Date"),
     }),
-    onSubmit: (values, { resetForm, setSubmitting }) => {
-      setPromotions([
-        ...promotions,
-        { ...values, id: Date.now() } as Promotion,
-      ]);
-      resetForm();
-      setSubmitting(false);
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      try {
+        const promoData = {
+          promo_code: values.code,
+          promo_description: values.description,
+          promo_start: values.startDate,
+          promo_end: values.endDate,
+          promo_status: "active", // Example status, adjust as necessary
+          store_id: store_id // Example store ID, adjust as necessary
+        };
+        const newPromo = await addMerchPromo(artist?.token? artist.token : "", promoData);
+        setPromotions([...promotions, { ...newPromo, id: Date.now() }]);
+        resetForm();
+        handleSnackbarOpen("Promotion created successfully!");
+      } catch (error) {
+        console.error("Error submitting promotion:", error);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -85,7 +112,7 @@ const Promotions = () => {
     if (editingPromotion) {
       setPromotions(
         promotions.map((p) =>
-          p.id === editingPromotion.id ? editingPromotion : p
+          p.promo_id === editingPromotion.promo_id ? editingPromotion : p
         )
       );
       setEditingPromotion(null);
@@ -93,29 +120,49 @@ const Promotions = () => {
     setOpenEditDialog(false);
   };
 
-  const handleDeletePromotion = (id: number) => {
-    setPromotions(promotions.filter((promotion) => promotion.id !== id));
-  };
-
-  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditingPromotion((prev) => (prev ? { ...prev, [name]: value } : null));
+  const handleDeletePromotion = (id: string) => {
+    deletePromo(artist?.token? artist.token : "", id).then(() => {
+      handleSnackbarOpen("Promotion deleted successfully!");
+      fetchPromos();
+    });
+    
+    setOpenEditDialog(false);
   };
 
   const generateQRCodeValue = (promotion: Promotion) => {
-    return `Promo Code: ${promotion.code}\nDescription: ${promotion.description}\nStart Date: ${promotion.startDate}\nEnd Date: ${promotion.endDate}`;
+    return `Promo Code: ${promotion.promo_code}\nDescription: ${promotion.promo_description}\nStart Date: ${promotion.promo_start?.split("T")[0]}\nEnd Date: ${promotion.promo_end?.split("T")[0]}`;
   };
+
+  const fetchPromos = () => {
+    getPromosForStore(store_id).then((res) => {
+      console.log(res)
+      setPromotions(res);
+    })
+  }
+
+  useEffect(() => {
+    fetchPromos();
+  }, [])
 
   const filteredPromotions = promotions.filter((promotion) => {
     const now = new Date();
-    const startDate = new Date(promotion.startDate);
-    const endDate = new Date(promotion.endDate);
+    const startDate = new Date(promotion.promo_start);
+    const endDate = new Date(promotion.promo_end);
 
     if (filter === "ongoing") return now >= startDate && now <= endDate;
     if (filter === "upcoming") return now < startDate;
     if (filter === "completed") return now > endDate;
     return true;
   });
+
+  const handleSnackbarOpen = (message: string) => {
+    setSnackbarMessage(message);
+    setOpenSnackbar(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -198,7 +245,6 @@ const Promotions = () => {
                   variant="contained"
                   color="primary"
                   type="submit"
-                  disabled={formik.isSubmitting}
                   fullWidth
                   sx={{ py: 1.5 }}
                 >
@@ -218,7 +264,7 @@ const Promotions = () => {
         <InputLabel>Filter Promotions</InputLabel>
         <Select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => setFilter(e.target.value as string)}
           label="Filter Promotions"
         >
           <MenuItem value="all">All</MenuItem>
@@ -230,7 +276,7 @@ const Promotions = () => {
 
       <Grid container spacing={3}>
         {filteredPromotions.map((promotion) => (
-          <Grid item xs={12} sm={6} md={4} key={promotion.id}>
+          <Grid item xs={12} sm={6} md={4} key={promotion.promo_id}>
             <Fade in>
               <Card
                 sx={{
@@ -248,13 +294,13 @@ const Promotions = () => {
                 >
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h6" component="div" gutterBottom>
-                      {promotion.code}
+                      {promotion.promo_code}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
                       <DescriptionIcon
                         sx={{ verticalAlign: "middle", mr: 1 }}
                       />
-                      {promotion.description}
+                      {promotion.promo_description}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -262,7 +308,7 @@ const Promotions = () => {
                       sx={{ mt: 1 }}
                     >
                       <EventIcon sx={{ verticalAlign: "middle", mr: 1 }} />
-                      {promotion.startDate} - {promotion.endDate}
+                      {promotion.promo_start?.split("T")[0]} - {promotion.promo_end?.split("T")[0]}
                     </Typography>
                   </Box>
                   <Box sx={{ ml: 2 }}>
@@ -270,19 +316,14 @@ const Promotions = () => {
                   </Box>
                 </CardContent>
                 <CardActions>
-                  <Tooltip title="Edit">
-                    <IconButton onClick={() => handleEditPromotion(promotion)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton
-                      onClick={() => handleDeletePromotion(promotion.id)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {/* <IconButton onClick={() => handleEditPromotion(promotion)}>
+                    <EditIcon />
+                  </IconButton> */}
+                  <IconButton
+                    onClick={() => handleDeletePromotion(promotion.promo_id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </CardActions>
               </Card>
             </Fade>
@@ -293,57 +334,38 @@ const Promotions = () => {
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
         <DialogTitle>Edit Promotion</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Edit the details of the promotion.
-          </DialogContentText>
-          {editingPromotion && (
-            <Box sx={{ mt: 2 }}>
-              <TextField
-                label="Promo Code"
-                name="code"
-                fullWidth
-                value={editingPromotion.code}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Description"
-                name="description"
-                fullWidth
-                value={editingPromotion.description}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Start Date"
-                name="startDate"
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={editingPromotion.startDate}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="End Date"
-                name="endDate"
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={editingPromotion.endDate}
-                onChange={handleEditInputChange}
-                sx={{ mb: 2 }}
-              />
-            </Box>
-          )}
+          <DialogContentText>Edit your promotion details here.</DialogContentText>
+          {/* Add form fields for editing promotion */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenEditDialog(false)} color="primary">
+            Cancel
+          </Button>
           <Button onClick={handleSaveEdit} color="primary">
             Save
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <SnackbarContent
+          message={snackbarMessage}
+          action={
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleSnackbarClose}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          }
+        />
+      </Snackbar>
     </Container>
   );
 };

@@ -71,7 +71,7 @@ const ArtistDashboardSideNav = () => {
         <ADNavItemGroupBox>
           <ADNavItemBox sx={{ marginBottom: "2em" }}>
             <Link
-              href="/artist"
+              href="/artist/settings"
               style={{ display: "flex", alignItems: "center" }}
             >
               <SettingsIcon

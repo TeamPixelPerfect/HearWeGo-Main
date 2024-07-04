@@ -31,7 +31,6 @@ import { IoMdMore } from "react-icons/io";
 import { IoAddOutline, IoClose } from "react-icons/io5";
 import { MdAlbum, MdDelete } from "react-icons/md";
 
-
 // Component for displaying an individual album card
 const MainAlbumCard = ({
   albumId,
@@ -44,14 +43,13 @@ const MainAlbumCard = ({
 }: any) => {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
-  
-   // Function to toggle the open state
+
+  // Function to toggle the open state
   const handleOpen = () => {
     setOpen((val) => !val);
   };
 
   return (
-
     // Album card with album details and action buttons
     <AlbumCard
       onClick={() => {
@@ -78,7 +76,7 @@ const MainAlbumCard = ({
         <GiSoundWaves />
         <Typography variant="body2">{albumLength}</Typography>
       </SongCardItem>
-    
+
       <IconButton onClick={handleOpen}>
         {open ? <IoClose /> : <IoMdMore />}
       </IconButton>
@@ -89,10 +87,12 @@ const MainAlbumCard = ({
           style={{ marginRight: "1em" }}
           // orientation="vertical"
         >
-          <Button startIcon={<FaEdit />}>Edit</Button>
-          <Button startIcon={<MdDelete />} color="error">
-            Delete
-          </Button>
+          <IconButton>
+            <FaEdit />
+          </IconButton>
+          <IconButton color="error">
+            <MdDelete />
+          </IconButton>
         </SongCardButtonGroup>
       )}
     </AlbumCard>
@@ -124,7 +124,6 @@ const ArtistAlbums = () => {
     setPage(value);
   };
 
-
   // Effect hook to fetch albums data
   useEffect(() => {
     if (artist?.token && artist?.user?.artist_id) {
@@ -140,7 +139,6 @@ const ArtistAlbums = () => {
   return (
     // Grid container for layout
     <Grid container sx={{ width: "100%", margin: 0 }}>
-
       {/* Card for displaying albums */}
       <Card
         sx={{
@@ -187,7 +185,7 @@ const ArtistAlbums = () => {
             <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-             {/* Display albums or message if no albums available */}
+            {/* Display albums or message if no albums available */}
             {albums.length > 0 ? (
               albums.map((album) => {
                 return (

@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Box,
   Typography,
@@ -13,41 +14,47 @@ import {
   DialogContentText,
   DialogTitle,
   Snackbar,
+  Alert,
 } from "@mui/material";
-import React, { useState } from "react";
-import { Formik, Form, Field } from "formik";
+import React, { useState, useEffect } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DropFile from "../../../components/DropFile";
 import { useRouter } from "next/navigation";
+import { addMerchStore } from "../../../services/StoreServices";
+import { MerchStore } from "../../../constants/models";
+import { useAppSelector } from "@/lib/hooks";
 
 const CreateStoreForm = () => {
-  const validationSchema = Yup.object().shape({
-    storeImages: Yup.array()
-      .of(
-        Yup.string()
-          .required("Store image is required")
-          .url("Invalid image URL")
-      )
-      .min(1, "At least one image is required"),
-    storeDescription: Yup.string().required("Store description is required"),
-    shippingDetails: Yup.object().shape({
-      fees: Yup.string().required("Shipping fees are required"),
-      services: Yup.string().required("Delivery services are required"),
-    }),
-  });
-
-  const handleSubmit = (values: any) => {
-    console.log(values);
-    // You can handle form submission here, e.g., send data to backend
-  };
+  const artist = useAppSelector((state) => state.artist.user);
 
   const router = useRouter();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
+  const [storeData, setStoreData] = useState<MerchStore>({
+    store_banner: "",
+    promo_banner: ["", "", ""],
+    store_description: "",
+    shipping_fees: "",
+    delivery_services: "",
+    artist_id: "ar4",
+  });
+
+  const [storeBanner, setStoreBanner] = useState<File | null>(null);
+  const [promoBanners, setPromoBanners] = useState<(File | null)[]>([null, null, null]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
+
+  const submitData = async (values: MerchStore) => {
+    try {
+      await addMerchStore(artist.token, values);
+      setSnackbarOpen(true); // Show success message
+      setTimeout(() => {
+        router.push("/artist/merchandise");
+      }, 2000); // Navigate after 2 seconds
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleClose = () => {
     setConfirmDialogOpen(true);
@@ -60,6 +67,18 @@ const CreateStoreForm = () => {
   const handleCancel = () => {
     router.push("/artist/merchandise");
   };
+
+  const validationSchema = Yup.object().shape({
+    store_banner: Yup.mixed().required("Store banner is required"),
+    store_description: Yup.string()
+      .required("Store description is required")
+      .min(20, "Store description should be at least 20 characters"),
+    shipping_fees: Yup.string().required("Shipping fees are required"),
+    delivery_services: Yup.string().required("Delivery services are required"),
+    promo_banner: Yup.array().of(
+      Yup.mixed().required("Promo banner is required")
+    ),
+  });
 
   return (
     <Box
@@ -76,18 +95,11 @@ const CreateStoreForm = () => {
       <Container maxWidth="lg">
         <Card sx={{ padding: 3 }}>
           <Formik
-            initialValues={{
-              storeImages: ["", "", ""],
-              storeDescription: "",
-              shippingDetails: {
-                fees: "",
-                services: "",
-              },
-            }}
+            initialValues={storeData}
             validationSchema={validationSchema}
-            onSubmit={handleSubmit}
+            onSubmit={submitData}
           >
-            {({ errors, touched }) => (
+            {({ setFieldValue, handleChange }) => (
               <Form>
                 <Typography
                   variant="h4"
@@ -97,104 +109,112 @@ const CreateStoreForm = () => {
                 >
                   Create Your Store
                 </Typography>
+
+                <Grid item xs={12} sm={4}>
+                  <Field name="store_banner">
+                    {({ field }) => (
+                      <DropFile
+                        fileTypes="image"
+                        fileExtensions="jpg, jpeg, png"
+                        isCircular={false}
+                        width="100%"
+                        height="400px"
+                        file={storeBanner}
+                        setFile={(file) => {
+                          setStoreBanner(file);
+                          setFieldValue("store_banner", file);
+                        }}
+                        aspectX={16}
+                        aspectY={9}
+                        shape="rect"
+                        style={{
+                          borderRadius: 10,
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        }}
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="store_banner" component="div" style={{ color: 'red' }} />
+                </Grid>
                 <Grid container spacing={3}>
-                  {[...Array(3)].map((_, index) => (
-                    <Grid item xs={12} sm={4} key={index}>
-                      <Field name={`storeImages[${index}]`}>
-                        {({ field }) => (
-                          <DropFile
-                            fileTypes="image"
-                            fileExtensions="jpg, jpeg, png"
-                            isCircular={false}
-                            width="100%"
-                            height="200px"
-                            file={field.value}
-                            setFile={(file) => {
-                              field.onChange({
-                                target: { name: field.name, value: file },
-                              });
-                            }}
-                            aspectX={16}
-                            aspectY={9}
-                            shape="rect"
-                            style={{
-                              borderRadius: 10,
-                              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                            }}
-                          />
-                        )}
-                      </Field>
-                      {errors.storeImages &&
-                        errors.storeImages[index] &&
-                        touched.storeImages &&
-                        touched.storeImages[index] && (
-                          <Typography color="error" variant="caption">
-                            {errors.storeImages[index]}
-                          </Typography>
-                        )}
-                    </Grid>
-                  ))}
                   <Grid item xs={12}>
-                    <Field name="storeDescription">
+                    <Field name="store_description">
                       {({ field }) => (
                         <TextField
+                          {...field}
+                          onChange={handleChange}
                           label="Store Description"
                           variant="outlined"
-                          {...field}
                           multiline
                           rows={4}
-                          sx={{ width: "100%" }}
+                          sx={{ width: "100%", marginTop: "30px" }}
                         />
                       )}
                     </Field>
-                    {errors.storeDescription && touched.storeDescription && (
-                      <Typography color="error" variant="caption">
-                        {errors.storeDescription}
-                      </Typography>
-                    )}
+                    <ErrorMessage name="store_description" component="div" style={{ color: 'red' }} />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Field name="shippingDetails.fees">
+                  <Grid item xs={12}>
+                    <Field name="shipping_fees">
                       {({ field }) => (
                         <TextField
+                          {...field}
+                          onChange={handleChange}
                           label="Shipping Fees"
                           variant="outlined"
-                          {...field}
                           multiline
                           sx={{ width: "100%" }}
                         />
                       )}
                     </Field>
-                    {errors.shippingDetails &&
-                      errors.shippingDetails.fees &&
-                      touched.shippingDetails &&
-                      touched.shippingDetails.fees && (
-                        <Typography color="error" variant="caption">
-                          {errors.shippingDetails.fees}
-                        </Typography>
-                      )}
+                    <ErrorMessage name="shipping_fees" component="div" style={{ color: 'red' }} />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Field name="shippingDetails.services">
+                  <Grid item xs={12}>
+                    <Field name="delivery_services">
                       {({ field }) => (
                         <TextField
+                          {...field}
+                          onChange={handleChange}
                           label="Delivery Services"
                           variant="outlined"
-                          {...field}
                           multiline
                           sx={{ width: "100%" }}
                         />
                       )}
                     </Field>
-                    {errors.shippingDetails &&
-                      errors.shippingDetails.services &&
-                      touched.shippingDetails &&
-                      touched.shippingDetails.services && (
-                        <Typography color="error" variant="caption">
-                          {errors.shippingDetails.services}
-                        </Typography>
-                      )}
+                    <ErrorMessage name="delivery_services" component="div" style={{ color: 'red' }} />
                   </Grid>
+
+                  
+                  {promoBanners.map((promoBanner, index) => (
+                  <Grid item xs={4} key={index}>
+                    <Field name={`promo_banner.${index}`}>
+                      {({ field }) => (
+                        <DropFile
+                          fileTypes="image"
+                          fileExtensions="jpg, jpeg, png"
+                          isCircular={false}
+                          width="100%"
+                          height="200px"
+                          file={promoBanner}
+                          setFile={(file) => {
+                            const updatedPromoBanners = [...promoBanners];
+                            updatedPromoBanners[index] = file;
+                            setPromoBanners(updatedPromoBanners);
+                            setFieldValue(`promo_banner.${index}`, file);
+                          }}
+                          aspectX={16}
+                          aspectY={9}
+                          shape="rect"
+                          style={{
+                            borderRadius: 10,
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          }}
+                        />
+                      )}
+                    </Field>
+                    <ErrorMessage name={`promo_banner.${index}`} component="div" style={{ color: 'red' }} />
+                  </Grid>
+                ))}
                   <Grid item xs={12}>
                     <Grid container justifyContent="flex-end">
                       <Button
@@ -242,10 +262,11 @@ const CreateStoreForm = () => {
           open={snackbarOpen}
           autoHideDuration={6000}
           onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          severity={snackbarSeverity}
-        />
+        >
+          <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+            Successfully Created!
+          </Alert>
+        </Snackbar>
       </Container>
     </Box>
   );

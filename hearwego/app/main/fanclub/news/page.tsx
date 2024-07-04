@@ -213,7 +213,7 @@ const NewsPage: React.FC = () => {
 
   return (
     <Container>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold"}}>
         News
       </Typography>
       <Grid container spacing={3}>
@@ -267,7 +267,7 @@ const NewsPage: React.FC = () => {
                   </Typography>
                 </Box>
               </Box>
-              <CardActions>
+              <CardActions sx={{margin:"10px"}}>
                 <Button
                   size="small"
                   startIcon={<FavoriteIcon />}

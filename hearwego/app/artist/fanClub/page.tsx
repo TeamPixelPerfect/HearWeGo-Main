@@ -1,398 +1,680 @@
 "use client";
-import React from "react";
-import { Divider, Stack, useTheme } from "@mui/material";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import SingleFan from "@/app/components/Single Fan";
-import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditNoteIcon from "@mui/icons-material/EditNote";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import SinglePost from "@/app/components/SinglePost";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
-import Avatar from "@mui/material/Avatar";
-import TextField from "@mui/material/TextField";
-import DropFile from "../../components/DropFile";
-import ImageCropper from "@/app/components/ImageCropper";
-
-// Stack from "@mui/material";
-
-// import { BorderBox } from "../../styles/fanclub.styles";
+import React, { useState } from "react";
 import {
-  BorderBox,
-  CoverBackgroundCard,
-  CoverCardMedia,
-  ProfilePicDiv,
-  ProfilePicAvatar,
-  ArtistNameBox,
-  NoOfFollowersBox,
-  ArtistDetailBox,
-  ChatButton,
-  FindMorebutton,
-  CreatePostPopup,
-  CreateContestPopup,
-  ArtistDetail,
-  PostTextField,
-  SubmitButton,
-  CancleButton,
-} from "../../styles/fanclub.styles";
+  Typography,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Container,
+  Paper,
+  Button,
+  Tab,
+  Tabs,
+  Box,
+  Card,
+  CardMedia,
+  CardHeader,
+  Avatar,
+  CardContent,
+  Fab,
+} from "@mui/material";
+import * as Yup from "yup";
+import { Formik, Form, Field } from "formik";
+import { Add as AddIcon } from "@mui/icons-material";
+import FeedTab from "./FeedTab";
+import PhotosTab from "./PhotosTab";
+import VideosTab from "./VideosTab";
+import DropFile from "../../components/DropFile";
+import NewsPage from "./NewsTab";
+import EventsTab from "./EventsTab";
 
-
-
-const userNames = [
+const dummyData: Post[] = [
   {
-    name: "Chandler Bing",
-    img: "https://pyxis.nymag.com/v1/imgs/079/792/3ed0d94be0a9bd3d023f00532889bab152-30-chandler-bing.rsquare.w330.jpg",
+    id: 1,
+    title: "First Post",
+    content: "Content of the first post.",
+    image:
+      "https://res.heraldm.com/content/image/2022/12/01/20221201000743_0.jpg",
+    likes: 10,
+    comments: [
+      {
+        id: 1,
+        user: "User A",
+        content: "First comment",
+        profilePicture: "path/to/user/profile/picture1.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        user: "User B",
+        content: "Second comment",
+        profilePicture: "path/to/user/profile/picture2.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist A",
+    profilePicture: "path/to/artist/profile/picture1.jpg",
+    timestamp: new Date().toISOString(),
   },
   {
-    name: "Ross Geller",
-    img: "https://upload.wikimedia.org/wikipedia/en/6/6f/David_Schwimmer_as_Ross_Geller.jpg",
+    id: 2,
+    title: "Second Post with Image",
+    content: "Content of the second post.",
+    image:
+      "https://www.billboard.com/wp-content/uploads/2021/06/maroon-5-superbowl-2019-billboard-1548-1623086440.jpg",
+    likes: 15,
+    comments: [
+      {
+        id: 3,
+        user: "User C",
+        content: "Third comment",
+        profilePicture: "path/to/user/profile/picture3.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 4,
+        user: "User D",
+        content: "Fourth comment",
+        profilePicture: "path/to/user/profile/picture4.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist B",
+    profilePicture: "path/to/artist/profile/picture2.jpg",
+    timestamp: new Date().toISOString(),
   },
   {
-    name: "Joey Tribbiani",
-    img: "https://upload.wikimedia.org/wikipedia/en/d/da/Matt_LeBlanc_as_Joey_Tribbiani.jpg",
+    id: 3,
+    title: "Third Post with Video",
+    content: "Content of the third post.",
+    video: "https://www.example.com/path/to/video.mp4",
+    likes: 20,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist C",
+    profilePicture: "path/to/artist/profile/picture3.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  // Add 10 more dummy posts here
+  {
+    id: 4,
+    title: "Fourth Post",
+    content: "Content of the fourth post.",
+    image: "https://example.com/image4.jpg",
+    likes: 5,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist D",
+    profilePicture: "path/to/artist/profile/picture4.jpg",
+    timestamp: new Date().toISOString(),
   },
   {
-    name: "Monica Geller",
-    img: "https://home.adelphi.edu/~ni21572/Monica.jpg",
+    id: 5,
+    title: "Fifth Post with Video",
+    content: "Content of the fifth post.",
+    video: "https://example.com/video5.mp4",
+    likes: 8,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist E",
+    profilePicture: "path/to/artist/profile/picture5.jpg",
+    timestamp: new Date().toISOString(),
   },
   {
-    name: "Rachel Green",
-    img: "https://pyxis.nymag.com/v1/imgs/47c/71a/130bf1e557e534b3f2be3351afc2ecf952-17-rachel-green-jewish.rsquare.w400.jpg",
+    id: 6,
+    title: "Sixth Post",
+    content: "Content of the sixth post.",
+    image: "https://example.com/image6.jpg",
+    likes: 12,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist F",
+    profilePicture: "path/to/artist/profile/picture6.jpg",
+    timestamp: new Date().toISOString(),
   },
   {
-    name: "Phoebe Buffay",
-    img: "https://upload.wikimedia.org/wikipedia/en/f/f6/Friendsphoebe.jpg",
+    id: 7,
+    title: "Seventh Post with Video",
+    content: "Content of the seventh post.",
+    video: "https://example.com/video7.mp4",
+    likes: 3,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist G",
+    profilePicture: "path/to/artist/profile/picture7.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: 8,
+    title: "Eighth Post",
+    content: "Content of the eighth post.",
+    image: "https://example.com/image8.jpg",
+    likes: 9,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist H",
+    profilePicture: "path/to/artist/profile/picture8.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: 9,
+    title: "Ninth Post",
+    content: "Content of the ninth post.",
+    image: "https://example.com/image9.jpg",
+    likes: 7,
+    comments: [
+      {
+        id: 5,
+        user: "User E",
+        content: "Fifth comment",
+        profilePicture: "path/to/user/profile/picture5.jpg",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        user: "User F",
+        content: "Sixth comment",
+        profilePicture: "path/to/user/profile/picture6.jpg",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+    user: "Artist I",
+    profilePicture: "path/to/artist/profile/picture9.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: 10,
+    title: "Tenth Post with Video",
+    content: "Content of the tenth post.",
+    video: "https://example.com/video10.mp4",
+    likes: 6,
+    comments: [],
+    user: "Artist J",
+    profilePicture: "path/to/artist/profile/picture10.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: 11,
+    title: "Eleventh Post",
+    content: "Content of the eleventh post.",
+    image: "https://example.com/image11.jpg",
+    likes: 13,
+    comments: [],
+    user: "Artist K",
+    profilePicture: "path/to/artist/profile/picture11.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: 12,
+    title: "Twelfth Post with Video",
+    content: "Content of the twelfth post.",
+    video: "https://example.com/video12.mp4",
+    likes: 4,
+    comments: [],
+    user: "Artist L",
+    profilePicture: "path/to/artist/profile/picture12.jpg",
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: 13,
+    title: "Thirteenth Post",
+    content: "Content of the thirteenth post.",
+    image: "https://example.com/image13.jpg",
+    likes: 11,
+    comments: [],
+    user: "Artist M",
+    profilePicture: "path/to/artist/profile/picture13.jpg",
+    timestamp: new Date().toISOString(),
   },
 ];
 
-const options = ["Edit Profile", "Manage Posts"];
-const ITEM_HEIGHT = 24;
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
+export type Comment = {
+  id: number;
+  user: string;
+  content: string;
+  profilePicture: string;
+  timestamp: string;
 };
 
-export default function ArtistFanClub() {
-  const theme = useTheme();
+export type Post = {
+  id: number;
+  title: string;
+  content: string;
+  image?: string;
+  video?: string;
+  likes: number;
+  comments: Comment[];
+  user: string;
+  profilePicture: string;
+  timestamp: string;
+};
 
-  const [openCreatePost, setOpenCreatePost] = React.useState(false);
-  const handleCreatePostOpen = () => setOpenCreatePost(true);
-  const handleCreatePostClose = () => setOpenCreatePost(false);
+const validationSchema = Yup.object().shape({
+  title: Yup.string().required("Title is required"),
+  content: Yup.string().required("Content is required"),
+  image: Yup.mixed().nullable().required("Image is required"),
+  video: Yup.mixed().nullable().required("Video is required"),
+});
 
-  const [openCreateContest, setOpenCreateContest] = React.useState(false);
-  const handleCreateContestOpen = () => setOpenCreateContest(true);
-  const handleCreateContestClose = () => setOpenCreateContest(false);
+const ArtistPage: React.FC = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<"post" | "news" | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [posts, setPosts] = useState<Post[]>(dummyData);
+  const [tabValue, setTabValue] = useState(0);
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
+
+  const handleDialogOpen = (type: "post" | "news") => {
+    setDialogType(type);
+    setDialogOpen(true);
   };
 
-  const [songFile, setSongFile] = React.useState("");
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDeletePost = (postId: number) => {
+    const updatedPosts = posts.filter((post) => post.id !== postId);
+    setPosts(updatedPosts);
+  };
+
+  const handleEditPost = (postId: number, updatedPost: Post) => {
+    const updatedPosts = posts.map((post) =>
+      post.id === postId ? updatedPost : post
+    );
+    setPosts(updatedPosts);
+  };
+
+  const handleAddComment = (postId: number, comment: Comment) => {
+    const updatedPosts = posts.map((post) => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          comments: [...post.comments, comment],
+        };
+      }
+      return post;
+    });
+    setPosts(updatedPosts);
+  };
+
+  const handleCreatePost = async (values: {
+    title: string;
+    content: string;
+    image: File | null;
+    video: File | null;
+  }) => {
+    try {
+      // Validate form values against the schema
+      await validationSchema.validate(values, { abortEarly: false });
+
+      // If validation succeeds, create a new post
+      const newPost: Post = {
+        id: posts.length + 1,
+        title: values.title,
+        content: values.content,
+        image: values.image ? URL.createObjectURL(values.image) : undefined,
+        video: values.video ? URL.createObjectURL(values.video) : undefined,
+        likes: 0,
+        comments: [],
+        user: "New Artist", // Dummy user
+        profilePicture: "path/to/artist/profile/picture.jpg", // Dummy path
+        timestamp: new Date().toISOString(),
+      };
+      setPosts([...posts, newPost]);
+      handleDialogClose();
+    } catch (error) {
+      // Handle validation errors
+      if (error instanceof Yup.ValidationError) {
+        const errorMessages = {};
+        error.inner.forEach((err) => {
+          errorMessages[err.path] = err.message;
+        });
+        console.log("Validation errors:", errorMessages);
+        // Optionally, you can set state to display error messages
+        // This could be done with a state variable like errorMessage
+        // errorMessage could then be displayed in the form
+      }
+    }
+  };
+
+  const handleCardClick = (post: Post) => {
+    setSelectedPost(post);
+  };
+
+  const handleClosePostDialog = () => {
+    setSelectedPost(null);
+  };
 
   return (
-    <>
-      <CoverBackgroundCard>
-        <CoverCardMedia
-          image={
-            "https://londonmumsmagazine.com/wp-content/uploads/2019/07/The-Rembrandts-Via-Satellite-2.jpg"
-          }
-        ></CoverCardMedia>
+    <Container maxWidth="lg">
+      <Paper sx={{ p: 2, marginBottom: 2 }}>
+        <Typography variant="h5" component="div">
+          Artist Page
+        </Typography>
+        <Typography variant="body1" component="p" sx={{ mb: 2 }}>
+          This is a place where you can share your latest posts, updates, and
+          news with your audience.
+        </Typography>
+        <Tabs value={tabValue} onChange={handleTabChange} centered>
+          <Tab label="Feed" />
+          <Tab label="Photos" />
+          <Tab label="Videos" />
+          <Tab label="News" />
+          <Tab label="Events" />
+        </Tabs>
+      </Paper>
 
-        <ProfilePicDiv>
-          <ProfilePicAvatar
-            src={
-              "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-            }
-          ></ProfilePicAvatar>
-        </ProfilePicDiv>
-
-        <ArtistDetailBox>
-          <Stack width="60%">
-            <ArtistNameBox>The Rembrandts</ArtistNameBox>
-            <NoOfFollowersBox>
-              <i>2.5K Followers</i>
-            </NoOfFollowersBox>
-          </Stack>
-
-          <Stack direction="row" spacing={1}>
-            <ChatButton variant="contained" disableElevation>
-              Chat
-            </ChatButton>
-          </Stack>
-        </ArtistDetailBox>
-      </CoverBackgroundCard>
-
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "100%",
-          margin: "15px 0",
-        }}
-      />
-
-      <Box
-        sx={{
-          fontSize: 16,
-          fontWeight: "bold",
-          marginLeft: 3,
-          color: "#464141",
-        }}
-      >
-        Fans<br></br>
-        1,900 Fans
+      <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
+        <FeedTab
+          posts={posts}
+          onDeletePost={handleDeletePost}
+          onEditPost={handleEditPost}
+          onAddComment={handleAddComment}
+          onEditComment={function (
+            postId: number,
+            commentId: number,
+            updatedContent: string
+          ): void {
+            throw new Error("Function not implemented.");
+          }}
+          onDeleteComment={function (postId: number, commentId: number): void {
+            throw new Error("Function not implemented.");
+          }}
+        />
       </Box>
 
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {userNames.map(({ name, img }) => (
-          <Grid item xs={4} md={3} style={{ paddingLeft: 0 }}>
-            <SingleFan userName={name} userImg={img}></SingleFan>
-          </Grid>
-        ))}
-      </Grid>
+      <Box sx={{ display: tabValue === 1 ? "block" : "none" }}>
+        <PhotosTab posts={posts} handleCardClick={handleCardClick} />
+      </Box>
 
-      <FindMorebutton color={"secondary"} fullWidth>
-        See all Fans <ChevronRightRounded />
-      </FindMorebutton>
+      <Box sx={{ display: tabValue === 2 ? "block" : "none" }}>
+        <VideosTab posts={posts} handleCardClick={handleCardClick} />
+      </Box>
 
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "100%",
-          margin: "15px 0",
-        }}
-      />
+      <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
+        <NewsPage />
+      </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "right",
-          width: "100%",
-       
-        }}
-      >
-        <Stack direction="row" spacing={1}>
-          <Button
-            onClick={handleCreatePostOpen}
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{
-              fontSize: 14,
-              textTransform: "capitalize",
+      <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
+        <EventsTab />
+      </Box>
+
+      {tabValue === 0 || tabValue === 3 ? (
+        <Fab
+          color="primary"
+          onClick={() => handleDialogOpen(tabValue === 0 ? "post" : "news")}
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            width: 80,
+            height: 80,
+            bgcolor: "primary.main",
+            color: "white",
+            "&:hover": {
+              bgcolor: "primary.dark",
+            },
+          }}
+        >
+          <AddIcon sx={{ fontSize: 40 }} />
+        </Fab>
+      ) : null}
+
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>
+          Create New {dialogType === "post" ? "Post" : "News"}
+        </DialogTitle>
+        <DialogContent>
+          <Formik
+            initialValues={{ title: "", content: "", image: null, video: null }}
+            validationSchema={validationSchema}
+            onSubmit={(values, { setSubmitting }) => {
+              handleCreatePost(values);
+              setSubmitting(false);
             }}
           >
-            Add Post
-          </Button>
-
-          <Modal open={openCreatePost} onClose={handleCreatePostClose}>
-            <CreatePostPopup style={{width:"40%"}}>
-              <Typography
-                variant="h5"
-                component="h5"
-                sx={{
-                  textAlign: "center",
-                  padding: "8px",
-                  borderColor: "divider",
-                  borderBottom: "1px solid",
-                  color: theme.palette.text.primary,
-                  fontWeight: 600,
-                  textTransform: "uppercase"
-                }}
-              >
-                Create Post
-              </Typography>
-              <ArtistDetail sx={{  marginLeft: "30px" }}>
-                <Avatar
-                  sx={{
-                    width: "60px",
-                    height: "60px",
-                    position: "relative",
-                    margin: "10px",
-                    //marginTop: "10px",
-                  }}
-                  alt="Remy Sharp"
-                  src="https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
+            {({
+              values,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+              errors,
+              touched,
+            }) => (
+              <Form onSubmit={handleSubmit}>
+                <Field
+                  as={TextField}
+                  autoFocus
+                  margin="dense"
+                  name="title"
+                  label="Title"
+                  fullWidth
+                  variant="standard"
+                  error={touched.title && Boolean(errors.title)}
+                  helperText={touched.title && errors.title}
                 />
-                <Typography
-                  sx={{
-                    //paddingLeft: "5px",
-                    color: theme.palette.text.primary,
-                    fontSize: "20px",
-                    fontWeight: "600",
-                  }}
-                >
-                  The Rembrandts<br></br>
-                 <Box sx={{fontSize: "14px", fontWeight: "400"}}>Musician</Box>
-                </Typography>
-              </ArtistDetail>
-
-              <Box
-                component="form"
-                sx={{
-                  "& > :not(style)": { m: 1, width: "5ch" },
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: "10px",
-                 
-                }}
-                noValidate
-                autoComplete="off"
-              >
-                <PostTextField
+                <Field
+                  as={TextField}
+                  margin="dense"
+                  name="content"
+                  label="Content"
+                  fullWidth
+                  variant="standard"
                   multiline
-                  minRows={4}
-                  placeholder="What's On Your Mind?"
-                  variant="filled"
-                  inputProps={{
-                    style: {
-                      color: theme.palette.text.primary,
-                      width: "80%",
-                      height:'50px',
-                      fontSize: "12px",
-                      display: "flex",
-                      justifyContent: "center",
-                    },
-                  }}
+                  rows={4}
+                  error={touched.content && Boolean(errors.content)}
+                  helperText={touched.content && errors.content}
                 />
-              </Box>
-  
-            <Box sx={{padding:'10px', width: "100%", display:"flex", justifyContent:"center"}}>
-              <Box
-                sx={{
-                  width: "300px",
-                  height: "300px",
-                  display: "flex",
-                  justifyContent: "center",
-                 backgroundColor:theme.palette.background.default ,
-                 borderRadius:'10px'
-                 
-                }}
-              >
-                <DropFile
-                  fileTypes="Music Track"
-                  fileExtensions="MP3,AAC,M4A"
-                  isCircular={false}
-                  width="100%"
-                  height="100%"
-                  file={songFile}
-                  setFile={setSongFile}
-                  aspectX={1}
-                  aspectY={1}
-                  shape="rect"
-                />
-              </Box>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "right",
-                  padding: "10px",
-                  marginTop: "25px",
-                }}
-              >
-                <Stack direction="row" spacing={1}>
-                  <CancleButton variant="contained" disableElevation onClick={handleCreatePostClose}>
-                    Cancle
-                  </CancleButton>
-                  <SubmitButton variant="contained" disableElevation>
-                    Post
-                  </SubmitButton>
-                </Stack>
-              </Box>
-            </CreatePostPopup>
-          </Modal>
+                {dialogType === "post" && (
+                  <>
+                    <DropFile
+                      fileTypes="Image"
+                      fileExtensions="JPEG,PNG,WEBP,SVG"
+                      isCircular={false}
+                      width="100%"
+                      height="200px"
+                      file={null}
+                      setFile={(file) => setFieldValue("image", file)}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                      error={touched.image && Boolean(errors.image)}
+                      helperText={touched.image && errors.image}
+                    />
+                    <DropFile
+                      fileTypes="Video"
+                      fileExtensions="MP4,AVI,MOV"
+                      isCircular={false}
+                      width="100%"
+                      height="200px"
+                      file={null}
+                      setFile={(file) => setFieldValue("video", file)}
+                      aspectX={1}
+                      aspectY={1}
+                      shape="rect"
+                      error={touched.video && Boolean(errors.video)}
+                      helperText={touched.video && errors.video}
+                    />
+                  </>
+                )}
+                <DialogActions>
+                  <Button onClick={handleDialogClose} disabled={isSubmitting}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" color="primary" disabled={isSubmitting}>
+                    Create
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
 
-          <Button
-            onClick={handleCreateContestOpen}
-            variant="contained"
-            startIcon={<EditNoteIcon />}
-            sx={{
-              fontSize: 14,
-              textTransform: "capitalize",
-            }}
-          >
-            Create Contest
-          </Button>
-          
-        </Stack>
-
-        <div>
-          <IconButton
-            aria-label="more"
-            id="long-button"
-            aria-controls={open ? "long-menu" : undefined}
-            aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="long-menu"
-            MenuListProps={{
-              "aria-labelledby": "long-button",
-            }}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            PaperProps={{
-              style: {
-                maxHeight: ITEM_HEIGHT * 4.5,
-                width: "20ch",
-                color: "black",
-                backgroundColor: "primary",
-              },
-            }}
-          >
-            {options.map((option) => (
-              <MenuItem
-                key={option}
-                selected={option === "Pyxis"}
-                onClick={handleClose}
-              >
-                {option}
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-      </Box>
-
-      <Box
-        sx={{
-          width: "100%",
-          flexDirection: "column",
-          display: "flex",
-          alignItems: "center",
-          marginTop: "20px",
-        }}
-      >
-        <SinglePost></SinglePost>
-        <SinglePost></SinglePost>
-      </Box>
-
-      <FindMorebutton color={"primary"} fullWidth>
-        Find Out More <ChevronRightRounded />
-      </FindMorebutton>
-    </>
+      <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
+        <DialogTitle>{selectedPost?.title}</DialogTitle>
+        <DialogContent>
+          <Card>
+            <CardHeader
+              avatar={<Avatar src={selectedPost?.profilePicture} />}
+              title={selectedPost?.user}
+              subheader={new Date(
+                selectedPost?.timestamp || ""
+              ).toLocaleString()}
+            />
+            {selectedPost?.image && (
+              <CardMedia
+                component="img"
+                height="500"
+                sx={{ width: "600px" }}
+                image={selectedPost?.image}
+                alt={selectedPost?.title}
+              />
+            )}
+            {selectedPost?.video && (
+              <CardMedia
+                component="video"
+                height="500"
+                sx={{ width: "600px" }}
+                src={selectedPost?.video}
+                controls
+              />
+            )}
+            <CardContent>
+              <Typography variant="body2" color="textSecondary" component="p">
+                {selectedPost?.content}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Likes: {selectedPost?.likes}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Comments:
+              </Typography>
+              {selectedPost?.comments.map((comment) => (
+                <Box key={comment.id} sx={{ display: "flex", mb: 1 }}>
+                  <Avatar src={comment.profilePicture} sx={{ mr: 2 }} />
+                  <Box>
+                    <Typography variant="body2" component="p">
+                      {comment.user}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      {comment.content}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      {new Date(comment.timestamp).toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+            </CardContent>
+          </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePostDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
-}
+};
+
+export default ArtistPage;

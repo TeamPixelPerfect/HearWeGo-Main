@@ -203,11 +203,11 @@ const AlbumDetails = ({ params: { id } }: Props) => {
   useEffect(() => {
     // Fetching album details and songs
     if (id) {
-      getAlbum(artist?.token, id).then((album) => {
+      getAlbum(artist?.token as string, id).then((album) => {
         console.log("Album:::", album[0]);
         setAlbumDetails(album[0]);
-        album[0].song.forEach((song_id) => {
-          getSong(artist?.token, song_id).then((song) => {
+        album[0].song.forEach((song_id: string) => {
+          getSong(artist?.token as string, song_id).then((song) => {
             setAlbumSongs((prev) => [...prev, song]);
           });
         });
@@ -251,7 +251,7 @@ const AlbumDetails = ({ params: { id } }: Props) => {
               }}
             >
               Albums <FaChevronRight style={{ fontSize: "12px" }} />{" "}
-              {albumDetails?.albumName}
+              {albumDetails?.album_title as string}
             </Typography>
           </Box>
           <ButtonGroup variant="outlined">

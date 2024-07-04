@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -16,27 +17,29 @@ import SwipeableStoreImg from "@/app/components/SwipebannermerchARTIST";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { motion } from "framer-motion";
+import { getStoreForArtist } from "@/app/services/StoreServices";
+import { MerchStore } from "@/app/constants/models";
 
-const StoreImgs = [
-  {
-    id: 1,
-    image:
-      "https://blog.clover.com/wp-content/uploads/2022/11/couple-using-phone-while-holiday-shopping.jpg",
-    title: "StoreImg 1",
-  },
-  {
-    id: 2,
-    image:
-      "https://media.istockphoto.com/id/1368994091/photo/couple-shopping-using-phone-application-holding-shopper-bags-in-mall.jpg?s=612x612&w=0&k=20&c=AnmKCImJhAqQzFQXh1xUZ9M0oLGGbrxpbfYmlXoGrYE=",
-    title: "StoreImg 2",
-  },
-  {
-    id: 3,
-    image:
-      "https://www.shutterstock.com/image-photo/midsection-couple-shopping-bags-city-600nw-428604085.jpg",
-    title: "StoreImg 3",
-  },
-];
+// const StoreImgsData = [
+//   {
+//     id: 1,
+//     image:
+//       "https://blog.clover.com/wp-content/uploads/2022/11/couple-using-phone-while-holiday-shopping.jpg",
+//     title: "StoreImg 1",
+//   },
+//   {
+//     id: 2,
+//     image:
+//       "https://media.istockphoto.com/id/1368994091/photo/couple-shopping-using-phone-application-holding-shopper-bags-in-mall.jpg?s=612x612&w=0&k=20&c=AnmKCImJhAqQzFQXh1xUZ9M0oLGGbrxpbfYmlXoGrYE=",
+//     title: "StoreImg 2",
+//   },
+//   {
+//     id: 3,
+//     image:
+//       "https://www.shutterstock.com/image-photo/midsection-couple-shopping-bags-city-600nw-428604085.jpg",
+//     title: "StoreImg 3",
+//   },
+// ];
 
 const shippingInfo = {
   deliveryFees: "$5 for orders under $50, Free for orders over $50",
@@ -76,7 +79,7 @@ const InfoCard = ({
   onSave,
   editedContent,
   setEditedContent,
-}) => (
+}: any) => (
   <Paper
     elevation={3}
     sx={{
@@ -123,7 +126,7 @@ const InfoCard = ({
   </Paper>
 );
 
-const PromotionCard = ({ id, image, title, publishedDate, onDelete }) => (
+const PromotionCard = ({ id, image, title, publishedDate, onDelete }: any) => (
   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} key={id}>
     <Paper
       elevation={3}
@@ -177,7 +180,12 @@ const PromotionCard = ({ id, image, title, publishedDate, onDelete }) => (
   </motion.div>
 );
 
+interface Props {
+  store: MerchStore;
+}
+
 const Store = () => {
+  const [storeImgs, setStoreImgs] = useState<any>([]);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [storeDescription, setStoreDescription] = useState(
     "We offer a wide range of high-quality products to meet your needs. Explore our collections and find the perfect items for you."
@@ -187,6 +195,7 @@ const Store = () => {
   const [isEditingDeliveryFees, setIsEditingDeliveryFees] = useState(false);
   const [deliveryFees, setDeliveryFees] = useState(shippingInfo.deliveryFees);
   const [editedDeliveryFees, setEditedDeliveryFees] = useState(deliveryFees);
+  const [storeData, setStoreData] = useState<MerchStore>();
 
   const [isEditingDeliveryServices, setIsEditingDeliveryServices] =
     useState(false);
@@ -228,9 +237,34 @@ const Store = () => {
     setDeliveryServices(editedDeliveryServices);
   };
 
-  const handleDeleteCampaign = (id) => {
+  const handleDeleteCampaign = (id: any) => {
     setCampaigns(campaigns.filter((campaign) => campaign.id !== id));
   };
+
+  useEffect(() => {
+    getStoreForArtist("ar4").then((data) => {
+      console.log(data);
+      setStoreData(data);
+      let banners = [];
+      banners.push(
+        data?.store_banner && {
+          id: 0,
+          image: data.store_banner,
+          title: "Store Banner",
+        }
+      );
+      const promo_banners = data?.promo_banner?.map(
+        (banner: string, index: number) => ({
+          id: index + 1,
+          image: banner,
+          title: `StoreImg ${index + 1}`,
+        })
+      );
+      banners = [...banners, ...promo_banners];
+
+      setStoreImgs(banners);
+    });
+  }, []);
 
   return (
     <Box
@@ -244,7 +278,8 @@ const Store = () => {
     >
       <Box sx={{ width: "100%" }}>
         <SwipeableStoreImg
-          StoreImgs={StoreImgs}
+          StoreImgs={storeImgs}
+          setStoreImgs={setStoreImgs}
           autoPlay={false}
           indicators={false}
           height="500px"
@@ -288,7 +323,7 @@ const Store = () => {
                   Welcome to Our Store
                 </Typography>
                 <Typography variant="body1" gutterBottom sx={{ color: "grey" }}>
-                  {storeDescription}
+                  {storeData?.store_description}
                 </Typography>
                 <IconButton
                   onClick={handleEditDescription}

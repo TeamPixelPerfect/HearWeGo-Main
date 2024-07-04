@@ -70,7 +70,7 @@ export const Caption03Box = styled(Box)(({ theme }) => ({
 
 export const SearchPaper = styled(Paper)(({ theme }) => ({
   component: "form",
-  p: "2px 4px",
+  p: "4px 8px",
   display: "flex",
   alignItems: "center",
   width: "100%",
@@ -78,6 +78,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   borderRadius: "90px",
   height: "40px",
   position: "relative",
+  minWidth: "300px",
 }));
 
 

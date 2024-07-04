@@ -18,7 +18,7 @@ export const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        logOutUser: (state, action: PayloadAction<User>) => {
+        logOutUser: (state) => {
             return {user:null, loading: true, error: null};
         },
         logInUser: (state, action: PayloadAction<User>) => {

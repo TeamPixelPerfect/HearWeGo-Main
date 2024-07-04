@@ -11,14 +11,15 @@ import Typography from "@mui/material/Typography";
 import Rating from "@mui/material/Rating";
 
 export const Search = styled("div")(({ theme }) => ({
-  p: "20px",
+  // p: "8px 4px",
   display: "flex",
   alignItems: "center",
-  width: "60%",
-  backgroundColor: theme.palette.background.default,
-  borderRadius: "90px",
-  border: "2px solid #E6ECF0",
-  height: "40px",
+  minWidth: "300px",
+  width: "40%",
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: "10px",
+  // border: "2px solid #E6ECF0",
+  // height: "40px",
   position: "relative",
 }));
 
@@ -37,7 +38,6 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const WhiteArea = styled(Stack)(({ theme }) => ({
-  padding: "10px",
-  marginBottom: "1em",
+  
 }));
 

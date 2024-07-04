@@ -28,7 +28,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 }) => {
   return (
     <div>
-      <FormControl sx={{ m: 1 }} size="small">
+      <FormControl sx={{ }} size="small">
         <InputLabel id={labelId}>{label}</InputLabel>
         <Select
           labelId={labelId}

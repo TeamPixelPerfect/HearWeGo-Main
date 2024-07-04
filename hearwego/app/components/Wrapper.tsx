@@ -16,6 +16,8 @@ const Wrapper = ({ app, children }: Props) => {
 
   const user = useAppSelector((state) => state.user?.user);
 
+  console.log(user);
+
   useEffect(() => {
     console.log(app);
     dispatch(setApp(app));

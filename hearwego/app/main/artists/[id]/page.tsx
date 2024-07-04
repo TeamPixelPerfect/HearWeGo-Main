@@ -2,6 +2,7 @@
 
 "use client";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -34,10 +35,12 @@ import {
   SearchPaper,
 } from "../../../styles/SingleArtistPage.styles";
 import { getArtist, getArtistV2 } from "@/app/services/ArtistServices";
-import { Album, Artist, Song } from "@/app/constants/models";
+import { Album, Artist, Song, MerchStore } from "@/app/constants/models";
 import { getAlbumForArtists } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
 import { getSongsForArtist } from "@/app/services/SongServices";
+import { getStoreForArtist } from "@/app/services/StoreServices";
+import { String } from "aws-sdk/clients/batch";
 
 interface Props {
   params: { id: string };
@@ -45,36 +48,37 @@ interface Props {
 
 export default function SingleArtistPage({ params: { id } }: Props) {
   const [artistData, setArtistData] = React.useState<Artist>(); // This is the state for artist data
+  const [artistStoreData, setArtistStoreData] = React.useState<MerchStore>();
   const [albumByArtist, setAlbumByArtist] = React.useState<Album[]>([]); // This is the state for album by artist
   const artist = useAppSelector((state) => state.artist.user);
   const [songByArtist, setSongByArtist] = React.useState<Song[]>([]); // This is the state for song by artist
 
   // This is the useEffect for get artist
   React.useEffect(() => {
-    console.log(id);
     getArtistV2(id).then((res) => {
       console.log("Res:::", res);
       if (res) {
         setArtistData(res);
       }
     });
-  }, []);
 
-  // This is the useEffect for get album by artist
-  React.useEffect(() => {
-    getAlbumForArtists(artist?.token, id).then((res) => {
+    getAlbumForArtists(artist?.token ? artist.token : "", id).then((res) => {
       console.log("Albums:::", res);
       setAlbumByArtist(res.data);
     });
-  }, []);
 
-  // This is the useEffect for get song by artist
-  React.useEffect(() => {
-    getSongsForArtist(artist?.token, id).then((res) => {
+    getSongsForArtist(artist?.token ? artist.token : "", id).then((res) => {
       console.log("Songs:::", res);
       setSongByArtist(res.data);
     });
-  }, []);
+
+    getStoreForArtist(id).then((res) => {
+      console.log("Store:::", res);
+      setArtistStoreData(res);
+    });
+  }, [id]);
+
+  const router = useRouter();
 
   return (
     <Maindiv>
@@ -84,7 +88,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           <CoverCardMedia
             image={
               artistData.user.artistCovers.length > 0
-                ? artistData.user.artistCovers[0]
+                ? (artistData.user.artistCovers[0] as string)
                 : "https://www.cincinnati.com/gcdn/authoring/authoring-images/2023/09/07/PCIN/70789109007-mj-1.jpg?width=660&height=441&fit=crop&format=pjpg&auto=webp"
             }
           >
@@ -102,7 +106,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                 {/* This is the profilepictureavtar for artist profile pic*/}
 
                 <ProfilePicAvatar
-                  src={artistData.user.profilePicture}
+                  src={artistData.user.profilePicture as string}
                 ></ProfilePicAvatar>
 
                 {/* This is the artistdetailbox for artist details*/}
@@ -147,16 +151,28 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                 {/* This is the optionbox for artist options*/}
                 <OptionBox>
                   <Stack direction="row" width="100%" spacing={"1px"}>
-                    <Button>
+                    <Button
+                      onClick={() => {
+                        router.push("/main/fanclub");
+                      }}
+                    >
                       <GroupAddIcon
                         style={{ color: "white", fontSize: "35px" }}
                       />
                     </Button>
-                    <Button>
-                      <StorefrontIcon
-                        style={{ color: "white", fontSize: "35px" }}
-                      />
-                    </Button>
+                    {artistStoreData?.store_id && (
+                      <Button
+                        onClick={() => {
+                          router.push(
+                            "/main/artists/store/" + artistStoreData.store_id
+                          );
+                        }}
+                      >
+                        <StorefrontIcon
+                          style={{ color: "white", fontSize: "35px" }}
+                        />
+                      </Button>
+                    )}
                     <Button>
                       <LocalActivityIcon
                         style={{ color: "white", fontSize: "35px" }}
@@ -206,10 +222,10 @@ export default function SingleArtistPage({ params: { id } }: Props) {
               <Grid item xs={2} md={2} style={{ paddingLeft: 3 }}>
                 {/* This is the singlealbum component for show single album*/}
                 <SingleAlbum
-                  album_id={albums.album_id}
-                  albumName={albums.album_title}
-                  year={albums.release_date?.trimStart().slice(0, 4)}
-                  albumImg={albums.album_img}
+                  album_id={albums.album_id as string}
+                  albumName={albums.album_title as string}
+                  year={albums.release_date?.trimStart().slice(0, 4) as string}
+                  albumImg={albums.album_img as String}
                 ></SingleAlbum>
               </Grid>
             ))}
@@ -241,10 +257,10 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           <Stack>
             {songByArtist.map((songs, index) => (
               <SingleSongRow
-                song_id={songs.song_id}
-                songImg={songs.song_img}
-                songName={songs.song_title}
-                noOfFollowers={songs.no_of_impressions}
+                song_id={songs.song_id as string}
+                songImg={songs.song_img as string}
+                songName={songs.song_title as string}
+                noOfFollowers={songs.no_of_impressions as number}
               ></SingleSongRow>
             ))}
           </Stack>

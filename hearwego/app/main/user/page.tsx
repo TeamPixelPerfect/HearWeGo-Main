@@ -28,6 +28,8 @@ import { BorderColor, Visibility, VisibilityOff } from "@mui/icons-material";
 import { countries } from "country-flag-icons";
 import ReactCountryFlag from "react-country-flag";
 import { AuthTextField } from "@/app/styles/auth.styles";
+import { useAppDispatch } from "@/lib/hooks";
+import { logOutUser } from "@/lib/features/user.slice";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -38,6 +40,8 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 export default function CustomizedDialogs() {
+  const dispatch = useAppDispatch();
+
   const [userDetails, setUserDetails] = React.useState({
     country: "",
     mobileNumber: "",
@@ -84,6 +88,11 @@ export default function CustomizedDialogs() {
     setUserDetails({ ...userDetails, country: event.target.value });
   };
 
+  const handleLogOut = () => {
+    sessionStorage.removeItem("hwg-user");
+    dispatch(logOutUser());
+  };
+
   return (
     <React.Fragment>
       <Button variant="outlined" onClick={handleClickOpen}>
@@ -94,7 +103,7 @@ export default function CustomizedDialogs() {
         aria-labelledby="customized-dialog-title"
         open={open}
       >
-        <Box sx={{ backgroundColor: "#3B1956" , padding: "20px"}}>
+        <Box sx={{ backgroundColor: "#3B1956", padding: "20px" }}>
           <DialogTitle
             sx={{ m: 0, color: "white", p: 2 }}
             id="customized-dialog-title"
@@ -299,7 +308,6 @@ export default function CustomizedDialogs() {
                           label="Old Mobile Number"
                           defaultValue="* ** ** ** 564"
                           variant="filled"
-                          
                         />
                       </div>
                     </Box>
@@ -317,7 +325,7 @@ export default function CustomizedDialogs() {
                           Country
                         </InputLabel>
                         <Select
-                        variant="filled"
+                          variant="filled"
                           labelId="demo-simple-select-autowidth-label"
                           id="country"
                           value={userDetails.country}
@@ -325,8 +333,6 @@ export default function CustomizedDialogs() {
                           // autoWidth
                           label="Country"
                           color={countryError ? "error" : "primary"}
-                         
-                        
                           defaultValue={selectedCountry}
                           inputRef={(input) =>
                             input && countryError && input.focus()
@@ -375,23 +381,27 @@ export default function CustomizedDialogs() {
                       />
                     </Stack>
                     <TextField
-                        id="OTP"
-                        label="OTP Number*"
-                        variant="filled"
-                        type="number"
-                        color={mobileNumberError ? "error" : "primary"}
-                        style={{ boxSizing: "initial", width: "97%",marginLeft:'9px'}}
-                        defaultValue={userDetails.mobileNumber}
-                        onChange={(e) => {
-                          setUserDetails({
-                            ...userDetails,
-                            mobileNumber: e.target.value,
-                          });
-                        }}
-                        inputRef={(input) =>
-                          input && mobileNumberError && input.focus()
-                        }
-                      />
+                      id="OTP"
+                      label="OTP Number*"
+                      variant="filled"
+                      type="number"
+                      color={mobileNumberError ? "error" : "primary"}
+                      style={{
+                        boxSizing: "initial",
+                        width: "97%",
+                        marginLeft: "9px",
+                      }}
+                      defaultValue={userDetails.mobileNumber}
+                      onChange={(e) => {
+                        setUserDetails({
+                          ...userDetails,
+                          mobileNumber: e.target.value,
+                        });
+                      }}
+                      inputRef={(input) =>
+                        input && mobileNumberError && input.focus()
+                      }
+                    />
                     <IconButton
                       aria-label="close"
                       onClick={handleClose2}
@@ -417,7 +427,10 @@ export default function CustomizedDialogs() {
 
           <DialogActions>
             <Button variant="text" autoFocus onClick={handleClose}>
-              <div style={{ color: "white" }}>Save changes</div>
+              Save changes
+            </Button>
+            <Button variant="text" color="error" autoFocus onClick={handleLogOut}>
+              Log Out
             </Button>
           </DialogActions>
         </Box>

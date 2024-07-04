@@ -40,25 +40,16 @@ const VideoPage: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: "bold",marginLeft:"60px" }}>
+
+    
+    <Container>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold"}}>
         Videos
       </Typography>
-    <Container sx={{
-      flexGrow: 1,
-      padding: '20px',
-      textAlign: 'left',
-      // background: '#f9f9f9',
-      borderRadius: '10px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-      // border: '0.5px solid #f0f0f0',
-      color: 'black',
-      marginTop: '20px',
-    }}>
       <Grid container spacing={3}>
         {videos.map(video => (
           <Grid item key={video.id} xs={12} sm={6}>
-            <Card style={{ margin: 'auto', boxShadow: '0 4px 8px rgba(0,0,0,0.1)', transition: '0.3s' }}>
+            <Card style={{boxShadow: '0 4px 8px rgba(0,0,0,0.1)', transition: '0.3s',margin:"10px" }}>
               <CardActionArea onClick={() => openVideoModal(video.src)}>
                 {video.src.includes('youtube') ? (
                   <CardMedia
@@ -125,7 +116,7 @@ const VideoPage: React.FC = () => {
         </DialogContent>
       </Dialog>
     </Container>
-    </Box>
+   
   );
 };
 

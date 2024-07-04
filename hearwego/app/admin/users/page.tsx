@@ -1,7 +1,6 @@
 "use client";
-
-import useAudio from "@/app/Hooks/useAudio";
-import { ADHomeTabBox, ADTabBox } from "@/app/styles/artistDashboard.styles";
+import * as React from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Box,
   Button,
@@ -9,70 +8,166 @@ import {
   Card,
   Grid,
   IconButton,
-  Pagination,
   Stack,
-  Tab,
-  Tabs,
+  TextField,
   Typography,
-  duration,
   useTheme,
+  Autocomplete,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { IoAddOutline, IoClose } from "react-icons/io5";
-import { IoIosPause, IoIosPlay, IoMdMore } from "react-icons/io";
-import { MdAlbum, MdDelete } from "react-icons/md";
-import { GiSoundWaves } from "react-icons/gi";
-import {
-  SongCard,
-  SongCardButtonGroup,
-  SongCardCoverArt,
-  SongCardItem,
-  SongCardPlayButton,
-} from "@/app/styles/songCard.styles";
-import CustomTabPanel from "@/app/components/CustomeTabPanel";
-import { FaEdit, FaEye } from "react-icons/fa";
-import { FaHeadphonesSimple } from "react-icons/fa6";
-import { bool } from "aws-sdk/clients/signer";
-import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
-import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
-import { useAppSelector } from "@/lib/hooks";
+import { FaEdit, FaEye } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { IoAddOutline } from "react-icons/io5";
+import { getAllUsers } from "@/app/services/UserServices";
+import { User } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
 
-const AdminUserPage = () => {
+interface UsersDataGridProps {
+  params: { id: string };
+}
+
+export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
   const theme = useTheme();
   const router = useRouter();
 
-  const artist = useAppSelector((state) => state.artist.user);
-  const [tabValue, setTabValue] = useState(0);
-  const [page, setPage] = useState(0);
+  const [userData, setUserData] = React.useState<User[]>([]);
+  const [rows, setRows] = React.useState<User[]>([]);
 
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number
+  const [category, setCategory] = React.useState<string>("Fans");
+
+  const columns: GridColDef[] = [
+    { field: "user_id", headerName: "User ID", flex: 1 },
+    { field: "email", headerName: "Email", flex: 2 },
+    { field: category === "Fanns" ? "name" : "artistName", headerName: "Name", flex: 2 },
+    { field: "mobileNumber", headerName: "Mobile Number", flex: 2 },
+    { field: "country", headerName: "Country", flex: 1 },
+    { field: "gender", headerName: "Gender", flex: 1 },
+    { field: "birthDate", headerName: "Birth Date", flex: 1 },
+    {
+      field: "profilePicture",
+      headerName: "Profile Picture",
+      flex: 2,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <img
+            src={params.value}
+            alt={`profile-${params.row.user_id}`}
+            style={{ width: 50, height: 50, objectFit: "cover" }}
+          />
+        </Box>
+      ),
+    },
+    {
+      field: "isEmailVerified",
+      headerName: "Email Verified",
+      flex: 1,
+      type: "boolean",
+    },
+    {
+      field: "isMobileVerified",
+      headerName: "Mobile Verified",
+      flex: 1,
+      type: "boolean",
+    },
+    { field: "role", headerName: "Role", flex: 1 },
+    { field: "joinedDate", headerName: "Joined Date", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 150,
+      renderCell: (params) => (
+        <ButtonGroup>
+          <IconButton color="primary" sx={{ fontSize: "16px" }}>
+            <FaEdit />
+          </IconButton>
+          <IconButton
+            color="secondary"
+            sx={{ fontSize: "16px" }}
+            onClick={() => {
+              router.push(`/admin/users/${params.row.user_id}`);
+            }}
+          >
+            <FaEye />
+          </IconButton>
+          <IconButton color="error" sx={{ fontSize: "16px" }}>
+            <MdDelete />
+          </IconButton>
+        </ButtonGroup>
+      ),
+    },
+  ];
+
+  const handleFilterChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    checked: boolean
   ) => {
-    setPage(value);
+    if (checked) {
+      const filteredData = rows.filter((user) => !user.isEmailVerified);
+      setRows(filteredData);
+    } else {
+      setRows(userData);
+    }
   };
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
+  const handleUserSearch = (
+    event: React.SyntheticEvent<Element, Event>,
+    value: string
+  ) => {
+    if (value === "All") return setRows(userData);
+    const filteredUsers = userData.filter((user) =>
+      user.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setRows(filteredUsers);
   };
+
+  const handleCategoryChange = (
+    event: SelectChangeEvent<string>,
+    value: any
+  ) => {
+    setCategory(value);
+    if (value === "Fans") {
+      getUsers();
+    } else {
+      getArtists();
+    }
+  };
+
+  const getUsers = () => {
+    const users = getAllUsers().then((data) => {
+      setUserData(data.data);
+      setRows(data.data);
+    });
+  };
+
+  const getArtists = () => {
+    const artists = getAllArtists().then((data) => {
+      setUserData(data.data);
+      setRows(data.data);
+    });
+  };
+
+  React.useEffect(() => {
+    getUsers();
+  }, []);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card
-        sx={{
-          width: "100%",
-          minHeight: "100vh",
-          // background: theme.palette.background.default,
-        }}
-      >
+      <Card sx={{ width: "100%", minHeight: "100vh" }}>
         <Box
           sx={{
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "2em 2em 0 2em",
+            padding: "2em",
           }}
         >
           <Typography
@@ -85,74 +180,87 @@ const AdminUserPage = () => {
           >
             Users
           </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              startIcon={<IoAddOutline />}
+              sx={{
+                textTransform: "capitalize",
+                background: "#000",
+                color: "#fff",
+              }}
+              onClick={() => {
+                router.push("/admin/users/add");
+              }}
+            >
+              Add New User
+            </Button>
+          </Stack>
         </Box>
-        <ADTabBox>
-          <Tabs value={tabValue} onChange={handleChange}>
-            <Tab label="All" />
-            <Tab label="Artists" />
-            <Tab label="Fans" />
-          </Tabs>
-          <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              <em>Sorry, No songs available yet!</em>
-            </Typography>
-          </CustomTabPanel>
-
-          <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
-            <Button
-              variant="contained"
-              startIcon={<IoAddOutline />}
-              sx={{
-                textTransform: "capitalize",
-                background: "#000",
-                color: "#fff",
-              }}
-              onClick={() => {}}
+        <Box sx={{ padding: "2em" }}>
+          <Grid container>
+            <Grid item xs={4}>
+              <Autocomplete
+                freeSolo
+                id="user-search"
+                disableClearable
+                options={["All", ...userData.map((option) => option.name)]}
+                sx={{ width: 300 }}
+                onChange={handleUserSearch}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search users by name"
+                    InputProps={{
+                      ...params.InputProps,
+                      type: "search",
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl sx={{width: "300px"}}>
+                <Select
+                  value={category}
+                  onChange={handleCategoryChange}
+                >
+                  <MenuItem value="fans" selected>Fans</MenuItem>
+                  <MenuItem value="artists">Artists</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              sx={{ display: "flex", justifyContent: "flex-end", mb: 4 }}
             >
-              Add New Artist
-            </Button>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              <em>Sorry, No songs available yet!</em>
-            </Typography>
-          </CustomTabPanel>
-
-          <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
-            <Button
-              variant="contained"
-              startIcon={<IoAddOutline />}
-              sx={{
-                textTransform: "capitalize",
-                background: "#000",
-                color: "#fff",
-              }}
-              onClick={() => {}}
-            >
-              Add New Fan
-            </Button>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              <em>Sorry, No songs available yet!</em>
-            </Typography>
-          </CustomTabPanel>
-        </ADTabBox>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "2em 0",
-          }}
-        >
-          <Pagination
-            count={10}
-            page={page}
-            onChange={handlePageChange}
-            color="secondary"
-          />
+              <FormGroup row>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  name={"email_not_verified"}
+                  onChange={handleFilterChange}
+                  label="Email Not Verified"
+                />
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12}>
+              <DataGrid
+                rows={rows ? rows : []}
+                columns={columns}
+                getRowId={(row) => row._id}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 25 },
+                  },
+                }}
+                pageSizeOptions={[25, 50]}
+                checkboxSelection
+              />
+            </Grid>
+          </Grid>
         </Box>
       </Card>
     </Grid>
   );
-};
-
-export default AdminUserPage;
+}

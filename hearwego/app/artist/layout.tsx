@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { logInArtist } from "@/lib/features/artist.slice";
 import { getArtist } from "../services/ArtistServices";
+import MusicPlayer from "../components/MusicPlayer";
 
 export default function Layout({
   children,
@@ -61,6 +62,8 @@ export default function Layout({
     }
   }, [artist]);
 
+  const song = useAppSelector((state) => state.song);
+
   if (artist)
     return (
       <ArtistDashboardLayout>
@@ -70,6 +73,7 @@ export default function Layout({
         <div className="ad-right">
           <ArtistDashboardHeader />
           <EventMainBox>{children}</EventMainBox>
+          {song.current_song && <MusicPlayer />}
         </div>
       </ArtistDashboardLayout>
     );
