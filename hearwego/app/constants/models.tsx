@@ -99,11 +99,12 @@ export interface Artist {
 }
 
 export interface Song {
+  _id?: string;
   song_id?: string;
   song_title?: string;
   album_title?: string;
   song_length?: number;
-  song_track: string;
+  song_track?: string;
   song_img?: string;
   no_of_impressions?: number;
   no_of_plays?: number;

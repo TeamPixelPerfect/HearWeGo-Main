@@ -109,7 +109,7 @@ export const updateSong = async (token: string, songId: string, data: any) => {
 };
 
 // delete a song
-export const deletSong = async (token: string, songId: string) => {
+export const deleteSong = async (token: string, songId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs/${songId}`, {
     method: "DELETE",
     headers: {
