@@ -48,6 +48,7 @@ import { useAppSelector } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
 import { Event } from "@/app/constants/models";
 import { deleteEvent } from "@/app/services/EventServices";
+import { getPastEventsForGivenArtist } from "@/app/services/EventServices";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -151,13 +152,13 @@ function EventTabs() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <EventArea />
+        {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         Item Two
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        Item Three
+      {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
         Item Four
@@ -170,7 +171,7 @@ function EventTabs() {
 }
 
 //event details
-function EventArea() {
+function EventArea(tab: number) {
   const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
 
@@ -189,13 +190,24 @@ function EventArea() {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
-      getUpcomingEventsForGivenArtist(page, limit, artist.artist_id).then((events) => {
-        console.log("Events:::", events);
-        setUpcomingEvents(events.data);
-        setPageCount(Math.ceil(events.total / limit));
-      });
+      if (tab === 0) {
+        getUpcomingEventsForGivenArtist(page, limit, artist.artist_id).then(
+          (events) => {
+            setUpcomingEvents(events.data);
+            setPageCount(Math.ceil(events.total / limit));
+          }
+        );
+      } else if (tab === 2) {
+        setLimit(5);
+        getPastEventsForGivenArtist(page, limit, artist.artist_id).then(
+          (events) => {
+            setUpcomingEvents(events.data);
+            setPageCount(Math.ceil(events.total / limit));
+          }
+        );
+      }
     }
-  }, [artist, page, upcomingEvents.length]);
+  }, [artist, page, upcomingEvents.length, tab]);
 
   const handleDeleteEvent = async (event_id: string) => {
     try {
