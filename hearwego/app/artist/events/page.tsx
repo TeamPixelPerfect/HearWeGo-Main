@@ -62,6 +62,7 @@ import {
   EventDetailRow,
 } from "../../styles/artistDashboardEventsPage.styles";
 import { getEvents } from "@/app/services/EventServices";
+import { getUpcomingEventsForGivenArtist } from "@/app/services/EventServices";
 import { RoundaboutLeft } from "@mui/icons-material";
 import { set } from "date-fns";
 
@@ -188,7 +189,7 @@ function EventArea() {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
-      getEvents(page, limit, "event_created_by", artist.artist_id).then((events) => {
+      getUpcomingEventsForGivenArtist(page, limit, artist.artist_id).then((events) => {
         console.log("Events:::", events);
         setUpcomingEvents(events.data);
         setPageCount(Math.ceil(events.total / limit));

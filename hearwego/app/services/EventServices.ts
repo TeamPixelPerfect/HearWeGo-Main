@@ -84,9 +84,30 @@ export const getEvent = async (id: string) => {
     return data;
   } catch (error) {
     console.error("Failed to fetch event:", error);
-    throw error; // Rethrow the error to handle it in the calling function
+    throw error; 
   }
 };
+
+export const getUpcomingEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&limit=${limit}&event_created_by=${artist_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
 
 export const addEvent = async (token: string, data: any) => {
   console.log("Sending event data:", data); 
