@@ -1,7 +1,14 @@
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { Alert, IconButton, Modal, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Divider,
+  IconButton,
+  Modal,
+  Stack,
+  Typography,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import ShareIcon from "@mui/icons-material/Share";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -16,12 +23,14 @@ import Grid from "@mui/material/Grid";
 import { getEvent } from "@/app/services/EventServices";
 import { Artist } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
+import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import { Event } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Snackbar from "@mui/material/Snackbar";
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { getUpcomingEventsForGivenArtistByFan } from "@/app/services/EventServices";
 
 interface Props {
   params: { id: string };
@@ -51,65 +60,10 @@ import {
   RightBox,
 } from "../../../styles/eventsMW.styles";
 
-const recommendEvents = [
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-];
 export default function SingleEvent({ params: { id } }: Props) {
   const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = React.useState<Event | null>(null);
+  const [artistEvents, setArtistEvents] = React.useState<Event[]>([]);
   const [artists, setArtists] = React.useState<Artist[]>([]);
   const [openShareModal, setOpenShareModal] = React.useState(false);
   const [currentUrl, setCurrentUrl] = React.useState("");
@@ -132,6 +86,16 @@ export default function SingleEvent({ params: { id } }: Props) {
       setArtists(artists.data);
     });
   }, []);
+
+  React.useEffect(() => {
+    if (event) {
+      getUpcomingEventsForGivenArtistByFan(1, 4, event.event_created_by).then(
+        (events) => {
+          setArtistEvents(events.data);
+        }
+      );
+    }
+  }, [event]);
 
   const getArtistName = (artistId) => {
     const artist = artists.find((artist) => artist.artist_id === artistId);
@@ -176,6 +140,16 @@ export default function SingleEvent({ params: { id } }: Props) {
       prevIndex < event.sessions.length - 1 ? prevIndex + 1 : 0
     );
   };
+
+  function formatSessionName(session) {
+    const match = session.match(/session(\d+)/i);
+    if (!match) return session;
+
+    let number = parseInt(match[1], 10);
+    let formattedNumber = number < 10 ? `0${number}` : `${number}`;
+
+    return `Session ${formattedNumber}`;
+  }
 
   return (
     <Maindiv>
@@ -226,189 +200,10 @@ export default function SingleEvent({ params: { id } }: Props) {
         </OptionBox>
       </CoverEventCardMedia>
 
-      <Box
-        sx={{
-          width: "100%",
-          height: "400px",
-          display: "flex",
-          position: "relative",
-          flexDirection: "row",
-          //backgroundColor: "yellow",
-          alignItems: "center",
-          padding: "10px",
-          //margin: "10px",
-        }}
-      >
-        <Box
-          sx={{
-            width: "20%",
-            height: "90%",
-            //backgroundColor: "red",
-            padding: "10px",
-            //margin: "10px",
-            display: "flex",
-            position: "relative",
-            left: "40%",
-            borderRadius: "10px",
-            backgroundImage: "url(`{event?.event_img}`)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></Box>
-
-        {/* This is the LeftBox component for event details */}
-        <LeftBox>
-          <Box
-            sx={{
-              width: "100%",
-              height: "95%",
-              //backgroundColor: "yellow",
-              display: "flex",
-              position: "relative",
-              flexDirection: "column",
-              // justifyContent: "space-between",
-              alignItems: "center",
-              padding: "20px 0px 0px 40px",
-            }}
-          >
-            <Box
-              sx={{
-                width: "90%",
-                height: "20%",
-                margin: "0px",
-                display: "flex",
-                position: "relative",
-                justifyContent: "left",
-              }}
-            >
-              <IoLocationSharp style={{ color: "white", fontSize: "35px" }} />
-              <LocationDescriptionBox>XYZ Hall</LocationDescriptionBox>
-            </Box>
-
-            <Box
-              sx={{
-                width: "90%",
-                height: "20%",
-                margin: "0px",
-                display: "flex",
-                position: "relative",
-                justifyContent: "left",
-              }}
-            >
-              <SlCalender style={{ color: "white", fontSize: "35px" }} />
-
-              <DateDescriptionBox>2024-01-19</DateDescriptionBox>
-            </Box>
-            <Box
-              sx={{
-                width: "90%",
-                height: "20%",
-                margin: "0px",
-                display: "flex",
-                position: "relative",
-                justifyContent: "left",
-              }}
-            >
-              <FaClock style={{ color: "white", fontSize: "30px" }} />
-
-              <TimeDescriptionBox>8.00 - 11.00.P.M</TimeDescriptionBox>
-            </Box>
-
-            <Box
-              sx={{
-                width: "90%",
-                height: "20%",
-                margin: "0px",
-                display: "flex",
-                position: "relative",
-                justifyContent: "left",
-              }}
-            >
-              <BsPersonStanding style={{ color: "white", fontSize: "35px" }} />
-
-              <YearDescriptionBox>18 years above</YearDescriptionBox>
-            </Box>
-
-            <Box
-              sx={{
-                width: "90%",
-                height: "20%",
-                margin: "0px",
-                //backgroundColor: "black",
-                //alignItems: "center",
-                display: "flex",
-                position: "relative",
-                justifyContent: "left",
-                //padding: "20px 0px 0px 50px",
-              }}
-            >
-              <SpatialTrackingIcon
-                style={{ color: "white", fontSize: "35px" }}
-              />
-
-              <NoOfArtistDescriptionBox> - </NoOfArtistDescriptionBox>
-            </Box>
-          </Box>
-        </LeftBox>
-
-        <RightBox>
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              //backgroundColor: "white",
-              position: "relative",
-              display: "flex",
-              borderRadius: "14px",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            {/* This is the Box component for event description */}
-            <Box
-              sx={{
-                width: "100%",
-                height: "20%",
-                // backgroundColor:'black',
-                display: "flex",
-                position: "relative",
-                fontSize: "20px",
-                fontWeight: "bold",
-                color: "white",
-                padding: "10px 0px 0px 25px",
-              }}
-            >
-              Description :
-            </Box>
-            <Box
-              sx={{
-                width: "100%",
-                height: "80%",
-                // backgroundColor: "black",
-                display: "flex",
-                position: "relative",
-                fontSize: "12px",
-                padding: "10px 0px 0px 25px",
-                //fontWeight: "bold",
-                //color: "white",
-                //padding: "15px 0px 0px 25px",
-              }}
-            >
-              Lorem ipsum dolor sit amet consectetur. Dui porttitor eu id
-              venenatis blandit lorem egestas. At adipiscing orci pulvinar
-              sodales arcu. Ultricies et enim molestie felis amet facilisi
-              nullam nunc consectetur. Sapien viverra magna a nunc aliquam odio
-              :
-            </Box>
-          </Box>
-        </RightBox>
-      </Box>
-
       <Box sx={{ width: "100%", display: "flex" }}>
         <Box
           sx={{
-            width: "10%",
+            width: "5%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -421,141 +216,209 @@ export default function SingleEvent({ params: { id } }: Props) {
 
         <Box
           sx={{
-            width: "80%",
+            width: "90%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            flexDirection: "column",
           }}
         >
           {event && event.sessions.length > 0 && (
-            <Box
-              sx={{
-                width: "100%",
-                height: "400px",
-                display: "flex",
-                position: "relative",
-                flexDirection: "row",
-                alignItems: "center",
-                padding: "10px",
-              }}
-            >
-              <MiddleEventImageBox></MiddleEventImageBox>
-              <LeftBox>
+            <>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "400px",
+                  display: "flex",
+                  position: "relative",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: "10px",
+                }}
+              >
                 <Box
                   sx={{
-                    width: "100%",
-                    height: "95%",
+                    width: "20%",
+                    height: "90%",
+                    //backgroundColor: "red",
+                    padding: "10px",
+                    //margin: "10px",
                     display: "flex",
                     position: "relative",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "20px 0px 0px 40px",
+                    left: "40%",
+                    borderRadius: "10px",
+                    backgroundImage: `url(${event.event_img})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                   }}
-                >
+                ></Box>
+
+                <LeftBox>
                   <Box
                     sx={{
-                      width: "90%",
-                      height: "20%",
-                      margin: "0px",
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "10px",
                       display: "flex",
                       position: "relative",
-                      justifyContent: "left",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      padding: "20px 0px 0px 40px",
+                      bgcolor: "primary.main",
                     }}
                   >
-                    <IoLocationSharp
-                      style={{ color: "white", fontSize: "35px" }}
-                    />
-                    <LocationDescriptionBox>
-                      {event.sessions[currentSessionIndex].session_venue}
-                    </LocationDescriptionBox>
+                    <Box
+                      sx={{
+                        width: "90%",
+                        height: "20%",
+                        margin: "0px",
+                        display: "flex",
+                        position: "relative",
+                        justifyContent: "left",
+                      }}
+                    >
+                      <IoLocationSharp
+                        style={{ fontSize: "35px" }}
+                      />
+                      <LocationDescriptionBox>
+                        {event.sessions[currentSessionIndex].venue}
+                      </LocationDescriptionBox>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "90%",
+                        height: "20%",
+                        margin: "0px",
+                        display: "flex",
+                        position: "relative",
+                        justifyContent: "left",
+                      }}
+                    >
+                      <SlCalender
+                        style={{ fontSize: "35px" }}
+                      />
+                      <DateDescriptionBox>
+                        {
+                          event.sessions[
+                            currentSessionIndex
+                          ].session_date.split("T")[0]
+                        }
+                      </DateDescriptionBox>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "90%",
+                        height: "20%",
+                        margin: "0px",
+                        display: "flex",
+                        position: "relative",
+                        justifyContent: "left",
+                      }}
+                    >
+                      <FaClock style={{ fontSize: "30px" }} />
+                      <TimeDescriptionBox>
+                        {event.sessions[currentSessionIndex].session_time}
+                      </TimeDescriptionBox>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "90%",
+                        height: "20%",
+                        margin: "0px",
+                        display: "flex",
+                        position: "relative",
+                        justifyContent: "left",
+                      }}
+                    >
+                      <HourglassTopIcon
+                        style={{ fontSize: "35px" }}
+                      />
+                      <YearDescriptionBox>
+                        {event.sessions[currentSessionIndex].duration} Hours
+                      </YearDescriptionBox>
+                    </Box>
                   </Box>
-                  <Box
-                    sx={{
-                      width: "90%",
-                      height: "20%",
-                      margin: "0px",
-                      display: "flex",
-                      position: "relative",
-                      justifyContent: "left",
-                    }}
-                  >
-                    <SlCalender style={{ color: "white", fontSize: "35px" }} />
-                    <DateDescriptionBox>
-                      {event.sessions[currentSessionIndex].session_date}
-                    </DateDescriptionBox>
+                </LeftBox>
+                <RightBox>
+                  <Box sx={{ width: "100%" }}>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        borderRadius: "14px",
+                        padding: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{ marginBottom: 1 }}
+                      >
+                        Artists
+                      </Typography>
+                      <Divider />
+                      <Typography
+                        variant="subtitle1"
+                        component="h2"
+                        sx={{ marginTop: 1 }}
+                      >
+                        {event.sessions[currentSessionIndex].artists
+                          .map((artistName) => artistName)
+                          .join(", ")}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        borderRadius: "14px",
+                        padding: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{ marginBottom: 1 }}
+                      >
+                        Description
+                      </Typography>
+                      <Divider />
+                      <Typography
+                        variant="subtitle1"
+                        component="h2"
+                        sx={{ marginTop: 1 }}
+                      >
+                        {event.sessions[currentSessionIndex]
+                          .session_special_notice == "" ||
+                        event.sessions[currentSessionIndex]
+                          .session_special_notice == "-"
+                          ? "No description available"
+                          : event.sessions[currentSessionIndex]
+                              .session_special_notice}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box
-                    sx={{
-                      width: "90%",
-                      height: "20%",
-                      margin: "0px",
-                      display: "flex",
-                      position: "relative",
-                      justifyContent: "left",
-                    }}
-                  >
-                    <FaClock style={{ color: "white", fontSize: "30px" }} />
-                    <TimeDescriptionBox>
-                      {event.sessions[currentSessionIndex].session_time}
-                    </TimeDescriptionBox>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "90%",
-                      height: "20%",
-                      margin: "0px",
-                      display: "flex",
-                      position: "relative",
-                      justifyContent: "left",
-                    }}
-                  >
-                    <BsPersonStanding
-                      style={{ color: "white", fontSize: "35px" }}
-                    />
-                    <YearDescriptionBox>
-                      {event.sessions[currentSessionIndex].duration}
-                    </YearDescriptionBox>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "90%",
-                      height: "20%",
-                      margin: "0px",
-                      display: "flex",
-                      position: "relative",
-                      justifyContent: "left",
-                    }}
-                  >
-                    <SpatialTrackingIcon
-                      style={{ color: "white", fontSize: "35px" }}
-                    />
-                    <NoOfArtistDescriptionBox> - </NoOfArtistDescriptionBox>
-                  </Box>
-                </Box>
-              </LeftBox>
-              <RightBox>
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    position: "relative",
-                    display: "flex",
-                    borderRadius: "14px",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  Description
-                </Box>
-              </RightBox>
-            </Box>
+                </RightBox>
+              </Box>
+
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="h5" component="h2">
+                  {formatSessionName(
+                    event.sessions[currentSessionIndex].session_name
+                  )}
+                </Typography>
+              </Box>
+            </>
           )}
         </Box>
 
         <Box
           sx={{
-            width: "10%",
+            width: "5%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -603,17 +466,15 @@ export default function SingleEvent({ params: { id } }: Props) {
 
       {/* This is the grid for recommend events */}
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {recommendEvents.map(
-          ({ name, img, date, day, time, artist, event_id }) => (
-            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+        {artistEvents.map(
+          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
+            <Grid item xs={4} md={3} style={{ paddingLeft: 30 }}>
               <SingleEventComponent
                 eventID={event_id}
-                eventName={name}
-                eventImg={img}
-                eventDate={date}
-                eventDay={day}
-                eventTime={time}
-                artistName={artist}
+                eventName={event_name}
+                eventImg={event_img}
+                artistName={getArtistName(event_created_by)}
+                noOfSessions={sessions?.length}
               ></SingleEventComponent>
             </Grid>
           )
