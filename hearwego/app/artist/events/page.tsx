@@ -49,6 +49,7 @@ import { useRouter } from "next/navigation";
 import { Event } from "@/app/constants/models";
 import { deleteEvent } from "@/app/services/EventServices";
 import { getPastEventsForGivenArtist } from "@/app/services/EventServices";
+import VpnLockIcon from '@mui/icons-material/VpnLock';
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -64,6 +65,8 @@ import {
 } from "../../styles/artistDashboardEventsPage.styles";
 import { getEvents } from "@/app/services/EventServices";
 import { getUpcomingEventsForGivenArtist } from "@/app/services/EventServices";
+import { getInterestedEventsForGivenArtist } from "@/app/services/EventServices";
+import { getPrivateEventsForGivenArtist } from "@/app/services/EventServices";
 import { RoundaboutLeft } from "@mui/icons-material";
 import { set } from "date-fns";
 
@@ -147,7 +150,7 @@ function EventTabs() {
           />
           <Tab icon={<TrendingUpIcon />} label="Popular" {...a11yProps(1)} />
           <Tab icon={<CallMissedIcon />} label="Past" {...a11yProps(2)} />
-          <Tab icon={<DraftsIcon />} label="Drafts" {...a11yProps(3)} />
+          <Tab icon={<VpnLockIcon />} label="Private" {...a11yProps(3)} />
           <Tab icon={<PeopleIcon />} label="Other" {...a11yProps(4)} />
         </Tabs>
       </Box>
@@ -155,19 +158,31 @@ function EventTabs() {
         {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+      {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
       {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        Item Four
+      {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={4}>
         Item Five
       </CustomTabPanel>
     </Box>
   );
+}
+
+function HeaderChange(tab: number) {
+  if (tab === 0) {
+    return "My Upcoming Events";
+  } else if (tab === 1) {
+    return "My Popular Events";
+  } else if (tab === 2) {
+    return "My Past Events";
+  } else if (tab === 3) {
+    return "My Private Events";
+  }
 }
 
 //event details
@@ -197,13 +212,28 @@ function EventArea(tab: number) {
             setPageCount(Math.ceil(events.total / limit));
           }
         );
-      } else if (tab === 2) {
-        setLimit(5);
+      }
+      else if (tab === 1) {
+        getInterestedEventsForGivenArtist(page, limit, artist.artist_id).then(
+          (events) => {
+            setUpcomingEvents(events);
+            setPageCount(Math.ceil(events.total / limit));
+          }
+        );
+      }
+      else if (tab === 2) {
         getPastEventsForGivenArtist(page, limit, artist.artist_id).then(
           (events) => {
             setUpcomingEvents(events.data);
             setPageCount(Math.ceil(events.total / limit));
           }
+        );
+      }
+      else if (tab === 3) {
+        getPrivateEventsForGivenArtist(page, limit, artist.artist_id).then((events) => {
+          setUpcomingEvents(events.data);
+          setPageCount(Math.ceil(events.total / limit));
+        }
         );
       }
     }
@@ -259,7 +289,7 @@ function EventArea(tab: number) {
           component="div"
           sx={{ fontWeight: 500 }}
         >
-          My Upcoming Events
+          {HeaderChange(tab)}
         </Typography>
         <Button
           variant="contained"

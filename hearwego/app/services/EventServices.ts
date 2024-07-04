@@ -130,6 +130,48 @@ export const getPastEventsForGivenArtist = async (page?: number, limit?: number,
   }
 }
 
+export const getInterestedEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events-sorted-by-interests?page=${page}&limit=${limit}&event_created_by=${artist_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getPrivateEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events?page=${page}&limit=${limit}&event_created_by=${artist_id}&event_status=private`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
 export const addEvent = async (token: string, data: any) => {
   console.log("Sending event data:", data); 
   const res = await fetch(`${base_url}/EventsManager/events`, {
