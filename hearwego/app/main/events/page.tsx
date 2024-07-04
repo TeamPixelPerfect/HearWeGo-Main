@@ -259,7 +259,7 @@ export default function EventsPage() {
   , []);
 
   React.useEffect(() => {
-    getUpcomingEventsSortByDate(1, 5).then((events) => {
+    getUpcomingEventsSortByDate(1, 8).then((events) => {
       console.log("Events......",events);
       setAllEvents(events.data);
     });

@@ -6,6 +6,9 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleEvent from "@/app/components/SingleEvent";
+import { getUpcomingEventsSortByDate } from "@/app/services/EventServices";
+import { Event } from "@/app/constants/models";
+import { Artist } from "@/app/constants/models";
 
 import { Maindiv, SearchPaper } from "../../../styles/eventsMW.styles";
 
@@ -101,6 +104,24 @@ const allEvents = [
 ];
 
 export default function MoreAlbums() {
+  const [allEvents, setAllEvents] = React.useState<Event[]>([]);
+  const [artists, setArtists] = React.useState<Artist[]>([]);
+
+  React.useEffect(() => {
+    getUpcomingEventsSortByDate(1, 8).then((events) => {
+      console.log("Events......",events);
+      setAllEvents(events.data);
+    });
+  }
+  , []);
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
+
+  
+
   return (
     <Maindiv>
       <Box
