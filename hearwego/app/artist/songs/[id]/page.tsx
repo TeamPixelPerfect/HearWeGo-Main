@@ -53,17 +53,21 @@ interface Props {
 }
 
 interface ClickPlayProps {
-  songUrl: string;
+  songData: Song;
 }
 
 interface SongPreviewProps {
   songData: Song;
 }
 
-
 //function to play the song
-function ClickPlay({ songUrl }: ClickPlayProps) {
-  const { toggle, playing } = useAudio({ url: songUrl });
+function ClickPlay({ songData }: ClickPlayProps) {
+  const { toggle, playing } = useAudio({
+    url: songData.song_track as string,
+    songName: songData.song_title as string,
+    artist: songData?.artist[0]?.artist_name as string,
+    coverArt: songData.song_img as string,
+  });
 
   return (
     <>
@@ -82,7 +86,6 @@ function ClickPlay({ songUrl }: ClickPlayProps) {
             onClick={toggle}
           />
         </IconButton>
-
       )}
     </>
   );
@@ -128,11 +131,10 @@ function SongPreview({ songData }: SongPreviewProps) {
             borderRadius: 1,
           }}
         >
-          <ClickPlay songUrl={songData.song_track} />
+          <ClickPlay songData={songData} />
         </Box>
       </SongPreviewSong>
 
-      
       <SongPreviewDetails>
         <Typography sx={{ fontSize: 12 }} color="text.secondary" gutterBottom>
           ISRC: {songData?.isrc && songData?.isrc}
@@ -144,7 +146,7 @@ function SongPreview({ songData }: SongPreviewProps) {
           {songData?.artist?.map((artist) => artist.artist_name).join(",")} -{" "}
           {songData.album_title ? songData.album_title : "Single"}
         </Typography>
-          
+
         {/* genre display */}
         <Stack
           direction="row"
@@ -179,7 +181,7 @@ function SongPreview({ songData }: SongPreviewProps) {
           })}
         </Stack>
 
-          {/* privacy chip */}
+        {/* privacy chip */}
         <Chip
           icon={
             songData?.privacy_status === "private" ? (
@@ -191,7 +193,6 @@ function SongPreview({ songData }: SongPreviewProps) {
           sx={{ marginBottom: "1em" }}
           label={songData?.privacy_status}
         />
-
 
         <Alert
           variant="filled"
@@ -269,7 +270,7 @@ function SongPreview({ songData }: SongPreviewProps) {
               fontSize: "12px",
               alignItems: "center",
               justifyContent: "center",
-              width: "100%"
+              width: "100%",
             }}
           >
             {/* link copy area */}
@@ -307,7 +308,13 @@ const SongDetails = ({ params: { id } }: Props) => {
   return (
     //song details
     <Grid container sx={{ width: "100%", margin: 0 }}>
-      <Card sx={{ width: "100%", minHeight: "100vh", background: theme.palette.background.default }}>
+      <Card
+        sx={{
+          width: "100%",
+          minHeight: "100vh",
+          background: theme.palette.background.default,
+        }}
+      >
         <Box
           sx={{
             width: "100%",

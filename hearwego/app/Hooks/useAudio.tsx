@@ -14,38 +14,12 @@ interface Props {
 const useAudio = ({ url, songName, artist, coverArt }: Props) => {
   const dispatch = useAppDispatch();
 
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const stopCurrentAudio = () => {
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-      setPlaying(false);
-    }
-  };
 
   const toggle = () => {
     setPlaying(!playing);
-  };
-
-  // useEffect(() => {
-  //   const newAudio = new Audio(url);
-  //   setAudio(newAudio);
-
-  //   console.log("Audio URL: ", url);
-
-  //   return () => {
-  //     const handleEnded = () => setPlaying(false);
-  //     newAudio.pause();
-  //     newAudio.removeEventListener("ended", handleEnded);
-  //     clearTimeout(timeoutRef.current!);
-  //   };
-  // }, [url]);
-
-  useEffect(() => {
-    if (playing) {
+    console.log("Playing: ", playing);
+    if (playing === false) {
       dispatch(
         playSong({
           playing: true,
@@ -56,10 +30,6 @@ const useAudio = ({ url, songName, artist, coverArt }: Props) => {
           song_track: "",
         })
       );
-      // audio?.play();
-      // timeoutRef.current = setTimeout(() => {
-      //   stopCurrentAudio();
-      // }, 30000); // Stop after 30 seconds
     } else {
       dispatch(
         playSong({
@@ -71,16 +41,10 @@ const useAudio = ({ url, songName, artist, coverArt }: Props) => {
           song_track: "",
         })
       );
-      audio?.pause();
-      // clearTimeout(timeoutRef.current!);
     }
+  };
 
-    // return () => {
-    //   clearTimeout(timeoutRef.current!);
-    // };
-  }, [playing, audio]);
-
-  return { playing, toggle, stopCurrentAudio };
+  return { playing, toggle };
 };
 
 export default useAudio;

@@ -8,7 +8,7 @@ import "react-h5-audio-player/lib/styles.css";
 
 const MusicPlayer = () => {
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down("md"));
+  const matches = useMediaQuery("(max-width:960px)");
 
   const playerRef = useRef();
 

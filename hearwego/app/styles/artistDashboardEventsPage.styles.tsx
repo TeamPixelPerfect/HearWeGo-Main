@@ -10,6 +10,7 @@ export const EventMainBox = styled(Box)(({ theme }) => ({
   borderRadius: 30,
   // padding: '1em',
   margin: "1em",
+  paddingBottom: "5em",
   "@media (max-width:960px)": {
     width: "100%",
     margin: "1em 0em",
