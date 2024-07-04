@@ -47,6 +47,44 @@ export const addPRCampaign = async (token: string, data: any) => {
   }
 };
 
+export const updatePRCampaign = async (
+  token: string,
+  data: any,
+  id: string
+) => {
+  const res = await fetch(`${base_url}/PRManager/PRCampaign/${id}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const Campaigns = await res.json();
+    return Campaigns;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deletePRCampaign = async (token: string, id: string) => {
+  const res = await fetch(`${base_url}/PRManager/PRCampaign/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return "Campaign Deleted";
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
 export const getallPRCampaigns = async (
   token: string
 ): Promise<PRCampaigns[]> => {

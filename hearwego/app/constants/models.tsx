@@ -278,6 +278,8 @@ export interface PRPosts {
   PostImage_URL?: string;
   CampaignID?: string;
 }
+
+
 export interface PRtask {
   TaskID?: string;
   TaskName?: string;

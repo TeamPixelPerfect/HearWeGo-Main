@@ -51,7 +51,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   const [campaignImg, setCampaignImg] = useState<File | null>(null);
   const [taskError, setTaskError] = useState<string | null>(null);
   const [campaignData, setCampaignData] = useState<PRCampaigns>({
-    ArtistID: "ar4",
+    ArtistID: artist?.user.artist_id ?? "",
     Campaign_Name: "",
     Campaign_Description: "",
     CampaignImage_URL: "",
@@ -61,7 +61,6 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
     PRtask: [], // Initialize as an empty array
   });
 
-  
   const formik = useFormik({
     initialValues: {
       Campaign_Name: "",
@@ -321,7 +320,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       setConfirmSaveOpen(false);
       setCampaignImg(null);
       setCampaignData({
-        ArtistID: "ar4",
+        ArtistID: "",
         Campaign_Name: "",
         Campaign_Description: "",
         CampaignImage_URL: "",
