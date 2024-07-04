@@ -301,12 +301,13 @@ const FeedTab = () => {
             <Box
               sx={{ display: "flex", marginTop: "1rem", alignItems: "center" }}
             >
-              <IconButton onClick={() => handleReactClick(post)}>
+              <IconButton
+               onClick={() => handleReactClick(post)}>
                 <ThumbUpIcon />
               </IconButton>
               <Typography> : {reactsCount[post.postId || ""] || 0}</Typography>
               <IconButton onClick={() => handleCommentClick(post)} sx={{marginLeft:"10px"}}>
-                <CommentIcon />
+            <CommentIcon /> 
               </IconButton>
             </Box>
 

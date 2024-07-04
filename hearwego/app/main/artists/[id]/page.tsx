@@ -19,7 +19,7 @@ import Grid from "@mui/material/Grid";
 import SingleAlbum from "@/app/components/SingleAlbum";
 import CardActions from "@mui/material/CardActions";
 import SingleSongRow from "@/app/components/SingleSongRow";
-
+import {useRouter} from "next/navigation";
 import {
   Maindiv,
   CoverCardMedia,
@@ -49,6 +49,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
   const artist = useAppSelector((state) => state.artist.user);
   const [songByArtist, setSongByArtist] = React.useState<Song[]>([]); // This is the state for song by artist
 
+  const router = useRouter();
   // This is the useEffect for get artist
   React.useEffect(() => {
     console.log(id);
@@ -147,7 +148,11 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                 {/* This is the optionbox for artist options*/}
                 <OptionBox>
                   <Stack direction="row" width="100%" spacing={"1px"}>
-                    <Button>
+                    <Button 
+                      onClick={() => {
+                        router.push("/main/fanclub");
+                      }}
+                    >
                       <GroupAddIcon
                         style={{ color: "white", fontSize: "35px" }}
                       />
