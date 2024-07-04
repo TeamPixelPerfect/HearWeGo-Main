@@ -1,9 +1,7 @@
-
-
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { IconButton, Modal, Stack, Typography } from "@mui/material";
+import { Alert, IconButton, Modal, Stack, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import ShareIcon from "@mui/icons-material/Share";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -20,7 +18,10 @@ import { Artist } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { Event } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import Snackbar from "@mui/material/Snackbar";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 interface Props {
   params: { id: string };
@@ -105,14 +106,19 @@ const recommendEvents = [
     time: "8:00 PM",
     artist: "Kaizer Kaize",
   },
-
-]
+];
 export default function SingleEvent({ params: { id } }: Props) {
   const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = React.useState<Event | null>(null);
   const [artists, setArtists] = React.useState<Artist[]>([]);
   const [openShareModal, setOpenShareModal] = React.useState(false);
   const [currentUrl, setCurrentUrl] = React.useState("");
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarStatus, setSnackbarStatus] = React.useState<
+    "success" | "error" | "info" | "warning" | undefined
+  >("success");
+  const [currentSessionIndex, setCurrentSessionIndex] = React.useState(0);
 
   React.useEffect(() => {
     getEvent(id).then((event) => {
@@ -122,15 +128,14 @@ export default function SingleEvent({ params: { id } }: Props) {
 
   React.useEffect(() => {
     getAllArtists().then((artists) => {
-      console.log("Artists......",artists);
+      console.log("Artists......", artists);
       setArtists(artists.data);
     });
-  }
-  , []);
+  }, []);
 
   const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
   };
 
   const handleOpenShareModal = () => {
@@ -140,11 +145,36 @@ export default function SingleEvent({ params: { id } }: Props) {
   const handleCloseShareModal = () => setOpenShareModal(false);
 
   const handleCopyUrl = () => {
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      alert("URL copied to clipboard!");
-    }, (err) => {
-      alert("Failed to copy URL: ", err);
-    });
+    navigator.clipboard.writeText(currentUrl).then(
+      () => {
+        // alert("URL copied to clipboard!");
+        setSnackbarMessage("URL copied to clipboard!");
+        setSnackbarStatus("success");
+        setSnackbarOpen(true);
+      },
+      (err) => {
+        // alert("Failed to copy URL: ", err);
+        setSnackbarMessage("Failed to copy URL!");
+        setSnackbarStatus("error");
+        setSnackbarOpen(true);
+      }
+    );
+  };
+
+  const handleSnackbarClose = (event) => {
+    setSnackbarOpen(false);
+  };
+
+  const handlePrevSession = () => {
+    setCurrentSessionIndex((prevIndex) =>
+      prevIndex > 0 ? prevIndex - 1 : event.sessions.length - 1
+    );
+  };
+
+  const handleNextSession = () => {
+    setCurrentSessionIndex((prevIndex) =>
+      prevIndex < event.sessions.length - 1 ? prevIndex + 1 : 0
+    );
   };
 
   return (
@@ -159,11 +189,13 @@ export default function SingleEvent({ params: { id } }: Props) {
             opacity: "0.7",
           }}
         ></div>
-      
-      {/* This is the EventBox component for event details */}
+
+        {/* This is the EventBox component for event details */}
         <EventBox>
           <EventNameBox>{event?.event_name}</EventNameBox>
-          <ArtistNameBox>{getArtistName(event?.event_created_by)}</ArtistNameBox>
+          <ArtistNameBox>
+            {getArtistName(event?.event_created_by)}
+          </ArtistNameBox>
         </EventBox>
 
         {/* This is the OptionBox component for event options */}
@@ -207,9 +239,24 @@ export default function SingleEvent({ params: { id } }: Props) {
           //margin: "10px",
         }}
       >
-        <MiddleEventImageBox></MiddleEventImageBox>
-      
-      {/* This is the LeftBox component for event details */}
+        <Box
+          sx={{
+            width: "20%",
+            height: "90%",
+            //backgroundColor: "red",
+            padding: "10px",
+            //margin: "10px",
+            display: "flex",
+            position: "relative",
+            left: "40%",
+            borderRadius: "10px",
+            backgroundImage: "url(`{event?.event_img}`)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></Box>
+
+        {/* This is the LeftBox component for event details */}
         <LeftBox>
           <Box
             sx={{
@@ -318,8 +365,7 @@ export default function SingleEvent({ params: { id } }: Props) {
               alignItems: "center",
             }}
           >
-
-           {/* This is the Box component for event description */}
+            {/* This is the Box component for event description */}
             <Box
               sx={{
                 width: "100%",
@@ -359,6 +405,168 @@ export default function SingleEvent({ params: { id } }: Props) {
         </RightBox>
       </Box>
 
+      <Box sx={{ width: "100%", display: "flex" }}>
+        <Box
+          sx={{
+            width: "10%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconButton onClick={handlePrevSession}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </Box>
+
+        <Box
+          sx={{
+            width: "80%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {event && event.sessions.length > 0 && (
+            <Box
+              sx={{
+                width: "100%",
+                height: "400px",
+                display: "flex",
+                position: "relative",
+                flexDirection: "row",
+                alignItems: "center",
+                padding: "10px",
+              }}
+            >
+              <MiddleEventImageBox></MiddleEventImageBox>
+              <LeftBox>
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "95%",
+                    display: "flex",
+                    position: "relative",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    padding: "20px 0px 0px 40px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "90%",
+                      height: "20%",
+                      margin: "0px",
+                      display: "flex",
+                      position: "relative",
+                      justifyContent: "left",
+                    }}
+                  >
+                    <IoLocationSharp
+                      style={{ color: "white", fontSize: "35px" }}
+                    />
+                    <LocationDescriptionBox>
+                      {event.sessions[currentSessionIndex].session_venue}
+                    </LocationDescriptionBox>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "90%",
+                      height: "20%",
+                      margin: "0px",
+                      display: "flex",
+                      position: "relative",
+                      justifyContent: "left",
+                    }}
+                  >
+                    <SlCalender style={{ color: "white", fontSize: "35px" }} />
+                    <DateDescriptionBox>
+                      {event.sessions[currentSessionIndex].session_date}
+                    </DateDescriptionBox>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "90%",
+                      height: "20%",
+                      margin: "0px",
+                      display: "flex",
+                      position: "relative",
+                      justifyContent: "left",
+                    }}
+                  >
+                    <FaClock style={{ color: "white", fontSize: "30px" }} />
+                    <TimeDescriptionBox>
+                      {event.sessions[currentSessionIndex].session_time}
+                    </TimeDescriptionBox>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "90%",
+                      height: "20%",
+                      margin: "0px",
+                      display: "flex",
+                      position: "relative",
+                      justifyContent: "left",
+                    }}
+                  >
+                    <BsPersonStanding
+                      style={{ color: "white", fontSize: "35px" }}
+                    />
+                    <YearDescriptionBox>
+                      {event.sessions[currentSessionIndex].duration}
+                    </YearDescriptionBox>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "90%",
+                      height: "20%",
+                      margin: "0px",
+                      display: "flex",
+                      position: "relative",
+                      justifyContent: "left",
+                    }}
+                  >
+                    <SpatialTrackingIcon
+                      style={{ color: "white", fontSize: "35px" }}
+                    />
+                    <NoOfArtistDescriptionBox> - </NoOfArtistDescriptionBox>
+                  </Box>
+                </Box>
+              </LeftBox>
+              <RightBox>
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    position: "relative",
+                    display: "flex",
+                    borderRadius: "14px",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  Description
+                </Box>
+              </RightBox>
+            </Box>
+          )}
+        </Box>
+
+        <Box
+          sx={{
+            width: "10%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconButton onClick={handleNextSession}>
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
+      </Box>
+
       <Box
         sx={{
           display: "flex",
@@ -392,7 +600,7 @@ export default function SingleEvent({ params: { id } }: Props) {
           </Button>
         </CardActions>
       </Box>
- 
+
       {/* This is the grid for recommend events */}
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
         {recommendEvents.map(
@@ -413,34 +621,51 @@ export default function SingleEvent({ params: { id } }: Props) {
       </Grid>
 
       <Modal open={openShareModal} onClose={handleCloseShareModal}>
-  <Box
-    sx={{
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      width: 400,
-      bgcolor: "background.paper",
-      border: "2px solid #000",
-      boxShadow: 24,
-      p: 4,
-      borderRadius: "10px",
-    }}
-  >
-    <Typography variant="h6" component="h2">
-      Share this Event
-    </Typography>
-    <Box sx={{width: "100%", display: "flex", alignItems: "center"}}>
-    <Typography sx={{ mt: 2 }}>
-      {currentUrl}
-    </Typography>
-    <IconButton onClick={handleCopyUrl} color="primary" sx={{ mt: 2, ml: 2 }} aria-label="copy">
-      <ContentCopyIcon />
-    </IconButton>
-    </Box>
-    
-  </Box>
-</Modal>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "10px",
+          }}
+        >
+          <Typography variant="h6" component="h2">
+            Share this Event
+          </Typography>
+          <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+            <Typography sx={{ mt: 2 }}>{currentUrl}</Typography>
+            <IconButton
+              onClick={handleCopyUrl}
+              color="primary"
+              sx={{ mt: 2, ml: 2 }}
+              aria-label="copy"
+            >
+              <ContentCopyIcon />
+            </IconButton>
+          </Box>
+        </Box>
+      </Modal>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarStatus}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Maindiv>
   );
 }
