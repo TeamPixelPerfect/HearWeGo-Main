@@ -210,18 +210,20 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
                 formik.touched.Campaign_Name && formik.errors.Campaign_Name
               }
             />
-            <DropFile
-              fileTypes="image"
-              fileExtensions="JPEG,PNG,WEBP,SVG"
-              isCircular={false}
-              width="100%"
-              height="200px"
-              aspectX={1}
-              aspectY={1}
-              shape="rect"
-              file={campaignImg}
-              setFile={setCampaignImg}
-            />
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <DropFile
+                fileTypes="image"
+                fileExtensions="JPEG,PNG,WEBP,SVG"
+                isCircular={false}
+                width="70%"
+                height="220px"
+                aspectX={1}
+                aspectY={1}
+                shape="rect"
+                file={campaignImg}
+                setFile={setCampaignImg}
+              />
+            </Box>
           </form>
         );
       case 1:

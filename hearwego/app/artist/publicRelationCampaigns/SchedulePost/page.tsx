@@ -1,5 +1,4 @@
-"use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -19,6 +18,10 @@ import {
   Alert,
   Box,
   IconButton,
+  FilledTextFieldProps,
+  OutlinedTextFieldProps,
+  StandardTextFieldProps,
+  TextFieldVariants,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
@@ -32,8 +35,11 @@ import * as Yup from "yup";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import DropFile from "../../../components/DropFile";
-import { addPRPost } from "../../../services/PrServices";
-import { PRPosts } from "../../../constants/models";
+import {
+  addPRPost,
+  getPRCampaignsByArtist,
+} from "../../../services/PrServices";
+import { PRPosts, PRCampaigns } from "../../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
 
 const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
@@ -48,11 +54,28 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"postNow" | "schedule">();
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+  const [errorOpen, setErrorOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
   const theme = useTheme();
-
   const [prPostImage, setPrPostImage] = useState<File | null>(null);
+  const [campaignNames, setCampaignNames] = useState<PRCampaigns[]>([]);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (artist?.token) {
+      getPRCampaignsByArtist(
+        artist.token,
+        artist?.user?.artist_id ? artist.user.artist_id : ""
+      )
+        .then((response) => {
+          setCampaignNames(response.data);
+          console.log("Campaign Data: ", response.data);
+        })
+        .catch((error) => setError(error));
+    }
+  }, [artist?.token, artist?.user?.artist_id]);
 
   const formik = useFormik({
     initialValues: {
@@ -63,7 +86,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       Scheduled_Time: "",
       SocialMedias: [],
       PostImage_URL: "",
-      CampaignID: "PRCamp33",
+      CampaignID: "",
     },
     validationSchema: Yup.object({
       ArtistName: Yup.string().required("Artist Name is required"),
@@ -77,40 +100,30 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       PostImage_URL: Yup.string().required("Post Image is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
-      const prPostData: PRPosts = {
-        ...values,
-        Scheduled_Date: selectedDate,
-        Scheduled_Time: selectedTime?.toLocaleTimeString() || "",
-        SocialMedias: selectedSocialMedia,
-        PostImage_URL: prPostImage ? URL.createObjectURL(prPostImage) : "",
-      };
-
       try {
-        await addPRPost(artist?.token ? artist.token : "", prPostData);
+        console.log("Form Values: ", values);
+        await addPRPost(artist?.token ? artist.token : "", values);
         setSnackbarMessage(
           confirmAction === "postNow"
             ? "Post Created Successfully!"
             : "Post Scheduled Successfully!"
         );
+        setPrPostImage(null);
         setSnackbarOpen(true);
         onClose();
-        router.push("/artist/publicRelationCampaigns");
-        resetForm(); // Optionally reset form after successful submission
+        resetForm();
       } catch (error) {
-        console.error("Error submitting post:", error);
-        // Handle error state or display error message
+        setErrorMessage("Error submitting post: " + error.message);
+        setErrorOpen(true);
       }
     },
   });
 
-  const handlePostSubmit = async () => {
-    try {
-      await formik.handleSubmit();
-    } catch (error) {
-      console.error("Error submitting post:", error);
-      // Handle error state or display error message
+  useEffect(() => {
+    if (prPostImage) {
+      formik.setFieldValue("PostImage_URL", prPostImage);
     }
-  };
+  }, [prPostImage]);
 
   const handleDateChange = (date: Date | null) => {
     setSelectedDate(date);
@@ -149,14 +162,10 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
   };
 
   const handleConfirmClose = (confirmed: boolean) => {
-    // setConfirmOpen(false);
-    console.log(confirmed, "confirmed");
     if (confirmed) {
-      console.log("confirmed");
-      formik.handleSubmit();
-    } else {
-      setConfirmOpen(false);
+      formik.submitForm(); // Use submitForm instead of handleSubmit
     }
+    setConfirmOpen(false);
   };
 
   const handlePreviewOpen = () => {
@@ -167,6 +176,10 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
     setPreviewOpen(false);
   };
 
+  const handleErrorClose = () => {
+    setErrorOpen(false);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Create Post</DialogTitle>
@@ -174,7 +187,6 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         <form onSubmit={formik.handleSubmit}>
           <TextField
             label="What's On Your Mind?"
-            fullWidth
             multiline
             rows={4}
             variant="outlined"
@@ -185,7 +197,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
               formik.touched.Description && Boolean(formik.errors.Description)
             }
             helperText={formik.touched.Description && formik.errors.Description}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, width: "100%" }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel id="campaign-label">Select the Campaign</InputLabel>
@@ -199,9 +211,14 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
                 formik.touched.Campaigns && Boolean(formik.errors.Campaigns)
               }
             >
-              <MenuItem value="Campaign_01">Campaign_01</MenuItem>
-              <MenuItem value="Campaign_02">Campaign_02</MenuItem>
-              <MenuItem value="Campaign_03">Campaign_03</MenuItem>
+              {campaignNames.map((campaign) => (
+                <MenuItem
+                  key={campaign.CampaignID}
+                  value={campaign.Campaign_Name}
+                >
+                  {campaign.Campaign_Name}
+                </MenuItem>
+              ))}
             </Select>
             {formik.touched.Campaigns && formik.errors.Campaigns && (
               <Typography color="error" variant="caption">
@@ -213,7 +230,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
             <Typography variant="subtitle1">
               Select Social Media Platforms
             </Typography>
-            {["facebook", "twitter", "linkedin", "instagram"].map(
+            {["Facebook", "Twitter", "linkedin", "Instagram"].map(
               (platform) => (
                 <FormControlLabel
                   key={platform}
@@ -236,9 +253,16 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
                   label="Input The Date"
                   value={selectedDate}
                   onChange={handleDateChange}
-                  renderInput={(params) => (
-                    <TextField {...params} fullWidth variant="outlined" />
-                  )}
+                  renderInput={(
+                    params: React.JSX.IntrinsicAttributes & {
+                      variant?: TextFieldVariants | undefined;
+                    } & Omit<
+                        | FilledTextFieldProps
+                        | OutlinedTextFieldProps
+                        | StandardTextFieldProps,
+                        "variant"
+                      >
+                  ) => <TextField {...params} fullWidth variant="outlined" />}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -246,20 +270,36 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
                   label="Input The Time"
                   value={selectedTime}
                   onChange={handleTimeChange}
-                  renderInput={(params) => (
-                    <TextField {...params} fullWidth variant="outlined" />
-                  )}
+                  renderInput={(
+                    params: React.JSX.IntrinsicAttributes & {
+                      variant?: TextFieldVariants | undefined;
+                    } & Omit<
+                        | FilledTextFieldProps
+                        | OutlinedTextFieldProps
+                        | StandardTextFieldProps,
+                        "variant"
+                      >
+                  ) => <TextField {...params} fullWidth variant="outlined" />}
                 />
               </Grid>
             </Grid>
           </LocalizationProvider>
-          <Box sx={{ mt: 2 }}>
+          <Box
+            sx={{
+              mt: 2,
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <DropFile
-              fileTypes="Additional Product Image"
+              fileTypes="Post Image"
               fileExtensions="JPEG,PNG,WEBP,SVG"
               isCircular={false}
-              width="100%"
-              height="200px"
+              width="80%"
+              height="220px"
               file={prPostImage}
               setFile={setPrPostImage}
               aspectX={1}
@@ -276,22 +316,28 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
               </Typography>
             )}
           </Box>
+          <DialogActions>
+            <Button onClick={onClose} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handlePreviewOpen} color="primary">
+              Preview
+            </Button>
+            <Button
+              onClick={() => handleConfirmOpen("postNow")}
+              color="primary"
+            >
+              Post Now
+            </Button>
+            <Button
+              onClick={() => handleConfirmOpen("schedule")}
+              color="primary"
+            >
+              Schedule
+            </Button>
+          </DialogActions>
         </form>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
-          Cancel
-        </Button>
-        <Button onClick={() => handlePreviewOpen()} color="primary">
-          Preview
-        </Button>
-        <Button onClick={() => handleConfirmOpen("postNow")} color="primary">
-          Post Now
-        </Button>
-        <Button onClick={() => handleConfirmOpen("schedule")} color="primary">
-          Schedule
-        </Button>
-      </DialogActions>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -357,6 +403,17 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handlePreviewClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={errorOpen} onClose={handleErrorClose}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <Typography>{errorMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleErrorClose} color="primary">
             Close
           </Button>
         </DialogActions>
