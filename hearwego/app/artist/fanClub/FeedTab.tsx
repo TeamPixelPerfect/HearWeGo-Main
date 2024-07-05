@@ -15,7 +15,7 @@ import {
   InputAdornment,
   Divider,
   Snackbar,
-
+  Paper,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -238,7 +238,15 @@ const FeedTab = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      marginTop: "1rem",
+    
+    }}>
       {clubPost.map((post) => (
         <Card
           key={post.createdAt}
@@ -246,7 +254,7 @@ const FeedTab = () => {
             marginBottom: 2,
             alignItems: "center",
             justifyContent: "center",
-            width: "100%",
+            width: "80%",
           }}
         >
           <CardHeader
@@ -283,31 +291,62 @@ const FeedTab = () => {
             subheader={new Date(post.createdAt).toLocaleString()}
           />
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
+            <Typography variant="body2" color="textSecondary" component="p" sx={{marginLeft:"10px"}}>
               {post.postDescription}
             </Typography>
+
+            <Box sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+            
+            }}>
             {post.postImage_URL && (
               <img
                 src={post.postImage_URL}
                 alt="Post image"
                 style={{
-                  width: "100%",
+                  width: "80%",
                   marginTop: "1rem",
                   maxHeight: "400px",
                   objectFit: "cover",
                 }}
               />
             )}
+            </Box>
             <Box
               sx={{ display: "flex", marginTop: "1rem", alignItems: "center" }}
             >
               <IconButton
-               onClick={() => handleReactClick(post)}>
+                onClick={() => handleReactClick(post)}
+                sx={{
+                  color: reactsCount[post.postId || ""] ? "blue" : "gray",
+                  transition: "color 0.3s, transform 0.3s",
+                  "&:hover": {
+                    color: "blue",
+                    transform: "scale(1.3)",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 <ThumbUpIcon />
+                <Typography
+                  sx={{
+                    marginLeft: "5px",
+                    fontWeight: "bold",
+                    color: reactsCount[post.postId || ""] ? "blue" : "gray",
+                  }}
+                >
+                  {reactsCount[post.postId || ""] || 0}
+                </Typography>
               </IconButton>
-              <Typography> : {reactsCount[post.postId || ""] || 0}</Typography>
-              <IconButton onClick={() => handleCommentClick(post)} sx={{marginLeft:"10px"}}>
-            <CommentIcon /> 
+              <IconButton
+                onClick={() => handleCommentClick(post)}
+                sx={{ marginLeft: "10px" }}
+              >
+                <CommentIcon />
               </IconButton>
             </Box>
 
@@ -315,7 +354,16 @@ const FeedTab = () => {
               <>
                 <Divider sx={{ my: 2 }} />
                 {commentsData.map((comment, index) => (
-                  <Box key={index} sx={{ mb: 2 }}>
+                  <Paper
+                    key={index}
+                    sx={{
+                      mb: 2,
+                      p: 2,
+                      // backgroundColor: "#f9f9f9",
+                      borderRadius: "10px",
+                    }}
+                    elevation={1}
+                  >
                     <Box
                       sx={{
                         display: "flex",
@@ -394,6 +442,7 @@ const FeedTab = () => {
                               alignItems: "center",
                               p: 1,
                               borderRadius: 1,
+                              // backgroundColor: "#f1f1f1",
                             }}
                           >
                             <Avatar
@@ -434,7 +483,7 @@ const FeedTab = () => {
                           </Box>
                         </Box>
                       )}
-                  </Box>
+                  </Paper>
                 ))}
                 <Divider sx={{ my: 2 }} />
                 <Box
@@ -443,6 +492,7 @@ const FeedTab = () => {
                     alignItems: "center",
                     p: 1,
                     borderRadius: 1,
+                    // backgroundColor: "#f1f1f1",
                   }}
                 >
                   <Avatar
@@ -486,7 +536,7 @@ const FeedTab = () => {
           </CardContent>
         </Card>
       ))}
-      
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000} // Adjust as per your requirement

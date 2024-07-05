@@ -44,6 +44,7 @@ import NewsPage from "./news/page";
 import EventsPage from "./events/page";
 import PhotosPage from "./photos/page";
 import VideosPage from "./videos/page";
+import { useAppSelector } from "@/lib/hooks";
 
 
 const topFans = [
@@ -102,7 +103,8 @@ const TabPanel = (props) => {
   );
 };
 
-const FanClubPage: React.FC = () => {
+const FanClubPage = () => {
+  const artist = useAppSelector((state) => state.artist.user);
   const [tabValue, setTabValue] = useState(0);
   const [showMoreFan, setShowMoreFan] = useState(false);
   const [showMoreRecommendedArtist, setShowMoreRecommendedArtist] =
@@ -169,12 +171,12 @@ const FanClubPage: React.FC = () => {
               }}
             >
               <ArtistInfo>
-                <Typography variant="h5">{artistName}</Typography>
+                <Typography variant="h5">{artist?.user.artistName}</Typography>
                 <Typography variant="subtitle1" sx={{ fontStyle: "italic" }}>
-                  {artistGenre}
+                  {artist?.user.musicGenres}
                 </Typography>
                 <StyledBadge color="primary" badgeContent={fanCount}>
-                  <ProfileAvatar src={profileImageUrl} alt={artistName} />
+                  <ProfileAvatar src={artist?.user.profilePicture} alt={artist?.user.artistName} />
                 </StyledBadge>
               </ArtistInfo>
 

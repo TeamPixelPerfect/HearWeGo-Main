@@ -26,9 +26,10 @@ import PhotosTab from "./PhotosTab";
 import DropFile from "../../components/DropFile";
 import NewsPage from "./NewsTab";
 import EventsTab from "./EventsTab";
+import VideosTab from "./VideosTab";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import { ClubPost, ClubNews ,Event } from "../../constants/models";
+import { ClubPost, ClubNews, Event } from "../../constants/models";
 import { addNews, addPost } from "../../services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
 
@@ -143,22 +144,22 @@ const ArtistPage = () => {
 
   const handleGoToProfile = () => {
     router.push("/artist/fanClub/Profile");
-  }
+  };
 
   return (
     <Container maxWidth="lg">
       <Paper sx={{ p: 5, marginBottom: 2 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-      <Box>
-        <Typography variant="h5" component="div">
-          Artist Page
-        </Typography>
-        <Typography variant="body1" component="p" sx={{ mb: 2 }}>
-          This is a place where you can share your latest posts, updates, and
-          news with your audience.
-        </Typography>
-        </Box>
-        {/* <Button variant="contained" color="primary" onClick={handleGoToProfile}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="h5" component="div">
+              Artist Page
+            </Typography>
+            <Typography variant="body1" component="p" sx={{ mb: 2 }}>
+              This is a place where you can share your latest posts, updates,
+              and news with your audience.
+            </Typography>
+          </Box>
+          {/* <Button variant="contained" color="primary" onClick={handleGoToProfile}>
           Go to Profile
         </Button> */}
         </Box>
@@ -167,7 +168,7 @@ const ArtistPage = () => {
           <Tab label="Events" />
           <Tab label="News" />
         </Tabs>
-        </Paper>
+      </Paper>
 
       {tabValue === 0 && (
         <Box>

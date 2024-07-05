@@ -150,7 +150,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                   <Stack direction="row" width="100%" spacing={"1px"}>
                     <Button 
                       onClick={() => {
-                        router.push("/main/fanclub");
+                        router.push("/main/fancub");
                       }}
                     >
                       <GroupAddIcon

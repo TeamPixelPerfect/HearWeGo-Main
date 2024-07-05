@@ -311,3 +311,24 @@ export interface reacts {
   postId?: string;
   timestamps?: string;
 }
+
+export interface newscomments {
+  newscommentId?: string;
+  newscommenter?: string;
+  newscommentBody?: string;
+  newscommenter_ProfilePic?: string;
+  postId?: string;
+  timestamps?: string;
+  parentCommentId?: string;
+}
+
+export interface ClubVideos{
+  videoId?: string;
+  videoTitle?: string;
+  videoDescription?: string;
+  videoURL?: string;
+  videoThumbnail?: string;
+  clubId?: string;
+  artistId?: string;
+  timestamps?: string;
+}

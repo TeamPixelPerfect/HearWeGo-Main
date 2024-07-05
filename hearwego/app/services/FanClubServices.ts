@@ -389,3 +389,133 @@ export const getReactsByNews = async (token: string, newsId: string) => {
     throw new Error(error.message);
   }
 };
+
+
+export const addNewsComments = async (token: string, data: any) => {
+  console.log("Sending newscomments data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/newscomments`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const newscomments = await res.json();
+    return newscomments;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getCommentsByNews = async (token: string, newsId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/newscomments/News/${newsId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const newscomments = await res.json();
+    console.log("Club newscomments Services: ", newscomments);
+    return newscomments;
+  } else {
+    const error = await res.json();
+    console.log("Club newscomments Services Error: ", error);
+    throw new Error(error.message);
+  }
+};
+
+export const deleteNews = async (token: string, newsId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/clubNews/${newsId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const clubNews = await res.json();
+    return clubNews;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deleteNewsComment = async (token: string, newscommentId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/newscomments/${newscommentId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const newscomments = await res.json();
+    return newscomments;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const updateNews = async (token: string, newsId: string, data: any) => {
+  try {
+    const res = await fetch(`${base_url}/FanClubManager/clubNews/${newsId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      const clubNews = await res.json();
+      return clubNews;
+    } else {
+      const error = await res.json();
+      throw new Error(error.message);
+    }
+  } catch (error) {
+    console.error("Error updating news:", error);
+    throw error;
+  }
+};
+
+export const addVideos = async (token: string, data: any) => {
+  console.log("Sending videos data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/clubVideos`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const clubVideos = await res.json();
+    return clubVideos;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
