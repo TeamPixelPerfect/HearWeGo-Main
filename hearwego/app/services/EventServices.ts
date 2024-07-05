@@ -573,7 +573,7 @@ export const getBudgetByEventId = async (id: string) => {
 
 export const createInterest = async (token?: string, data?: any) => {
   console.log("Sending interest data:", data); 
-  const res = await fetch(`${base_url}/EventsManager/interests`, {
+  const res = await fetch(`${base_url}/EventsManager/interest`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -591,8 +591,8 @@ export const createInterest = async (token?: string, data?: any) => {
   }
 };
 
-export const deleteInterest = async (token?: string, id?: string) => {
-  const res = await fetch(`${base_url}/EventsManager/interests/${id}`, {
+export const deleteInterest = async (token?: string, user_id?: string, event_id?: string) => {
+  const res = await fetch(`${base_url}/EventsManager/delete-interest/user/${user_id}/event/${event_id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -627,6 +627,28 @@ export const getUserInterestForEvent = async (token?: string, user_id?: string, 
 
     const data = await res.json();
     return data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error("Failed to fetch interest:", error);
+    throw error;
+  }
+}
+
+export const checkUserInterestForEvent = async (token?: string, user_id?: string, event_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/is-interest/user/${user_id}/event/${event_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data.status;
   } catch (error) {
     console.error("Failed to fetch interest:", error);
     throw error;

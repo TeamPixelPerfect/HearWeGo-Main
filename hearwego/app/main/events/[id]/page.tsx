@@ -33,6 +33,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { getUserInterestForEvent } from "@/app/services/EventServices";
 import { getUpcomingEventsForGivenArtistByFan } from "@/app/services/EventServices";
 import { createInterest, deleteInterest } from "@/app/services/EventServices";
+import { checkUserInterestForEvent } from "@/app/services/EventServices";
 
 interface Props {
   params: { id: string };
@@ -98,8 +99,20 @@ export default function SingleEvent({ params: { id } }: Props) {
     if (event && user) {
       getUserInterestForEvent(user.token, user.user_id, id).then((interest) => {
         if (interest) {
-          setIsInterested(true);
+          // setIsInterested(true);
           setInterestId(interest.interest_id);
+        }
+      });
+    }
+  }, [event, user]);
+
+  React.useEffect(() => {
+    if (event && user) {
+      checkUserInterestForEvent(user.token, user.user_id, id).then((interest) => {
+        if (interest) {
+          setIsInterested(interest);
+          console.log("Interest ?: ", interest);
+          // setInterestId(interest.interest_id);
         }
       });
     }
@@ -109,7 +122,7 @@ export default function SingleEvent({ params: { id } }: Props) {
     if (isInterested) {
       // Remove interest
       try {
-        await deleteInterest(user.token, interestId as string);
+        await deleteInterest(user.token, user.user_id, id);
         setIsInterested(false);
         setInterestId(null);
         setSnackbarMessage("Interest removed successfully!");
