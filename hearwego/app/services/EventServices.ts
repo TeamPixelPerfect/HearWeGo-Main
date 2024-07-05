@@ -622,7 +622,6 @@ export const getUserInterestForEvent = async (token?: string, user_id?: string, 
       if (res.status === 404) {
         return null; // No interest found
       }
-      throw new Error(`Error: ${res.status} ${res.statusText}`);
     }
 
     const data = await res.json();
