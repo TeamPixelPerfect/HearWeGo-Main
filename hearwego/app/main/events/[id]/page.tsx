@@ -30,18 +30,13 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Snackbar from "@mui/material/Snackbar";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { getUserInterestForEvent } from "@/app/services/EventServices";
 import { getUpcomingEventsForGivenArtistByFan } from "@/app/services/EventServices";
+import { createInterest, deleteInterest } from "@/app/services/EventServices";
 
 interface Props {
   params: { id: string };
 }
-
-const SingleEventDetails = [
-  {
-    eventName: "Beats",
-    artistName: "Kaizer Kaize",
-  },
-];
 
 import {
   Maindiv,
@@ -73,6 +68,8 @@ export default function SingleEvent({ params: { id } }: Props) {
     "success" | "error" | "info" | "warning" | undefined
   >("success");
   const [currentSessionIndex, setCurrentSessionIndex] = React.useState(0);
+  const [isInterested, setIsInterested] = React.useState(false);
+  const [interestId, setInterestId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     getEvent(id).then((event) => {
@@ -95,7 +92,55 @@ export default function SingleEvent({ params: { id } }: Props) {
         }
       );
     }
-  }, [event]);
+  }, [event, user]);
+
+  React.useEffect(() => {
+    if (event && user) {
+      getUserInterestForEvent(user.token, user.user_id, id).then((interest) => {
+        if (interest) {
+          setIsInterested(true);
+          setInterestId(interest.interest_id);
+        }
+      });
+    }
+  }, [event, user]);
+
+  const handleInterestClick = async () => {
+    if (isInterested) {
+      // Remove interest
+      try {
+        await deleteInterest(user.token, interestId as string);
+        setIsInterested(false);
+        setInterestId(null);
+        setSnackbarMessage("Interest removed successfully!");
+        setSnackbarStatus("success");
+        setSnackbarOpen(true);
+      } catch (error) {
+        setSnackbarMessage("Failed to remove interest!");
+        setSnackbarStatus("error");
+        setSnackbarOpen(true);
+      }
+    } else {
+      // Add interest
+      try {
+        const interestData = {
+          event_id: event?.event_id,
+          user_id: user.user_id,
+        };
+        const interest = await createInterest(user.token, interestData);
+        setIsInterested(true);
+        setInterestId(interest.interest_id);
+        setSnackbarMessage("Interest added successfully!");
+        setSnackbarStatus("success");
+        setSnackbarOpen(true);
+      } catch (error) {
+        setSnackbarMessage("Failed to add interest!");
+        setSnackbarStatus("error");
+        setSnackbarOpen(true);
+      }
+    }
+  };
+  
 
   const getArtistName = (artistId) => {
     const artist = artists.find((artist) => artist.artist_id === artistId);
@@ -178,9 +223,9 @@ export default function SingleEvent({ params: { id } }: Props) {
             <Button onClick={handleOpenShareModal}>
               <ShareIcon style={{ color: "white", fontSize: "35px" }} />
             </Button>
-            <Button>
+            <Button onClick={handleInterestClick}>
               <FavoriteBorderIcon
-                style={{ color: "white", fontSize: "35px" }}
+                style={{ color: isInterested ? "red" : "white", fontSize: "35px" }}
               />
             </Button>
             <CardActions style={{ justifyContent: "right" }}>
@@ -277,9 +322,7 @@ export default function SingleEvent({ params: { id } }: Props) {
                         justifyContent: "left",
                       }}
                     >
-                      <IoLocationSharp
-                        style={{ fontSize: "35px" }}
-                      />
+                      <IoLocationSharp style={{ fontSize: "35px" }} />
                       <LocationDescriptionBox>
                         {event.sessions[currentSessionIndex].venue}
                       </LocationDescriptionBox>
@@ -294,9 +337,7 @@ export default function SingleEvent({ params: { id } }: Props) {
                         justifyContent: "left",
                       }}
                     >
-                      <SlCalender
-                        style={{ fontSize: "35px" }}
-                      />
+                      <SlCalender style={{ fontSize: "35px" }} />
                       <DateDescriptionBox>
                         {
                           event.sessions[
@@ -330,9 +371,7 @@ export default function SingleEvent({ params: { id } }: Props) {
                         justifyContent: "left",
                       }}
                     >
-                      <HourglassTopIcon
-                        style={{ fontSize: "35px" }}
-                      />
+                      <HourglassTopIcon style={{ fontSize: "35px" }} />
                       <YearDescriptionBox>
                         {event.sessions[currentSessionIndex].duration} Hours
                       </YearDescriptionBox>

@@ -407,3 +407,9 @@ export interface ProductVariant {
   variation_price?: Number;
   variation_quantity?: Number;
 }
+
+export interface EventInterest  {
+  interest_id?: string;
+  event_id?: string;
+  user_id?: string;
+}

@@ -570,3 +570,65 @@ export const getBudgetByEventId = async (id: string) => {
     throw error; // Rethrow the error to handle it in the calling function
   }
 }
+
+export const createInterest = async (token?: string, data?: any) => {
+  console.log("Sending interest data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/interests`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const interest = await res.json();
+    return interest;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error); 
+    throw new Error(error.message);
+  }
+};
+
+export const deleteInterest = async (token?: string, id?: string) => {
+  const res = await fetch(`${base_url}/EventsManager/interests/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    return true;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getUserInterestForEvent = async (token?: string, user_id?: string, event_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/interest/user/${user_id}/event/${event_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return null; // No interest found
+      }
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error("Failed to fetch interest:", error);
+    throw error;
+  }
+}
