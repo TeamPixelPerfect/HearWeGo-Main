@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -7,110 +8,33 @@ import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleEvent from "@/app/components/SingleEvent";
 import { getUpcomingEventsSortByDate } from "@/app/services/EventServices";
+import { getAllArtists } from "@/app/services/ArtistServices";
 import { Event } from "@/app/constants/models";
 import { Artist } from "@/app/constants/models";
 
 import { Maindiv, SearchPaper } from "../../../styles/eventsMW.styles";
-
-const allEvents = [
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-];
+import { Pagination } from "@mui/material";
 
 export default function MoreAlbums() {
   const [allEvents, setAllEvents] = React.useState<Event[]>([]);
   const [artists, setArtists] = React.useState<Artist[]>([]);
+  const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(12);
+  const [pageCount, setPageCount] = React.useState(0);
 
   React.useEffect(() => {
-    getUpcomingEventsSortByDate(1, 8).then((events) => {
+    getUpcomingEventsSortByDate(page, limit).then((events) => {
       console.log("Events......",events);
       setAllEvents(events.data);
+      setPageCount(Math.ceil(events.total / limit));
+    });
+  }
+  , [page, allEvents.length]);
+
+  React.useEffect(() => {
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
     });
   }
   , []);
@@ -120,7 +44,9 @@ export default function MoreAlbums() {
     return artist ? artist.artistName : 'Unknown';
   };
 
-  
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
   return (
     <Maindiv>
@@ -154,19 +80,35 @@ export default function MoreAlbums() {
         All Events
       </Box>
       <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-        {allEvents.map(({ name, img, date, day, time, artist }) => (
+        {allEvents.map(({ event_id, event_name, event_img, sessions, event_created_by }) => (
           <Grid item xs={6} md={3}>
             <SingleEvent
-              eventName={name}
-              eventImg={img}
-              eventDate={date}
-              eventDay={day}
-              eventTime={time}
-              artistName={artist}
+              eventID={event_id}
+              eventName={event_name}
+              eventImg={event_img}
+              artistName={getArtistName(event_created_by)}
+              noOfSessions={sessions?.length}
             ></SingleEvent>
           </Grid>
         ))}
       </Grid>
+
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "1em",
+          marginBottom: "1em",
+        }}
+      >
+        <Pagination
+          count={pageCount}
+          color="primary"
+          page={page}
+          onChange={handlePageChange}
+        />
+      </Box>
     </Maindiv>
   );
 }

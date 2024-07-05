@@ -46,7 +46,7 @@ export const getAllEvents = async (): Promise<Event[]> => {
 };
 
 export const getUpcomingEventsSortByDate = async (page?: number, limit?: number) => {
-  const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&sort=-updatedAt&limit=${limit}`, {
+  const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&sort=-updatedAt&limit=${limit}&event_status=public`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export const getPrivateEventsForGivenArtist = async (page?: number, limit?: numb
 
 export const getInterestedEventsByUser = async (page?: number, limit?: number, user_id?: string) => {
   try {
-    const res = await fetch(`${base_url}/EventsManager/interested-events/${user_id}?page=${page}&limit=${limit}`, {
+    const res = await fetch(`${base_url}/EventsManager/interested-events/${user_id}?page=${page}&limit=${limit}&event_status=public`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -212,7 +212,7 @@ export const getInterestedEventsByUser = async (page?: number, limit?: number, u
 
 export const getUpcomingEventsByInterest = async (page?: number, limit?: number) => {
   try {
-    const res = await fetch(`${base_url}/EventsManager/upcoming-events-sorted-by-interests?page=${page}&limit=${limit}`, {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events-sorted-by-interests?page=${page}&limit=${limit}&event_status=public`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

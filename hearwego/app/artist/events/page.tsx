@@ -19,6 +19,7 @@ import Card from "@mui/material/Card";
 import {
   CardActionArea,
   CardActions,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -50,6 +51,8 @@ import { Event } from "@/app/constants/models";
 import { deleteEvent } from "@/app/services/EventServices";
 import { getPastEventsForGivenArtist } from "@/app/services/EventServices";
 import VpnLockIcon from '@mui/icons-material/VpnLock';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -124,6 +127,17 @@ function a11yProps(index: number) {
     id: `simple-tab-${index}`,
     "aria-controls": `simple-tabpanel-${index}`,
   };
+}
+
+function switchStatus (status: string) {
+  switch(status) {
+    case "public":
+      return <Chip color="success" icon={<PublicIcon />} label="Public" />;
+    case "private":
+      return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
+    default:
+      return <Chip icon={<LockIcon />} label="Private" />;
+  }
 }
 
 //event tab bar
@@ -308,7 +322,7 @@ function EventArea(tab: number) {
                 aria-controls="panel2-content"
                 id="panel2-header"
               >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Avatar
                       alt="event_img"
@@ -317,6 +331,10 @@ function EventArea(tab: number) {
                       variant="square"
                     />
                     <Typography>{events.event_name}</Typography>
+                  </Box>
+
+                  <Box sx={{marginRight: 2}}>
+                    {switchStatus(events.event_status as string)}
                   </Box>
                 </Box>
               </AccordionSummary>
