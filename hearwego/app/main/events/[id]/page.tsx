@@ -3,7 +3,7 @@
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { Stack } from "@mui/material";
+import { IconButton, Modal, Stack, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import ShareIcon from "@mui/icons-material/Share";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -15,6 +15,12 @@ import { BsPersonStanding } from "react-icons/bs";
 import SpatialTrackingIcon from "@mui/icons-material/SpatialTracking";
 import SingleEventComponent from "@/app/components/SingleEvent";
 import Grid from "@mui/material/Grid";
+import { getEvent } from "@/app/services/EventServices";
+import { Artist } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { Event } from "@/app/constants/models";
+import { useAppSelector } from "@/lib/hooks";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 interface Props {
   params: { id: string };
@@ -102,10 +108,49 @@ const recommendEvents = [
 
 ]
 export default function SingleEvent({ params: { id } }: Props) {
+  const user = useAppSelector((state) => state.user.user);
+  const [event, setEvent] = React.useState<Event | null>(null);
+  const [artists, setArtists] = React.useState<Artist[]>([]);
+  const [openShareModal, setOpenShareModal] = React.useState(false);
+  const [currentUrl, setCurrentUrl] = React.useState("");
+
+  React.useEffect(() => {
+    getEvent(id).then((event) => {
+      setEvent(event);
+    });
+  }, [id]);
+
+  React.useEffect(() => {
+    getAllArtists().then((artists) => {
+      console.log("Artists......",artists);
+      setArtists(artists.data);
+    });
+  }
+  , []);
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
+
+  const handleOpenShareModal = () => {
+    setCurrentUrl(window.location.href);
+    setOpenShareModal(true);
+  };
+  const handleCloseShareModal = () => setOpenShareModal(false);
+
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      alert("URL copied to clipboard!");
+    }, (err) => {
+      alert("Failed to copy URL: ", err);
+    });
+  };
+
   return (
     <Maindiv>
       {/* This is the CoverEventCardMedia component for backcover img */}
-      <CoverEventCardMedia image="https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png">
+      <CoverEventCardMedia image={event?.event_img}>
         <div
           style={{
             background: "black",
@@ -117,14 +162,14 @@ export default function SingleEvent({ params: { id } }: Props) {
       
       {/* This is the EventBox component for event details */}
         <EventBox>
-          <EventNameBox>Beats</EventNameBox>
-          <ArtistNameBox>Kaizer Kaize</ArtistNameBox>
+          <EventNameBox>{event?.event_name}</EventNameBox>
+          <ArtistNameBox>{getArtistName(event?.event_created_by)}</ArtistNameBox>
         </EventBox>
 
         {/* This is the OptionBox component for event options */}
         <OptionBox>
           <Stack direction="row" width="100%" spacing={"1px"}>
-            <Button>
+            <Button onClick={handleOpenShareModal}>
               <ShareIcon style={{ color: "white", fontSize: "35px" }} />
             </Button>
             <Button>
@@ -366,6 +411,36 @@ export default function SingleEvent({ params: { id } }: Props) {
           )
         )}
       </Grid>
+
+      <Modal open={openShareModal} onClose={handleCloseShareModal}>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: 400,
+      bgcolor: "background.paper",
+      border: "2px solid #000",
+      boxShadow: 24,
+      p: 4,
+      borderRadius: "10px",
+    }}
+  >
+    <Typography variant="h6" component="h2">
+      Share this Event
+    </Typography>
+    <Box sx={{width: "100%", display: "flex", alignItems: "center"}}>
+    <Typography sx={{ mt: 2 }}>
+      {currentUrl}
+    </Typography>
+    <IconButton onClick={handleCopyUrl} color="primary" sx={{ mt: 2, ml: 2 }} aria-label="copy">
+      <ContentCopyIcon />
+    </IconButton>
+    </Box>
+    
+  </Box>
+</Modal>
     </Maindiv>
   );
 }
