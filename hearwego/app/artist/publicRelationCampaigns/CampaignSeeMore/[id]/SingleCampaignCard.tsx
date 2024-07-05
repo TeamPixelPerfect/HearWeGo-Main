@@ -25,6 +25,7 @@ import {
   Avatar,
   TextField,
   Snackbar,
+  DialogContentText,
 } from "@mui/material";
 import { Task as TaskIcon, Edit, Add, Save, Delete } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
@@ -37,7 +38,7 @@ interface CampaignCardProps {
   title: string;
   image: string;
   description: string;
-  status: "in_progress" | "completed";
+  status: string;
   tasks?: PRtask[]; // Optional tasks array
   token: string; // Add token prop for authentication
   id: string; // Add id prop to identify the campaign
@@ -69,6 +70,8 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null); // State for editing task ID
   const [editedTaskName, setEditedTaskName] = useState(""); // State for edited task name
   const [successMessage, setSuccessMessage] = useState(false); // State for success message
+  const [CampaignStatus, setCampaignStatus] = useState("in_progress"); // State for campaign status
+  const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false); // State for confirm complete dialog
 
   useEffect(() => {
     calculateProgress(); // Calculate initial progress
@@ -103,7 +106,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
         ? {
             ...task,
             TaskStatus:
-              task.TaskStatus === "completed" ? "incomplete" : "completed",
+              task.TaskStatus === "completed" ? "in_progress" : "completed",
           }
         : task
     );
@@ -153,19 +156,38 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
     const progress =
       totalTasks === 0 ? 0 : ((completedTasks / totalTasks) * 100).toFixed(2);
     setCompletedProgress(Number(progress)); // Update progress
-
-    if (Number(progress) === 100) {
-      status = "completed"; // Change status to completed if progress is 100%
-    }
   };
 
   const handleDone = async () => {
+    if (completedProgress === 100) {
+      setConfirmCompleteOpen(true);
+    } else {
+      await saveCampaignChanges();
+    }
+  };
+
+  const saveCampaignChanges = async () => {
+    console.log("id: ", id, "tasks: ", tasks, "status: ", status);
     try {
-      await updatePRCampaign(token, { PRtask: tasks }, id);
-      setSuccessMessage(true); // Show success message
-      setOpen(false); // Close the main dialog
+      await updatePRCampaign(token, { PRtask: tasks, completedProgress }, id);
+      setSuccessMessage(true);
+      setOpen(false);
     } catch (error) {
-      console.error(error.message); // Handle the error
+      console.error(error);
+    }
+  };
+
+  const handleConfirmComplete = async (complete: boolean) => {
+    if (complete) {
+      await updatePRCampaign(
+        token,
+        { PRtask: tasks, CampaignStatus: "completed", completedProgress: 100 },
+        id
+      );
+      setConfirmCompleteOpen(false);
+    } else {
+      await saveCampaignChanges();
+      setConfirmCompleteOpen(false);
     }
   };
 
@@ -173,26 +195,13 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
     try {
       await deletePRCampaign(token, id);
     } catch (error) {
-      console.error(error.message); // Handle the error
+      console.error(error); // Handle the error
     }
   };
 
   const handleCloseSnackbar = () => {
     setSuccessMessage(false); // Hide success message
   };
-
-  let statusLabel = "";
-
-  switch (status) {
-    case "in_progress":
-      statusLabel = "In Progress";
-      break;
-    case "completed":
-      statusLabel = "Completed";
-      break;
-    default:
-      statusLabel = "";
-  }
 
   return (
     <>
@@ -451,6 +460,29 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               </Button>
             </>
           )}
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={confirmCompleteOpen}
+        onClose={() => setConfirmCompleteOpen(false)}
+      >
+        <DialogTitle>Complete Campaign</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to mark this campaign as completed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleConfirmComplete(false)} color="primary">
+            Continue Adding Tasks
+          </Button>
+          <Button
+            onClick={() => handleConfirmComplete(true)}
+            color="primary"
+            autoFocus
+          >
+            Mark as Completed
+          </Button>
         </DialogActions>
       </Dialog>
       <Snackbar

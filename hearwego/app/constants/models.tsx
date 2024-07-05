@@ -262,7 +262,7 @@ export interface PRCampaigns {
   Campaign_Description?: string;
   CampaignImage_URL?: string;
   CampaignStatus?: string;
-  Com_percentage?: number;
+  completedProgress?: number;
   PRPosts?: PRPosts[];
   PRtask?: PRtask[];
 }

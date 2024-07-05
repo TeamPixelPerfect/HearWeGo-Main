@@ -53,7 +53,6 @@ const Dashboard = () => {
   };
 
   const CampaignTabPanel = ({ status }: { status: string }) => {
-    console.log(status, campaigns);
     const filteredCampaigns = campaigns.filter(
       (campaign) => campaign.CampaignStatus === status
     );
@@ -66,10 +65,10 @@ const Dashboard = () => {
               title={campaign?.Campaign_Name as string}
               image={campaign?.CampaignImage_URL as string}
               description={campaign?.Campaign_Description as string}
-              completedProgress={campaign?.Com_percentage as number}
+              completedProgress={campaign?.completedProgress as number}
               status={campaign?.CampaignStatus}
               tasks={campaign?.PRtask}
-              campaignId={campaign?.CampaignID}
+              id={campaign?.CampaignID as string}
               token={artist?.token as string}
             />
           </Grid>

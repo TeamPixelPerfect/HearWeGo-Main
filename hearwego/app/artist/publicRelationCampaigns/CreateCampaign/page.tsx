@@ -38,6 +38,17 @@ interface CreateCampaignPopProps {
   onClose: () => void;
 }
 
+const initialCampaignData = (artistId: string): PRCampaigns => ({
+  ArtistID: artistId,
+  Campaign_Name: "",
+  Campaign_Description: "",
+  CampaignImage_URL: "",
+  CampaignStatus: "in_progress",
+  completedProgress: 0,
+  PRPosts: [],
+  PRtask: [],
+});
+
 const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   open,
   onClose,
@@ -47,19 +58,11 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   const [tabValue, setTabValue] = useState(0);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
-  const [taskContent, setTaskContent] = useState([]);
-  const [campaignImg, setCampaignImg] = useState<File | null>(null);
   const [taskError, setTaskError] = useState<string | null>(null);
-  const [campaignData, setCampaignData] = useState<PRCampaigns>({
-    ArtistID: artist?.user.artist_id ?? "",
-    Campaign_Name: "",
-    Campaign_Description: "",
-    CampaignImage_URL: "",
-    CampaignStatus: "in_progress", // Set CampaignStatus here
-    Com_percentage: 0,
-    PRPosts: [],
-    PRtask: [], // Initialize as an empty array
-  });
+  const [campaignImg, setCampaignImg] = useState<File | null>(null);
+  const [campaignData, setCampaignData] = useState<PRCampaigns>(
+    initialCampaignData(artist?.user.artist_id ?? "")
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -160,11 +163,10 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       const tasksToSubmit = campaignData.PRtask.filter(
         (task) => task.TaskName.trim() !== ""
       );
-      console.log(tasksToSubmit);
       const campaignToSubmit = {
         ...campaignData,
-        Campaign_Name: formik.values.Campaign_Name, // Ensure Campaign_Name is correctly mapped
-        CampaignStatus: "in_progress", // Ensure CampaignStatus is set here
+        Campaign_Name: formik.values.Campaign_Name,
+        CampaignStatus: "in_progress",
         artist_id: artist ? artist.user.artist_id : "",
         PRtask: tasksToSubmit.map((task) => ({
           ...task,
@@ -319,22 +321,14 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       setConfirmCancelOpen(false);
       setConfirmSaveOpen(false);
       setCampaignImg(null);
-      setCampaignData({
-        ArtistID: "",
-        Campaign_Name: "",
-        Campaign_Description: "",
-        CampaignImage_URL: "",
-        CampaignStatus: "",
-        Com_percentage: 0,
-        PRPosts: [],
-        PRtask: [],
-      });
+      setCampaignData(initialCampaignData(artist?.user.artist_id ?? ""));
       setTaskError(null);
     }
   }, [open]);
 
   useEffect(() => {
     if (campaignImg) {
+      // Update the campaign data with the campaign image URL
       setCampaignData({
         ...campaignData,
         CampaignImage_URL: campaignImg,
