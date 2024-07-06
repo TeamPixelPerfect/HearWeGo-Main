@@ -139,8 +139,7 @@ export default function Tickets() {
         setManualTickets(manualTickets);
       });
     }
-  }
-  , [event_id, session_name, ticketTypes]);
+  }, [event_id, session_name, ticketTypes]);
 
   React.useEffect(() => {
     getEvent(event_id as string).then((event) => {
@@ -301,14 +300,28 @@ export default function Tickets() {
               >
                 {autoTickets.map(({ ticket_type, ticket_price }) => (
                   <TableRow>
-                    <TableCell sx={{ fontSize: "16px" }}>{ticket_type}</TableCell>
-                    <TableCell sx={{ fontSize: "16px" }}>{ticket_price}</TableCell>
+                    <TableCell sx={{ fontSize: "16px" }}>
+                      {ticket_type}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "16px" }}>
+                      {ticket_price}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-        ): <></>}
+        ) : ticketTypes?.ticket_type === "Manual" ? (
+          <Box>
+            Ticket Location
+            {manualTickets.map(({ ticket_location }) => (
+              
+                <Typography>
+                  {ticket_location}
+                </Typography>
+            ))}
+          </Box>
+        ) : null}
 
         <Box
           sx={{
