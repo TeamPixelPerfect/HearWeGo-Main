@@ -28,6 +28,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useAppSelector } from "@/lib/hooks";
 import { getClubPostsByArtist } from "@/app/services/FanClubServices";
 import { ClubPost, comments, replies, reacts } from "../../../constants/models";
+import { getArtist } from "@/app/services/ArtistServices";
 
 type Comment = {
   id: number;
@@ -54,6 +55,7 @@ interface Props {
   artist_id: string;
 }
 const FanClubFanPage = ({ artist_id }: Props) => {
+  const user = useAppSelector((state) => state.user.user);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [clubPost, setClubPost] = useState<ClubPost[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -62,12 +64,13 @@ const FanClubFanPage = ({ artist_id }: Props) => {
   const [newPostContent, setNewPostContent] = useState("");
 
   useEffect(() => {
-    // getClubPostsByArtist(artist_id)
-    //     .then((post) => {
-    //       console.log("Club Posts: ", post);
-    //       setClubPost(post.data);
-    //     })
-    //     .catch((error) => console.log(error));
+    console.log("Artist ID: ", artist_id);
+    getClubPostsByArtist(user?.token as string, artist_id)
+      .then((post) => {
+        console.log("Club Posts: ", post);
+        setClubPost(post.data);
+      })
+      .catch((error) => console.log(error));
   }, [artist_id]);
 
   const handleDialogOpen = (type: "post" | "news") => {
@@ -159,50 +162,56 @@ const FanClubFanPage = ({ artist_id }: Props) => {
             Feed
           </Typography>
         </Grid>
-        {clubPost.map((post) => (
-          <Grid item xs={12} key={post.artistId}>
-            <Paper sx={{ p: 2, marginBottom: 2, borderRadius: "10px" }}>
-              <Box display="flex" alignItems="center" mb={2}>
-                <Avatar
-                  alt="Poster Profile Picture"
-                  src={(artist?.user?.profilePicture as string) || ""}
-                  sx={{ marginRight: 2 }}
-                />
-                <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                    {artist?.user?.artistName || ""}
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    {new Date(post.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Typography variant="body1" gutterBottom>
-                {post.postDescription}
-              </Typography>
-
-              {post.postImage_URL && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginTop: 16,
-                    marginBottom: 16,
-                  }}
-                >
-                  <img
-                    src={post.postImage_URL}
-                    alt={post.postType}
-                    style={{ maxWidth: "70%", minWidth: "70%" }}
+        {clubPost.map((post) => {
+          let artist = {}
+          getArtist(post?.artistId as string).then((res) => {
+            console.log(res);
+          });
+          return (
+            <Grid item xs={12} key={post?.artistId}>
+              <Paper sx={{ p: 2, marginBottom: 2, borderRadius: "10px" }}>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <Avatar
+                    alt="Poster Profile Picture"
+                    src={(artist?.user?.profilePicture as string) || ""}
+                    sx={{ marginRight: 2 }}
                   />
-                </div>
-              )}
-            </Paper>
-          </Grid>
-        ))}
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                      {artist?.user?.artistName || ""}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {new Date(post?.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Typography variant="body1" gutterBottom>
+                  {post.postDescription}
+                </Typography>
+
+                {post.postImage_URL && (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      marginTop: 16,
+                      marginBottom: 16,
+                    }}
+                  >
+                    <img
+                      src={post.postImage_URL}
+                      alt={post.postType}
+                      style={{ maxWidth: "70%", minWidth: "70%" }}
+                    />
+                  </div>
+                )}
+              </Paper>
+            </Grid>
+          );
+        })}
       </Grid>
     </Container>
   );

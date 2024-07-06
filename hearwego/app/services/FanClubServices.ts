@@ -131,7 +131,7 @@ export const addNews = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
-export const getClubPostsByArtist = async (token: string, artistId: string) => {
+export const getClubPostsByArtist = async (token: string, artistId: string) => {''
   const res = await fetch(`${base_url}/FanClubManager/clubposts/Artist/${artistId}`, {
     method: "GET",
     headers: {

@@ -2,7 +2,6 @@
 
 "use client";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -54,6 +53,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
   const [songByArtist, setSongByArtist] = React.useState<Song[]>([]); // This is the state for song by artist
 
   const router = useRouter();
+
   // This is the useEffect for get artist
   React.useEffect(() => {
     getArtistV2(id).then((res) => {
@@ -62,6 +62,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
         setArtistData(res);
       }
     });
+  }, []);
 
   // This is the useEffect for get album by artist
   React.useEffect(() => {
@@ -70,8 +71,6 @@ export default function SingleArtistPage({ params: { id } }: Props) {
       setAlbumByArtist(res.data);
     });
 
-  // This is the useEffect for get song by artist
-  React.useEffect(() => {
     getSongsForArtist(artist?.token as string, id).then((res) => {
       console.log("Songs:::", res);
       setSongByArtist(res.data);
@@ -82,8 +81,6 @@ export default function SingleArtistPage({ params: { id } }: Props) {
       setArtistStoreData(res);
     });
   }, [id]);
-
-  const router = useRouter();
 
   return (
     <Maindiv>
