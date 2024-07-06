@@ -267,26 +267,27 @@ export default function EventsPage() {
         sx={{
           display: "flex",
           flexDirection: "row",
-          width: "100%",
+          width: "95%",
           height: "100%",
           alignItems: "center",
+          margin: "auto",
           //backgroundColor: "blue",
           //padding: "20px",
+          justifyContent: "space-between",
         }}
       >
         <Box
           style={{
-            width: "50%",
+            // width: "50%",
             display: "flex",
             padding: "15px",
-            marginLeft: "40px",
             //backgroundColor: "red",
             // justifyContent: "left",
           }}
         >
           <SearchPaper>
             <InputBase
-              sx={{ ml: 5, flex: 1 }}
+              sx={{ flex: 1, p: "10px" }}
               placeholder="Search for Events"
               inputProps={{ "aria-label": "search" }}
             />
@@ -299,7 +300,7 @@ export default function EventsPage() {
 
         <Box
           sx={{
-            width: "50%",
+            // width: "50%",
             //backgroundColor: "red",
             //position: "relative",
             display: "flex",
@@ -311,7 +312,7 @@ export default function EventsPage() {
             //margin:'15px 40px 15px 0px',
           }}
         >
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={1}>
             <CustomSelect
               labelId="genre-select-label"
               id="genre-select"
@@ -356,8 +357,9 @@ export default function EventsPage() {
         sx={{
           display: "flex",
           flexDirection: "row",
-          width: "100%",
+          width: "95%",
           height: "100%",
+          margin: "auto",
           justifyContent: "space-between",
           //alignItems: "right",
           //backgroundColor: "blue",
@@ -366,7 +368,7 @@ export default function EventsPage() {
       >
         <Box
           style={{
-            padding: "10px 0px 0px 60px",
+            padding: "10px 0px 0px 0px",
             color: "primary.default",
             fontSize: "32px",
             fontWeight: "bold",
@@ -375,7 +377,7 @@ export default function EventsPage() {
         >
           My Interest
         </Box>
-        <CardActions style={{ padding: "20px" }}>
+        <CardActions style={{ padding: "20px", paddingRight: 0 }}>
           <Button
             href="/main/events/MoreInterestEvents"
             //variant="contained"
@@ -386,10 +388,10 @@ export default function EventsPage() {
         </CardActions>
       </Box>
 
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
         {interestEvents.map(
           ({ name, img, date, day, time, artist, event_id }) => (
-            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+            <Grid item xs={6} md={3}>
               <SingleEvent
                 eventID={event_id}
                 eventName={name}
@@ -408,8 +410,9 @@ export default function EventsPage() {
         sx={{
           display: "flex",
           flexDirection: "row",
-          width: "100%",
+          width: "95%",
           height: "100%",
+          margin: "auto",
           justifyContent: "space-between",
           //alignItems: "right",
           //backgroundColor: "blue",
@@ -418,7 +421,7 @@ export default function EventsPage() {
       >
         <Box
           style={{
-            padding: "10px 0px 0px 60px",
+            padding: "10px 0px 0px 0px",
             color: "primary.default",
             fontSize: "32px",
             fontWeight: "bold",
@@ -427,7 +430,7 @@ export default function EventsPage() {
         >
           Trending Events
         </Box>
-        <CardActions style={{ padding: "20px" }}>
+        <CardActions style={{ padding: "20px", paddingRight: "0" }}>
           <Button
             href="/main/events/MoreTrendingEvents"
             //variant="contained"
@@ -438,10 +441,10 @@ export default function EventsPage() {
         </CardActions>
       </Box>
 
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
         {trendingEvents.map(
           ({ name, img, date, day, time, artist, event_id }) => (
-            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+            <Grid item xs={6} md={3}>
               <SingleEvent
                 eventID={event_id}
                 eventName={name}
@@ -460,7 +463,8 @@ export default function EventsPage() {
         sx={{
           display: "flex",
           flexDirection: "row",
-          width: "100%",
+          width: "95%",
+          margin: "auto",
           height: "100%",
           justifyContent: "space-between",
           //alignItems: "right",
@@ -470,7 +474,7 @@ export default function EventsPage() {
       >
         <Box
           style={{
-            padding: "10px 0px 0px 60px",
+            padding: "10px 0px 0px 0px",
             color: "primary.default",
             fontSize: "32px",
             fontWeight: "bold",
@@ -479,7 +483,7 @@ export default function EventsPage() {
         >
           All Events
         </Box>
-        <CardActions style={{ padding: "20px" }}>
+        <CardActions style={{ padding: "20px", paddingRight: 0 }}>
           <Button
             href="/main/events/allEvents"
             //variant="contained"
@@ -490,9 +494,9 @@ export default function EventsPage() {
         </CardActions>
       </Box>
 
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
         {allEvents.map(({ name, img, date, day, time, artist, event_id }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+          <Grid item xs={6} md={3}>
             <SingleEvent
               eventID={event_id}
               eventName={name}

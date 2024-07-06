@@ -2,6 +2,7 @@
 import { useState } from "react";
 import React from "react";
 import { TextField } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 import {
   Box,
@@ -138,6 +139,8 @@ const SingleOrderDetail: React.FC = () => {
     setSubmitted(true);
   };
 
+  const router = useRouter();
+
   return (
     <Container
       maxWidth="md"
@@ -148,10 +151,13 @@ const SingleOrderDetail: React.FC = () => {
         marginTop: "20px",
       }}
     >
-      <Link href="/orders">
+    
         <Button
           startIcon={<ArrowBackIos />}
-          sx={{
+          onClick={() => {
+            router.push("/main/user/orders");
+          }}
+           sx={{
             marginBottom: "20px",
             fontSize: "32px",
             textTransform: "none",
@@ -160,8 +166,7 @@ const SingleOrderDetail: React.FC = () => {
         >
           Back to Orders
         </Button>
-      </Link>
-
+     
       <Paper
         elevation={3}
         sx={{

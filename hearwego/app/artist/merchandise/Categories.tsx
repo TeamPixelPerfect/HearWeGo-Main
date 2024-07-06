@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme, ThemeProvider } from "@mui/material/styles";
 import {
   Container,
@@ -25,53 +25,15 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import DropFile from "../../components/DropFile"; // Adjust the import path as needed
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  subCategories: string[];
-  image: string;
-}
-
-const dummyCategories: Category[] = [
-  {
-    id: "1",
-    name: "Electronics",
-    description: "Gadgets and devices",
-    subCategories: ["Phones", "Laptops", "Cameras"],
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "2",
-    name: "Clothing",
-    description: "Apparel for all",
-    subCategories: ["Men", "Women", "Kids"],
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "3",
-    name: "Home & Kitchen",
-    description: "Household items",
-    subCategories: ["Furniture", "Appliances", "Decor"],
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "4",
-    name: "Books",
-    description: "Books and magazines",
-    subCategories: ["Fiction", "Non-Fiction", "Children"],
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "5",
-    name: "Toys & Games",
-    description: "Fun for kids",
-    subCategories: ["Action Figures", "Board Games", "Puzzles"],
-    image: "https://via.placeholder.com/150",
-  },
-];
+import DropFile from "../../components/DropFile";
+import {
+  addMerchCategory,
+  deleteCategory,
+  editCategory,
+  getCategories,
+} from "../../services/StoreServices"; // Make sure to implement this service
+import { MerchCategory } from "../../constants/models";
+import { useAppSelector } from "@/lib/hooks";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -80,9 +42,13 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Categories: React.FC = () => {
+interface Props {
+  store_id: string;
+}
+
+const Categories = ({ store_id }: Props) => {
+  const artist = useAppSelector((state) => state.artist.user);
   const theme = useTheme();
-  const [categories, setCategories] = useState<Category[]>(dummyCategories);
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -95,6 +61,8 @@ const Categories: React.FC = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+  const [categories, setCategories] = useState<MerchCategory[]>([]);
+  const [categoryId, setCategoryId] = useState<String>("");
 
   const handleClickOpen = (isEdit: boolean) => {
     setOpen(true);
@@ -113,21 +81,18 @@ const Categories: React.FC = () => {
 
   const handleConfirmDialogOpen = (
     type: "cancel" | "delete",
-    index?: number
+    categoryId?: string | undefined
   ) => {
     setConfirmDialogType(type);
-    setDeleteIndex(index ?? null);
+    setCategoryId(categoryId ? categoryId : "");
     setConfirmDialogOpen(true);
   };
 
   const handleConfirmAction = () => {
     if (confirmDialogType === "cancel") {
       handleClose();
-    } else if (confirmDialogType === "delete" && deleteIndex !== null) {
-      setCategories((prev) => prev.filter((_, i) => i !== deleteIndex));
-      setSnackbarMessage("Category deleted successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+    } else if (confirmDialogType === "delete") {
+      handleDelete(categoryId);
     }
     handleConfirmDialogClose();
   };
@@ -148,76 +113,98 @@ const Categories: React.FC = () => {
       name: "",
       description: "",
       subCategories: "",
-      image: "",
       logoFile: null,
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Required"),
-      description: Yup.string().required("Required"),
-      subCategories: Yup.string().required("Required"),
-      logoFile: Yup.mixed()
-        .required("A file is required")
-        .test("fileFormat", "Unsupported Format", (value) =>
-          value
-            ? [
-                "image/jpeg",
-                "image/png",
-                "image/webp",
-                "image/svg+xml",
-              ].includes(value.type)
-            : false
-        ),
+      // description: Yup.string().required("Required"),
+      // subCategories: Yup.string().required("Required"),
+      // logoFile: Yup.mixed().required("A file is required"),
     }),
-    onSubmit: (values) => {
-      const newCategory: Category = {
-        id: isEditing ? values.id : String(Date.now()),
-        name: values.name,
-        description: values.description,
+    onSubmit: async (values) => {
+      const newCategory: MerchCategory = {
+        store_id: store_id,
+        category_id: isEditing ? values.id : String(Date.now()),
+        category_name: values.name,
+        category_description: values.description,
         subCategories: values.subCategories
           .split(",")
           .map((subCat) => subCat.trim()),
-        image: URL.createObjectURL(values.logoFile),
+        image: values?.logoFile ? values.logoFile : "",
       };
 
-      if (isEditing) {
-        setCategories((prev) =>
-          prev.map((category) =>
-            category.id === newCategory.id ? newCategory : category
-          )
-        );
-        setSnackbarMessage("Category updated successfully!");
-      } else {
-        const duplicate = categories.find(
-          (category) =>
-            category.name.toLowerCase() === newCategory.name.toLowerCase()
-        );
-        if (duplicate) {
-          setSnackbarMessage("Category name already exists!");
-          setSnackbarSeverity("error");
-          setSnackbarOpen(true);
-          return;
+      try {
+        if (isEditing) {
+          editCategory(
+            artist?.token ? artist.token : "",
+            newCategory?.category_id ? newCategory.category_id : "",
+            newCategory
+          ).then((res) => {
+            console.log("Category edited successfully:", res);
+            setSnackbarSeverity("success");
+            setSnackbarOpen(true);
+            setSnackbarMessage("Category edited successfully!");
+            fetchCategories();
+          });
+        } else {
+          const res = await addMerchCategory(
+            artist ? artist.token : "",
+            newCategory
+          );
+          if (res.error) {
+            setSnackbarMessage(res.error);
+            setSnackbarSeverity("error");
+          } else {
+            setSnackbarMessage("Category added successfully!");
+            setSnackbarSeverity("success");
+            fetchCategories();
+          }
         }
-        setCategories((prev) => [...prev, newCategory]);
-        setSnackbarMessage("Category added successfully!");
+      } catch (error) {
+        console.error("Error adding/updating category: ", error);
+        setSnackbarMessage("Error adding/updating category!");
+        setSnackbarSeverity("error");
       }
-      setSnackbarSeverity("success");
+
       setSnackbarOpen(true);
       handleClose();
     },
   });
 
-  const handleEdit = (index: number) => {
+  const handleEdit = (index: Number) => {
     const categoryToEdit = categories[index];
     formik.setValues({
-      id: categoryToEdit.id,
-      name: categoryToEdit.name,
-      description: categoryToEdit.description,
+      id: categoryToEdit.category_id,
+      name: categoryToEdit.category_name,
+      description: categoryToEdit.category_description,
       subCategories: categoryToEdit.subCategories.join(", "),
-      image: categoryToEdit.image,
-      logoFile: null, // Reset the file input
+      logoFile: categoryToEdit.image,
     });
     handleClickOpen(true);
   };
+
+  const handleDelete = async (categoryId: string | undefined) => {
+    deleteCategory(
+      artist?.token ? artist.token : "",
+      categoryId ? categoryId : ""
+    ).then((res) => {
+      console.log("Category deleted successfully:", res);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      setSnackbarMessage("Category deleted successfully!");
+      fetchCategories();
+    });
+  };
+
+  const fetchCategories = () => {
+    getCategories().then((res) => {
+      setCategories(res.data);
+    });
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -228,12 +215,12 @@ const Categories: React.FC = () => {
           </Typography>
           <Grid container spacing={4}>
             {categories.map((category, index) => (
-              <Grid item xs={12} sm={6} md={4} key={category.id}>
+              <Grid item xs={12} sm={6} md={4} key={category.category_id}>
                 <Card style={{ position: "relative", height: "380px" }}>
                   <CardContent>
                     <img
                       src={category.image}
-                      alt={category.name}
+                      alt={category.category_name}
                       style={{
                         width: "100%",
                         height: "200px",
@@ -241,10 +228,10 @@ const Categories: React.FC = () => {
                       }}
                     />
                     <Typography variant="h5" component="div" gutterBottom>
-                      {category.name}
+                      {category.category_name}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {category.description}
+                      {category.category_description}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
                       Subcategories: {category.subCategories.join(", ")}
@@ -255,7 +242,9 @@ const Categories: React.FC = () => {
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleConfirmDialogOpen("delete", index)}
+                      onClick={() =>
+                        handleConfirmDialogOpen("delete", category.category_id)
+                      }
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -383,6 +372,7 @@ const Categories: React.FC = () => {
                 >
                   Cancel
                 </Button>
+
                 <Button type="submit" color="primary">
                   {isEditing ? "Update" : "Add"}
                 </Button>

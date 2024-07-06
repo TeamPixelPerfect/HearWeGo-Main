@@ -9,6 +9,7 @@ export const HeaderBox = styled("div")(({ theme }) => ({
   height: "fit-content",
   display: "flex",
   alignItems: "center",
+  justifyContent: "space-between",
 }));
 
 export const SearchArea = styled("div")(({ theme }) => ({
@@ -21,7 +22,6 @@ export const SearchArea = styled("div")(({ theme }) => ({
 
 export const HitPredictorIco = styled("div")(({ theme }) => ({
   height: "100%",
-  width: "10%",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -35,11 +35,11 @@ export const HitPredictorBtn = styled(Fab)(({ theme }) => ({
 
 export const ProfileArea = styled("div")(({ theme }) => ({
   height: "100%",
-  width: "20%",
-  minWidth: "200px",
+  // minWidth: "200px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  cursor: "pointer",
   "@media (max-width: 960px)": {
     minWidth: "fit-content",
   },
@@ -48,7 +48,7 @@ export const ProfileArea = styled("div")(({ theme }) => ({
 export const ProfileDetailArea = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
+  justifyContent: "center",
   padding: "8px",
   width: "100%",
   height: "100%",

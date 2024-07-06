@@ -18,7 +18,7 @@ export const artistSlice = createSlice({
     name: "artist",
     initialState,
     reducers: {
-        logOutArtist: (state, action: PayloadAction<Artist>) => {
+        logOutArtist: (state) => {
             return {user: null, loading: true, error: null};
         },
         logInArtist: (state, action: PayloadAction<Artist>) => {

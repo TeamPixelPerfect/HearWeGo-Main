@@ -24,6 +24,7 @@ import { Album, Artist, Song } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { useAppSelector } from "@/lib/hooks";
 import { getSongsForArtist } from "@/app/services/SongServices";
+import ArtistSearch from "./ArtistSearch";
 
 export const genreOptions = [
   { value: "pop", label: "Pop" },
@@ -64,6 +65,8 @@ interface props {
   params: { id: string };
 }
 export default function Artist({ params: { id } }: props) {
+  const [searchText, setSearchText] = useState("");
+
   //State variables for the filters
   const [genre, setGenre] = React.useState("");
   const [profession, setProfession] = React.useState("");
@@ -76,6 +79,8 @@ export default function Artist({ params: { id } }: props) {
 
   //State variables for the artist data
   const [allArtistData, setAllArtistData] = useState<Artist[]>([]);
+  const [searchedArtists, setSearchedArtists] = useState<any[]>([]);
+
   const [page, setPage] = useState(1);
   const [per_page, setLimit] = useState(5);
 
@@ -131,6 +136,11 @@ export default function Artist({ params: { id } }: props) {
   ) => {
     setValue(newValue);
   };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
+
   return (
     //This is the Maindiv that contains all the components
     <Maindiv>
@@ -145,19 +155,20 @@ export default function Artist({ params: { id } }: props) {
       >
         <Box
           sx={{
-            alignItems: "baseline",
+            // alignItems: "baseline",
             width: "100%",
-            flex: 1,
-            position: "relative",
-            marginTop: "30px",
+            // flex: 1,
+            // position: "relative",
+            marginTop: "20px",
           }}
         >
           {/* This is the SearchPaper that contains the search bar */}
           <SearchPaper>
             <InputBase
-              sx={{ ml: 1, flex: 1 }}
+              sx={{ ml: 1, flex: 1, p: "10px" }}
               placeholder="Search for an Artist"
-              inputProps={{ "aria-label": "search google maps" }}
+              inputProps={{ "aria-label": "search artists" }}
+              onChange={handleSearch}
             />
             <IconButton type="button" sx={{ p: "10px" }} aria-label="Search">
               <SearchIcon />
@@ -165,7 +176,7 @@ export default function Artist({ params: { id } }: props) {
           </SearchPaper>
         </Box>
         {/* This is the Stack that contains the CustomSelect components */}
-        <Stack direction="row" spacing={5}>
+        <Stack direction="row" spacing={1}>
           <CustomSelect
             labelId="genre-select-label"
             id="genre-select"
@@ -213,145 +224,164 @@ export default function Artist({ params: { id } }: props) {
           />
         </Stack>
       </Box>
-      {/* This is the Typography that contains the text "Featured Artists" */}
-      <Typography
-        variant="h6"
-        sx={{ marginTop: "20px", color: "text.primary" }}
-      >
-        Featured Artists
-      </Typography>
-      {/* This is the Stack that contains the ArtistCard components */}
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ marginTop: "20px", marginBottom: "20px" }}
-      >
-        {/* Map all the artists to the ArtistCard component */}
-        {allArtistData.map((artists) => (
-          <ArtistCard
-            name={artists.artistName}
-            Genre={artists.musicGenres.join(", ")}
-            img_url={
-              artists.artistCovers.length > 0
-                ? artists.artistCovers[0]
-                : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-            }
-            id={artists.artist_id}
-          />
-        ))}
-      </Stack>
-      {/* This is the Typography that contains the text "Trending Artists" */}
-      <Typography
-        variant="h6"
-        sx={{ marginTop: "20px", color: "text.primary" }}
-      >
-        Trending Artists
-      </Typography>
-      <TableContainer
-        component={Paper}
-        style={{ borderRadius: "30px", marginTop: "20px" }}
-      >
-        {/* This is the Table that contains the TrendingRow components */}
-        <Table
-          sx={{
-            width: "100%",
-            backgroundColor: "primary.light",
-          }}
-        >
-          <TableHead style={{ color: "primary.main" }}>
-            <TableRow>
-              <TableCell align="center">Rank</TableCell>
-              <TableCell align="center">Artist Name</TableCell>
-              <TableCell align="center">Latest Song</TableCell>
-              <TableCell align="center">Latest Album</TableCell>
-              <TableCell align="center">Fans</TableCell>
-              <TableCell align="center">Popularity</TableCell>
-              <TableCell align="center">Country</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {/* Map all the artists to the TrendingRow component */}
+      {searchText !== "" ? (
+        <ArtistSearch
+          searchTerm={searchText}
+          searchedArtists={searchedArtists}
+        />
+      ) : (
+        <>
+          {/* This is the Typography that contains the text "Featured Artists" */}
+          <Typography
+            variant="h6"
+            sx={{ marginTop: "20px", color: "text.primary" }}
+          >
+            Featured Artists
+          </Typography>
+          {/* This is the Stack that contains the ArtistCard components */}
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              marginTop: "20px",
+              marginBottom: "20px",
+              flexWrap: "nowrap",
+              maxWidth: "100%",
+              overflow: "scroll",
+            }}
+          >
+            {/* Map all the artists to the ArtistCard component */}
             {allArtistData.map((artists) => (
-              <TrendingRow
-                Rank={{
-                  rank: 1,
-                  rank_img:
-                    "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
-                }}
-                Artist={{
-                  name: artists.artistName,
-                  img_url:
-                    artists.artistCovers.length > 0
-                      ? artists.artistCovers[0]
-                      : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg",
-                }}
-                Latest_song={{
-                  song_name: artist?.token ? allArtistSongs[0].song_title : "",
-                  song_img:
-                    "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
-                }}
-                Latest_album={{
-                  album_name: "Scream",
-                  album_img:
-                    "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
-                }}
-                Fans={100000000}
-                popularity={""}
-                country_img={""}
-                LinkPage={""}
+              <ArtistCard
+                name={artists.artistName}
+                Genre={artists.musicGenres.join(", ")}
+                img_url={
+                  artists.artistCovers.length > 0
+                    ? artists.artistCovers[0]
+                    : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+                }
+                id={artists.artist_id}
               />
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Box
-        sx={{
-          width: "100%",
-          justifyContent: "right",
-          position: "relative",
-          display: "flex",
-        }}
-      >
-        {/* Link to the TrendingArtistsSeeMore page */}
-        <Link href="/main/artists/TrendingArtistsSeeMore/">
+          </Stack>
+          {/* This is the Typography that contains the text "Trending Artists" */}
           <Typography
-            variant="body1"
-            sx={{ color: "primary.main", padding: "20px", display: "flex" }}
+            variant="h6"
+            sx={{ marginTop: "20px", color: "text.primary" }}
           >
-            <ArrowDropDownIcon />
-            Show all Artists
+            Trending Artists
           </Typography>
-        </Link>
-      </Box>
-      <Typography
-        variant="h6"
-        sx={{ marginTop: "20px", color: "text.primary" }}
-      >
-        Recently Joined Artists
-      </Typography>
+          <TableContainer
+            component={Paper}
+            style={{ borderRadius: "30px", marginTop: "20px" }}
+          >
+            {/* This is the Table that contains the TrendingRow components */}
+            <Table
+              sx={{
+                width: "100%",
+                backgroundColor: "primary.light",
+              }}
+            >
+              <TableHead style={{ color: "primary.main" }}>
+                <TableRow>
+                  <TableCell align="center">Rank</TableCell>
+                  <TableCell align="center">Artist Name</TableCell>
+                  <TableCell align="center">Latest Song</TableCell>
+                  <TableCell align="center">Latest Album</TableCell>
+                  <TableCell align="center">Fans</TableCell>
+                  <TableCell align="center">Popularity</TableCell>
+                  <TableCell align="center">Country</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/* Map all the artists to the TrendingRow component */}
+                {allArtistData.map((artists) => (
+                  <TrendingRow
+                    Rank={{
+                      rank: 1,
+                      rank_img:
+                        "https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg",
+                    }}
+                    Artist={{
+                      name: artists.artistName,
+                      img_url:
+                        artists.artistCovers.length > 0
+                          ? artists.artistCovers[0]
+                          : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg",
+                    }}
+                    Latest_song={{
+                      song_name: "Thriller",
+                      song_img:
+                        "https://www.shopmichaeljackson.uk/images/michael_jackson_leave_me_alone_cd_single_654672_2_front.jpg",
+                    }}
+                    Latest_album={{
+                      album_name: "Scream",
+                      album_img:
+                        "https://cdn.smehost.net/michaeljacksoncom-uslegacyprod/wp-content/uploads/2017/09/170906_mj_scream_cover-300x300.jpg",
+                    }}
+                    Fans={100000000}
+                    popularity={""}
+                    country_img={""}
+                    LinkPage={""}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Box
+            sx={{
+              width: "100%",
+              justifyContent: "right",
+              position: "relative",
+              display: "flex",
+            }}
+          >
+            {/* Link to the TrendingArtistsSeeMore page */}
+            <Link href="/main/artists/TrendingArtistsSeeMore/">
+              <Typography
+                variant="body1"
+                sx={{ color: "primary.main", padding: "20px", display: "flex" }}
+              >
+                <ArrowDropDownIcon />
+                Show all Artists
+              </Typography>
+            </Link>
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{ marginTop: "20px", color: "text.primary" }}
+          >
+            Recently Joined Artists
+          </Typography>
 
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ marginTop: "20px", marginBottom: "20px" }}
-      >
-        {/* Map all the artists to the ArtistCard component on the reverse order */}
-        {allArtistData
-          .slice()
-          .reverse()
-          .map((artists) => (
-            <ArtistCard
-              name={artists.artistName}
-              Genre={artists.musicGenres.join(", ")}
-              img_url={
-                artists.artistCovers.length > 0
-                  ? artists.artistCovers[0]
-                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
-              }
-              id={artists.artist_id}
-            />
-          ))}
-      </Stack>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              marginTop: "20px",
+              width: "100%",
+              overflow: "scroll",
+            }}
+          >
+            {/* Map all the artists to the ArtistCard component on the reverse order */}
+            {allArtistData
+              .slice()
+              .reverse()
+              .map((artists) => (
+                <ArtistCard
+                  name={artists.artistName}
+                  Genre={artists.musicGenres.join(", ")}
+                  img_url={
+                    artists.artistCovers.length > 0
+                      ? artists.artistCovers[0]
+                      : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Michael_Jackson_Dangerous_World_Tour_1993.jpg/640px-Michael_Jackson_Dangerous_World_Tour_1993.jpg"
+                  }
+                  id={artists.artist_id}
+                />
+              ))}
+          </Stack>
+        </>
+      )}
     </Maindiv>
   );
 }

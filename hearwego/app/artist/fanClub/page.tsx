@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
@@ -15,586 +14,268 @@ import {
   Tabs,
   Box,
   Card,
-  CardMedia,
   CardHeader,
-  Avatar,
-  CardContent,
-  Fab,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { Add as AddIcon } from "@mui/icons-material";
 import FeedTab from "./FeedTab";
 import PhotosTab from "./PhotosTab";
-import VideosTab from "./VideosTab";
 import DropFile from "../../components/DropFile";
 import NewsPage from "./NewsTab";
 import EventsTab from "./EventsTab";
-
-const dummyData: Post[] = [
-  {
-    id: 1,
-    title: "First Post",
-    content: "Content of the first post.",
-    image:
-      "https://res.heraldm.com/content/image/2022/12/01/20221201000743_0.jpg",
-    likes: 10,
-    comments: [
-      {
-        id: 1,
-        user: "User A",
-        content: "First comment",
-        profilePicture: "path/to/user/profile/picture1.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 2,
-        user: "User B",
-        content: "Second comment",
-        profilePicture: "path/to/user/profile/picture2.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist A",
-    profilePicture: "path/to/artist/profile/picture1.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: "Second Post with Image",
-    content: "Content of the second post.",
-    image:
-      "https://www.billboard.com/wp-content/uploads/2021/06/maroon-5-superbowl-2019-billboard-1548-1623086440.jpg",
-    likes: 15,
-    comments: [
-      {
-        id: 3,
-        user: "User C",
-        content: "Third comment",
-        profilePicture: "path/to/user/profile/picture3.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 4,
-        user: "User D",
-        content: "Fourth comment",
-        profilePicture: "path/to/user/profile/picture4.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist B",
-    profilePicture: "path/to/artist/profile/picture2.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    title: "Third Post with Video",
-    content: "Content of the third post.",
-    video: "https://www.example.com/path/to/video.mp4",
-    likes: 20,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist C",
-    profilePicture: "path/to/artist/profile/picture3.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  // Add 10 more dummy posts here
-  {
-    id: 4,
-    title: "Fourth Post",
-    content: "Content of the fourth post.",
-    image: "https://example.com/image4.jpg",
-    likes: 5,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist D",
-    profilePicture: "path/to/artist/profile/picture4.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 5,
-    title: "Fifth Post with Video",
-    content: "Content of the fifth post.",
-    video: "https://example.com/video5.mp4",
-    likes: 8,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist E",
-    profilePicture: "path/to/artist/profile/picture5.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 6,
-    title: "Sixth Post",
-    content: "Content of the sixth post.",
-    image: "https://example.com/image6.jpg",
-    likes: 12,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist F",
-    profilePicture: "path/to/artist/profile/picture6.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 7,
-    title: "Seventh Post with Video",
-    content: "Content of the seventh post.",
-    video: "https://example.com/video7.mp4",
-    likes: 3,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist G",
-    profilePicture: "path/to/artist/profile/picture7.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 8,
-    title: "Eighth Post",
-    content: "Content of the eighth post.",
-    image: "https://example.com/image8.jpg",
-    likes: 9,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist H",
-    profilePicture: "path/to/artist/profile/picture8.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 9,
-    title: "Ninth Post",
-    content: "Content of the ninth post.",
-    image: "https://example.com/image9.jpg",
-    likes: 7,
-    comments: [
-      {
-        id: 5,
-        user: "User E",
-        content: "Fifth comment",
-        profilePicture: "path/to/user/profile/picture5.jpg",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: 6,
-        user: "User F",
-        content: "Sixth comment",
-        profilePicture: "path/to/user/profile/picture6.jpg",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    user: "Artist I",
-    profilePicture: "path/to/artist/profile/picture9.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 10,
-    title: "Tenth Post with Video",
-    content: "Content of the tenth post.",
-    video: "https://example.com/video10.mp4",
-    likes: 6,
-    comments: [],
-    user: "Artist J",
-    profilePicture: "path/to/artist/profile/picture10.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 11,
-    title: "Eleventh Post",
-    content: "Content of the eleventh post.",
-    image: "https://example.com/image11.jpg",
-    likes: 13,
-    comments: [],
-    user: "Artist K",
-    profilePicture: "path/to/artist/profile/picture11.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 12,
-    title: "Twelfth Post with Video",
-    content: "Content of the twelfth post.",
-    video: "https://example.com/video12.mp4",
-    likes: 4,
-    comments: [],
-    user: "Artist L",
-    profilePicture: "path/to/artist/profile/picture12.jpg",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: 13,
-    title: "Thirteenth Post",
-    content: "Content of the thirteenth post.",
-    image: "https://example.com/image13.jpg",
-    likes: 11,
-    comments: [],
-    user: "Artist M",
-    profilePicture: "path/to/artist/profile/picture13.jpg",
-    timestamp: new Date().toISOString(),
-  },
-];
-
-export type Comment = {
-  id: number;
-  user: string;
-  content: string;
-  profilePicture: string;
-  timestamp: string;
-};
-
-export type Post = {
-  id: number;
-  title: string;
-  content: string;
-  image?: string;
-  video?: string;
-  likes: number;
-  comments: Comment[];
-  user: string;
-  profilePicture: string;
-  timestamp: string;
-};
+import VideosTab from "./VideosTab";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import { ClubPost, ClubNews, Event } from "../../constants/models";
+import { addNews, addPost } from "../../services/FanClubServices";
+import { useAppSelector } from "@/lib/hooks";
 
 const validationSchema = Yup.object().shape({
-  title: Yup.string().required("Title is required"),
-  content: Yup.string().required("Content is required"),
-  image: Yup.mixed().nullable().required("Image is required"),
-  video: Yup.mixed().nullable().required("Video is required"),
+  postDescription: Yup.string().required("Description is required"),
 });
-
-const ArtistPage: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<"post" | "news" | null>(null);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [posts, setPosts] = useState<Post[]>(dummyData);
+const newsValidationSchema = Yup.object().shape({
+  newsTitle: Yup.string().required("Title is required"),
+  newsBody: Yup.string().required("Description is required"),
+});
+const ArtistPage = () => {
+  const router = useRouter();
+  const artist = useAppSelector((state) => state.artist.user);
+  const artistId = artist?.user.artist_id ?? "";
+  const [selectedPost, setSelectedPost] = useState<ClubPost | null>(null);
+  const [posts, setPosts] = useState<ClubPost[]>([]);
+  const [news, setNews] = useState<ClubNews[]>([]);
+  const [artistData, setArtistData] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
+  const [openPostDialog, setOpenPostDialog] = useState(false);
+  const [openNewsDialog, setOpenNewsDialog] = useState(false);
+
+  const [postImage, setPostImage] = useState<File | null>(null);
+  const [newsImage, setNewsImage] = useState<File | null>(null);
+
+  const initialValues: ClubPost = {
+    postType: "",
+    postDescription: "",
+    postpublisher: artist ? artist.user.artist_id : "",
+    postImage_URL: "",
+    reacts: "",
+    comments: "",
+    clubId: "fc0",
+    artistId: artist ? artist.user.artist_id : "",
+    timestamps: "",
+  };
+
+  const initialValuesNews: ClubNews = {
+    newsTitle: "",
+    newsBody: "",
+    newsPublisher: artist ? artist.user.artist_id : "",
+    newsImage_URL: "",
+    clubId: "fc0",
+    artistId: artist ? artist.user.artist_id : "",
+    timestamps: "",
+  };
+
+  useEffect(() => {
+    if (newsImage) {
+      setNewsImage(newsImage);
+    }
+  }, [newsImage]);
+
+  useEffect(() => {
+    if (postImage) {
+      setPostImage(postImage);
+    }
+  }, [postImage]);
+
+  const submitData = async (values: ClubPost) => {
+    try {
+      const updatedPost = {
+        ...values,
+        postImage_URL: postImage ? postImage : "",
+      };
+      const newPost = await addPost(artist.token, updatedPost);
+      setPosts([...posts, newPost]); // Update the state with the new post
+      setOpenPostDialog(false);
+      setPostImage(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const submitNewsData = async (values: ClubNews) => {
+    try {
+      const updatedNews = {
+        ...values,
+        newsImage_URL: newsImage ? newsImage : "",
+      };
+      const newNews = await addNews(artist.token, updatedNews);
+      setNews([...news, newNews]); // Update the state with the new news
+      setOpenNewsDialog(false);
+      setNewsImage(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleDialogOpen = (type: "post" | "news") => {
-    setDialogType(type);
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
-  const handleDeletePost = (postId: number) => {
-    const updatedPosts = posts.filter((post) => post.id !== postId);
-    setPosts(updatedPosts);
-  };
-
-  const handleEditPost = (postId: number, updatedPost: Post) => {
-    const updatedPosts = posts.map((post) =>
-      post.id === postId ? updatedPost : post
-    );
-    setPosts(updatedPosts);
-  };
-
-  const handleAddComment = (postId: number, comment: Comment) => {
-    const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          comments: [...post.comments, comment],
-        };
-      }
-      return post;
-    });
-    setPosts(updatedPosts);
-  };
-
-  const handleCreatePost = async (values: {
-    title: string;
-    content: string;
-    image: File | null;
-    video: File | null;
-  }) => {
-    try {
-      // Validate form values against the schema
-      await validationSchema.validate(values, { abortEarly: false });
-
-      // If validation succeeds, create a new post
-      const newPost: Post = {
-        id: posts.length + 1,
-        title: values.title,
-        content: values.content,
-        image: values.image ? URL.createObjectURL(values.image) : undefined,
-        video: values.video ? URL.createObjectURL(values.video) : undefined,
-        likes: 0,
-        comments: [],
-        user: "New Artist", // Dummy user
-        profilePicture: "path/to/artist/profile/picture.jpg", // Dummy path
-        timestamp: new Date().toISOString(),
-      };
-      setPosts([...posts, newPost]);
-      handleDialogClose();
-    } catch (error) {
-      // Handle validation errors
-      if (error instanceof Yup.ValidationError) {
-        const errorMessages = {};
-        error.inner.forEach((err) => {
-          errorMessages[err.path] = err.message;
-        });
-        console.log("Validation errors:", errorMessages);
-        // Optionally, you can set state to display error messages
-        // This could be done with a state variable like errorMessage
-        // errorMessage could then be displayed in the form
-      }
-    }
-  };
-
-  const handleCardClick = (post: Post) => {
-    setSelectedPost(post);
+  const handleClickOpenPostDialog = () => {
+    setSelectedPost(null);
+    setOpenPostDialog(true);
   };
 
   const handleClosePostDialog = () => {
-    setSelectedPost(null);
+    setOpenPostDialog(false);
+  };
+  const handleClickOpenNewsDialog = () => {
+    setOpenNewsDialog(true);
+  };
+
+  const handleCloseNewsDialog = () => {
+    setOpenNewsDialog(false);
+  };
+  const handleCardClick = (post: ClubPost) => {
+    setSelectedPost(post);
+  };
+
+  const handleGoToProfile = () => {
+    router.push("/artist/fanClub/Profile");
   };
 
   return (
     <Container maxWidth="lg">
-      <Paper sx={{ p: 2, marginBottom: 2 }}>
-        <Typography variant="h5" component="div">
-          Artist Page
-        </Typography>
-        <Typography variant="body1" component="p" sx={{ mb: 2 }}>
-          This is a place where you can share your latest posts, updates, and
-          news with your audience.
-        </Typography>
+      <Paper sx={{ p: 5, marginBottom: 2 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="h5" component="div">
+              Artist Page
+            </Typography>
+            <Typography variant="body1" component="p" sx={{ mb: 2 }}>
+              This is a place where you can share your latest posts, updates,
+              and news with your audience.
+            </Typography>
+          </Box>
+          {/* <Button variant="contained" color="primary" onClick={handleGoToProfile}>
+          Go to Profile
+        </Button> */}
+        </Box>
         <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Feed" />
-          <Tab label="Photos" />
-          <Tab label="Videos" />
-          <Tab label="News" />
           <Tab label="Events" />
+          <Tab label="News" />
         </Tabs>
       </Paper>
 
-      <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
-        <FeedTab
-          posts={posts}
-          onDeletePost={handleDeletePost}
-          onEditPost={handleEditPost}
-          onAddComment={handleAddComment}
-          onEditComment={function (
-            postId: number,
-            commentId: number,
-            updatedContent: string
-          ): void {
-            throw new Error("Function not implemented.");
-          }}
-          onDeleteComment={function (postId: number, commentId: number): void {
-            throw new Error("Function not implemented.");
-          }}
-        />
-      </Box>
+      {tabValue === 0 && (
+        <Box>
+          <Card
+            sx={{ marginBottom: 2, cursor: "pointer" }}
+            onClick={handleClickOpenPostDialog}
+          >
+            <CardHeader
+              title={
+                <Typography variant="body1" color="textSecondary">
+                  What's on your mind?
+                </Typography>
+              }
+              action={
+                <Tooltip title="Create Post">
+                  <IconButton onClick={handleClickOpenPostDialog}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              }
+            />
+          </Card>
 
-      <Box sx={{ display: tabValue === 1 ? "block" : "none" }}>
-        <PhotosTab posts={posts} handleCardClick={handleCardClick} />
-      </Box>
-
-      <Box sx={{ display: tabValue === 2 ? "block" : "none" }}>
-        <VideosTab posts={posts} handleCardClick={handleCardClick} />
-      </Box>
-
-      <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
-        <NewsPage />
-      </Box>
-
-      <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
-        <EventsTab />
-      </Box>
-
-      {tabValue === 0 || tabValue === 3 ? (
-        <Fab
-          color="primary"
-          onClick={() => handleDialogOpen(tabValue === 0 ? "post" : "news")}
-          sx={{
-            position: "fixed",
-            bottom: 16,
-            right: 16,
-            width: 80,
-            height: 80,
-            bgcolor: "primary.main",
-            color: "white",
-            "&:hover": {
-              bgcolor: "primary.dark",
-            },
-          }}
-        >
-          <AddIcon sx={{ fontSize: 40 }} />
-        </Fab>
-      ) : null}
-
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+          <FeedTab
+            posts={posts}
+            onAddPost={(newPost) => {}}
+            onDeletePost={(postId) => {}}
+            onEditPost={(postId, updatedPost) => {}}
+            onAddComment={(postId, comment) => {}}
+            onEditComment={(postId, commentId, updatedContent) => {}}
+            onDeleteComment={(postId, commentId) => {}}
+          />
+        </Box>
+      )}
+      <Dialog
+        open={openPostDialog}
+        onClose={handleClosePostDialog}
+        maxWidth="lg"
+        // fullWidth
+        PaperProps={{
+          style: {
+            height: "60vh",
+            width: "30vw",
+          },
+        }}
+      >
         <DialogTitle>
-          Create New {dialogType === "post" ? "Post" : "News"}
+          Create Post
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleClosePostDialog}
+            aria-label="close"
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
-        <DialogContent>
+
+        <DialogContent dividers>
           <Formik
-            initialValues={{ title: "", content: "", image: null, video: null }}
+            initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              handleCreatePost(values);
-              setSubmitting(false);
+            onSubmit={(values, { resetForm }) => {
+              submitData(values);
+              resetForm();
             }}
           >
-            {({
-              values,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting,
-              errors,
-              touched,
-            }) => (
+            {({ handleSubmit, setFieldValue, errors, touched }) => (
               <Form onSubmit={handleSubmit}>
-                <Field
-                  as={TextField}
-                  autoFocus
-                  margin="dense"
-                  name="title"
-                  label="Title"
-                  fullWidth
-                  variant="standard"
-                  error={touched.title && Boolean(errors.title)}
-                  helperText={touched.title && errors.title}
-                />
-                <Field
-                  as={TextField}
-                  margin="dense"
-                  name="content"
-                  label="Content"
-                  fullWidth
-                  variant="standard"
-                  multiline
-                  rows={4}
-                  error={touched.content && Boolean(errors.content)}
-                  helperText={touched.content && errors.content}
-                />
-                {dialogType === "post" && (
-                  <>
-                    <DropFile
-                      fileTypes="Image"
-                      fileExtensions="JPEG,PNG,WEBP,SVG"
-                      isCircular={false}
-                      width="100%"
-                      height="200px"
-                      file={null}
-                      setFile={(file) => setFieldValue("image", file)}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                      error={touched.image && Boolean(errors.image)}
-                      helperText={touched.image && errors.image}
-                    />
-                    <DropFile
-                      fileTypes="Video"
-                      fileExtensions="MP4,AVI,MOV"
-                      isCircular={false}
-                      width="100%"
-                      height="200px"
-                      file={null}
-                      setFile={(file) => setFieldValue("video", file)}
-                      aspectX={1}
-                      aspectY={1}
-                      shape="rect"
-                      error={touched.video && Boolean(errors.video)}
-                      helperText={touched.video && errors.video}
-                    />
-                  </>
-                )}
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Description"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    name="postDescription"
+                    error={
+                      touched.postDescription && Boolean(errors.postDescription)
+                    }
+                    helperText={
+                      touched.postDescription && errors.postDescription
+                    }
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box mb={2}>
+                  <DropFile
+                    fileTypes="image"
+                    fileExtensions=".jpg,.png,.jpeg"
+                    isCircular={false}
+                    width="100%"
+                    height="200px"
+                    file={postImage}
+                    setFile={setPostImage}
+                    aspectX={4}
+                    aspectY={3}
+                    shape="rect"
+                  />
+                </Box>
                 <DialogActions>
-                  <Button onClick={handleDialogClose} disabled={isSubmitting}>
+                  <Button onClick={handleClosePostDialog} variant="outlined">
                     Cancel
                   </Button>
-                  <Button type="submit" color="primary" disabled={isSubmitting}>
-                    Create
+                  <Button type="submit" variant="contained" color="primary">
+                    Add Post
                   </Button>
                 </DialogActions>
               </Form>
@@ -603,75 +284,119 @@ const ArtistPage: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!selectedPost} onClose={handleClosePostDialog}>
-        <DialogTitle>{selectedPost?.title}</DialogTitle>
-        <DialogContent>
-          <Card>
-            <CardHeader
-              avatar={<Avatar src={selectedPost?.profilePicture} />}
-              title={selectedPost?.user}
-              subheader={new Date(
-                selectedPost?.timestamp || ""
-              ).toLocaleString()}
-            />
-            {selectedPost?.image && (
-              <CardMedia
-                component="img"
-                height="500"
-                sx={{ width: "600px" }}
-                image={selectedPost?.image}
-                alt={selectedPost?.title}
-              />
-            )}
-            {selectedPost?.video && (
-              <CardMedia
-                component="video"
-                height="500"
-                sx={{ width: "600px" }}
-                src={selectedPost?.video}
-                controls
-              />
-            )}
-            <CardContent>
-              <Typography variant="body2" color="textSecondary" component="p">
-                {selectedPost?.content}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Likes: {selectedPost?.likes}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Comments:
-              </Typography>
-              {selectedPost?.comments.map((comment) => (
-                <Box key={comment.id} sx={{ display: "flex", mb: 1 }}>
-                  <Avatar src={comment.profilePicture} sx={{ mr: 2 }} />
-                  <Box>
-                    <Typography variant="body2" component="p">
-                      {comment.user}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {comment.content}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {new Date(comment.timestamp).toLocaleString()}
-                    </Typography>
-                  </Box>
+      {tabValue === 1 && (
+        <Box>
+          <EventsTab />
+        </Box>
+      )}
+
+      {tabValue === 2 && (
+        <Box sx={{ position: "relative" }}>
+          <NewsPage
+            news={news}
+            onAddNews={(newNews) => {}}
+            onDeleteNews={(newsId) => {}}
+            onEditNews={(newsId, updatedNews) => {}}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            sx={{ position: "absolute", top: 5, right: 16 }}
+            onClick={handleClickOpenNewsDialog} // Replace with the actual handler for adding news
+          >
+            Add News
+          </Button>
+        </Box>
+      )}
+
+      {/* News Dialog */}
+      <Dialog
+        open={openNewsDialog}
+        onClose={handleCloseNewsDialog}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          style: {
+            height: "60vh",
+            width: "30vw",
+          },
+        }}
+      >
+        <DialogTitle>
+          Create News
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleCloseNewsDialog}
+            aria-label="close"
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent dividers>
+          <Formik
+            initialValues={initialValuesNews}
+            validationSchema={newsValidationSchema}
+            onSubmit={(values, { resetForm }) => {
+              submitNewsData(values);
+              resetForm();
+            }}
+          >
+            {({ handleSubmit, setFieldValue, errors, touched }) => (
+              <Form onSubmit={handleSubmit}>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Title"
+                    variant="outlined"
+                    name="newsTitle"
+                    error={touched.newsTitle && Boolean(errors.newsTitle)}
+                    helperText={touched.newsTitle && errors.newsTitle}
+                    sx={{ width: "100%" }}
+                  />
                 </Box>
-              ))}
-            </CardContent>
-          </Card>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Description"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    name="newsBody"
+                    error={touched.newsBody && Boolean(errors.newsBody)}
+                    helperText={touched.newsBody && errors.newsBody}
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box mb={2}>
+                  <DropFile
+                    fileTypes="image"
+                    fileExtensions=".jpg,.png,.jpeg"
+                    isCircular={false}
+                    width="100%"
+                    height="200px"
+                    file={newsImage}
+                    setFile={setNewsImage}
+                    aspectX={4}
+                    aspectY={3}
+                    shape="rect"
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={handleCloseNewsDialog} variant="outlined">
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="contained" color="primary">
+                    Add News
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePostDialog}>Close</Button>
-        </DialogActions>
       </Dialog>
     </Container>
   );
