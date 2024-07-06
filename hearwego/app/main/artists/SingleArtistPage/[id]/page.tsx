@@ -38,7 +38,7 @@ export default function MoreAlbums({ params: { id } }: Props) {
 
   // This is the useEffect for get album by artist
   React.useEffect(() => {
-    getAlbumForArtists(artist?.token, id).then((res) => {
+    getAlbumForArtists(artist?.token as string, id).then((res) => {
       console.log("Albums:::", res);
       setAlbumByArtist(res.data);
     });
@@ -82,10 +82,10 @@ export default function MoreAlbums({ params: { id } }: Props) {
             {albumByArtist.map((albums, index) => (
               <Grid item xs={2} md={2} style={{ paddingLeft: 3 }}>
                 <SingleAlbum
-                  album_id={albums.album_id}
-                  albumName={albums.album_title}
-                  year={albums.release_date?.trimStart().slice(0, 4)}
-                  albumImg={albums.album_img}
+                  album_id={albums?.album_id as string}
+                  albumName={albums?.album_title as string}
+                  year={albums?.release_date?.trimStart().slice(0, 4) as string}
+                  albumImg={albums?.album_img as string}
                 ></SingleAlbum>
               </Grid>
             ))}

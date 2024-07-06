@@ -20,7 +20,7 @@ import Grid from "@mui/material/Grid";
 import SingleAlbum from "@/app/components/SingleAlbum";
 import CardActions from "@mui/material/CardActions";
 import SingleSongRow from "@/app/components/SingleSongRow";
-
+import { useRouter } from "next/navigation";
 import {
   Maindiv,
   CoverCardMedia,
@@ -53,6 +53,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
   const artist = useAppSelector((state) => state.artist.user);
   const [songByArtist, setSongByArtist] = React.useState<Song[]>([]); // This is the state for song by artist
 
+  const router = useRouter();
   // This is the useEffect for get artist
   React.useEffect(() => {
     getArtistV2(id).then((res) => {
@@ -62,12 +63,16 @@ export default function SingleArtistPage({ params: { id } }: Props) {
       }
     });
 
-    getAlbumForArtists(artist?.token ? artist.token : "", id).then((res) => {
+  // This is the useEffect for get album by artist
+  React.useEffect(() => {
+    getAlbumForArtists(artist?.token as string, id).then((res) => {
       console.log("Albums:::", res);
       setAlbumByArtist(res.data);
     });
 
-    getSongsForArtist(artist?.token ? artist.token : "", id).then((res) => {
+  // This is the useEffect for get song by artist
+  React.useEffect(() => {
+    getSongsForArtist(artist?.token as string, id).then((res) => {
       console.log("Songs:::", res);
       setSongByArtist(res.data);
     });
@@ -106,16 +111,16 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                 {/* This is the profilepictureavtar for artist profile pic*/}
 
                 <ProfilePicAvatar
-                  src={artistData.user.profilePicture as string}
+                  src={artistData?.user.profilePicture as string}
                 ></ProfilePicAvatar>
 
                 {/* This is the artistdetailbox for artist details*/}
                 <ArtistDetailBox>
                   <ArtistNameBox>
-                    {artistData.user.artistName}
+                    {artistData?.user.artistName}
                     <FlagBox></FlagBox>
                   </ArtistNameBox>
-                  <GenreBox>{artistData.user.musicGenres.join(", ")}</GenreBox>
+                  <GenreBox>{artistData?.user.musicGenres.join(", ")}</GenreBox>
                   <SocialMediaBox>
                     <Button>
                       <FacebookRoundedIcon
@@ -144,7 +149,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                       padding: "30px 0px",
                     }}
                   >
-                    {artistData.user.artistBio}
+                    {artistData?.user.artistBio}
                   </Box>
                 </ArtistDetailBox>
 
@@ -153,7 +158,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                   <Stack direction="row" width="100%" spacing={"1px"}>
                     <Button
                       onClick={() => {
-                        router.push("/main/fanclub");
+                        router.push("/main/fanclub/" + id);
                       }}
                     >
                       <GroupAddIcon
@@ -222,10 +227,10 @@ export default function SingleArtistPage({ params: { id } }: Props) {
               <Grid item xs={2} md={2} style={{ paddingLeft: 3 }}>
                 {/* This is the singlealbum component for show single album*/}
                 <SingleAlbum
-                  album_id={albums.album_id as string}
-                  albumName={albums.album_title as string}
-                  year={albums.release_date?.trimStart().slice(0, 4) as string}
-                  albumImg={albums.album_img as String}
+                  album_id={albums?.album_id as string}
+                  albumName={albums?.album_title as string}
+                  year={albums?.release_date?.trimStart().slice(0, 4) as string}
+                  albumImg={albums?.album_img as string}
                 ></SingleAlbum>
               </Grid>
             ))}
@@ -257,10 +262,10 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           <Stack>
             {songByArtist.map((songs, index) => (
               <SingleSongRow
-                song_id={songs.song_id as string}
-                songImg={songs.song_img as string}
-                songName={songs.song_title as string}
-                noOfFollowers={songs.no_of_impressions as number}
+                song_id={songs?.song_id as string}
+                songImg={songs?.song_img as string}
+                songName={songs?.song_title as string}
+                noOfFollowers={songs?.no_of_impressions as number}
               ></SingleSongRow>
             ))}
           </Stack>

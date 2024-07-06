@@ -247,8 +247,7 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
-  
+  SocialMedias?: string[];
 }
 
 export interface AutoTicket {
@@ -268,7 +267,7 @@ export interface ManualTicket {
 }
 
 export interface TicketType {
-  ticket_type_id? : string;
+  ticket_type_id?: string;
   ticket_type?: string;
   ticket_description?: string;
   ticket_img?: string;
@@ -314,13 +313,30 @@ export interface ClubPost {
   postpublisher?: string;
   postImage_URL?: string;
   clubId?: string;
+  artistId?: string;
+  reacts?: string;
+  comments?: string;
+  timestamps?: string;
 }
 
-export interface Comment {
+export interface ClubNews {
+  newsId?: string;
+  newsTitle?: string;
+  newsBody?: string;
+  newsImage_URL?: string;
+  newsPublisher?: string;
+  clubId?: string;
+  artistId?: string;
+  timestamps?: string;
+}
+export interface comments {
   commentId?: string;
   commenter?: string;
   commentBody?: string;
+  commenter_ProfilePic?: string;
   postId?: string;
+  timestamps?: string;
+  parentCommentId?: string;
 }
 
 export interface MerchStore {
@@ -342,33 +358,32 @@ export interface MerchCategory {
   image?: string;
 }
 
-
- export interface MerchProduct {
-      product_id?: string,
-      product_name?: string,
-      product_description?: string,
-      product_Main_image?: string,
-      product_Additional_image?: string,
-      catagory_name?: string,
-      product_price?: string,
-      product_quantity?: string,
-      product_rating?: string,
-      store_id?: string,
-      rating_count?: number
-      product_variations?: ProductVariant[]
-      review_count?: number
-      product_sold?: number
+export interface MerchProduct {
+  product_id?: string;
+  product_name?: string;
+  product_description?: string;
+  product_Main_image?: string;
+  product_Additional_image?: string;
+  catagory_name?: string;
+  product_price?: string;
+  product_quantity?: string;
+  product_rating?: string;
+  store_id?: string;
+  rating_count?: number;
+  product_variations?: ProductVariant[];
+  review_count?: number;
+  product_sold?: number;
 }
 
-export interface MerchPromo{
-  promo_id?: string,
-  promo_code?: string,
-  promo_description?: string,
-  promo_image?: string,
-  promo_start?: string,
-  promo_end?: string,
-  promo_status?: string,
-  store_id?: string,
+export interface MerchPromo {
+  promo_id?: string;
+  promo_code?: string;
+  promo_description?: string;
+  promo_image?: string;
+  promo_start?: string;
+  promo_end?: string;
+  promo_status?: string;
+  store_id?: string;
 }
 
 export interface Product {
@@ -378,7 +393,7 @@ export interface Product {
   product_Main_image?: string;
   product_Additional_image?: string;
   category_name?: string;
-  product_price?: string; 
+  product_price?: string;
   product_quantity?: string;
   product_rating?: string;
   store_id?: string;
@@ -403,7 +418,46 @@ export interface CartItem {
 
 export interface ProductVariant {
   variation_name?: string;
-  variation_value?: string; 
+  variation_value?: string;
   variation_price?: Number;
   variation_quantity?: Number;
+}
+
+export interface replies {
+  replyId?: string;
+  replier?: string;
+  replyBody?: string;
+  postId?: string;
+  replier_ProfilePic?: string;
+  commenter_ProfilePic?: string;
+  commentId?: string;
+  timestamps?: string;
+}
+
+export interface reacts {
+  reactId?: string;
+  reacter?: string;
+  postId?: string;
+  timestamps?: string;
+}
+
+export interface Newscomments {
+  newscommentId?: string;
+  newscommenter?: string;
+  newscommentBody?: string;
+  newscommenter_ProfilePic?: string;
+  newsId?: string;
+  timestamps?: string;
+  parentCommentId?: string;
+}
+
+export interface ClubVideos {
+  videoId?: string;
+  videoTitle?: string;
+  videoDescription?: string;
+  videoURL?: string;
+  videoThumbnail?: string;
+  clubId?: string;
+  artistId?: string;
+  timestamps?: string;
 }
