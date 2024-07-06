@@ -18,15 +18,19 @@ import CampaignCard from "./CampaignSeeMore/[id]/SingleCampaignCard";
 import CreateCampaignPop from "./CreateCampaign/page";
 import CreatePost from "./SchedulePost/page";
 import ScheduledPostCard from "./scheduledPostView/[id]/page";
-import { PRCampaigns } from "@/app/constants/models";
+import { PRCampaigns, PRPosts } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
-import { getPRCampaignsByArtist } from "@/app/services/PrServices";
+import {
+  getPRCampaignsByArtist,
+  getPRPostsByArtist,
+} from "@/app/services/PrServices";
 
 const Dashboard = () => {
   const [value, setValue] = useState(0);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<PRCampaigns[]>([]);
+  const [ScheduledPosts, setScheduledPosts] = useState<PRPosts[]>([]);
   const [openCreateCampaignDialog, setOpenCreateCampaignDialog] =
     useState(false);
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
@@ -42,6 +46,20 @@ const Dashboard = () => {
       )
         .then((response) => {
           setCampaigns(response.data);
+        })
+        .catch((error) => setError(error))
+        .finally(() => setLoading(false));
+    }
+  }, [artist?.token, artist?.user?.artist_id]);
+
+  useEffect(() => {
+    if (artist?.token) {
+      getPRPostsByArtist(
+        artist.token,
+        artist?.user?.artist_id ? artist.user.artist_id : ""
+      )
+        .then((response) => {
+          setScheduledPosts(response.data);
         })
         .catch((error) => setError(error))
         .finally(() => setLoading(false));
@@ -78,21 +96,17 @@ const Dashboard = () => {
   };
 
   const ScheduledPostsTabPanel = () => {
-    const scheduledPosts = campaigns.flatMap(
-      (campaign) => campaign.PRPosts || []
-    );
-
     return (
       <Grid container spacing={3}>
-        {scheduledPosts.map((post) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={post.id}>
+        {ScheduledPosts.map((post) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={post.PrPostID}>
             <ScheduledPostCard
-              description={post.Description}
-              assignedCampaign={post.CampaignID}
-              image={post.PostImage_URL}
-              socialMedias={post.SocialMedias}
-              date={post.Scheduled_Date}
-              time={post.Scheduled_Time}
+              description={post.Description as string}
+              assignedCampaign={post.CampaignID as string}
+              image={post.PostImage_URL as string}
+              socialMedias={post.SocialMedias as string[]}
+              date={post.Scheduled_Date as Date}
+              time={post.Scheduled_Time as string}
             />
           </Grid>
         ))}

@@ -46,8 +46,8 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
   open,
   onClose,
 }) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [selectedTime, setSelectedTime] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<Date | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [selectedSocialMedia, setSelectedSocialMedia] = useState<string[]>([]);
@@ -79,10 +79,11 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
 
   const formik = useFormik({
     initialValues: {
+      artist_id: artist?.user.artist_id || "",
       ArtistName: artist?.user.artistName || "",
       Description: "",
       Campaigns: "",
-      Scheduled_Date: new Date(),
+      Scheduled_Date: "",
       Scheduled_Time: "",
       SocialMedias: [],
       PostImage_URL: "",
@@ -332,6 +333,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
             <Button
               onClick={() => handleConfirmOpen("schedule")}
               color="primary"
+              disabled={!selectedDate || !selectedTime}
             >
               Schedule
             </Button>

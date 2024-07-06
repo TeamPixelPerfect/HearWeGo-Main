@@ -268,6 +268,7 @@ export interface PRCampaigns {
 }
 
 export interface PRPosts {
+  artist_id?: string;
   PrPostID?: string;
   ArtistName?: string;
   Campaign?: string;

@@ -139,3 +139,20 @@ export const addPRPost = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
+
+export const getPRPostsByArtist = async (token: string, artistId: string) => {
+  const res = await fetch(`${base_url}/PRManager/PRPosts/artist/${artistId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const PRPosts = await res.json();
+    return PRPosts;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
