@@ -204,9 +204,9 @@ export const ADHomeSocialIcons = styled(Box)(({ theme }) => ({
   marginBottom: "0.5em",
   fontSize: "32px",
 
-  "& svg": {
-    marginRight: "8px",
-  },
+  // "& svg": {
+  //   marginRight: "8px",
+  // },
 }));
 
 export const FeaturedSongCard = styled(Card)(({ theme }) => ({
