@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export interface menuItem {
   _id: string;
   name: string;
@@ -431,6 +433,41 @@ export interface replies {
   replier_ProfilePic?: string;
   commenter_ProfilePic?: string;
   commentId?: string;
+}
+
+export interface PRCampaigns {
+  ArtistID: string;
+  CampaignID?: string;
+  Campaign_Name?: string;
+  Campaign_Description?: string;
+  CampaignImage_URL?: string;
+  CampaignStatus?: string;
+  completedProgress?: number;
+  PRPosts?: PRPosts[];
+  PRtask?: PRtask[];
+}
+
+export interface PRPosts {
+  artist_id?: string;
+  PrPostID?: string;
+  ArtistName?: string;
+  Campaign?: string;
+  Description?: string;
+  Scheduled_Date?: Date;
+  Scheduled_Time?: string;
+  SocialMedias?: string[];
+  PostImage_URL?: string;
+  CampaignID?: string;
+}
+
+
+export interface PRtask {
+  TaskID?: string;
+  TaskName?: string;
+  TaskDescription?: string;
+  TaskStatus?: string;
+  CampaignID?: string;
+  isEdit?: boolean; 
   timestamps?: string;
 }
 

@@ -24,26 +24,24 @@ import {
   Checkbox,
   Avatar,
   TextField,
-  DialogContentText,
   Snackbar,
+  DialogContentText,
 } from "@mui/material";
 import { Task as TaskIcon, Edit, Add, Save, Delete } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-
-interface Task {
-  id: number;
-  name: string;
-  completed: boolean;
-}
+import { updatePRCampaign, deletePRCampaign } from "@/app/services/PrServices";
+import { PRtask, PRCampaigns } from "@/app/constants/models";
 
 interface CampaignCardProps {
   title: string;
   image: string;
   description: string;
-  status: "in_progress" | "completed";
-  tasks?: Task[]; // Optional tasks array
+  status: string;
+  tasks?: PRtask[]; // Optional tasks array
+  token: string; // Add token prop for authentication
+  id: string; // Add id prop to identify the campaign
 }
 
 const validationSchema = Yup.object().shape({
@@ -58,18 +56,22 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   description,
   status,
   tasks: initialTasks = [], // Default to empty array if tasks not provided
+  token,
+  id,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const [open, setOpen] = useState(false); // State to handle dialog open/close
   const [activeTab, setActiveTab] = useState(0); // State to handle active tab
-  const [tasks, setTasks] = useState<Task[]>(initialTasks); // State to handle tasks
-  const [originalTasks, setOriginalTasks] = useState<Task[]>([]); // State to handle original tasks
+  const [tasks, setTasks] = useState<PRtask[]>(initialTasks); // State to handle tasks
+  const [originalTasks, setOriginalTasks] = useState<PRtask[]>([]); // State to handle original tasks
   const [completedProgress, setCompletedProgress] = useState(0); // State to handle progress
   const [newTaskName, setNewTaskName] = useState(""); // State for new task name
-  const [editingTaskId, setEditingTaskId] = useState<number | null>(null); // State for editing task ID
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null); // State for editing task ID
   const [editedTaskName, setEditedTaskName] = useState(""); // State for edited task name
   const [successMessage, setSuccessMessage] = useState(false); // State for success message
+  const [CampaignStatus, setCampaignStatus] = useState("in_progress"); // State for campaign status
+  const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false); // State for confirm complete dialog
 
   useEffect(() => {
     calculateProgress(); // Calculate initial progress
@@ -93,29 +95,37 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
     setActiveTab(newValue); // Update active tab
   };
 
-  const handleDeleteTask = (taskId: number) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+  const handleDeleteTask = (taskId: string) => {
+    const updatedTasks = tasks.filter((task) => task.TaskID !== taskId);
     setTasks(updatedTasks); // Delete task
   };
 
-  const handleToggleTaskCompletion = (taskId: number) => {
+  const handleToggleTaskCompletion = (taskId: string) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
+      task.TaskID === taskId
+        ? {
+            ...task,
+            TaskStatus:
+              task.TaskStatus === "completed" ? "in_progress" : "completed",
+          }
+        : task
     );
     setTasks(updatedTasks); // Toggle task completion
   };
 
-  const handleEditTask = (taskId: number) => {
-    const taskToEdit = tasks.find((task) => taskId === task.id);
+  const handleEditTask = (taskId: string) => {
+    const taskToEdit = tasks.find((task) => taskId === task.TaskID);
     if (taskToEdit) {
       setEditingTaskId(taskId);
-      setEditedTaskName(taskToEdit.name);
+      setEditedTaskName(taskToEdit.TaskName || "");
     }
   };
 
   const handleSaveEditTask = () => {
     const updatedTasks = tasks.map((task) =>
-      task.id === editingTaskId ? { ...task, name: editedTaskName } : task
+      task.TaskID === editingTaskId
+        ? { ...task, TaskName: editedTaskName }
+        : task
     );
     setTasks(updatedTasks); // Save edited task
     setEditingTaskId(null); // Reset editing state
@@ -125,10 +135,14 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   const handleAddTask = (values: { newTaskName: string }) => {
     if (status === "completed") return; // Disable adding new tasks if status is completed
 
-    const newTask: Task = {
-      id: tasks.length ? Math.max(...tasks.map((task) => task.id)) + 1 : 1,
-      name: values.newTaskName,
-      completed: false,
+    const newTask: PRtask = {
+      TaskID: tasks.length
+        ? (
+            Math.max(...tasks.map((task) => parseInt(task.TaskID || "0"))) + 1
+          ).toString()
+        : "1",
+      TaskName: values.newTaskName,
+      TaskStatus: "incomplete",
     };
     setTasks([...tasks, newTask]); // Add new task
     setNewTaskName(""); // Clear new task name
@@ -136,37 +150,58 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
 
   const calculateProgress = (tasksList = tasks) => {
     const totalTasks = tasksList.length;
-    const completedTasks = tasksList.filter((task) => task.completed).length;
+    const completedTasks = tasksList.filter(
+      (task) => task.TaskStatus === "completed"
+    ).length;
     const progress =
       totalTasks === 0 ? 0 : ((completedTasks / totalTasks) * 100).toFixed(2);
     setCompletedProgress(Number(progress)); // Update progress
+  };
 
-    if (Number(progress) === 100) {
-      status = "completed"; // Change status to completed if progress is 100%
+  const handleDone = async () => {
+    if (completedProgress === 100) {
+      setConfirmCompleteOpen(true);
+    } else {
+      await saveCampaignChanges();
     }
   };
 
-  const handleDone = () => {
-    setSuccessMessage(true); // Show success message
-    setOpen(false); // Close the main dialog
+  const saveCampaignChanges = async () => {
+    console.log("id: ", id, "tasks: ", tasks, "status: ", status);
+    try {
+      await updatePRCampaign(token, { PRtask: tasks, completedProgress }, id);
+      setSuccessMessage(true);
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleConfirmComplete = async (complete: boolean) => {
+    if (complete) {
+      await updatePRCampaign(
+        token,
+        { PRtask: tasks, CampaignStatus: "completed", completedProgress: 100 },
+        id
+      );
+      setConfirmCompleteOpen(false);
+    } else {
+      await saveCampaignChanges();
+      setConfirmCompleteOpen(false);
+    }
+  };
+
+  const handleDeleteCampaign = async () => {
+    try {
+      await deletePRCampaign(token, id);
+    } catch (error) {
+      console.error(error); // Handle the error
+    }
   };
 
   const handleCloseSnackbar = () => {
     setSuccessMessage(false); // Hide success message
   };
-
-  let statusLabel = "";
-
-  switch (status) {
-    case "in_progress":
-      statusLabel = "In Progress";
-      break;
-    case "completed":
-      statusLabel = "Completed";
-      break;
-    default:
-      statusLabel = "";
-  }
 
   return (
     <>
@@ -246,6 +281,14 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
             >
               See More
             </Button>
+            <Button
+              size="large"
+              color="secondary"
+              variant="contained"
+              onClick={handleDeleteCampaign} // Delete the campaign on click
+            >
+              Delete
+            </Button>
           </CardActions>
         </Box>
       </Card>
@@ -285,12 +328,15 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               <List>
                 {tasks.map((task) => (
                   <ListItem
-                    key={task.id}
+                    key={task.TaskID}
                     sx={{
                       display: "flex",
                       alignItems: "center",
                       borderBottom: "1px solid #e0e0e0",
-                      textDecoration: task.completed ? "line-through" : "none",
+                      textDecoration:
+                        task.TaskStatus === "completed"
+                          ? "line-through"
+                          : "none",
                     }}
                   >
                     <ListItemAvatar>
@@ -301,7 +347,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                     <Box
                       sx={{ flex: 1, display: "flex", alignItems: "center" }}
                     >
-                      {editingTaskId === task.id ? (
+                      {editingTaskId === task.TaskID ? (
                         <TextField
                           fullWidth
                           value={editedTaskName}
@@ -309,7 +355,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                           autoFocus
                         />
                       ) : (
-                        <ListItemText primary={task.name} />
+                        <ListItemText primary={task.TaskName} />
                       )}
                     </Box>
                     <ListItemSecondaryAction>
@@ -318,16 +364,20 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                           <IconButton
                             edge="end"
                             onClick={() =>
-                              editingTaskId === task.id
+                              editingTaskId === task.TaskID
                                 ? handleSaveEditTask()
-                                : handleEditTask(task.id)
+                                : handleEditTask(task.TaskID!)
                             }
                           >
-                            {editingTaskId === task.id ? <Save /> : <Edit />}
+                            {editingTaskId === task.TaskID ? (
+                              <Save />
+                            ) : (
+                              <Edit />
+                            )}
                           </IconButton>
                           <IconButton
                             edge="end"
-                            onClick={() => handleDeleteTask(task.id)}
+                            onClick={() => handleDeleteTask(task.TaskID!)}
                           >
                             <Delete />
                           </IconButton>
@@ -337,11 +387,11 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                         edge="end"
                         onClick={() =>
                           status !== "completed" &&
-                          handleToggleTaskCompletion(task.id)
+                          handleToggleTaskCompletion(task.TaskID!)
                         }
                         disabled={status === "completed"}
                       >
-                        <Checkbox checked={task.completed} />
+                        <Checkbox checked={task.TaskStatus === "completed"} />
                       </IconButton>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -410,6 +460,29 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               </Button>
             </>
           )}
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={confirmCompleteOpen}
+        onClose={() => setConfirmCompleteOpen(false)}
+      >
+        <DialogTitle>Complete Campaign</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to mark this campaign as completed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleConfirmComplete(false)} color="primary">
+            Continue Adding Tasks
+          </Button>
+          <Button
+            onClick={() => handleConfirmComplete(true)}
+            color="primary"
+            autoFocus
+          >
+            Mark as Completed
+          </Button>
         </DialogActions>
       </Dialog>
       <Snackbar
