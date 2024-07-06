@@ -319,6 +319,7 @@ export interface ClubPost {
   reacts?: string;
   comments?: string;
   timestamps?: string;
+  createdAt?: string;
 }
 
 export interface ClubNews {
