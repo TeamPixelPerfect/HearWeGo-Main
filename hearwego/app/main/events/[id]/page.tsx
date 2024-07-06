@@ -34,6 +34,7 @@ import { getUserInterestForEvent } from "@/app/services/EventServices";
 import { getUpcomingEventsForGivenArtistByFan } from "@/app/services/EventServices";
 import { createInterest, deleteInterest } from "@/app/services/EventServices";
 import { checkUserInterestForEvent } from "@/app/services/EventServices";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 interface Props {
   params: { id: string };
@@ -236,11 +237,15 @@ export default function SingleEvent({ params: { id } }: Props) {
             <Button onClick={handleOpenShareModal}>
               <ShareIcon style={{ color: "white", fontSize: "35px" }} />
             </Button>
+            {(user)?
             <Button onClick={handleInterestClick}>
-              <FavoriteBorderIcon
+            {isInterested ? <FavoriteIcon style={{ color: "red", fontSize: "35px" }} /> : <FavoriteBorderIcon style={{ color: "white", fontSize: "35px" }} />}
+              {/* <FavoriteBorderIcon
                 style={{ color: isInterested ? "red" : "white", fontSize: "35px" }}
-              />
-            </Button>
+              /> */}
+            </Button>:<></>  
+          }
+            
             <CardActions style={{ justifyContent: "right" }}>
               <Button
                 sx={{
