@@ -225,6 +225,7 @@ export default function Tickets() {
                 }}
                 href="/main/events/BuyTickets"
                 variant="contained"
+                disabled={ticketTypes?.ticket_type !== "Auto"}
                 //size="small"
               >
                 Buy Ticket

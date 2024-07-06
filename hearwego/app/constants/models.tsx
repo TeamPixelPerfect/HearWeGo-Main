@@ -284,6 +284,7 @@ export interface SoldTickets {
   user_name?: string;
   user_email?: string;
   user_contact?: string;
+  user_nic?: string;
 }
 
 export interface RemainingTickets {
