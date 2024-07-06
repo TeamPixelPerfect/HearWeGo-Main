@@ -312,12 +312,12 @@ export interface reacts {
   timestamps?: string;
 }
 
-export interface newscomments {
+export interface Newscomments {
   newscommentId?: string;
   newscommenter?: string;
   newscommentBody?: string;
   newscommenter_ProfilePic?: string;
-  postId?: string;
+  newsId?: string;
   timestamps?: string;
   parentCommentId?: string;
 }
