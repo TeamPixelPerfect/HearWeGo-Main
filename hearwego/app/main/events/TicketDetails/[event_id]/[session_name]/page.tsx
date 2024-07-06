@@ -13,7 +13,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Grid, Typography } from "@mui/material";
+import { Divider, Grid, Typography } from "@mui/material";
 import SingleEventComponent from "../../../../../components/SingleEvent";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -28,6 +28,7 @@ import { getAutoTicketsByEventAndSession } from "@/app/services/EventServices";
 import { AutoTicket } from "@/app/constants/models";
 import { getManualTicketsByEventAndSession } from "@/app/services/EventServices";
 import { ManualTicket } from "@/app/constants/models";
+import { getUpcomingEventsForGivenArtistByFan } from "@/app/services/EventServices";
 
 interface Props {
   params: { id: string };
@@ -109,12 +110,13 @@ const recommendEvents = [
 export default function Tickets() {
   const router = useRouter();
   const { event_id, session_name } = useParams();
-
+  const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = React.useState<Event | null>(null);
   const [artists, setArtists] = React.useState<Artist[]>([]);
   const [ticketTypes, setTicketTypes] = React.useState<TicketType>();
   const [autoTickets, setAutoTickets] = React.useState<AutoTicket[]>([]);
   const [manualTickets, setManualTickets] = React.useState<ManualTicket[]>([]);
+  const [artistEvents, setArtistEvents] = React.useState<Event[]>([]);
 
   React.useEffect(() => {
     getTicketTypeByEventId(event_id as string).then((ticketTypes) => {
@@ -153,6 +155,16 @@ export default function Tickets() {
       setArtists(artists.data);
     });
   }, []);
+
+  React.useEffect(() => {
+    if (event) {
+      getUpcomingEventsForGivenArtistByFan(1, 4, event.event_created_by).then(
+        (events) => {
+          setArtistEvents(events.data);
+        }
+      );
+    }
+  }, [event, user]);
 
   const getArtistName = (artistId) => {
     const artist = artists.find((artist) => artist.artist_id === artistId);
@@ -245,166 +257,173 @@ export default function Tickets() {
         }}
       >
         {ticketTypes?.ticket_type === "Auto" ? (
-          <TableContainer
+          <Box
             sx={{
-              width: "30%",
-              margin: "50px 0px 0px 80px",
-              height: "30%",
-              border: "1px solid black",
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              pr: 20,
+              pl: 10,
               alignItems: "center",
-              borderRadius: "16px",
             }}
-            component={Paper}
           >
-            <Table
+            <TableContainer
               sx={{
-                width: "100%",
-                height: "100%",
-                //backgroundColor:'blue'
+                width: "50%",
+                // margin: "50px 0px 0px 80px",
+                // height: "30%",
+                border: "1px solid black",
                 alignItems: "center",
+                borderRadius: "16px",
               }}
+              component={Paper}
             >
-              <TableHead
+              <Table
                 sx={{
-                  backgroundColor: "#3B0764",
+                  width: "100%",
+                  height: "100%",
+                  //backgroundColor:'blue'
+                  alignItems: "center",
                 }}
               >
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      fontSize: "16px",
-                      color: "white",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Ticket Type
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      fontSize: "16px",
-                      color: "white",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Price
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody
-                sx={{
-                  backgroundColor: "primary.light",
-                  //alignItems:'center',
-                }}
-              >
-                {autoTickets.map(({ ticket_type, ticket_price }) => (
+                <TableHead
+                  sx={{
+                    backgroundColor: "#3B0764",
+                  }}
+                >
                   <TableRow>
-                    <TableCell sx={{ fontSize: "16px" }}>
-                      {ticket_type}
+                    <TableCell
+                      sx={{
+                        fontSize: "16px",
+                        color: "white",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Ticket Type
                     </TableCell>
-                    <TableCell sx={{ fontSize: "16px" }}>
-                      {ticket_price}
+                    <TableCell
+                      sx={{
+                        fontSize: "16px",
+                        color: "white",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Price
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody
+                  sx={{
+                    backgroundColor: "primary.light",
+                    //alignItems:'center',
+                  }}
+                >
+                  {autoTickets.map(({ ticket_type, ticket_price }) => (
+                    <TableRow>
+                      <TableCell sx={{ fontSize: "16px" }}>
+                        {ticket_type}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: "16px" }}>
+                        {ticket_price}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Paper
+              sx={{
+                width: "45%",
+                height: "250px",
+                p: 5,
+                bgcolor: "primary.main",
+                borderRadius: "20px",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                color="#fff"
+                sx={{ marginBottom: 1, fontSize: "1.5em" }}
+              >
+                Description
+              </Typography>
+              <Divider />
+              <Typography
+                variant="body1"
+                sx={{ padding: "20px", marginTop: 1 }}
+              >
+                {ticketTypes?.ticket_description == "" ||
+                ticketTypes?.ticket_description == "-"
+                  ? "No Description Provided"
+                  : ticketTypes?.ticket_description}
+              </Typography>
+            </Paper>
+          </Box>
         ) : ticketTypes?.ticket_type === "Manual" ? (
-          <Box>
-            Ticket Location
-            {manualTickets.map(({ ticket_location }) => (
-              
-                <Typography>
-                  {ticket_location}
-                </Typography>
-            ))}
-          </Box>
-        ) : null}
-
-        <Box
-          sx={{
-            backgroundColor: "#6B21A8",
-            width: "40%",
-            //height: "500px",
-            padding: "20px",
-            borderRadius: "15px",
-            margin: "0px 90px",
-            position: "relative",
-          }}
-        >
           <Box
             sx={{
-              fontSize: "20px",
-              color: "white",
-              fontWeight: "bold",
-            }}
-          >
-            {" "}
-            Special Notice :
-          </Box>
-          <Box
-            sx={{
-              fontSize: "16px",
-              //color: "white",
-              padding: "20px",
+              width: "100%",
               display: "flex",
+              justifyContent: "space-between",
+              pr: 20,
+              pl: 10,
+              alignItems: "center",
             }}
           >
-            Lorem ipsum dolor sit amet consectetur. Dui porttitor eu id
-            venenatis blandit lorem egestas. At adipiscing orci pulvinar sodales
-            arcu. Ultricies et enim molestie felis amet facilisi nullam nunc
-            consectetur. Sapien viverra magna a nunc aliquam odio :
-          </Box>
-        </Box>
-      </Box>
+            <Paper
+              sx={{
+                width: "45%",
+                p: 5,
+                bgcolor: "primary.main",
+                height: "250px",
+                borderRadius: "20px",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                color="#fff"
+                sx={{ marginBottom: 1, fontSize: "1.5em" }}
+              >
+                Where to buy Tickets ?
+              </Typography>
+              <Divider />
+              {manualTickets.map(({ ticket_location }) => (
+                <Typography sx={{marginTop: 1}}>{ticket_location}</Typography>
+              ))}
+            </Paper>
 
-      <Box
-        sx={{
-          width: "100%",
-          height: "300px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: "#6B21A8",
-            width: "75%",
-            height: "250px",
-            padding: "20px",
-            borderRadius: "15px",
-            margin: "20px 0px 0px 0px",
-            position: "relative",
-          }}
-        >
-          <Box
-            sx={{
-              fontSize: "20px",
-              color: "white",
-              fontWeight: "bold",
-            }}
-          >
-            {" "}
-            Description :
+            <Paper
+              sx={{
+                width: "45%",
+                height: "250px",
+                p: 5,
+                bgcolor: "primary.main",
+                borderRadius: "20px",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                color="#fff"
+                sx={{ marginBottom: 1, fontSize: "1.5em" }}
+              >
+                Description
+              </Typography>
+              <Divider />
+              <Typography
+                variant="body1"
+                sx={{ padding: "20px", marginTop: 1 }}
+              >
+                {ticketTypes?.ticket_description == "" ||
+                ticketTypes?.ticket_description == "-"
+                  ? "No Description Provided"
+                  : ticketTypes?.ticket_description}
+              </Typography>
+            </Paper>
           </Box>
-          <Box
-            sx={{
-              fontSize: "16px",
-              //color: "white",
-              padding: "20px",
-              display: "flex",
-            }}
-          >
-            Lorem ipsum dolor sit amet consectetur. Dui porttitor eu id
-            venenatis blandit lorem egestas. At adipiscing orci pulvinar sodales
-            arcu. Ultricies et enim molestie felis amet facilisi nullam nunc
-            consectetur. Sapien viverra magna a nunc aliquam odio :
-          </Box>
-        </Box>
+        ) : <Typography>Not Provided</Typography>}
       </Box>
 
       <Box
@@ -442,17 +461,15 @@ export default function Tickets() {
       </Box>
 
       <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {recommendEvents.map(
-          ({ name, img, date, day, time, artist, event_id }) => (
-            <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+        {artistEvents.map(
+          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
+            <Grid item xs={4} md={3} style={{ paddingLeft: 30 }}>
               <SingleEventComponent
                 eventID={event_id}
-                eventName={name}
-                eventImg={img}
-                eventDate={date}
-                eventDay={day}
-                eventTime={time}
-                artistName={artist}
+                eventName={event_name}
+                eventImg={event_img}
+                artistName={getArtistName(event_created_by)}
+                noOfSessions={sessions?.length}
               ></SingleEventComponent>
             </Grid>
           )
