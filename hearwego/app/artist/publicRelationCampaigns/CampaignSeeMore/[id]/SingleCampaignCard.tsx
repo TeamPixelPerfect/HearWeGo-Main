@@ -32,7 +32,8 @@ import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { updatePRCampaign, deletePRCampaign } from "@/app/services/PrServices";
-import { PRtask, PRCampaigns } from "@/app/constants/models";
+import { PRtask, PRCampaigns, PRPosts } from "@/app/constants/models";
+import { getPrPostsByCampaign } from "@/app/services/PrServices";
 
 interface CampaignCardProps {
   title: string;
@@ -70,8 +71,8 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null); // State for editing task ID
   const [editedTaskName, setEditedTaskName] = useState(""); // State for edited task name
   const [successMessage, setSuccessMessage] = useState(false); // State for success message
-  const [CampaignStatus, setCampaignStatus] = useState("in_progress"); // State for campaign status
   const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false); // State for confirm complete dialog
+  const [prPosts, setPrPosts] = useState<PRPosts[]>([]); // State to handle PR posts
 
   useEffect(() => {
     calculateProgress(); // Calculate initial progress
@@ -81,6 +82,15 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
     setOriginalTasks([...tasks]); // Save original tasks
     setOpen(true); // Open the dialog
   };
+
+  useEffect(() => {
+    if (open) {
+      getPrPostsByCampaign(token, id).then((response) => {
+        setPrPosts(response.data); 
+        console.log("posts: ", response.data);
+      });
+    }
+  }, [open]);
 
   const handleClose = () => {
     if (status === "completed") {
@@ -439,9 +449,21 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           {activeTab === 1 && (
             <Box sx={{ p: theme.spacing(2) }}>
               {/* Posts Tab Content */}
-              <Typography variant="body1">
-                {/* Posts content goes here */}
-              </Typography>
+              <List>
+                {prPosts.map((post) => (
+                  <ListItem key={post.PrPostID}>
+                    <ListItemAvatar>
+                      <Avatar src={post.PostImage_URL} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={post.Description}
+                      secondary={`Scheduled Date: ${new Date(
+                        post.Scheduled_Date!
+                      ).toLocaleDateString()} - Time: ${post.Scheduled_Time}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
             </Box>
           )}
         </DialogContent>
@@ -487,8 +509,9 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
       </Dialog>
       <Snackbar
         open={successMessage}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
+        color="success"
         message="Changes saved successfully!"
       />
     </>

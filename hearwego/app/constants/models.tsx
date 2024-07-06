@@ -190,18 +190,6 @@ export interface Event {
   event_created_by?: string;
 }
 
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias?: string[];
-}
-
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
@@ -451,7 +439,7 @@ export interface PRPosts {
   artist_id?: string;
   PrPostID?: string;
   ArtistName?: string;
-  Campaign?: string;
+  Campaigns?: string;
   Description?: string;
   Scheduled_Date?: Date;
   Scheduled_Time?: string;
@@ -460,14 +448,13 @@ export interface PRPosts {
   CampaignID?: string;
 }
 
-
 export interface PRtask {
   TaskID?: string;
   TaskName?: string;
   TaskDescription?: string;
   TaskStatus?: string;
   CampaignID?: string;
-  isEdit?: boolean; 
+  isEdit?: boolean;
   timestamps?: string;
 }
 

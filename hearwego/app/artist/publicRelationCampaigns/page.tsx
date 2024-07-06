@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<PRCampaigns[]>([]);
-  const [ScheduledPosts, setScheduledPosts] = useState<PRPosts[]>([]);
+  const [scheduledPosts, setScheduledPosts] = useState<PRPosts[]>([]);
   const [openCreateCampaignDialog, setOpenCreateCampaignDialog] =
     useState(false);
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
@@ -98,15 +98,17 @@ const Dashboard = () => {
   const ScheduledPostsTabPanel = () => {
     return (
       <Grid container spacing={3}>
-        {ScheduledPosts.map((post) => (
+        {scheduledPosts.map((post) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={post.PrPostID}>
             <ScheduledPostCard
               description={post.Description as string}
-              assignedCampaign={post.CampaignID as string}
+              assignedCampaign={post.Campaigns as string}
               image={post.PostImage_URL as string}
               socialMedias={post.SocialMedias as string[]}
               date={post.Scheduled_Date as Date}
               time={post.Scheduled_Time as string}
+              id={post.PrPostID as string}
+              token={artist?.token as string}
             />
           </Grid>
         ))}

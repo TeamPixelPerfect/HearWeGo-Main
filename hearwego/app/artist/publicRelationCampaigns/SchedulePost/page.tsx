@@ -71,7 +71,6 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       )
         .then((response) => {
           setCampaignNames(response.data);
-          console.log("Campaign Data: ", response.data);
         })
         .catch((error) => setError(error));
     }
@@ -186,137 +185,178 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       <DialogTitle>Create Post</DialogTitle>
       <DialogContent>
         <form onSubmit={formik.handleSubmit}>
-          <TextField
-            label="What's On Your Mind?"
-            multiline
-            rows={4}
-            variant="outlined"
-            name="Description"
-            value={formik.values.Description}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.Description && Boolean(formik.errors.Description)
-            }
-            helperText={formik.touched.Description && formik.errors.Description}
-            sx={{ mb: 2, width: "100%" }}
-          />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="campaign-label">Select the Campaign</InputLabel>
-            <Select
-              labelId="campaign-label"
-              id="campaign-select"
-              name="Campaigns"
-              value={formik.values.Campaigns}
-              onChange={formik.handleChange}
-              error={
-                formik.touched.Campaigns && Boolean(formik.errors.Campaigns)
-              }
-            >
-              {campaignNames.map((campaign) => (
-                <MenuItem
-                  key={campaign.CampaignID}
-                  value={campaign.Campaign_Name}
-                >
-                  {campaign.Campaign_Name}
-                </MenuItem>
-              ))}
-            </Select>
-            {formik.touched.Campaigns && formik.errors.Campaigns && (
-              <Typography color="error" variant="caption">
-                {formik.errors.Campaigns}
-              </Typography>
-            )}
-          </FormControl>
-          <FormControl component="fieldset" sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">
-              Select Social Media Platforms
-            </Typography>
-            {["Facebook", "Twitter", "linkedin", "Instagram"].map(
-              (platform) => (
-                <FormControlLabel
-                  key={platform}
-                  control={
-                    <Checkbox
-                      checked={selectedSocialMedia.includes(platform)}
-                      onChange={handleSocialMediaChange}
-                      name={platform}
-                    />
-                  }
-                  label={platform.charAt(0).toUpperCase() + platform.slice(1)}
-                />
-              )
-            )}
-          </FormControl>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <DatePicker
-                  label="Input The Date"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  renderInput={(
-                    params: React.JSX.IntrinsicAttributes & {
-                      variant?: TextFieldVariants | undefined;
-                    } & Omit<
-                        | FilledTextFieldProps
-                        | OutlinedTextFieldProps
-                        | StandardTextFieldProps,
-                        "variant"
-                      >
-                  ) => <TextField {...params} fullWidth variant="outlined" />}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TimePicker
-                  label="Input The Time"
-                  value={selectedTime}
-                  onChange={handleTimeChange}
-                  renderInput={(
-                    params: React.JSX.IntrinsicAttributes & {
-                      variant?: TextFieldVariants | undefined;
-                    } & Omit<
-                        | FilledTextFieldProps
-                        | OutlinedTextFieldProps
-                        | StandardTextFieldProps,
-                        "variant"
-                      >
-                  ) => <TextField {...params} fullWidth variant="outlined" />}
-                />
-              </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="What's On Your Mind?"
+                multiline
+                rows={4}
+                variant="outlined"
+                name="Description"
+                value={formik.values.Description}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.Description &&
+                  Boolean(formik.errors.Description)
+                }
+                helperText={
+                  formik.touched.Description && formik.errors.Description
+                }
+                sx={{ width: "100%" }}
+              />
             </Grid>
-          </LocalizationProvider>
-          <Box
-            sx={{
-              mt: 2,
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <DropFile
-              fileTypes="Post Image"
-              fileExtensions="JPEG,PNG,WEBP,SVG"
-              isCircular={false}
-              width="80%"
-              height="220px"
-              file={prPostImage}
-              setFile={setPrPostImage}
-              aspectX={1}
-              aspectY={1}
-              shape="rect"
-              error={
-                formik.touched.PostImage_URL &&
-                Boolean(formik.errors.PostImage_URL)
-              }
-            />
-            {formik.touched.PostImage_URL && formik.errors.PostImage_URL && (
-              <Typography color="error" variant="caption">
-                {formik.errors.PostImage_URL}
-              </Typography>
-            )}
-          </Box>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel id="campaign-label">Select the Campaign</InputLabel>
+                <Select
+                  labelId="campaign-label"
+                  id="campaign-select"
+                  name="Campaigns"
+                  value={formik.values.Campaigns}
+                  onChange={(event) => {
+                    const selectedCampaign = campaignNames.find(
+                      (campaign) =>
+                        campaign.Campaign_Name === event.target.value
+                    );
+                    formik.setFieldValue("Campaigns", event.target.value);
+                    formik.setFieldValue(
+                      "CampaignID",
+                      selectedCampaign?.CampaignID
+                    );
+                  }}
+                  error={
+                    formik.touched.Campaigns && Boolean(formik.errors.Campaigns)
+                  }
+                >
+                  {campaignNames.map((campaign) => (
+                    <MenuItem
+                      key={campaign.CampaignID}
+                      value={campaign.Campaign_Name}
+                    >
+                      {campaign.Campaign_Name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formik.touched.Campaigns && formik.errors.Campaigns && (
+                  <Typography color="error" variant="caption">
+                    {formik.errors.Campaigns}
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl component="fieldset" fullWidth>
+                <Typography variant="subtitle1">
+                  Select Social Media Platforms
+                </Typography>
+                {["Facebook", "Twitter", "LinkedIn", "Instagram"].map(
+                  (platform) => (
+                    <FormControlLabel
+                      key={platform}
+                      control={
+                        <Checkbox
+                          checked={selectedSocialMedia.includes(platform)}
+                          onChange={handleSocialMediaChange}
+                          name={platform}
+                        />
+                      }
+                      label={
+                        platform.charAt(0).toUpperCase() + platform.slice(1)
+                      }
+                    />
+                  )
+                )}
+                {formik.touched.SocialMedias && formik.errors.SocialMedias && (
+                  <Typography color="error" variant="caption">
+                    {formik.errors.SocialMedias}
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <DatePicker
+                    label="Input The Date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        variant="outlined"
+                        error={
+                          formik.touched.Scheduled_Date &&
+                          Boolean(formik.errors.Scheduled_Date)
+                        }
+                        helperText={
+                          formik.touched.Scheduled_Date &&
+                          formik.errors.Scheduled_Date
+                        }
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Input The Time"
+                    value={selectedTime}
+                    onChange={handleTimeChange}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        variant="outlined"
+                        error={
+                          formik.touched.Scheduled_Time &&
+                          Boolean(formik.errors.Scheduled_Time)
+                        }
+                        helperText={
+                          formik.touched.Scheduled_Time &&
+                          formik.errors.Scheduled_Time
+                        }
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </LocalizationProvider>
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  mt: 2,
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <DropFile
+                  fileTypes="Post Image"
+                  fileExtensions="JPEG,PNG,WEBP,SVG"
+                  isCircular={false}
+                  width="80%"
+                  height="220px"
+                  file={prPostImage}
+                  setFile={setPrPostImage}
+                  aspectX={1}
+                  aspectY={1}
+                  shape="rect"
+                  error={
+                    formik.touched.PostImage_URL &&
+                    Boolean(formik.errors.PostImage_URL)
+                  }
+                />
+                {formik.touched.PostImage_URL &&
+                  formik.errors.PostImage_URL && (
+                    <Typography color="error" variant="caption">
+                      {formik.errors.PostImage_URL}
+                    </Typography>
+                  )}
+              </Box>
+            </Grid>
+          </Grid>
           <DialogActions>
             <Button onClick={onClose} color="secondary">
               Cancel
@@ -342,7 +382,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
       </DialogContent>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >

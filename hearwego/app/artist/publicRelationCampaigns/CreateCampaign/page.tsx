@@ -71,9 +71,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
     validationSchema: Yup.object({
       Campaign_Name: Yup.string().required("Campaign name is required"),
     }),
-    onSubmit: (values) => {
-      handleNext();
-    },
+    onSubmit: () => handleNext(),
   });
 
   const steps = ["Enter Campaign Name", "Create Campaign", "Review & Save"];
@@ -198,9 +196,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
               id="Campaign_Name"
               name="Campaign_Name"
               value={formik.values.Campaign_Name}
-              onChange={(e) =>
-                formik.setFieldValue("Campaign_Name", e.target.value)
-              }
+              onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={
                 formik.touched.Campaign_Name &&
@@ -326,7 +322,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       setCampaignData(initialCampaignData(artist?.user.artist_id ?? ""));
       setTaskError(null);
     }
-  }, [open]);
+  }, [open, artist]);
 
   useEffect(() => {
     if (campaignImg) {
@@ -361,7 +357,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
           Cancel
         </Button>
         {step === steps.length - 1 ? (
-          <Button onClick={submitCampaign} color="primary">
+          <Button onClick={handleSave} color="primary">
             Save
           </Button>
         ) : (
