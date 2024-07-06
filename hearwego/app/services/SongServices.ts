@@ -230,7 +230,7 @@ export const updateAlbum = async (
 };
 
 // delete an album
-export const deletAlbum = async (token: string, albumId: string) => {
+export const deleteAlbum = async (token: string, albumId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/albums/${albumId}`, {
     method: "DELETE",
     headers: {

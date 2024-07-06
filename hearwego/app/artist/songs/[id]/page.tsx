@@ -13,10 +13,16 @@ import {
   Card,
   CardMedia,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   Paper,
   Stack,
+  Snackbar,
   Typography,
   useMediaQuery,
   useTheme,
@@ -46,7 +52,11 @@ import {
   SongDetailTitleEven,
 } from "@/app/styles/artistSongDetails.styles";
 import Link from "next/link";
-import { getSong } from "@/app/services/SongServices";
+import { deleteSong, getSong } from "@/app/services/SongServices";
+import { useRouter } from "next/navigation";
+import LoadingButton from "@mui/lab/LoadingButton";
+import dayjs from "dayjs";
+import { site_url } from "@/app/constants/keys";
 
 interface Props {
   params: { id: string };
@@ -96,6 +106,29 @@ function SongPreview({ songData }: SongPreviewProps) {
   const artist = useAppSelector((state) => state.artist.user?.user);
 
   const matches = useMediaQuery("(min-width:540px)");
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(site_url + "main/songs/" + songData?.song_id);
+    setSnackbarOpen(true);
+    setSnackbarMessage("Link Copied to Clipboard!");
+    setSnackbarSeverity("success");
+  };
 
   return (
     //song details
@@ -275,13 +308,22 @@ function SongPreview({ songData }: SongPreviewProps) {
           >
             {/* link copy area */}
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              https://www.hearwego.com/wq23s
+              {site_url + "main/songs/" + songData?.song_id}
             </Box>
-            <IconButton>
+            <IconButton onClick={handleCopyLink}>
               <ContentCopyIcon sx={{ color: "#fff" }} />
             </IconButton>
           </Stack>
         </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </SongPreviewShare>
     </Paper>
   );
@@ -290,9 +332,36 @@ function SongPreview({ songData }: SongPreviewProps) {
 //song details area
 const SongDetails = ({ params: { id } }: Props) => {
   const theme = useTheme();
+  const router = useRouter();
+
   const artist = useAppSelector((state) => state.artist.user);
 
   const [songDetails, setSongDetails] = useState<Song | null>(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState("to-delete");
+
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleSongDelete();
+    handleCloseDeleteModal();
+  };
+
+  const handleSongDelete = () => {
+    setDeleting("deleting");
+    deleteSong(artist?.token as string, songDetails?._id as string).then(
+      (res) => {
+        setDeleting("deleted");
+        router.push("/artist/songs");
+      }
+    );
+  };
 
   useEffect(() => {
     if (artist) {
@@ -346,9 +415,13 @@ const SongDetails = ({ params: { id } }: Props) => {
           </Box>
           <ButtonGroup variant="outlined">
             <IconButton color="secondary">
-              <FaEdit />
+              <FaEdit
+                onClick={() => {
+                  router.push(`/artist/songs/edit/${id}`);
+                }}
+              />
             </IconButton>
-            <IconButton color="secondary">
+            <IconButton onClick={handleDeleteModal} color="error">
               <MdDelete />
             </IconButton>
           </ButtonGroup>
@@ -359,7 +432,7 @@ const SongDetails = ({ params: { id } }: Props) => {
             Release Date
           </SongDetailTitle>
           <SongDetailData item xs={8} md={10}>
-            {songDetails?.release_date}
+            {dayjs(songDetails?.release_date).format("YYYY MMMM DD")}
           </SongDetailData>
 
           <SongDetailTitleEven item xs={4} md={2}>
@@ -419,6 +492,39 @@ const SongDetails = ({ params: { id } }: Props) => {
           </SongDetailDataEven>
         </SongDetailTable>
       </Card>
+      <Dialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        sx={{ borderRadius: 20 }}
+      >
+        <DialogTitle id="alert-dialog-title" color="error">
+          {"Delete Song"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {deleting === "deleting"
+              ? "Deleting Song..."
+              : deleting === "deleted"
+              ? "Song Deleted Successfully!"
+              : "Are you sure you want to delete this song?"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal} color="secondary">
+            No
+          </Button>
+          <LoadingButton
+            loading={deleting === "deleting"}
+            onClick={handleConfirmDelete}
+            color="error"
+            autoFocus
+          >
+            Yes
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 };

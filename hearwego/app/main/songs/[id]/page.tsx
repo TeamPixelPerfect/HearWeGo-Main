@@ -27,16 +27,23 @@ import {
   TableRow,
   TableCell,
   RightBox,
-} from "../../../../styles/SingleArtistPage.styles";
+} from "@/app/styles/SingleArtistPage.styles";
 
-export default function SingleSongPage() {
+interface Props {
+  params: { id: string };
+}
+
+export default function SingleSongPage({ params: { id } }: Props) {
   const tableData = [
     { key: 1, attribute: "Released", value: "January 2, 1983" },
     { key: 2, attribute: "Recorded", value: "1982" },
     { key: 3, attribute: "Length", value: "04:57" },
     { key: 4, attribute: "Label", value: "Epic" },
     { key: 5, attribute: "Songwriter(s)", value: "Michael Jackson" },
-    {key: 6,attribute: "Producer(s)",value: "Quincy Jones, Michael Jackson",
+    {
+      key: 6,
+      attribute: "Producer(s)",
+      value: "Quincy Jones, Michael Jackson",
     },
   ];
   return (
