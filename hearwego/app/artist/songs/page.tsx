@@ -8,6 +8,11 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   Pagination,
@@ -36,14 +41,23 @@ import { FaHeadphonesSimple } from "react-icons/fa6";
 import { bool } from "aws-sdk/clients/signer";
 import { Song } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
-import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
+import {
+  deleteSong,
+  getSongs,
+  getSongsForArtist,
+} from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
+import { set } from "date-fns";
+import { setSong } from "@/lib/features/song.slice";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 interface HomeSongCardProps {
   songData: Song;
+  isDeleted?: boolean;
+  setIsDeleted?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const MainSongCard = ({ songData }: HomeSongCardProps) => {
+export const MainSongCard = ({ songData, setIsDeleted }: HomeSongCardProps) => {
   const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
   const { playing, toggle } = useAudio({
@@ -53,9 +67,32 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
     coverArt: songData?.song_img as string,
   });
   const [open, setOpen] = useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState("to-delete");
 
   const handleOpen = () => {
     setOpen((val) => !val);
+  };
+
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleSongDelete();
+    handleCloseDeleteModal();
+  };
+
+  const handleSongDelete = () => {
+    setDeleting("deleting");
+    deleteSong(artist?.token as string, songData?._id as string).then((res) => {
+      setDeleting("deleted");
+      if (setIsDeleted) setIsDeleted(true);
+    });
   };
 
   return (
@@ -102,14 +139,52 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
           >
             <FaEye />
           </IconButton>
-          <IconButton color="secondary">
+          <IconButton
+            onClick={() => {
+              router.push(`/artist/songs/edit/${songData.song_id}`);
+            }}
+            color="secondary"
+          >
             <FaEdit />
           </IconButton>
-          <IconButton color="error">
+          <IconButton onClick={handleDeleteModal} color="error">
             <MdDelete />
           </IconButton>
         </SongCardButtonGroup>
       )}
+      <Dialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        sx={{ borderRadius: 20 }}
+      >
+        <DialogTitle id="alert-dialog-title" color="error">
+          {"Delete Song"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {deleting === "deleting"
+              ? "Deleting Song..."
+              : deleting === "deleted"
+              ? "Song Deleted Successfully!"
+              : "Are you sure you want to delete this song?"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal} color="secondary">
+            No
+          </Button>
+          <LoadingButton
+            loading={deleting === "deleting"}
+            onClick={handleConfirmDelete}
+            color="error"
+            autoFocus
+          >
+            Yes
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </SongCard>
   );
 };
@@ -129,6 +204,8 @@ const ArtistSongs = () => {
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
+
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -181,6 +258,46 @@ const ArtistSongs = () => {
     }
   }, [page]);
 
+  useEffect(() => {
+    if (isDeleted) {
+      // fetch popular songs
+      getSongsForArtist(
+        artist?.token as string,
+        artist?.user?.artist_id as string,
+        page,
+        limit
+      ).then((songs) => {
+        console.log("Songs:::", songs);
+        setPopularSongs(songs.data);
+      });
+
+      // fetch recent songs
+      getSongsForArtist(
+        artist?.token as string,
+        artist?.user?.artist_id as string,
+        page,
+        limit
+      ).then((songs) => {
+        console.log("Songs:::", songs);
+        setRecentSongs(songs.data);
+      });
+
+      // fetch upcoming songs
+      getSongsForArtist(
+        artist?.token as string,
+        artist?.user?.artist_id as string,
+        page,
+        limit
+      ).then((songs) => {
+        console.log("Songs:::", songs);
+        setUpcomingSongs(songs.data);
+      });
+
+      setIsDeleted(false);
+      // fetch draft songs
+    }
+  }, [isDeleted]);
+
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>
       <Card
@@ -230,7 +347,13 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
             {popularSongs?.length > 0 ? (
               popularSongs?.map((song) => {
-                return <MainSongCard key={song.song_id} songData={song} />;
+                return (
+                  <MainSongCard
+                    key={song.song_id}
+                    songData={song}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -242,7 +365,13 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
             {recentSongs.length > 0 ? (
               recentSongs.map((song) => {
-                return <MainSongCard key={song.song_id} songData={song} />;
+                return (
+                  <MainSongCard
+                    key={song.song_id}
+                    songData={song}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -254,7 +383,13 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
             {upcomingSongs.length > 0 ? (
               upcomingSongs.map((song) => {
-                return <MainSongCard key={song.song_id} songData={song} />;
+                return (
+                  <MainSongCard
+                    key={song.song_id}
+                    songData={song}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>
@@ -266,7 +401,13 @@ const ArtistSongs = () => {
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>
             {draftSongs.length > 0 ? (
               draftSongs.map((song) => {
-                return <MainSongCard key={song.song_id} songData={song} />;
+                return (
+                  <MainSongCard
+                    key={song.song_id}
+                    songData={song}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
               })
             ) : (
               <Typography variant="body1" sx={{ p: 2 }}>

@@ -1,9 +1,13 @@
+"use client";
+
 import Box from "@mui/material/Box";
-import { Button, Stack } from "@mui/material";
+import { Button, IconButton, Stack } from "@mui/material";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import PauseCircleIcon from "@mui/icons-material/PauseCircleFilled";
 import React, { useState } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { ro } from "date-fns/locale";
+import { useRouter } from "next/navigation";
 
 interface Props {
   //index: number;
@@ -21,6 +25,8 @@ export default function SingleAlbum({
   noOfFollowers,
 }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const router = useRouter();
 
   const togglePlay = () => {
     setIsPlaying((prevState) => !prevState);
@@ -148,8 +154,10 @@ export default function SingleAlbum({
           </Box>
         </Box>
 
-        <Button
-          href="/main/artists/SingleArtistPage/SingleSong"
+        <IconButton
+          onClick={() => {
+            router.push(`/main/songs/${song_id}`);
+          }}
           size="small"
           sx={{
             position: "relative",
@@ -158,7 +166,7 @@ export default function SingleAlbum({
           }}
         >
           <MoreVertIcon />
-        </Button>
+        </IconButton>
       </Stack>
     </Box>
   );
