@@ -38,12 +38,12 @@ import {
   RecommendedArtistInfo,
   RecommendedArtistsFollowers,
   RecommendedArtistName,
-} from "../../styles/fanclub.styles";
-import FeedPage from "./feed/page";
-import NewsPage from "./news/page";
-import EventsPage from "./events/page";
-import PhotosPage from "./photos/page";
-import VideosPage from "./videos/page";
+} from "@/app/styles/fanclub.styles";
+import FeedPage from "../feed/page";
+import NewsPage from "../news/page";
+import EventsPage from "../events/page";
+import PhotosPage from "../photos/page";
+import VideosPage from "../videos/page";
 import { useAppSelector } from "@/lib/hooks";
 
 
@@ -87,7 +87,7 @@ const recommendedArtists = [
   { name: "Artist 9", followers: "1200 followers", avatar: "url_to_image9" },
   { name: "Artist 10", followers: "1200 followers", avatar: "url_to_image10" },
 ];
-const TabPanel = (props) => {
+const TabPanel = (props: any) => {
   const { children, value, index, ...other } = props;
 
   return (
@@ -103,7 +103,11 @@ const TabPanel = (props) => {
   );
 };
 
-const FanClubPage = () => {
+interface Props {
+    params : { id: string };
+}
+
+const FanClubPage = ({ params: { id }}: Props) => {
   const artist = useAppSelector((state) => state.artist.user);
   const [tabValue, setTabValue] = useState(0);
   const [showMoreFan, setShowMoreFan] = useState(false);
@@ -176,7 +180,7 @@ const FanClubPage = () => {
                   {artist?.user.musicGenres}
                 </Typography>
                 <StyledBadge color="primary" badgeContent={fanCount}>
-                  <ProfileAvatar src={artist?.user.profilePicture} alt={artist?.user.artistName} />
+                  <ProfileAvatar src={artist?.user.profilePicture as string} alt={artist?.user.artistName as string} />
                 </StyledBadge>
               </ArtistInfo>
 
@@ -249,7 +253,7 @@ const FanClubPage = () => {
           </Box>
           <Box sx={{ flexGrow: 1, padding: "1rem" }}>
             <TabPanel value={tabValue} index={0}>
-              <FeedPage />
+              <FeedPage artist_id={id} />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
               <NewsPage />

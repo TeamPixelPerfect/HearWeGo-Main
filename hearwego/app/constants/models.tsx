@@ -128,6 +128,7 @@ export interface Song {
 }
 
 export interface Album {
+  album_id?: string;
   album_title?: string;
   artist?: { artist_id: string; artist_name: string }[];
   album_img?: string;

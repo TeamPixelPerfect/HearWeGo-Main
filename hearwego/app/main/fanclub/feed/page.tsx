@@ -50,8 +50,10 @@ type Post = {
   comments: Comment[];
 };
 
-const FanClubFanPage = () => {
-  const artist = useAppSelector((state) => state.artist.user);
+interface Props {
+  artist_id: string;
+}
+const FanClubFanPage = ({ artist_id }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [clubPost, setClubPost] = useState<ClubPost[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -60,21 +62,13 @@ const FanClubFanPage = () => {
   const [newPostContent, setNewPostContent] = useState("");
 
   useEffect(() => {
-    if (artist?.token) {
-      console.log("Token:", artist.token);
-      console.log("Artist ID:", artist?.user?.artist_id);
-      getClubPostsByArtist(
-        artist.token,
-        artist?.user?.artist_id ? artist.user.artist_id : ""
-      )
-        .then((post) => {
-          console.log("Club Posts: ", post);
-          setClubPost(post.data);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [artist]);
-  
+    // getClubPostsByArtist(artist_id)
+    //     .then((post) => {
+    //       console.log("Club Posts: ", post);
+    //       setClubPost(post.data);
+    //     })
+    //     .catch((error) => console.log(error));
+  }, [artist_id]);
 
   const handleDialogOpen = (type: "post" | "news") => {
     setDialogType(type);
@@ -93,14 +87,14 @@ const FanClubFanPage = () => {
   };
 
   const handleEditPost = (postId: number, updatedPost: Post) => {
-    const updatedPosts = clubPost.map((post) =>
+    const updatedPosts = clubPost.map((post: any) =>
       post.id === postId ? updatedPost : post
     );
     setClubPost(updatedPosts);
   };
 
   const handleAddComment = (postId: number, comment: Comment) => {
-    const updatedPosts = clubPost.map((post) => {
+    const updatedPosts = clubPost.map((post: any) => {
       if (post.id === postId) {
         return {
           ...post,
@@ -126,9 +120,9 @@ const FanClubFanPage = () => {
       isArtist: true,
     };
 
-    const updatedPosts = clubPost.map((post) => {
+    const updatedPosts = clubPost.map((post: any) => {
       if (post.id === postId) {
-        const updatedComments = post.comments.map((comment) =>
+        const updatedComments = post.comments.map((comment: any) =>
           comment.id === commentId
             ? { ...comment, replies: [...(comment.replies || []), reply] }
             : comment
@@ -144,14 +138,14 @@ const FanClubFanPage = () => {
   const handleLikePost = (postId: number) => {
     // Placeholder for future backend integration
     // Find the post and update its likes
-    const updatedPosts = clubPost.map((post) =>
+    const updatedPosts = clubPost.map((post: any) =>
       post.id === postId ? { ...post, likes: (post.likes || 0) + 1 } : post
     );
     setClubPost(updatedPosts);
   };
 
   const handleShowComments = (postId: number) => {
-    const updatedPosts = clubPost.map((post) =>
+    const updatedPosts = clubPost.map((post: any) =>
       post.id === postId ? { ...post, showComments: !post.showComments } : post
     );
     setClubPost(updatedPosts);
@@ -171,7 +165,7 @@ const FanClubFanPage = () => {
               <Box display="flex" alignItems="center" mb={2}>
                 <Avatar
                   alt="Poster Profile Picture"
-                  src={artist?.user?.profilePicture || ""}
+                  src={(artist?.user?.profilePicture as string) || ""}
                   sx={{ marginRight: 2 }}
                 />
                 <Box>
