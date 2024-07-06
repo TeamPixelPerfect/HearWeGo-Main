@@ -56,8 +56,10 @@ import {
   NoOfArtistDescriptionBox,
   RightBox,
 } from "../../../styles/eventsMW.styles";
+import { useRouter } from "next/navigation";
 
 export default function SingleEvent({ params: { id } }: Props) {
+  const router = useRouter();
   const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = React.useState<Event | null>(null);
   const [artistEvents, setArtistEvents] = React.useState<Event[]>([]);
@@ -154,7 +156,7 @@ export default function SingleEvent({ params: { id } }: Props) {
       }
     }
   };
-  
+
 
   const getArtistName = (artistId) => {
     const artist = artists.find((artist) => artist.artist_id === artistId);
@@ -240,9 +242,6 @@ export default function SingleEvent({ params: { id } }: Props) {
             {(user)?
             <Button onClick={handleInterestClick}>
             {isInterested ? <FavoriteIcon style={{ color: "red", fontSize: "35px" }} /> : <FavoriteBorderIcon style={{ color: "white", fontSize: "35px" }} />}
-              {/* <FavoriteBorderIcon
-                style={{ color: isInterested ? "red" : "white", fontSize: "35px" }}
-              /> */}
             </Button>:<></>  
           }
             
@@ -252,7 +251,7 @@ export default function SingleEvent({ params: { id } }: Props) {
                   borderRadius: "40px",
                   width: "100%",
                 }}
-                href="/main/events/TicketDetails"
+                onClick={() => {router.push(`/main/events/TicketDetails/${id}/${event?.sessions[currentSessionIndex].session_name}`)}}
                 variant="contained"
                 //size="small"
               >

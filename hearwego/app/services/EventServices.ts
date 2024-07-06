@@ -653,3 +653,45 @@ export const checkUserInterestForEvent = async (token?: string, user_id?: string
     throw error;
   }
 }
+
+export const getAutoTicketsByEventAndSession = async (event_id: string, session_name: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/autoTickets/event/${event_id}/session/${session_name}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto tickets:", error);
+    throw error;
+  }
+}
+
+export const getManualTicketsByEventAndSession = async (event_id: string, session_name: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/manualTickets/event/${event_id}/session/${session_name}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto tickets:", error);
+    throw error;
+  }
+}

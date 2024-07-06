@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { styled } from "@mui/material/styles";
 import CardMedia from "@mui/material/CardMedia";
@@ -12,8 +13,21 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Grid } from "@mui/material";
-import SingleEventComponent from "../../../components/SingleEvent";
+import { Grid, Typography } from "@mui/material";
+import SingleEventComponent from "../../../../../components/SingleEvent";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Event } from "@/app/constants/models";
+import { useAppSelector } from "@/lib/hooks";
+import { getEvent } from "@/app/services/EventServices";
+import { Artist } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { getTicketTypeByEventId } from "@/app/services/EventServices";
+import { TicketType } from "@/app/constants/models";
+import { getAutoTicketsByEventAndSession } from "@/app/services/EventServices";
+import { AutoTicket } from "@/app/constants/models";
+import { getManualTicketsByEventAndSession } from "@/app/services/EventServices";
+import { ManualTicket } from "@/app/constants/models";
 
 interface Props {
   params: { id: string };
@@ -33,7 +47,7 @@ import {
   EventNameBox,
   ArtistNameBox,
   OptionBox,
-} from "../../../styles/eventsMW.styles";
+} from "../../../../../styles/eventsMW.styles";
 
 const recommendEvents = [
   {
@@ -90,14 +104,75 @@ const recommendEvents = [
     time: "8:00 PM",
     artist: "Kaizer Kaize",
   },
+];
 
-]
+export default function Tickets() {
+  const router = useRouter();
+  const { event_id, session_name } = useParams();
 
-export default function Tickets({ params: { id } }: Props) {
-  console.log("Event_id::", id);
+  const [event, setEvent] = React.useState<Event | null>(null);
+  const [artists, setArtists] = React.useState<Artist[]>([]);
+  const [ticketTypes, setTicketTypes] = React.useState<TicketType>();
+  const [autoTickets, setAutoTickets] = React.useState<AutoTicket[]>([]);
+  const [manualTickets, setManualTickets] = React.useState<ManualTicket[]>([]);
+
+  React.useEffect(() => {
+    getTicketTypeByEventId(event_id as string).then((ticketTypes) => {
+      setTicketTypes(ticketTypes);
+    });
+  }, [event_id, session_name]);
+
+  React.useEffect(() => {
+    if (ticketTypes?.ticket_type === "Auto") {
+      getAutoTicketsByEventAndSession(
+        event_id as string,
+        session_name as string
+      ).then((autoTickets) => {
+        setAutoTickets(autoTickets);
+      });
+    }
+    if (ticketTypes?.ticket_type === "Manual") {
+      getManualTicketsByEventAndSession(
+        event_id as string,
+        session_name as string
+      ).then((manualTickets) => {
+        setManualTickets(manualTickets);
+      });
+    }
+  }
+  , [event_id, session_name, ticketTypes]);
+
+  React.useEffect(() => {
+    getEvent(event_id as string).then((event) => {
+      setEvent(event);
+    });
+  }, [event_id]);
+
+  React.useEffect(() => {
+    getAllArtists().then((artists) => {
+      console.log("Artists......", artists);
+      setArtists(artists.data);
+    });
+  }, []);
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
+  };
+
+  function formatSessionName(session) {
+    const match = session.match(/session(\d+)/i);
+    if (!match) return session;
+
+    let number = parseInt(match[1], 10);
+    let formattedNumber = number < 10 ? `0${number}` : `${number}`;
+
+    return `Session ${formattedNumber}`;
+  }
+  // console.log("Event_id::", id);
   return (
     <Maindiv>
-      <CoverEventCardMedia image="https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png">
+      <CoverEventCardMedia image={event?.event_img}>
         <div
           style={{
             background: "black",
@@ -108,8 +183,24 @@ export default function Tickets({ params: { id } }: Props) {
         ></div>
 
         <EventBox>
-          <EventNameBox>Beats</EventNameBox>
-          <ArtistNameBox>Kaizer Kaize</ArtistNameBox>
+          <EventNameBox sx={{ alignItems: "center" }}>
+            {event?.event_name}
+            <Typography
+              variant="subtitle1"
+              style={{
+                color: "#898b8c",
+                fontSize: "28px",
+                marginLeft: 10,
+                fontStyle: "italic",
+              }}
+            >
+              {" "}
+              - {formatSessionName(session_name)}
+            </Typography>
+          </EventNameBox>
+          <ArtistNameBox>
+            {getArtistName(event?.event_created_by)}
+          </ArtistNameBox>
         </EventBox>
 
         <OptionBox>
@@ -154,74 +245,71 @@ export default function Tickets({ params: { id } }: Props) {
           //alignItems: "center",
         }}
       >
-        <TableContainer
-          sx={{
-            width: "30%",
-            margin: "50px 0px 0px 80px",
-            height: "30%",
-            border: "1px solid black",
-            alignItems: "center",
-            borderRadius: "16px",
-          }}
-          component={Paper}
-        >
-          <Table
+        {ticketTypes?.ticket_type === "Auto" ? (
+          <TableContainer
             sx={{
-              width: "100%",
-              height: "100%",
-              //backgroundColor:'blue'
+              width: "30%",
+              margin: "50px 0px 0px 80px",
+              height: "30%",
+              border: "1px solid black",
               alignItems: "center",
+              borderRadius: "16px",
             }}
+            component={Paper}
           >
-            <TableHead
+            <Table
               sx={{
-                backgroundColor: "#3B0764",
+                width: "100%",
+                height: "100%",
+                //backgroundColor:'blue'
+                alignItems: "center",
               }}
             >
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontSize: "16px",
-                    color: "white",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Ticket Type
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontSize: "16px",
-                    color: "white",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Price
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody
-              sx={{
-                backgroundColor: "primary.light",
-                //alignItems:'center',
-              }}
-            >
-              <TableRow sx={{}}>
-                <TableCell sx={{ fontSize: "16px" }}>Gold</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>2500</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: "16px" }}>Silver</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>2000</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: "16px" }}>Bronze</TableCell>
-                <TableCell sx={{ fontSize: "16px" }}>1000</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+              <TableHead
+                sx={{
+                  backgroundColor: "#3B0764",
+                }}
+              >
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontSize: "16px",
+                      color: "white",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Ticket Type
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontSize: "16px",
+                      color: "white",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Price
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody
+                sx={{
+                  backgroundColor: "primary.light",
+                  //alignItems:'center',
+                }}
+              >
+                {autoTickets.map(({ ticket_type, ticket_price }) => (
+                  <TableRow>
+                    <TableCell sx={{ fontSize: "16px" }}>{ticket_type}</TableCell>
+                    <TableCell sx={{ fontSize: "16px" }}>{ticket_price}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ): <></>}
+
         <Box
           sx={{
             backgroundColor: "#6B21A8",
@@ -278,8 +366,6 @@ export default function Tickets({ params: { id } }: Props) {
             borderRadius: "15px",
             margin: "20px 0px 0px 0px",
             position: "relative",
-
-        
           }}
         >
           <Box
