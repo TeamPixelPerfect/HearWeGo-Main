@@ -43,7 +43,12 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MainSongCard } from "../../songs/page";
-import { deleteAlbum, getAlbum, getSong } from "@/app/services/SongServices";
+import {
+  deleteAlbum,
+  getAlbum,
+  getSong,
+  getSongsForAlbum,
+} from "@/app/services/SongServices";
 import { site_url } from "@/app/constants/keys";
 import { deleteAdmin } from "@/app/services/UserServices";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -210,8 +215,25 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
             alignItems: "center",
           }}
         >
-          <Stack direction="row" spacing={1} sx={{ color: "#fff" }}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              color: "#fff",
+              width: "100%",
+              justifyContent: "center",
+              padding: "5px",
+              maxWidth: "100%",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                fontSize: "14px",
+              }}
+            >
               {site_url + "main/albums/" + albumData?.album_id}
             </Box>
             <IconButton onClick={handleCopyLink}>
@@ -274,12 +296,9 @@ const AlbumDetails = ({ params: { id } }: Props) => {
     // Fetching album details and songs
     if (id) {
       getAlbum(artist?.token as string, id).then((album) => {
-        console.log("Album:::", album[0]);
         setAlbumDetails(album);
-        album.song.forEach((song_id: string) => {
-          getSong(artist?.token as string, song_id).then((song) => {
-            setAlbumSongs((prev) => [...prev, song]);
-          });
+        getSongsForAlbum(id).then((songs) => {
+          setAlbumSongs(songs);
         });
       });
     }
@@ -339,7 +358,7 @@ const AlbumDetails = ({ params: { id } }: Props) => {
           </ButtonGroup>
         </Box>
         <AlbumPreview albumData={albumDetails} />
-        <Paper elevation={2} sx={{ width: "100%", margin: 1 }}>
+        <Paper elevation={2} sx={{ width: "100%", margin: 0 }}>
           {albumSongs &&
             albumSongs.map((song) => {
               return <MainSongCard songData={song} />;

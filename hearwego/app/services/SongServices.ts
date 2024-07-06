@@ -5,7 +5,7 @@ export const getSongs = async (
   token: string,
   page?: number,
   limit?: number,
-  sort?: string,
+  sort?: string
 ) => {
   const res = await fetch(
     `${base_url}/DiscographyManager/songs?page=${page}&limit=${limit}&`,
@@ -39,6 +39,25 @@ export const getSongsForArtist = async (
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const songs = await res.json();
+    return songs;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getSongsForAlbum = async (albumId: string) => {
+  const res = await fetch(
+    `${base_url}/DiscographyManager/songs/album/${albumId}`,
+    {
+      method: "GET",
+      headers: {
         "Content-Type": "application/json",
       },
     }
