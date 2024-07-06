@@ -695,3 +695,45 @@ export const getManualTicketsByEventAndSession = async (event_id: string, sessio
     throw error;
   }
 }
+
+export const getRemainingTicketByTicketId = async (ticket_id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/remainTickets/ticket/${ticket_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch remaining tickets:", error);
+    throw error;
+  }
+}
+
+export const getAllRemainingTickets = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/remainTickets`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch remaining tickets:", error);
+    throw error;
+  }
+}

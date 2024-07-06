@@ -223,7 +223,8 @@ export default function Tickets() {
                   width: "100%",
                   left: "80%",
                 }}
-                href="/main/events/BuyTickets"
+                // href=/main/events/BuyTickets/${event_id}/${session_name}
+                onClick={() =>{router.push(`/main/events/BuyTickets/${event_id}/${session_name}`)}}
                 variant="contained"
                 disabled={ticketTypes?.ticket_type !== "Auto"}
                 //size="small"
