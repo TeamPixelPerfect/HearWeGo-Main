@@ -169,6 +169,11 @@ const SignIn = () => {
 
           {/* Sign up link */}
           <Typography variant="body1" sx={{ marginTop: "40px" }}>
+            <Link href="/auth/forgot" style={{ color: "#C084FC" }}>
+              Forgot Password?
+            </Link>
+          </Typography>
+          <Typography variant="body1" sx={{ marginTop: "20px" }}>
             Don't have an account?{" "}
             <Link href="/auth/signUp" style={{ color: "#C084FC" }}>
               Sign Up

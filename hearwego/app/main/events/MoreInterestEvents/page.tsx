@@ -133,9 +133,9 @@ export default function MoreAlbums() {
       >
         Interest Events
       </Box>
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
         {interestEvents.map(({ name, img, date, day, time, artist }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+          <Grid item xs={6} md={3}>
             <SingleEvent
               eventName={name}
               eventImg={img}

@@ -1,10 +1,9 @@
 "use client";
-// ArtistProfilePage.tsx
 import React, { useState } from 'react';
-import { Grid, Card, CardContent, Avatar, Typography, Container, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Grid, Card, CardContent, Avatar, Typography, Container, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton,Box } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
-// Dummy data
+// Dummy data for fans
 const dummyFans = [
   { id: 1, name: 'Fan 1', profilePicture: 'https://via.placeholder.com/150' },
   { id: 2, name: 'Fan 2', profilePicture: 'https://via.placeholder.com/150' },
@@ -70,10 +69,26 @@ const ArtistProfilePage: React.FC<ArtistProfileProps> = ({
 
   return (
     <Container maxWidth="md">
-      {/* Cover Photo */}
-      <div style={{ position: 'relative', marginBottom: '20px' }}>
+   
+      <div style={{ position: 'relative', marginBottom: '20px',backgroundColor:"white"}}>
         <div style={{ backgroundImage: `url(${coverPhoto})`, height: '300px', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-          <input
+       
+          <Avatar
+            alt={artistName}
+            src={profilePhoto}
+            style={{
+              width: '150px',
+              height: '150px',
+              border: '4px solid white',
+              borderRadius: '50%',
+              position: 'absolute',
+              left: '10%',
+              bottom: '10%',
+              // transform: 'translateX(-50%)',
+              // zIndex: 1, 
+            }}
+          />
+       <input
             accept="image/*"
             style={{ display: 'none' }}
             id="cover-photo-upload"
@@ -86,15 +101,19 @@ const ArtistProfilePage: React.FC<ArtistProfileProps> = ({
             </IconButton>
           </label>
         </div>
-        {/* Profile Photo and Artist Info */}
-        <Container style={{ position: 'relative', paddingTop: '100px', textAlign: 'center', color: 'white' }}>
-          <Avatar alt={artistName} src={profilePhoto} style={{ width: '150px', height: '150px', border: '4px solid white', borderRadius: '50%', position: 'absolute', bottom: '-75px', left: '50%', transform: 'translateX(-50%)' }} />
-          <Typography variant="h4" gutterBottom>{artistName}</Typography>
-          <Typography variant="subtitle1" gutterBottom>{followersCount} Followers</Typography>
+        <Box sx={{
+          // backgroundColor: 'red',
+          width:"90%",
+         
+        }}>
+        <Container style={{ position: 'relative',textAlign:"center",color:"black" }}>
+          <Typography variant="h4">{artistName}</Typography>
+          <Typography variant="subtitle1">{followersCount} Followers</Typography>
+          
         </Container>
+        </Box>
       </div>
 
-      {/* Artist Details */}
       <section style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Typography variant="h5" gutterBottom>Biography</Typography>
         <Typography variant="body1">{biography}</Typography>
@@ -173,6 +192,7 @@ const ExampleArtistProfile: React.FC = () => {
 };
 
 export default ExampleArtistProfile;
+
 
 
 

@@ -10,96 +10,95 @@ import SingleEvent from "@/app/components/SingleEvent";
 import { Maindiv, SearchPaper } from "../../../styles/eventsMW.styles";
 
 const trendingEvents = [
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-  ];
-
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+];
 
 export default function MoreAlbums() {
   return (
@@ -133,9 +132,9 @@ export default function MoreAlbums() {
       >
         Trending Events
       </Box>
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
+      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
         {trendingEvents.map(({ name, img, date, day, time, artist }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
+          <Grid item xs={6} md={3}>
             <SingleEvent
               eventName={name}
               eventImg={img}
@@ -147,7 +146,6 @@ export default function MoreAlbums() {
           </Grid>
         ))}
       </Grid>
-   
     </Maindiv>
   );
 }

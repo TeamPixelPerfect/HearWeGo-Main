@@ -543,9 +543,9 @@ const ArtistSignUp = () => {
           </Typography>
           <Typography
             variant="h5"
-            sx={{ color: "#A5B4FC", textAlign: "center" }}
+            sx={{ color: "#A5B4FC", textAlign: "center", fontSize: "24px" }}
           >
-            You’re going to join HearWeGo as an Artist!
+            You’re going to join <b>HearWeGo</b> as an Artist!
           </Typography>
           <Button
             size="large"

@@ -44,9 +44,13 @@ interface HomeSongCardProps {
 }
 
 export const MainSongCard = ({ songData }: HomeSongCardProps) => {
+  const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
   const { playing, toggle } = useAudio({
-    url: songData.song_track ? songData.song_track : "",
+    url: songData?.song_track as string,
+    songName: songData?.song_title as string,
+    artist: artist?.user?.artistName as string,
+    coverArt: songData?.song_img as string,
   });
   const [open, setOpen] = useState<boolean>(false);
 
@@ -55,11 +59,7 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
   };
 
   return (
-    <SongCard
-      onClick={() => {
-        router.push(`/artist/songs/${songData.song_id}`);
-      }}
-    >
+    <SongCard>
       <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
         <SongCardCoverArt imgUrl={songData.song_img ? songData.song_img : ""} />
         <Typography variant="h6">{songData.song_title}</Typography>
@@ -95,10 +95,19 @@ export const MainSongCard = ({ songData }: HomeSongCardProps) => {
           aria-label="song action group"
           // orientation="vertical"
         >
-          <Button startIcon={<FaEdit />}>Edit</Button>
-          <Button startIcon={<MdDelete />} color="error">
-            Delete
-          </Button>
+          <IconButton
+            onClick={() => {
+              router.push(`/artist/songs/${songData.song_id}`);
+            }}
+          >
+            <FaEye />
+          </IconButton>
+          <IconButton color="secondary">
+            <FaEdit />
+          </IconButton>
+          <IconButton color="error">
+            <MdDelete />
+          </IconButton>
         </SongCardButtonGroup>
       )}
     </SongCard>
