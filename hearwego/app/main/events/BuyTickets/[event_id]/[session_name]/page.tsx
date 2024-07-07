@@ -27,14 +27,17 @@ import { TicketType } from "@/app/constants/models";
 import { AutoTicket, Artist, RemainingTickets } from "@/app/constants/models";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import Alert from '@mui/material/Alert';
 import PaymentIcon from "@mui/icons-material/Payment";
 import Modal from "@mui/material/Modal";
+import { Snackbar } from '@mui/material';
 import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import QRCode from "qrcode.react";
 import { jsPDF } from "jspdf";
 import html2canvas from 'html2canvas';
 import "jspdf-autotable";
+import Checkout from "@/app/components/EventCheckout";
 
 const ticketModalStyle = {
   position: "absolute" as "absolute",
@@ -173,6 +176,8 @@ export default function Page() {
   const { event_id, session_name } = useParams();
   const boxRef = useRef();
   const [openTicketModal, setOpenTicketModal] = React.useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const handleOpenTicketModal = () => setOpenTicketModal(true);
   const handleCloseTicketModal = () => setOpenTicketModal(false);
   const user = useAppSelector((state) => state.user.user);
@@ -197,6 +202,25 @@ export default function Page() {
     RemainingTickets[]
   >([]);
   const [cartTickets, setCartTickets] = useState<CartTickets[]>([]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+  const handleSuccessClose = () => {
+    setSuccessMessage('');
+    setOpenTicketModal(true); // Close modal on success
+  };
+
+  const handleErrorClose = () => {
+    setErrorMessage('');
+  };
+
+  const handlePaymentGateway = () => {
+    return (
+      <EventCheckout amount={1099} onSuccess={(message) => {
+        setSuccessMessage(message);
+        setOpenTicketModal(true); // Open modal on success
+      }} onError={(message) => setErrorMessage(message)} />
+    )
+  }
 
   useEffect(() => {
     getEvent(event_id as string).then((event) => {
@@ -253,6 +277,10 @@ export default function Page() {
         { remaining_quantity: tempRemainingTickets[i].remaining_quantity }
       );
     }
+  };
+
+  const handleOpenCheckout = () => {
+    setCheckoutOpen(true); // Open Checkout component
   };
 
   const handleCreateSoldTicket = () => {
@@ -478,8 +506,9 @@ export default function Page() {
           sx={{ marginTop: "20px" }}
           endIcon={<PaymentIcon />}
           onClick={() => {
-            handleUpdateRemainingTickets();
-            handleCreateSoldTicket();
+            // handleUpdateRemainingTickets();
+            // handleCreateSoldTicket();
+            handlePaymentGateway();
           }}
         >
           Proceed to Payment
@@ -487,6 +516,20 @@ export default function Page() {
       </Box>
 
       <Button onClick={handleOpenTicketModal}>Click</Button>
+      <Button onClick={handleOpenCheckout} variant="contained" color="primary">
+        Open Checkout
+      </Button>
+
+      {checkoutOpen && (
+        <Checkout
+          amount={1099 as number}
+          onSuccess={(message) => {
+            setSuccessMessage(message);
+            setOpenTicketModal(true); // Open modal on success
+          }}
+          onError={(message) => setErrorMessage(message)}
+        />
+      )}
 
       <Modal
         aria-labelledby="transition-modal-title"
@@ -567,6 +610,11 @@ export default function Page() {
           </Box>
         </Fade>
       </Modal>
+      <Snackbar open={!!errorMessage} autoHideDuration={6000} onClose={handleErrorClose}>
+        <Alert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </Maindiv>
   );
 }
