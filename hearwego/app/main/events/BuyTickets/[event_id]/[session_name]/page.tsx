@@ -19,6 +19,8 @@ import { getAllArtists } from "@/app/services/ArtistServices";
 import { getAutoTicketsByEventAndSession, getAllRemainingTickets } from "@/app/services/EventServices";
 import { AutoTicket, Artist, RemainingTickets } from "@/app/constants/models";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import PaymentIcon from '@mui/icons-material/Payment';
 
 interface CartTickets {
   ticket_id: string;
@@ -106,6 +108,34 @@ export default function Page() {
     });
   };
 
+  const handleCartTicketClick = (ticket) => {
+    if (ticket.ticket_count > 1) {
+      setCartTickets((prevCartTickets) =>
+        prevCartTickets.map((cartTicket) =>
+          cartTicket.ticket_id === ticket.ticket_id
+            ? {
+                ...cartTicket,
+                ticket_count: cartTicket.ticket_count - 1,
+                ticket_price: cartTicket.ticket_price - (cartTicket.ticket_price / cartTicket.ticket_count),
+              }
+            : cartTicket
+        )
+      );
+    } else {
+      setCartTickets((prevCartTickets) =>
+        prevCartTickets.filter((cartTicket) => cartTicket.ticket_id !== ticket.ticket_id)
+      );
+    }
+
+    setTempRemainingTickets((prevTickets) =>
+      prevTickets.map((tempTicket) =>
+        tempTicket.ticket_id === ticket.ticket_id
+          ? { ...tempTicket, remaining_quantity: tempTicket.remaining_quantity + 1 }
+          : tempTicket
+      )
+    );
+  };
+
   return (
     <Maindiv>
       <TicketCover
@@ -115,7 +145,7 @@ export default function Page() {
       />
       <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ width: "45%", marginTop: "20px", p: 5 }}>
-        <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             Tickets
           </Typography>
           <Stack spacing={2} sx={{ width: "100%", padding: "10px" }}>
@@ -129,7 +159,7 @@ export default function Page() {
                 onClick={() => handleTicketClick(autoTicket)}
               >
                 <Typography variant="h5">{autoTicket.ticket_type}</Typography>
-                <Typography variant="h5">{getTicketRemainCountTemp(autoTicket._id)}</Typography>
+                <Typography variant="subtitle1" fontStyle="italic">( {getTicketRemainCountTemp(autoTicket._id)} Remaining )</Typography>
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>LKR {autoTicket.ticket_price}</Typography>
               </Button>
             ))}
@@ -142,14 +172,38 @@ export default function Page() {
           </Typography>
           <Stack spacing={2} sx={{ width: "100%", padding: "10px" }}>
             {cartTickets.map((ticket) => (
-              <Paper key={ticket.ticket_id} sx={{ padding: "10px", display: "flex", justifyContent: "space-between" }}>
+              <Button
+                startIcon={<RemoveCircleIcon />}
+                variant="contained"
+                color="error"
+                key={ticket.ticket_id}
+                sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}
+                onClick={() => handleCartTicketClick(ticket)}
+              >
                 <Typography variant="h6">{ticket.ticket_type}</Typography>
                 <Typography variant="h6">Count: {ticket.ticket_count}</Typography>
                 <Typography variant="h6">Total: LKR {ticket.ticket_price}</Typography>
-              </Paper>
+              </Button>
             ))}
           </Stack>
         </Box>
+      </Box>
+
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", p: 5 }}>
+        <Typography variant="h4" gutterBottom sx={{display: "flex", alignItems: "center"}}>
+          Total: 
+          <Typography variant="h4" color="secondary" sx={{ fontWeight: 600, fontSize: "1.5em", marginLeft: 3 }}>
+          LKR {cartTickets.reduce((acc, ticket) => acc + ticket.ticket_price, 0)}
+          </Typography>
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ marginTop: "20px" }}
+          endIcon={<PaymentIcon />}
+        >
+          Proceed to Payment
+        </Button>
       </Box>
     </Maindiv>
   );
