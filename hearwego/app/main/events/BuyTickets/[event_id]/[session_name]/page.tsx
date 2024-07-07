@@ -1,6 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CardMedia,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { TicketCover } from "../../../../../styles/BuyTickets.styles";
 import { Maindiv } from "../../../../../styles/SingleArtistPage.styles";
 import { useParams } from "next/navigation";
@@ -14,11 +21,31 @@ import {
   getAllRemainingTickets,
   updateRemainingTicketByTicketId,
   createSoldTicket,
+  getTicketTypeByEventId,
 } from "@/app/services/EventServices";
+import { TicketType } from "@/app/constants/models";
 import { AutoTicket, Artist, RemainingTickets } from "@/app/constants/models";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import PaymentIcon from "@mui/icons-material/Payment";
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
+import Backdrop from "@mui/material/Backdrop";
+import QRCode from "qrcode.react";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+
+const ticketModalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 1000,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 interface CartTickets {
   ticket_id: string;
@@ -27,22 +54,137 @@ interface CartTickets {
   ticket_count: number;
 }
 
-const steps = ["Your Details", "Ticket Details", "Payment", "Successful"];
+const QRCodeComponent = ({ value }) => {
+  return (
+    <div>
+      <QRCode value={value} />
+    </div>
+  );
+};
+
+function SingleTicket(
+  ticket_id: string,
+  ticket_type: string,
+  event_name: string,
+  session_name: string,
+  session_date: string,
+  session_time: string,
+  session_venue: string,
+  ticket_price: number,
+  ticket_img: string,
+  ticket_count: number,
+) {
+  return (
+    <Paper
+      sx={{
+        width: "100%",
+        display: "flex",
+        border: "1px #000 solid",
+        marginBottom: 2,
+      }}
+    >
+      <Box sx={{ width: "25%" }}>
+        <CardMedia
+          component="img"
+          sx={{ width: "200px", height: "200px" }}
+          image={ticket_img}
+        />
+      </Box>
+      <Box sx={{ width: "35%" }}>
+        <Typography variant="subtitle1" sx={{ fontSize: "16px", marginBottom: 2, marginTop: 2 }}>
+          Ticket ID: {ticket_id}
+        </Typography>
+        <Box sx={{ width: "100%", display: "flex" }}>
+          <Box
+            sx={{
+              width: "50%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Ticket Count: {ticket_count}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Ticket Type: {ticket_type}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Event: {event_name}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Session: {session_name}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              width: "50%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Date: {session_date}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Time: {session_time}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontSize: "16px" }}>
+              Venue: {session_venue}
+            </Typography>
+
+            <Typography
+              variant="subtitle2"
+              color="primary"
+              sx={{ fontSize: "24px" }}
+            >
+              LKR {ticket_price}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          width: "30%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <QRCodeComponent
+          value={JSON.stringify({
+            ticketId: ticket_id,
+            ticketType: ticket_type,
+            eventName: event_name,
+            sessionName: session_name,
+            sessionDate: session_date,
+          })}
+        />
+      </Box>
+    </Paper>
+  );
+}
 
 export default function Page() {
   const { event_id, session_name } = useParams();
+  const [openTicketModal, setOpenTicketModal] = React.useState(false);
+  const handleOpenTicketModal = () => setOpenTicketModal(true);
+  const handleCloseTicketModal = () => setOpenTicketModal(false);
   const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = useState<Event | null>(null);
+  const [ticketType, setTicketType] = useState<TicketType | null>(null);
   const [soldTicket, setSoldTicket] = useState<SoldTickets | null>({
-    ticket_id : "",
+    ticket_id: "",
     user_id: "",
-    bought_quantity : 0,
-    total_price : 0,
-    user_name : "",
-    user_email : "",
-    user_contact : "",
-    user_nic : "",
-
+    bought_quantity: 0,
+    total_price: 0,
+    user_name: "",
+    user_email: "",
+    user_contact: "",
+    user_nic: "",
   });
   const [autoTickets, setAutoTickets] = useState<AutoTicket[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
@@ -83,6 +225,12 @@ export default function Page() {
     });
   }, []);
 
+  useEffect(() => {
+    getTicketTypeByEventId(event_id as string).then((ticketType) => {
+      setTicketType(ticketType);
+    });
+  }, [event_id]);
+
   const getArtistName = (artistId) => {
     const artist = artists.find((artist) => artist.artist_id === artistId);
     return artist ? artist.artistName : "Unknown";
@@ -109,19 +257,25 @@ export default function Page() {
     for (let i = 0; i < cartTickets.length; i++) {
       createSoldTicket(user.token, {
         ticket_id: cartTickets[i].ticket_id,
-        user_id: "u3",
+        user_id: user?.user_id,
         bought_quantity: cartTickets[i].ticket_count,
         total_price: cartTickets[i].ticket_price,
+        user_name: user?.name,
+        user_email: user?.email,
+        user_contact: user?.mobileNumber,
         user_nic: "",
       });
     }
-  }
+  };
 
   const handleTicketClick = (autoTicket) => {
     setTempRemainingTickets((prevTickets) =>
       prevTickets.map((ticket) =>
         ticket.ticket_id === autoTicket._id
-          ? { ...ticket, remaining_quantity: ticket.remaining_quantity - 1 }
+          ? {
+              ...ticket,
+              remaining_quantity: (ticket.remaining_quantity as number) - 1,
+            }
           : ticket
       )
     );
@@ -291,12 +445,90 @@ export default function Page() {
           onClick={() => {
             handleUpdateRemainingTickets();
             handleCreateSoldTicket();
-          }
-          }
+          }}
         >
           Proceed to Payment
         </Button>
       </Box>
+
+      <Button onClick={handleOpenTicketModal}>Click</Button>
+
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={openTicketModal}
+        onClose={handleCloseTicketModal}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openTicketModal}>
+          <Box sx={ticketModalStyle}>
+            <Typography id="transition-modal-title" variant="h6" component="h2">
+              Your Tickets
+            </Typography>
+            <Box sx={{ width: "100%", height: "75vh" }}>
+              <Box
+                id="tickets"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {cartTickets.map((ticket) => {
+                  const autoTicket = autoTickets.find(
+                    (autoTicket) => autoTicket._id === ticket.ticket_id
+                  );
+                  return autoTicket
+                    ? SingleTicket(
+                        autoTicket._id ,
+                        autoTicket?.ticket_type,
+                        event?.event_name as string,
+                        session_name as string,
+                        event?.sessions[
+                          (session_name.match(/\d+/)[0] - 1) as number
+                        ].session_date.slice(0,10) as string,
+                        event?.sessions[
+                          (session_name.match(/\d+/)[0] - 1) as number
+                        ].session_time as string,
+                        event?.sessions[
+                          (session_name.match(/\d+/)[0] - 1) as number
+                        ].venue as string,
+                        ticket.ticket_price,
+                        (ticketType?.ticket_img as string) ||
+                          "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg ",
+                        ticket.ticket_count
+                      )
+                    : null;
+                })}
+              </Box>
+            </Box>
+            <Box
+              sx={{ display: "flex", justifyContent: "center", width: "100%" }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                // onClick={() => {
+                //   const doc = new jsPDF();
+                //   doc.autoTable({ html: "#tickets" });
+                //   doc.save("tickets.pdf");
+                // }}
+              >
+                Download PDF
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </Maindiv>
   );
 }
