@@ -12,7 +12,12 @@ import { base_url } from "../constants/keys";
 import { Box, Button } from "@mui/material";
 import { Paper, TextField, Typography,Grid} from "@mui/material";
 
-export const EventCheckoutForm = () => {
+type Props = {
+    amount: number;
+    setPaymentStatus: (status: boolean) => void;
+};
+
+export const EventCheckoutForm = ({amount, setPaymentStatus}: Props) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -34,8 +39,6 @@ export const EventCheckoutForm = () => {
       return;
     }
 
-    const price = 12;
-
     // Create the PaymentIntent and obtain clientSecret from your server endpoint
     const res = await fetch(`${base_url}/Payment/makePayment`, {
       method: "POST",
@@ -45,7 +48,7 @@ export const EventCheckoutForm = () => {
       body: JSON.stringify({
         currency: "usd",
         email: emailInput,
-        amount: price * 100,
+        amount: amount * 100,
         paymentMethodType: "card",
       }),
     });
@@ -57,7 +60,7 @@ export const EventCheckoutForm = () => {
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/success`,
+        return_url: window.location.href, // Temporary return_url
       },
     });
 
@@ -67,6 +70,7 @@ export const EventCheckoutForm = () => {
       // details incomplete)
       setErrorMessage(error.message);
     } else {
+        setPaymentStatus(true);
       // Your customer will be redirected to your return_url. For some payment
       // methods like iDEAL, your customer will be redirected to an intermediate
       // site first to authorize the payment, then redirected to the return_url.

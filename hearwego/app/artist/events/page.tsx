@@ -201,7 +201,7 @@ function HeaderChange(tab: number) {
 
 //event details
 function EventArea(tab: number) {
-  const artist = useAppSelector((state) => state.artist.user);
+  const artist = useAppSelector((state) => state?.artist?.user);
   const router = useRouter();
 
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
@@ -214,13 +214,14 @@ function EventArea(tab: number) {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
 
+
   useEffect(() => {
     if (artist) {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
       if (tab === 0) {
-        getUpcomingEventsForGivenArtist(page, limit, artist.artist_id).then(
+        getUpcomingEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
           (events) => {
             setUpcomingEvents(events.data);
             setPageCount(Math.ceil(events.total / limit));
@@ -228,7 +229,7 @@ function EventArea(tab: number) {
         );
       }
       else if (tab === 1) {
-        getInterestedEventsForGivenArtist(page, limit, artist.artist_id).then(
+        getInterestedEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
           (events) => {
             setUpcomingEvents(events);
             setPageCount(Math.ceil(events.total / limit));
@@ -236,7 +237,7 @@ function EventArea(tab: number) {
         );
       }
       else if (tab === 2) {
-        getPastEventsForGivenArtist(page, limit, artist.artist_id).then(
+        getPastEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
           (events) => {
             setUpcomingEvents(events.data);
             setPageCount(Math.ceil(events.total / limit));
@@ -244,14 +245,14 @@ function EventArea(tab: number) {
         );
       }
       else if (tab === 3) {
-        getPrivateEventsForGivenArtist(page, limit, artist.artist_id).then((events) => {
+        getPrivateEventsForGivenArtist(page, limit, artist?.user?.artist_id).then((events) => {
           setUpcomingEvents(events.data);
           setPageCount(Math.ceil(events.total / limit));
         }
         );
       }
     }
-  }, [artist, page, upcomingEvents.length, tab]);
+  }, [artist?.user?.artist_id, artist?.token, upcomingEvents.length, tab]);
 
   const handleDeleteEvent = async (event_id: string) => {
     try {

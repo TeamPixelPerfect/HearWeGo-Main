@@ -27,17 +27,17 @@ import { TicketType } from "@/app/constants/models";
 import { AutoTicket, Artist, RemainingTickets } from "@/app/constants/models";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
 import PaymentIcon from "@mui/icons-material/Payment";
 import Modal from "@mui/material/Modal";
-import { Snackbar } from '@mui/material';
+import { Snackbar } from "@mui/material";
 import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import QRCode from "qrcode.react";
 import { jsPDF } from "jspdf";
-import html2canvas from 'html2canvas';
+import html2canvas from "html2canvas";
 import "jspdf-autotable";
-import Checkout from "@/app/components/EventCheckout";
+import EventCheckout from "@/app/components/EventCheckout";
 
 const ticketModalStyle = {
   position: "absolute" as "absolute",
@@ -49,6 +49,17 @@ const ticketModalStyle = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+};
+
+const paymentModalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "auto",
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
 };
 
 interface CartTickets {
@@ -76,7 +87,7 @@ function SingleTicket(
   session_venue: string,
   ticket_price: number,
   ticket_img: string,
-  ticket_count: number,
+  ticket_count: number
 ) {
   return (
     <Paper
@@ -95,7 +106,10 @@ function SingleTicket(
         />
       </Box>
       <Box sx={{ width: "35%" }}>
-        <Typography variant="subtitle1" sx={{ fontSize: "16px", marginBottom: 2, marginTop: 2 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontSize: "16px", marginBottom: 2, marginTop: 2 }}
+        >
           Ticket ID: {ticket_id}
         </Typography>
         <Box sx={{ width: "100%", display: "flex" }}>
@@ -176,8 +190,8 @@ export default function Page() {
   const { event_id, session_name } = useParams();
   const boxRef = useRef();
   const [openTicketModal, setOpenTicketModal] = React.useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const handleOpenTicketModal = () => setOpenTicketModal(true);
   const handleCloseTicketModal = () => setOpenTicketModal(false);
   const user = useAppSelector((state) => state.user.user);
@@ -203,24 +217,18 @@ export default function Page() {
   >([]);
   const [cartTickets, setCartTickets] = useState<CartTickets[]>([]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(false);
+
+  const amount = 200;
 
   const handleSuccessClose = () => {
-    setSuccessMessage('');
+    setSuccessMessage("");
     setOpenTicketModal(true); // Close modal on success
   };
 
   const handleErrorClose = () => {
-    setErrorMessage('');
+    setErrorMessage("");
   };
-
-  const handlePaymentGateway = () => {
-    return (
-      <EventCheckout amount={1099} onSuccess={(message) => {
-        setSuccessMessage(message);
-        setOpenTicketModal(true); // Open modal on success
-      }} onError={(message) => setErrorMessage(message)} />
-    )
-  }
 
   useEffect(() => {
     getEvent(event_id as string).then((event) => {
@@ -376,33 +384,33 @@ export default function Page() {
   const downloadPDF = () => {
     const input = boxRef.current;
     html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL("image/png");
       // Specify dimensions for the PDF
       const pdf = new jsPDF({
-        orientation: 'landscape', // 'portrait' or 'landscape'
-        unit: 'mm', // 'mm', 'pt', 'cm', 'in'
-        format: 'a3', // 'a3', 'a4', 'a5', 'letter', 'legal', or custom [width, height]
+        orientation: "landscape", // 'portrait' or 'landscape'
+        unit: "mm", // 'mm', 'pt', 'cm', 'in'
+        format: "a3", // 'a3', 'a4', 'a5', 'letter', 'legal', or custom [width, height]
       });
 
       // Calculate width and height to fit the page
       const imgWidth = 500; // A4 width in mm
-      const pageHeight =500 ; // A4 height in mm
+      const pageHeight = 500; // A4 height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
       let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
-      pdf.save('download.pdf');
+      pdf.save("download.pdf");
     });
   };
 
@@ -508,7 +516,7 @@ export default function Page() {
           onClick={() => {
             // handleUpdateRemainingTickets();
             // handleCreateSoldTicket();
-            handlePaymentGateway();
+            // handlePaymentGateway();
           }}
         >
           Proceed to Payment
@@ -519,17 +527,6 @@ export default function Page() {
       <Button onClick={handleOpenCheckout} variant="contained" color="primary">
         Open Checkout
       </Button>
-
-      {checkoutOpen && (
-        <Checkout
-          amount={1099 as number}
-          onSuccess={(message) => {
-            setSuccessMessage(message);
-            setOpenTicketModal(true); // Open modal on success
-          }}
-          onError={(message) => setErrorMessage(message)}
-        />
-      )}
 
       <Modal
         aria-labelledby="transition-modal-title"
@@ -551,7 +548,7 @@ export default function Page() {
             </Typography>
             <Box sx={{ width: "100%", height: "75vh" }}>
               <Box
-              ref={boxRef}
+                ref={boxRef}
                 id="tickets"
                 sx={{
                   width: "100%",
@@ -561,11 +558,11 @@ export default function Page() {
                   justifyContent: "center",
                   alignItems: "center",
                   overflow: "scroll",
-                    "&::-webkit-scrollbar": {
-                      display: "none",
-                    },
-                    "-ms-overflow-style": "none", // IE and Edge
-                    "scrollbar-width": "none",
+                  "&::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                  "-ms-overflow-style": "none", // IE and Edge
+                  "scrollbar-width": "none",
                 }}
               >
                 {cartTickets.map((ticket) => {
@@ -574,13 +571,13 @@ export default function Page() {
                   );
                   return autoTicket
                     ? SingleTicket(
-                        autoTicket._id ,
+                        autoTicket._id,
                         autoTicket?.ticket_type,
                         event?.event_name as string,
                         session_name as string,
                         event?.sessions[
                           (session_name.match(/\d+/)[0] - 1) as number
-                        ].session_date.slice(0,10) as string,
+                        ].session_date.slice(0, 10) as string,
                         event?.sessions[
                           (session_name.match(/\d+/)[0] - 1) as number
                         ].session_time as string,
@@ -599,19 +596,46 @@ export default function Page() {
             <Box
               sx={{ display: "flex", justifyContent: "center", width: "100%" }}
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={downloadPDF}
-              >
+              <Button variant="contained" color="primary" onClick={downloadPDF}>
                 Download PDF
               </Button>
             </Box>
           </Box>
         </Fade>
       </Modal>
-      <Snackbar open={!!errorMessage} autoHideDuration={6000} onClose={handleErrorClose}>
-        <Alert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>
+
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={checkoutOpen}
+        onClose={handleCloseTicketModal}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={checkoutOpen}>
+          <Box sx={paymentModalStyle}>
+            <EventCheckout
+              amount={amount as number}
+              setPaymentStatus={setPaymentStatus}
+            />
+          </Box>
+        </Fade>
+      </Modal>
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={handleErrorClose}
+      >
+        <Alert
+          onClose={handleErrorClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
           {errorMessage}
         </Alert>
       </Snackbar>

@@ -3,7 +3,7 @@
 import React from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { CheckoutForm } from "@/app/components/CheckoutForm";
+import { EventCheckoutForm } from "@/app/components/EventCheckoutForm";
 import { Box } from "@mui/material";
 
 type Props = {};
@@ -18,7 +18,12 @@ const options = {
   },
 };
 
-const Checkout = (props: Props) => {
+type EventCheckoutProps = {
+  amount: number;
+  setPaymentStatus: (status: boolean) => void;
+};
+
+const EventCheckout = ({amount, setPaymentStatus}: EventCheckoutProps) => {
   const stripePromise = loadStripe(
     "pk_test_51IlCEpL4tmTpsrTcesiKMgF17ZgnopCbFlTZN2qRq8PhLwAy2T47jX3xvL3gAqU0FkJDenzgAv7iVUh6fniNhasT00QF4ctvDA"
   );
@@ -27,10 +32,10 @@ const Checkout = (props: Props) => {
   return (
     <Box sx={{ display: "flex", mt: 8 }}>
       <Elements stripe={stripePromise} options={options}>
-        <CheckoutForm />
+        <EventCheckoutForm amount={amount} setPaymentStatus={setPaymentStatus} />
       </Elements>
     </Box>
   );
 };
 
-export default Checkout;
+export default EventCheckout;
