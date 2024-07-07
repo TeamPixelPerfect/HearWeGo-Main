@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -33,6 +33,7 @@ import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import QRCode from "qrcode.react";
 import { jsPDF } from "jspdf";
+import html2canvas from 'html2canvas';
 import "jspdf-autotable";
 
 const ticketModalStyle = {
@@ -170,6 +171,7 @@ function SingleTicket(
 
 export default function Page() {
   const { event_id, session_name } = useParams();
+  const boxRef = useRef();
   const [openTicketModal, setOpenTicketModal] = React.useState(false);
   const handleOpenTicketModal = () => setOpenTicketModal(true);
   const handleCloseTicketModal = () => setOpenTicketModal(false);
@@ -343,6 +345,39 @@ export default function Page() {
     );
   };
 
+  const downloadPDF = () => {
+    const input = boxRef.current;
+    html2canvas(input).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      // Specify dimensions for the PDF
+      const pdf = new jsPDF({
+        orientation: 'landscape', // 'portrait' or 'landscape'
+        unit: 'mm', // 'mm', 'pt', 'cm', 'in'
+        format: 'a3', // 'a3', 'a4', 'a5', 'letter', 'legal', or custom [width, height]
+      });
+
+      // Calculate width and height to fit the page
+      const imgWidth = 500; // A4 width in mm
+      const pageHeight =500 ; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('download.pdf');
+    });
+  };
+
   return (
     <Maindiv>
       <TicketCover
@@ -473,6 +508,7 @@ export default function Page() {
             </Typography>
             <Box sx={{ width: "100%", height: "75vh" }}>
               <Box
+              ref={boxRef}
                 id="tickets"
                 sx={{
                   width: "100%",
@@ -481,6 +517,12 @@ export default function Page() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  overflow: "scroll",
+                    "&::-webkit-scrollbar": {
+                      display: "none",
+                    },
+                    "-ms-overflow-style": "none", // IE and Edge
+                    "scrollbar-width": "none",
                 }}
               >
                 {cartTickets.map((ticket) => {
@@ -517,11 +559,7 @@ export default function Page() {
               <Button
                 variant="contained"
                 color="primary"
-                // onClick={() => {
-                //   const doc = new jsPDF();
-                //   doc.autoTable({ html: "#tickets" });
-                //   doc.save("tickets.pdf");
-                // }}
+                onClick={downloadPDF}
               >
                 Download PDF
               </Button>
