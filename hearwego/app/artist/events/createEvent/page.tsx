@@ -661,7 +661,7 @@ function CreateEvent() {
             console.log("Created Auto Ticket: ", createdAutoTicket);
 
             const remainingTicket = {
-              ticket_id: createdAutoTicket.auto_ticket_id,
+              ticket_id: createdAutoTicket._id,
               remaining_quantity: createdAutoTicket.ticket_count,
             };
 

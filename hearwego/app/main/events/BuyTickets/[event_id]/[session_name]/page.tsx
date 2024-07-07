@@ -1,40 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
   Paper,
   Stack,
   Typography,
-  stepConnectorClasses,
 } from "@mui/material";
 import {
-  PaymentDetails,
-  SuccessfulDetails,
   TicketCover,
-  Ticketdetails,
 } from "../../../../../styles/BuyTickets.styles";
 import { Maindiv } from "../../../../../styles/SingleArtistPage.styles";
-import { styled } from "@mui/material/styles";
-import { Step, StepLabel, Stepper, StepConnector } from "@mui/material";
-import { StepIconProps } from "@mui/material/StepIcon";
-import FeedIcon from "@mui/icons-material/Feed";
-import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Check } from "@mui/icons-material";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import { FillDetails } from "../../../../../styles/BuyTickets.styles";
 import { useParams } from "next/navigation";
 import { Event } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import { getEvent } from "@/app/services/EventServices";
-import { Artist } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
-import { getAutoTicketsByEventAndSession } from "@/app/services/EventServices";
-import { AutoTicket } from "@/app/constants/models";
-import { getRemainingTicketByTicketId } from "@/app/services/EventServices";
-import { getAllRemainingTickets } from "@/app/services/EventServices";
-import { RemainingTickets } from "@/app/constants/models";
+import { getAutoTicketsByEventAndSession, getAllRemainingTickets } from "@/app/services/EventServices";
+import { AutoTicket, Artist, RemainingTickets } from "@/app/constants/models";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 interface CartTickets {
   ticket_id: string;
@@ -48,34 +32,36 @@ const steps = ["Your Details", "Ticket Details", "Payment", "Successful"];
 export default function Page() {
   const { event_id, session_name } = useParams();
   const user = useAppSelector((state) => state.user.user);
-  const [event, setEvent] = React.useState<Event | null>(null);
-  const [autoTickets, setAutoTickets] = React.useState<AutoTicket[]>([]);
-  const [artists, setArtists] = React.useState<Artist[]>([]);
-  const [remainingTickets, setRemainingTickets] = React.useState<RemainingTickets[]>([]);
-  const [cartTickets, setCartTickets] = React.useState<CartTickets[]>([]);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [autoTickets, setAutoTickets] = useState<AutoTicket[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [remainingTickets, setRemainingTickets] = useState<RemainingTickets[]>([]);
+  const [tempRemainingTickets, setTempRemainingTickets] = useState<RemainingTickets[]>([]);
+  const [cartTickets, setCartTickets] = useState<CartTickets[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getEvent(event_id as string).then((event) => {
       setEvent(event);
     });
   }, [event_id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllArtists().then((artists) => {
-      console.log("Artists......", artists);
       setArtists(artists.data);
     });
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAutoTicketsByEventAndSession(event_id as string, session_name as string).then((autoTickets) => {
+      console.log("Auto Tickets.... ", autoTickets);
       setAutoTickets(autoTickets);
     });
   }, [event_id, session_name]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllRemainingTickets().then((remainingTickets) => {
       setRemainingTickets(remainingTickets.data);
+      setTempRemainingTickets(remainingTickets.data);
     });
   }, []);
 
@@ -84,9 +70,40 @@ export default function Page() {
     return artist ? artist.artistName : "Unknown";
   };
 
-  const getTicketRemainCount = (ticketId) => {
-    const remainingTicket = remainingTickets.find((remainingTicket) => remainingTicket.ticket_id === ticketId);
+  const getTicketRemainCountTemp = (ticketId) => {
+    const remainingTicket = tempRemainingTickets.find((remainingTicket) => remainingTicket.ticket_id === ticketId);
     return remainingTicket ? remainingTicket.remaining_quantity : 0;
+  };
+
+  const handleTicketClick = (autoTicket) => {
+    setTempRemainingTickets((prevTickets) =>
+      prevTickets.map((ticket) =>
+        ticket.ticket_id === autoTicket._id
+          ? { ...ticket, remaining_quantity: ticket.remaining_quantity - 1 }
+          : ticket
+      )
+    );
+
+    setCartTickets((prevCartTickets) => {
+      const existingCartTicket = prevCartTickets.find((ticket) => ticket.ticket_id === autoTicket._id);
+      if (existingCartTicket) {
+        return prevCartTickets.map((ticket) =>
+          ticket.ticket_id === autoTicket._id
+            ? { ...ticket, ticket_count: ticket.ticket_count + 1, ticket_price: ticket.ticket_price + autoTicket.ticket_price }
+            : ticket
+        );
+      } else {
+        return [
+          ...prevCartTickets,
+          {
+            ticket_id: autoTicket._id,
+            ticket_type: autoTicket.ticket_type,
+            ticket_price: autoTicket.ticket_price,
+            ticket_count: 1,
+          },
+        ];
+      }
+    });
   };
 
   return (
@@ -96,21 +113,44 @@ export default function Page() {
         artist_name={getArtistName(event?.event_created_by)}
         img={event?.event_img}
       />
-      <Box sx={{ width: "100%" }}>
-        <Box sx={{ width: "40%" }}>
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ width: "45%", marginTop: "20px", p: 5 }}>
+        <Typography variant="h4" gutterBottom>
+            Tickets
+          </Typography>
           <Stack spacing={2} sx={{ width: "100%", padding: "10px" }}>
             {autoTickets.map((autoTicket) => (
-              <Button disabled={(getTicketRemainCount(autoTicket.auto_ticket_id) as number <=0)} variant="contained" sx={{width: "100%", display: "flex", justifyContent: "space-between"}} startIcon={<AddCircleIcon />}>
+              <Button
+                key={autoTicket.auto_ticket_id}
+                disabled={getTicketRemainCountTemp(autoTicket._id) <= 0}
+                variant="contained"
+                sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}
+                startIcon={<AddCircleIcon />}
+                onClick={() => handleTicketClick(autoTicket)}
+              >
                 <Typography variant="h5">{autoTicket.ticket_type}</Typography>
-                <Typography variant="h5">{getTicketRemainCount(autoTicket.auto_ticket_id)}</Typography>
-                <Typography variant="h5" sx={{fontWeight: 600}}>LKR {autoTicket.ticket_price}</Typography>
-              </Button>))}
+                <Typography variant="h5">{getTicketRemainCountTemp(autoTicket._id)}</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>LKR {autoTicket.ticket_price}</Typography>
+              </Button>
+            ))}
           </Stack>
         </Box>
 
-
+        <Box sx={{ width: "45%", marginTop: "20px", p: 5 }}>
+          <Typography variant="h4" gutterBottom>
+            Cart Details
+          </Typography>
+          <Stack spacing={2} sx={{ width: "100%", padding: "10px" }}>
+            {cartTickets.map((ticket) => (
+              <Paper key={ticket.ticket_id} sx={{ padding: "10px", display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="h6">{ticket.ticket_type}</Typography>
+                <Typography variant="h6">Count: {ticket.ticket_count}</Typography>
+                <Typography variant="h6">Total: LKR {ticket.ticket_price}</Typography>
+              </Paper>
+            ))}
+          </Stack>
+        </Box>
       </Box>
     </Maindiv>
   );
 }
-
