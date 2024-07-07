@@ -31,18 +31,23 @@ import { Task as TaskIcon, Edit, Add, Save, Delete } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { updatePRCampaign, deletePRCampaign } from "@/app/services/PrServices";
+import {
+  updatePRCampaign,
+  deletePRCampaign,
+  getPrPostsByCampaign,
+  deleteAllPostsForCampaign,
+} from "@/app/services/PrServices";
 import { PRtask, PRCampaigns, PRPosts } from "@/app/constants/models";
-import { getPrPostsByCampaign } from "@/app/services/PrServices";
 
 interface CampaignCardProps {
   title: string;
   image: string;
   description: string;
   status: string;
-  tasks?: PRtask[]; // Optional tasks array
-  token: string; // Add token prop for authentication
-  id: string; // Add id prop to identify the campaign
+  tasks?: PRtask[];
+  token: string;
+  id: string;
+  setIsChanged: (value: boolean) => void;
 }
 
 const validationSchema = Yup.object().shape({
@@ -56,58 +61,64 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   image,
   description,
   status,
-  tasks: initialTasks = [], // Default to empty array if tasks not provided
+  tasks: initialTasks = [],
   token,
   id,
+  setIsChanged,
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const [open, setOpen] = useState(false); // State to handle dialog open/close
-  const [activeTab, setActiveTab] = useState(0); // State to handle active tab
-  const [tasks, setTasks] = useState<PRtask[]>(initialTasks); // State to handle tasks
-  const [originalTasks, setOriginalTasks] = useState<PRtask[]>([]); // State to handle original tasks
-  const [completedProgress, setCompletedProgress] = useState(0); // State to handle progress
-  const [newTaskName, setNewTaskName] = useState(""); // State for new task name
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null); // State for editing task ID
-  const [editedTaskName, setEditedTaskName] = useState(""); // State for edited task name
-  const [successMessage, setSuccessMessage] = useState(false); // State for success message
-  const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false); // State for confirm complete dialog
-  const [prPosts, setPrPosts] = useState<PRPosts[]>([]); // State to handle PR posts
+  const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [tasks, setTasks] = useState<PRtask[]>(initialTasks);
+  const [originalTasks, setOriginalTasks] = useState<PRtask[]>([]);
+  const [completedProgress, setCompletedProgress] = useState(0);
+  const [newTaskName, setNewTaskName] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editedTaskName, setEditedTaskName] = useState("");
+  const [successMessage, setSuccessMessage] = useState(false);
+  const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false);
+  const [prPosts, setPrPosts] = useState<PRPosts[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    calculateProgress(); // Calculate initial progress
+    calculateProgress();
   }, [tasks]);
 
   const handleClickOpen = () => {
-    setOriginalTasks([...tasks]); // Save original tasks
-    setOpen(true); // Open the dialog
+    setOriginalTasks([...tasks]);
+    setOpen(true);
   };
 
   useEffect(() => {
     if (open) {
-      getPrPostsByCampaign(token, id).then((response) => {
-        setPrPosts(response.data); 
-        console.log("posts: ", response.data);
-      });
+      getPrPostsByCampaign(token, id)
+        .then((response) => {
+          setPrPosts(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+          setErrorMessage("Failed to load posts.");
+        });
     }
-  }, [open]);
+  }, [open, token, id]);
 
   const handleClose = () => {
     if (status === "completed") {
-      setOpen(false); // Close the main dialog directly for completed campaigns
+      setOpen(false);
     } else {
-      setTasks(originalTasks); // Revert to original tasks
-      setOpen(false); // Close the main dialog
+      setTasks(originalTasks);
+      setOpen(false);
     }
   };
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setActiveTab(newValue); // Update active tab
+    setActiveTab(newValue);
   };
 
   const handleDeleteTask = (taskId: string) => {
     const updatedTasks = tasks.filter((task) => task.TaskID !== taskId);
-    setTasks(updatedTasks); // Delete task
+    setTasks(updatedTasks);
   };
 
   const handleToggleTaskCompletion = (taskId: string) => {
@@ -120,7 +131,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           }
         : task
     );
-    setTasks(updatedTasks); // Toggle task completion
+    setTasks(updatedTasks);
   };
 
   const handleEditTask = (taskId: string) => {
@@ -137,13 +148,13 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
         ? { ...task, TaskName: editedTaskName }
         : task
     );
-    setTasks(updatedTasks); // Save edited task
-    setEditingTaskId(null); // Reset editing state
-    setEditedTaskName(""); // Clear edited task name
+    setTasks(updatedTasks);
+    setEditingTaskId(null);
+    setEditedTaskName("");
   };
 
   const handleAddTask = (values: { newTaskName: string }) => {
-    if (status === "completed") return; // Disable adding new tasks if status is completed
+    if (status === "completed") return;
 
     const newTask: PRtask = {
       TaskID: tasks.length
@@ -154,8 +165,8 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
       TaskName: values.newTaskName,
       TaskStatus: "incomplete",
     };
-    setTasks([...tasks, newTask]); // Add new task
-    setNewTaskName(""); // Clear new task name
+    setTasks([...tasks, newTask]);
+    setNewTaskName("");
   };
 
   const calculateProgress = (tasksList = tasks) => {
@@ -165,7 +176,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
     ).length;
     const progress =
       totalTasks === 0 ? 0 : ((completedTasks / totalTasks) * 100).toFixed(2);
-    setCompletedProgress(Number(progress)); // Update progress
+    setCompletedProgress(Number(progress));
   };
 
   const handleDone = async () => {
@@ -177,24 +188,36 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   };
 
   const saveCampaignChanges = async () => {
-    console.log("id: ", id, "tasks: ", tasks, "status: ", status);
     try {
       await updatePRCampaign(token, { PRtask: tasks, completedProgress }, id);
       setSuccessMessage(true);
       setOpen(false);
+      setIsChanged(true);
     } catch (error) {
       console.error(error);
+      setErrorMessage("Failed to save changes.");
     }
   };
 
   const handleConfirmComplete = async (complete: boolean) => {
     if (complete) {
-      await updatePRCampaign(
-        token,
-        { PRtask: tasks, CampaignStatus: "completed", completedProgress: 100 },
-        id
-      );
-      setConfirmCompleteOpen(false);
+      try {
+        await updatePRCampaign(
+          token,
+          {
+            PRtask: tasks,
+            CampaignStatus: "completed",
+            completedProgress: 100,
+          },
+          id
+        );
+        setConfirmCompleteOpen(false);
+        setSuccessMessage(true);
+        setIsChanged(true);
+      } catch (error) {
+        console.error(error);
+        setErrorMessage("Failed to complete the campaign.");
+      }
     } else {
       await saveCampaignChanges();
       setConfirmCompleteOpen(false);
@@ -203,14 +226,22 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
 
   const handleDeleteCampaign = async () => {
     try {
-      await deletePRCampaign(token, id);
+      await deleteAllPostsForCampaign(token, id).then(() => {
+        deletePRCampaign(token, id);
+      });
+      setIsChanged(true);
     } catch (error) {
-      console.error(error); // Handle the error
+      console.error(error);
+      setErrorMessage("Failed to delete campaign.");
     }
   };
 
   const handleCloseSnackbar = () => {
-    setSuccessMessage(false); // Hide success message
+    setSuccessMessage(false);
+  };
+
+  const handleCloseErrorSnackbar = () => {
+    setErrorMessage(null);
   };
 
   return (
@@ -220,7 +251,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
         style={{
           display: "flex",
           flexDirection: "column",
-          height: "450px", // Set fixed height
+          height: "450px",
           boxShadow: "0 2px 4px rgba(0,0,0,0.5)",
           width: "100%",
         }}
@@ -230,7 +261,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           src={image}
           alt={title}
           style={{
-            height: "180px", // Set fixed height for the image
+            height: "180px",
             width: "100%",
             objectFit: "cover",
             borderTopLeftRadius: theme.shape.borderRadius,
@@ -287,7 +318,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               size="large"
               color="primary"
               variant="contained"
-              onClick={handleClickOpen} // Open the dialog on click
+              onClick={handleClickOpen}
             >
               See More
             </Button>
@@ -295,7 +326,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               size="large"
               color="secondary"
               variant="contained"
-              onClick={handleDeleteCampaign} // Delete the campaign on click
+              onClick={handleDeleteCampaign}
             >
               Delete
             </Button>
@@ -448,7 +479,6 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           )}
           {activeTab === 1 && (
             <Box sx={{ p: theme.spacing(2) }}>
-              {/* Posts Tab Content */}
               <List>
                 {prPosts.map((post) => (
                   <ListItem key={post.PrPostID}>
@@ -513,6 +543,13 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
         onClose={handleCloseSnackbar}
         color="success"
         message="Changes saved successfully!"
+      />
+      <Snackbar
+        open={Boolean(errorMessage)}
+        autoHideDuration={3000}
+        onClose={handleCloseErrorSnackbar}
+        color="error"
+        message={errorMessage}
       />
     </>
   );

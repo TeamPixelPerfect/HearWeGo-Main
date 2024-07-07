@@ -29,6 +29,7 @@ interface ScheduledPostProps {
   time: string;
   id: string;
   token: string;
+  setIsChanged: (value: boolean) => void;
 }
 
 const ScheduledPostCard: React.FC<ScheduledPostProps> = ({
@@ -40,29 +41,23 @@ const ScheduledPostCard: React.FC<ScheduledPostProps> = ({
   time,
   token,
   id,
+  setIsChanged,
 }) => {
   const [expanded, setExpanded] = useState(false);
-
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   const onDelete = async () => {
     try {
-      await deletePRPost(token, id);
+      await deletePRPost(token, id).then(() => setIsChanged(true));
     } catch (error) {
       console.error(error);
     }
   };
-  const formattedDate = new Date(date).toLocaleDateString("en-CA"); // Format date as YYYY/MM/DD
-  const formattedTime = new Date(`1970-01-01T${time}`).toLocaleTimeString(
-    "en-US",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }
-  ); // Format time as HH:MM
+
+  const formattedDate = new Date(date).toLocaleDateString("en-CA"); // Format date as YYYY-MM-DD
+  const formattedTime = time; // Directly use the time string for display
 
   return (
     <Card sx={{ maxWidth: 345, m: 2, boxShadow: 3 }}>
