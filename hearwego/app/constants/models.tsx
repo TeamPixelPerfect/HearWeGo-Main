@@ -354,6 +354,14 @@ export interface MerchStore {
   artist_id?: string;
 }
 
+export interface Artistcover {
+ 
+  store_banner?: string;
+  promo_banner?: string[];
+  
+  artist_id?: string;
+}
+
 export interface MerchCategory {
   store_id?: string;
   category_id?: string;
