@@ -737,3 +737,43 @@ export const getAllRemainingTickets = async () => {
     throw error;
   }
 }
+
+export const updateRemainingTicketByTicketId = async (token: string, ticket_id: string, data: any) => {
+  console.log("Sending updated remaining ticket data:", data);
+  const res = await fetch(`${base_url}/EventsManager/remainTickets/ticket/${ticket_id}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const createSoldTicket = async (token: string, data: any) => {
+  console.log("Sending sold ticket data:", data);
+  const res = await fetch(`${base_url}/EventsManager/soldTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}

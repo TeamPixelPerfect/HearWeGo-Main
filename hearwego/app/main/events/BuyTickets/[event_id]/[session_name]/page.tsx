@@ -1,26 +1,24 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import {
-  TicketCover,
-} from "../../../../../styles/BuyTickets.styles";
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import { TicketCover } from "../../../../../styles/BuyTickets.styles";
 import { Maindiv } from "../../../../../styles/SingleArtistPage.styles";
 import { useParams } from "next/navigation";
 import { Event } from "@/app/constants/models";
+import { SoldTickets } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";
 import { getEvent } from "@/app/services/EventServices";
 import { getAllArtists } from "@/app/services/ArtistServices";
-import { getAutoTicketsByEventAndSession, getAllRemainingTickets } from "@/app/services/EventServices";
+import {
+  getAutoTicketsByEventAndSession,
+  getAllRemainingTickets,
+  updateRemainingTicketByTicketId,
+  createSoldTicket,
+} from "@/app/services/EventServices";
 import { AutoTicket, Artist, RemainingTickets } from "@/app/constants/models";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import PaymentIcon from '@mui/icons-material/Payment';
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import PaymentIcon from "@mui/icons-material/Payment";
 
 interface CartTickets {
   ticket_id: string;
@@ -35,10 +33,25 @@ export default function Page() {
   const { event_id, session_name } = useParams();
   const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = useState<Event | null>(null);
+  const [soldTicket, setSoldTicket] = useState<SoldTickets | null>({
+    ticket_id : "",
+    user_id: "",
+    bought_quantity : 0,
+    total_price : 0,
+    user_name : "",
+    user_email : "",
+    user_contact : "",
+    user_nic : "",
+
+  });
   const [autoTickets, setAutoTickets] = useState<AutoTicket[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
-  const [remainingTickets, setRemainingTickets] = useState<RemainingTickets[]>([]);
-  const [tempRemainingTickets, setTempRemainingTickets] = useState<RemainingTickets[]>([]);
+  const [remainingTickets, setRemainingTickets] = useState<RemainingTickets[]>(
+    []
+  );
+  const [tempRemainingTickets, setTempRemainingTickets] = useState<
+    RemainingTickets[]
+  >([]);
   const [cartTickets, setCartTickets] = useState<CartTickets[]>([]);
 
   useEffect(() => {
@@ -54,7 +67,10 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    getAutoTicketsByEventAndSession(event_id as string, session_name as string).then((autoTickets) => {
+    getAutoTicketsByEventAndSession(
+      event_id as string,
+      session_name as string
+    ).then((autoTickets) => {
       console.log("Auto Tickets.... ", autoTickets);
       setAutoTickets(autoTickets);
     });
@@ -73,9 +89,33 @@ export default function Page() {
   };
 
   const getTicketRemainCountTemp = (ticketId) => {
-    const remainingTicket = tempRemainingTickets.find((remainingTicket) => remainingTicket.ticket_id === ticketId);
+    const remainingTicket = tempRemainingTickets.find(
+      (remainingTicket) => remainingTicket.ticket_id === ticketId
+    );
     return remainingTicket ? remainingTicket.remaining_quantity : 0;
   };
+
+  const handleUpdateRemainingTickets = () => {
+    for (let i = 0; i < tempRemainingTickets.length; i++) {
+      updateRemainingTicketByTicketId(
+        user.token,
+        tempRemainingTickets[i].ticket_id as string,
+        { remaining_quantity: tempRemainingTickets[i].remaining_quantity }
+      );
+    }
+  };
+
+  const handleCreateSoldTicket = () => {
+    for (let i = 0; i < cartTickets.length; i++) {
+      createSoldTicket(user.token, {
+        ticket_id: cartTickets[i].ticket_id,
+        user_id: "u3",
+        bought_quantity: cartTickets[i].ticket_count,
+        total_price: cartTickets[i].ticket_price,
+        user_nic: "",
+      });
+    }
+  }
 
   const handleTicketClick = (autoTicket) => {
     setTempRemainingTickets((prevTickets) =>
@@ -87,11 +127,17 @@ export default function Page() {
     );
 
     setCartTickets((prevCartTickets) => {
-      const existingCartTicket = prevCartTickets.find((ticket) => ticket.ticket_id === autoTicket._id);
+      const existingCartTicket = prevCartTickets.find(
+        (ticket) => ticket.ticket_id === autoTicket._id
+      );
       if (existingCartTicket) {
         return prevCartTickets.map((ticket) =>
           ticket.ticket_id === autoTicket._id
-            ? { ...ticket, ticket_count: ticket.ticket_count + 1, ticket_price: ticket.ticket_price + autoTicket.ticket_price }
+            ? {
+                ...ticket,
+                ticket_count: ticket.ticket_count + 1,
+                ticket_price: ticket.ticket_price + autoTicket.ticket_price,
+              }
             : ticket
         );
       } else {
@@ -116,21 +162,28 @@ export default function Page() {
             ? {
                 ...cartTicket,
                 ticket_count: cartTicket.ticket_count - 1,
-                ticket_price: cartTicket.ticket_price - (cartTicket.ticket_price / cartTicket.ticket_count),
+                ticket_price:
+                  cartTicket.ticket_price -
+                  cartTicket.ticket_price / cartTicket.ticket_count,
               }
             : cartTicket
         )
       );
     } else {
       setCartTickets((prevCartTickets) =>
-        prevCartTickets.filter((cartTicket) => cartTicket.ticket_id !== ticket.ticket_id)
+        prevCartTickets.filter(
+          (cartTicket) => cartTicket.ticket_id !== ticket.ticket_id
+        )
       );
     }
 
     setTempRemainingTickets((prevTickets) =>
       prevTickets.map((tempTicket) =>
         tempTicket.ticket_id === ticket.ticket_id
-          ? { ...tempTicket, remaining_quantity: tempTicket.remaining_quantity + 1 }
+          ? {
+              ...tempTicket,
+              remaining_quantity: tempTicket.remaining_quantity + 1,
+            }
           : tempTicket
       )
     );
@@ -143,7 +196,9 @@ export default function Page() {
         artist_name={getArtistName(event?.event_created_by)}
         img={event?.event_img}
       />
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+      <Box
+        sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}
+      >
         <Box sx={{ width: "45%", marginTop: "20px", p: 5 }}>
           <Typography variant="h4" gutterBottom>
             Tickets
@@ -154,13 +209,21 @@ export default function Page() {
                 key={autoTicket.auto_ticket_id}
                 disabled={getTicketRemainCountTemp(autoTicket._id) <= 0}
                 variant="contained"
-                sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
                 startIcon={<AddCircleIcon />}
                 onClick={() => handleTicketClick(autoTicket)}
               >
                 <Typography variant="h5">{autoTicket.ticket_type}</Typography>
-                <Typography variant="subtitle1" fontStyle="italic">( {getTicketRemainCountTemp(autoTicket._id)} Remaining )</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>LKR {autoTicket.ticket_price}</Typography>
+                <Typography variant="subtitle1" fontStyle="italic">
+                  ( {getTicketRemainCountTemp(autoTicket._id)} Remaining )
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  LKR {autoTicket.ticket_price}
+                </Typography>
               </Button>
             ))}
           </Stack>
@@ -177,23 +240,47 @@ export default function Page() {
                 variant="contained"
                 color="error"
                 key={ticket.ticket_id}
-                sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
                 onClick={() => handleCartTicketClick(ticket)}
               >
                 <Typography variant="h6">{ticket.ticket_type}</Typography>
-                <Typography variant="h6">Count: {ticket.ticket_count}</Typography>
-                <Typography variant="h6">Total: LKR {ticket.ticket_price}</Typography>
+                <Typography variant="h6">
+                  Count: {ticket.ticket_count}
+                </Typography>
+                <Typography variant="h6">
+                  Total: LKR {ticket.ticket_price}
+                </Typography>
               </Button>
             ))}
           </Stack>
         </Box>
       </Box>
 
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", p: 5 }}>
-        <Typography variant="h4" gutterBottom sx={{display: "flex", alignItems: "center"}}>
-          Total: 
-          <Typography variant="h4" color="secondary" sx={{ fontWeight: 600, fontSize: "1.5em", marginLeft: 3 }}>
-          LKR {cartTickets.reduce((acc, ticket) => acc + ticket.ticket_price, 0)}
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          p: 5,
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          Total:
+          <Typography
+            variant="h4"
+            color="secondary"
+            sx={{ fontWeight: 600, fontSize: "1.5em", marginLeft: 3 }}
+          >
+            LKR{" "}
+            {cartTickets.reduce((acc, ticket) => acc + ticket.ticket_price, 0)}
           </Typography>
         </Typography>
         <Button
@@ -201,6 +288,11 @@ export default function Page() {
           color="primary"
           sx={{ marginTop: "20px" }}
           endIcon={<PaymentIcon />}
+          onClick={() => {
+            handleUpdateRemainingTickets();
+            handleCreateSoldTicket();
+          }
+          }
         >
           Proceed to Payment
         </Button>
