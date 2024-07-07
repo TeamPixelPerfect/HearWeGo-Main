@@ -24,6 +24,7 @@ import {
   getPRCampaignsByArtist,
   getPRPostsByArtist,
 } from "@/app/services/PrServices";
+import { set } from "date-fns";
 
 const Dashboard = () => {
   const [value, setValue] = useState(0);
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const artist = useAppSelector((state) => state.artist.user);
+  const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
     if (artist?.token) {
@@ -46,11 +48,12 @@ const Dashboard = () => {
       )
         .then((response) => {
           setCampaigns(response.data);
+          if (isChanged) setIsChanged(false);
         })
         .catch((error) => setError(error))
         .finally(() => setLoading(false));
     }
-  }, [artist?.token, artist?.user?.artist_id]);
+  }, [artist?.token, artist?.user?.artist_id, isChanged]);
 
   useEffect(() => {
     if (artist?.token) {
@@ -60,11 +63,12 @@ const Dashboard = () => {
       )
         .then((response) => {
           setScheduledPosts(response.data);
+          if (isChanged) setIsChanged(false);
         })
         .catch((error) => setError(error))
         .finally(() => setLoading(false));
     }
-  }, [artist?.token, artist?.user?.artist_id]);
+  }, [artist?.token, artist?.user?.artist_id, isChanged]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -88,6 +92,7 @@ const Dashboard = () => {
               tasks={campaign?.PRtask}
               id={campaign?.CampaignID as string}
               token={artist?.token as string}
+              setIsChanged={setIsChanged}
             />
           </Grid>
         ))}
@@ -109,6 +114,7 @@ const Dashboard = () => {
               time={post.Scheduled_Time as string}
               id={post.PrPostID as string}
               token={artist?.token as string}
+              setIsChanged={setIsChanged}
             />
           </Grid>
         ))}
@@ -196,10 +202,12 @@ const Dashboard = () => {
       <CreateCampaignPop
         open={openCreateCampaignDialog}
         onClose={() => setOpenCreateCampaignDialog(false)}
+        setIsChanged={setIsChanged}
       />
       <CreatePost
         open={openCreatePostDialog}
         onClose={() => setOpenCreatePostDialog(false)}
+        setIsChanged={setIsChanged}
       />
     </>
   );

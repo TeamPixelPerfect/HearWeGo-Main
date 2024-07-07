@@ -18,10 +18,6 @@ import {
   Alert,
   Box,
   IconButton,
-  FilledTextFieldProps,
-  OutlinedTextFieldProps,
-  StandardTextFieldProps,
-  TextFieldVariants,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
@@ -33,7 +29,6 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import CloseIcon from "@mui/icons-material/Close";
-import { useTheme } from "@mui/material/styles";
 import DropFile from "../../../components/DropFile";
 import {
   addPRPost,
@@ -42,9 +37,16 @@ import {
 import { PRPosts, PRCampaigns } from "../../../constants/models";
 import { useAppSelector } from "@/lib/hooks";
 
-const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
+interface CreatePostProps {
+  open: boolean;
+  onClose: () => void;
+  setIsChanged: (value: boolean) => void;
+}
+
+const CreatePost: React.FC<CreatePostProps> = ({
   open,
   onClose,
+  setIsChanged,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<Date | null>(null);
@@ -58,7 +60,6 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
   const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
-  const theme = useTheme();
   const [prPostImage, setPrPostImage] = useState<File | null>(null);
   const [campaignNames, setCampaignNames] = useState<PRCampaigns[]>([]);
   const [error, setError] = useState<Error | null>(null);
@@ -70,7 +71,11 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         artist?.user?.artist_id ? artist.user.artist_id : ""
       )
         .then((response) => {
-          setCampaignNames(response.data);
+          const filteredCampaigns = response.data.filter(
+            (campaign: { CampaignStatus: string }) =>
+              campaign.CampaignStatus !== "completed"
+          );
+          setCampaignNames(filteredCampaigns);
         })
         .catch((error) => setError(error));
     }
@@ -99,6 +104,8 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         .min(1, "Select at least one social media platform"),
       PostImage_URL: Yup.string().required("Post Image is required"),
     }),
+    validateOnChange: false,
+    validateOnBlur: false,
     onSubmit: async (values, { resetForm }) => {
       try {
         console.log("Form Values: ", values);
@@ -112,6 +119,9 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         setSnackbarOpen(true);
         onClose();
         resetForm();
+        setSelectedDate(null);
+        setSelectedTime(null);
+        setSelectedSocialMedia([]);
       } catch (error) {
         setErrorMessage("Error submitting post: " + error.message);
         setErrorOpen(true);
@@ -163,7 +173,8 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
 
   const handleConfirmClose = (confirmed: boolean) => {
     if (confirmed) {
-      formik.submitForm(); // Use submitForm instead of handleSubmit
+      formik.submitForm().then(() => setIsChanged(true));
+      setConfirmOpen(false);
     }
     setConfirmOpen(false);
   };
@@ -180,8 +191,16 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
     setErrorOpen(false);
   };
 
+  const handleCancel = () => {
+    onClose();
+    formik.resetForm();
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setSelectedSocialMedia([]);
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
       <DialogTitle>Create Post</DialogTitle>
       <DialogContent>
         <form onSubmit={formik.handleSubmit}>
@@ -228,14 +247,18 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
                     formik.touched.Campaigns && Boolean(formik.errors.Campaigns)
                   }
                 >
-                  {campaignNames.map((campaign) => (
-                    <MenuItem
-                      key={campaign.CampaignID}
-                      value={campaign.Campaign_Name}
-                    >
-                      {campaign.Campaign_Name}
-                    </MenuItem>
-                  ))}
+                  {campaignNames
+                    .filter(
+                      (campaign) => campaign.CampaignStatus !== "completed"
+                    )
+                    .map((campaign) => (
+                      <MenuItem
+                        key={campaign.CampaignID}
+                        value={campaign.Campaign_Name}
+                      >
+                        {campaign.Campaign_Name}
+                      </MenuItem>
+                    ))}
                 </Select>
                 {formik.touched.Campaigns && formik.errors.Campaigns && (
                   <Typography color="error" variant="caption">
@@ -244,6 +267,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
                 )}
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
               <FormControl component="fieldset" fullWidth>
                 <Typography variant="subtitle1">
@@ -273,54 +297,56 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
                 )}
               </FormControl>
             </Grid>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <DatePicker
-                    label="Input The Date"
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        variant="outlined"
-                        error={
-                          formik.touched.Scheduled_Date &&
-                          Boolean(formik.errors.Scheduled_Date)
-                        }
-                        helperText={
-                          formik.touched.Scheduled_Date &&
-                          formik.errors.Scheduled_Date
-                        }
-                      />
-                    )}
-                  />
+            <Grid item xs={12}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <DatePicker
+                      label="Input The Date"
+                      value={selectedDate}
+                      onChange={handleDateChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          variant="outlined"
+                          error={
+                            formik.touched.Scheduled_Date &&
+                            Boolean(formik.errors.Scheduled_Date)
+                          }
+                          helperText={
+                            formik.touched.Scheduled_Date &&
+                            formik.errors.Scheduled_Date
+                          }
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TimePicker
+                      label="Input The Time"
+                      value={selectedTime}
+                      onChange={handleTimeChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          variant="outlined"
+                          error={
+                            formik.touched.Scheduled_Time &&
+                            Boolean(formik.errors.Scheduled_Time)
+                          }
+                          helperText={
+                            formik.touched.Scheduled_Time &&
+                            formik.errors.Scheduled_Time
+                          }
+                        />
+                      )}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TimePicker
-                    label="Input The Time"
-                    value={selectedTime}
-                    onChange={handleTimeChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        variant="outlined"
-                        error={
-                          formik.touched.Scheduled_Time &&
-                          Boolean(formik.errors.Scheduled_Time)
-                        }
-                        helperText={
-                          formik.touched.Scheduled_Time &&
-                          formik.errors.Scheduled_Time
-                        }
-                      />
-                    )}
-                  />
-                </Grid>
-              </Grid>
-            </LocalizationProvider>
+              </LocalizationProvider>
+            </Grid>
             <Grid item xs={12}>
               <Box
                 sx={{
@@ -358,7 +384,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
             </Grid>
           </Grid>
           <DialogActions>
-            <Button onClick={onClose} color="secondary">
+            <Button onClick={handleCancel} color="secondary">
               Cancel
             </Button>
             <Button onClick={handlePreviewOpen} color="primary">
@@ -408,7 +434,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         <DialogContent>
           <Typography>
             Are you sure you want to{" "}
-            {confirmAction === "postNow" ? "post now" : "schedule"} this post?
+            {confirmAction === "postNow" ? "post" : "schedule"} this post?
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -427,21 +453,65 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
         fullWidth
       >
         <DialogTitle>Post Preview</DialogTitle>
-        <DialogContent>
-          <Typography variant="h6">{formik.values.Campaigns}</Typography>
-          <Typography variant="body1">{formik.values.Description}</Typography>
-          <Typography variant="subtitle1">Social Media Platforms:</Typography>
-          <ul>
-            {selectedSocialMedia.map((platform) => (
-              <li key={platform}>{platform}</li>
-            ))}
-          </ul>
-          <Typography variant="subtitle1">
-            Date: {selectedDate?.toLocaleDateString()}
-          </Typography>
-          <Typography variant="subtitle1">
-            Time: {selectedTime?.toLocaleTimeString()}
-          </Typography>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                {formik.values.Description}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1" gutterBottom>
+                {formik.values.Campaigns}
+              </Typography>
+            </Grid>
+            {prPostImage && (
+              <Grid item xs={12}>
+                <Box display="flex" justifyContent="center">
+                  <img
+                    src={prPostImage as unknown as string}
+                    alt="Post Preview"
+                    style={{
+                      maxWidth: "100%",
+                      height: "auto",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </Box>
+              </Grid>
+            )}
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" gutterBottom>
+                Social Media Platforms:
+              </Typography>
+              <Box
+                component="ul"
+                sx={{ listStyleType: "disc", paddingLeft: 2 }}
+              >
+                {selectedSocialMedia.map((platform) => (
+                  <Typography component="li" key={platform}>
+                    {platform}
+                  </Typography>
+                ))}
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1" gutterBottom>
+                Date:
+              </Typography>
+              <Typography variant="body2">
+                {selectedDate?.toLocaleDateString()}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1" gutterBottom>
+                Time:
+              </Typography>
+              <Typography variant="body2">
+                {selectedTime?.toLocaleTimeString()}
+              </Typography>
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handlePreviewClose} color="primary">
@@ -449,6 +519,7 @@ const CreatePost: React.FC<{ open: boolean; onClose: () => void }> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={errorOpen} onClose={handleErrorClose}>
         <DialogTitle>Error</DialogTitle>
         <DialogContent>

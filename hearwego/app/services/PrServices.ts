@@ -196,3 +196,22 @@ export const getPrPostsByCampaign = async (
     throw new Error(error.message);
   }
 };
+
+export const deleteAllPostsForCampaign = async (
+  token: string,
+  campaignId: string
+) => {
+  try {
+    const response = await getPrPostsByCampaign(token, campaignId);
+    const posts = response.data;
+
+    console.log("posts", posts);
+
+    if (!posts) return;
+    for (const post of posts) {
+      await deletePRPost(token, post.PrPostID);
+    }
+  } catch (error) {
+    console.error("Error deleting posts for campaign:", error);
+  }
+};
