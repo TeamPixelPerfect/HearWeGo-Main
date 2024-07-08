@@ -254,6 +254,7 @@ export default function SingleEvent({ params: { id } }: Props) {
                 onClick={() => {router.push(`/main/events/TicketDetails/${id}/${event?.sessions[currentSessionIndex].session_name}`)}}
                 variant="contained"
                 //size="small"
+                disabled={!user}
               >
                 Find Tickets
               </Button>

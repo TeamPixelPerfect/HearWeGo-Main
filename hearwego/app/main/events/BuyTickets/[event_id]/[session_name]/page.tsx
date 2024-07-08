@@ -38,6 +38,7 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import EventCheckout from "@/app/components/EventCheckout";
+import { id } from "date-fns/locale";
 
 const ticketModalStyle = {
   position: "absolute" as "absolute",
@@ -89,6 +90,16 @@ function SingleTicket(
   ticket_img: string,
   ticket_count: number
 ) {
+  console.log("Ticket ID: ", ticket_id);
+  const generateQRCode = () => {
+    return `
+    Ticket ID: ${ticket_id}\n
+    Ticket Type: ${ticket_type}\n
+    Event: ${event_name}\n
+    Session: ${session_name}\n
+    No of Tickets: ${ticket_count}\n
+    `;
+  };
   return (
     <Paper
       sx={{
@@ -172,15 +183,7 @@ function SingleTicket(
           alignItems: "center",
         }}
       >
-        <QRCodeComponent
-          value={JSON.stringify({
-            ticketId: ticket_id,
-            ticketType: ticket_type,
-            eventName: event_name,
-            sessionName: session_name,
-            sessionDate: session_date,
-          })}
-        />
+        <QRCodeComponent value={generateQRCode()} />
       </Box>
     </Paper>
   );
@@ -189,6 +192,7 @@ function SingleTicket(
 export default function Page() {
   const { event_id, session_name } = useParams();
   const boxRef = useRef();
+  const [id_list, setIdList] = useState<string[]>([]);
   const [openTicketModal, setOpenTicketModal] = React.useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -293,7 +297,7 @@ export default function Page() {
 
   const handleCreateSoldTicket = () => {
     for (let i = 0; i < cartTickets.length; i++) {
-      createSoldTicket(user.token, {
+      const createdTicket = createSoldTicket(user.token, {
         ticket_id: cartTickets[i].ticket_id,
         user_id: user?.user_id,
         bought_quantity: cartTickets[i].ticket_count,
@@ -302,8 +306,23 @@ export default function Page() {
         user_email: user?.email,
         user_contact: user?.mobileNumber,
         user_nic: "",
+        order_ticket_id: (cartTickets[i].ticket_id +
+          user.user_id +
+          new Date().getTime().toString()) as string,
+      }).then((res) => {
+        setIdList((prevIdList) => [...prevIdList, res.order_ticket_id]);
+        console.log("Sold Ticket Response: ", res.order_ticket_id);
+
+        if (i === cartTickets.length - 1) {
+          handleOpenTicketModal();
+        }
       });
+
+      // console.log("Sold Ticket Response: ", orderId);
+      // id_list.push(res.data.order_ticket_id as string);
+      // id_list.push(orderId);
     }
+    console.log("ID List: ", id_list);
   };
 
   const handleTicketClick = (autoTicket) => {
@@ -383,6 +402,9 @@ export default function Page() {
 
   const downloadPDF = () => {
     const input = boxRef.current;
+    console.log("Input: ", input);
+    const img = input.children[0].children[0].children[0].src;
+    console.log("Image: ", img);
     html2canvas(input).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       // Specify dimensions for the PDF
@@ -516,7 +538,6 @@ export default function Page() {
           onClick={() => {
             handleUpdateRemainingTickets();
             handleCreateSoldTicket();
-            handleOpenTicketModal();
             // handlePaymentGateway();
           }}
         >
@@ -566,13 +587,13 @@ export default function Page() {
                   "scrollbar-width": "none",
                 }}
               >
-                {cartTickets.map((ticket) => {
+                {cartTickets.map((ticket, index) => {
                   const autoTicket = autoTickets.find(
                     (autoTicket) => autoTicket._id === ticket.ticket_id
                   );
                   return autoTicket
                     ? SingleTicket(
-                        autoTicket._id,
+                        id_list[index] as string,
                         autoTicket?.ticket_type,
                         event?.event_name as string,
                         session_name as string,

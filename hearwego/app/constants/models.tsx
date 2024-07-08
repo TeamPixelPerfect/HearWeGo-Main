@@ -285,6 +285,7 @@ export interface SoldTickets {
   user_email?: string;
   user_contact?: string;
   user_nic?: string;
+  order_ticket_id?: string;
 }
 
 export interface RemainingTickets {
