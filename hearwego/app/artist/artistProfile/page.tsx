@@ -1069,12 +1069,12 @@ const ADHomePage = () => {
       }}
     >
      <Typography
-            sx={{ marginTop: "10px", marginLeft: "27px" }}
+            sx={{ marginTop: "10px", marginLeft: "18px" }}
             variant="h5"
             mb={2}
             gutterBottom
           >
-        Streaming Platform Links
+        Social media Platforms
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
         <TextField
