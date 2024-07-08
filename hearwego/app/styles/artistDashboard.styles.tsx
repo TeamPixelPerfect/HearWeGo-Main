@@ -128,7 +128,7 @@ export const ADHomeCoverBox = styled(Box, {
 
 export const ADHomeNameArea = styled(Box)(({ theme }) => ({
   width: "100%",
-  maxHeight: "150px",
+  // maxHeight: "150px",
   padding: "1em",
   // paddingBottom: "0",
   background: "rgba(0,0,0,0.5)",

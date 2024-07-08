@@ -29,7 +29,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { FaCopy, FaFacebook } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
@@ -51,14 +51,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DropArtistPP from "@/app/components/DropArtistPP";
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import TikTokIcon from '@mui/icons-material/MusicNote';
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TikTokIcon from "@mui/icons-material/MusicNote";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 
 import ReactCountryFlag from "react-country-flag";
 import { countries } from "country-flag-icons";
@@ -73,6 +73,10 @@ import { Formik, Form, Field } from "formik";
 import { Artistcover } from "@/app/constants/models";
 import DropFile from "@/app/components/DropFile";
 import { color } from "framer-motion";
+import { ar } from "date-fns/locale";
+import dayjs from "dayjs";
+import { updateArtist } from "@/app/services/ArtistServices";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 interface Platform {
   name: string;
@@ -106,8 +110,6 @@ const initialSocialMediaOptions = [
   },
 ];
 
-
-
 const contributes = [
   {
     value: "Performer",
@@ -125,9 +127,7 @@ const contributes = [
     value: "Instrumentalist",
     label: "Instrumentalist",
   },
-
-
-]
+];
 
 const genres = [
   {
@@ -181,24 +181,20 @@ const ADHomePage = () => {
 
   const matches = useMediaQuery("(max-width:960px)");
 
-  const [profilePic, setProfilePic] = useState<string>(
-    // "https://placehold.co/600x600/png"
-    "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-  );
-  const [coverPic, setCoverPic] = useState<string>(
-    // "https://placehold.co/1280x720/png"
-    "https://.com/wp-content/uploads/2019/07/The-Rembrandts-Via-Satellite-2.jpg"
-  );
-
   const [tabValue, setTabValue] = React.useState(0);
+
+  const [loading, setLoading] = useState(false);
+
   const artist = useAppSelector((state) => state.artist.user);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-  const [profilePicture, setProfilePicture] = useState<any>(null);
+  const [profilePicture, setProfilePicture] = useState<any>(
+    artist?.user.profilePicture || ""
+  );
   // New state for cover photo editing
-  const [coverPhoto, setCoverPhoto] = useState<string>(
-    "https://www.profilerehab.com/facebook_covers/hearts/tree_heart_cover_1.jpg"
+  const [coverPhoto, setCoverPhoto] = useState<any>(
+    artist?.user?.artistCovers[0] || ""
   );
 
   const handleCoverPhotoChange = (
@@ -256,6 +252,20 @@ const ADHomePage = () => {
     setArtistBio(event.target.value);
   };
 
+  const handleContributeChange = (
+    event: SyntheticEvent<Element, Event>,
+    value: any
+  ) => {
+    setContribute(value);
+  };
+
+  const handleGenreChange = (
+    event: SyntheticEvent<Element, Event>,
+    value: any
+  ) => {
+    setGenre(value);
+  };
+
   const handleLogOut = () => {
     // Implement your log out logic here
     sessionStorage.removeItem("hwg-artist");
@@ -293,21 +303,21 @@ const ADHomePage = () => {
     setProfiles(updatedProfiles);
   };
 
-  const [alias, setAlias] = useState("Jone");
-  const [email, setEmail] = useState("maroon5@gmail.com");
-  const [address, setAddress] = useState("America");
-  const [contribute, setContribute] = useState("Producer");
-  const [birthDay, setBirthDay] = useState("1999-03-12");
-  const [genre, setGenre] = useState("Hip Pop");
- 
+  const [alias, setAlias] = useState(artist?.user?.alias || "");
+  const [email, setEmail] = useState(artist?.user?.email || "");
+  // const [address, setAddress] = useState("America");
+  const [contribute, setContribute] = useState(artist?.user?.artistProfession);
+  const [birthDay, setBirthDay] = useState(artist?.user?.birthDate);
+  const [genre, setGenre] = useState(artist?.user?.musicGenres);
+  const [gender, setGender] = useState(artist?.user?.gender?.toLowerCase());
 
-  const [selectedCountry, setSelectedCountry] = useState<string>("LK");
+  const [selectedCountry, setSelectedCountry] = useState(artist?.user?.country);
   const [artistBankDetails, setArtistBankDetails] = useState({
     bankDetails: {
-      accountName: "John Doe",
-      accountNumber: "123456789",
-      bankName: "Bank of Example",
-      bankBranch: "Main Branch",
+      accountName: artist?.bankDetails?.accountName,
+      accountNumber: artist?.bankDetails?.accountNumber,
+      bankName: artist?.bankDetails?.bankName,
+      bankBranch: artist?.bankDetails?.bankBranch,
     },
   });
 
@@ -360,11 +370,12 @@ const ADHomePage = () => {
     promo_banner: ["", "", ""],
   });
 
-  const [promoBanners, setPromoBanners] = useState<(File | null)[]>([
-    null,
-    null,
-    null,
+  const [promoBanners, setPromoBanners] = useState<any>([
+    artist?.artistCovers[0] || "",
+    artist?.artistCovers[1] || "",
+    artist?.artistCovers[2] || "",
   ]);
+
   const submitData = async (values: Artistcover) => {};
   const handleDeletee = (index: number) => {
     const updatedPromoBanners = [...promoBanners];
@@ -373,11 +384,20 @@ const ADHomePage = () => {
   };
   //end
 
-
   //social media platform
-  const [platform, setPlatform] = useState('YouTube');
-  const [link, setLink] = useState('https://www.youtube.com/results?search_query=friends');
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [platform, setPlatform] = useState("YouTube");
+  const [link, setLink] = useState<string>();
+  const [facebookLink, setFacebookLink] = useState<string>(
+    artist?.socialMediaLinks?.facebook
+  );
+  const [twitterLink, setTwitterLink] = useState<string>(
+    artist?.socialMediaLinks?.twitter
+  );
+  const [instagramLink, setInstagramLink] = useState<string>(
+    artist?.socialMediaLinks?.instagram
+  );
+
+  const [platforms, setPlatforms] = useState(artist?.user?.socialMediaLinks);
 
   const handlePlatformChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPlatform(event.target.value);
@@ -387,34 +407,57 @@ const ADHomePage = () => {
     setLink(event.target.value);
   };
 
-  const addPlatform = () => {
-    setPlatforms([...platforms, { name: platform, link }]);
-    setLink('');
-  };
-
-  const removePlatform = (index: number) => {
-    setPlatforms(platforms.filter((_, i) => i !== index));
-  };
-
   const renderIcon = (platform: string) => {
     switch (platform) {
-      case 'YouTube':
+      case "YouTube":
         return <YouTubeIcon />;
-      case 'Facebook':
+      case "Facebook":
         return <FacebookIcon />;
-      case 'Twitter':
+      case "Twitter":
         return <TwitterIcon />;
-      case 'Instagram':
+      case "Instagram":
         return <InstagramIcon />;
-      case 'LinkedIn':
+      case "LinkedIn":
         return <LinkedInIcon />;
-      case 'TikTok':
+      case "TikTok":
         return <TikTokIcon />;
       default:
         return null;
     }
   };
 
+  const handleUpdate = () => {
+    const data = {
+      artistName,
+      artistBio,
+      alias,
+      email,
+      artistProfession: contribute,
+      birthDate: birthDay,
+      musicGenres: genre,
+      gender,
+      country: selectedCountry,
+      bankDetails: artistBankDetails.bankDetails,
+      artistCovers: promoBanners,
+      profilePicture,
+      socialMediaLinks: {
+        facebook: facebookLink,
+        twitter: twitterLink,
+        instagram: instagramLink,
+      },
+    };
+
+    setLoading(true);
+    updateArtist(
+      artist?.token as string,
+      artist?.user?._id as string,
+      data
+    ).then((response) => {
+      console.log(response);
+      setLoading(false);
+      window.location.reload();
+    });
+  };
 
   return (
     <>
@@ -613,24 +656,6 @@ const ADHomePage = () => {
                       </ADArtistInfo>
                     </>
                   )}
-                  <ADArtistPageUrl>
-                    <Link href="">http://www.hearwego.com/wq23s</Link>
-                    <FaCopy />
-                  </ADArtistPageUrl>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: "600",
-                      mb: 0,
-                      fontSize: "20px",
-                    }}
-                  >
-                    22,522,155
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: "#fff" }}>
-                    Followers
-                  </Typography>
                 </Box>
               </Box>
               <Box
@@ -718,32 +743,34 @@ const ADHomePage = () => {
             }}
           >
             <TextField
-              id="artist-address"
+              id="artist-alias"
               label="Alias(other)"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              value={alias}
+              onChange={(e) => setAlias(e.target.value)}
               variant="filled"
               fullWidth
               margin="normal"
             />
 
-<TextField
-              id="genre"
-              select
-              label="Contribute"
-              value={contribute}
-              onChange={(event) => setContribute(event.target.value)}
-              variant="filled"
-              fullWidth
-              margin="normal"
-              sx={{ width: "60ch" }}
-            >
-              {contributes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Autocomplete
+              freeSolo
+              id="contribute"
+              multiple
+              disableClearable
+              options={contributes.map((option) => option.label)}
+              defaultValue={contribute}
+              onChange={handleContributeChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Profession"
+                  InputProps={{
+                    ...params.InputProps,
+                    type: "search",
+                  }}
+                />
+              )}
+            />
           </Box>
 
           <Box
@@ -756,7 +783,7 @@ const ADHomePage = () => {
             <TextField
               id="artist-birthday"
               label="Birthday"
-              value={birthDay}
+              value={dayjs(birthDay as string).format("YYYY-MM-DD") || ""}
               onChange={(e) => setBirthDay(e.target.value)}
               variant="filled"
               fullWidth
@@ -767,23 +794,25 @@ const ADHomePage = () => {
               }}
             />
 
-            <TextField
-              id="genre"
-              select
-              label="Genre"
-              value={genre}
-              onChange={(event) => setGenre(event.target.value)}
-              variant="filled"
-              fullWidth
-              margin="normal"
-              sx={{ width: "60ch" }}
-            >
-              {genres.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Autocomplete
+              freeSolo
+              id="contribute"
+              multiple
+              disableClearable
+              options={genres.map((option) => option.label)}
+              defaultValue={genre}
+              onChange={handleContributeChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Genres"
+                  InputProps={{
+                    ...params.InputProps,
+                    type: "search",
+                  }}
+                />
+              )}
+            />
           </Box>
           <Box
             sx={{
@@ -798,7 +827,10 @@ const ADHomePage = () => {
               <FormLabel id="gender-label">Gender</FormLabel>
               <RadioGroup
                 aria-labelledby="gender-label"
-                defaultValue="female"
+                defaultValue={gender}
+                onChange={(e) => {
+                  setGender(e.target.value);
+                }}
                 name="radio-buttons-group"
                 sx={{ display: "flex", flexDirection: "row" }}
               >
@@ -832,7 +864,7 @@ const ADHomePage = () => {
                 labelId="country-label"
                 id="country"
                 variant="outlined"
-                value={selectedCountry}
+                value={selectedCountry === "USA" ? "US" : selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
                 sx={{
                   background: "rgba(255,255,255,0.1)",
@@ -871,7 +903,7 @@ const ADHomePage = () => {
           padding: "10px",
         }}
       >
-         <Box
+        <Box
           component="form"
           sx={{
             "& .MuiTextField-root": { m: 1, width: "60ch" },
@@ -883,34 +915,33 @@ const ADHomePage = () => {
           noValidate
           autoComplete="off"
         >
-        
-            <Typography
-              sx={{ marginTop: "10px", marginLeft: "30px" }}
-              variant="h5"
-              gutterBottom
-            >
-              Bank Details
-            </Typography>
+          <Typography
+            sx={{ marginTop: "10px", marginLeft: "30px" }}
+            variant="h5"
+            gutterBottom
+          >
+            Bank Details
+          </Typography>
 
-            <Box
-              component="form"
-              sx={{
-                "& .MuiTextField-root": { m: 1, width: "60ch" },
-                display: "flex",
-                flexDirection: "column",
-
-                justifyContent: "space-evenly",
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <Box
+          <Box
+            component="form"
             sx={{
+              "& .MuiTextField-root": { m: 1, width: "60ch" },
               display: "flex",
-              flexDirection: "row",
+              flexDirection: "column",
+
               justifyContent: "space-evenly",
             }}
+            noValidate
+            autoComplete="off"
           >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+              }}
+            >
               <TextField
                 id="bank-account-name"
                 label="Bank Account Name"
@@ -944,16 +975,15 @@ const ADHomePage = () => {
                   });
                 }}
               />
-              </Box>
+            </Box>
 
-              <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-            }}
-          >
-
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+              }}
+            >
               <TextField
                 id="bank"
                 label="Bank"
@@ -987,9 +1017,8 @@ const ADHomePage = () => {
                   });
                 }}
               />
-              </Box>
             </Box>
-            
+          </Box>
         </Box>
       </Card>
 
@@ -1001,20 +1030,20 @@ const ADHomePage = () => {
           padding: "20px",
         }}
       >
-         <Typography
-            sx={{ marginTop: "10px", marginLeft: "27px" }}
-            variant="h5"
-            gutterBottom
-          >
-            Cover Photos
-          </Typography>
+        <Typography
+          sx={{ marginTop: "10px", marginLeft: "27px" }}
+          variant="h5"
+          gutterBottom
+        >
+          Cover Photos
+        </Typography>
         <Formik initialValues={coverphoto} onSubmit={submitData}>
           <Form>
             <Grid container spacing={3}>
-              {promoBanners.map((promoBanner, index) => (
+              {promoBanners.map((promoBanner: string, index: number) => (
                 <Grid item xs={4} key={index} sx={{ position: "relative" }}>
                   <Field name={`promo_banner.${index}`}>
-                    {({ field }) => (
+                    {({ field }: any) => (
                       <>
                         <DropFile
                           fileTypes="image"
@@ -1031,10 +1060,10 @@ const ADHomePage = () => {
                           aspectX={16}
                           aspectY={9}
                           shape="rect"
-                          style={{
-                            borderRadius: 10,
-                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                          }}
+                          // style={{
+                          //   borderRadius: 10,
+                          //   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          // }}
                         />
                         <IconButton
                           aria-label="delete"
@@ -1057,83 +1086,78 @@ const ADHomePage = () => {
         </Formik>
       </Card>
 
-      <Card sx={{ border: "black", borderRadius: "5px", marginTop: "10px",padding:'20px' }}>
-      <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-       
-        padding: 2,
-        borderRadius: 2,
-        width: '100%',
-      }}
-    >
-     <Typography
+      <Card
+        sx={{
+          border: "black",
+          borderRadius: "5px",
+          marginTop: "10px",
+          padding: "20px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            padding: 2,
+            borderRadius: 2,
+            width: "100%",
+          }}
+        >
+          <Typography
             sx={{ marginTop: "10px", marginLeft: "18px" }}
             variant="h5"
             mb={2}
             gutterBottom
           >
-        Social media Platforms
-      </Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-        <TextField
-          select
-          value={platform}
-          onChange={handlePlatformChange}
-          variant="outlined"
-          sx={{ marginRight: 2, flex: 1, color: 'white' }}
-        >
-          <MenuItem value="YouTube">
-            <YouTubeIcon sx={{ marginRight: 1 }} /> YouTube
-          </MenuItem>
-          <MenuItem value="Facebook">
-            <FacebookIcon sx={{ marginRight: 1 }} /> Facebook
-          </MenuItem>
-          <MenuItem value="Twitter">
-            <TwitterIcon sx={{ marginRight: 1 }} /> Twitter
-          </MenuItem>
-          <MenuItem value="Instagram">
-            <InstagramIcon sx={{ marginRight: 1 }} /> Instagram
-          </MenuItem>
-          <MenuItem value="LinkedIn">
-            <LinkedInIcon sx={{ marginRight: 1 }} /> LinkedIn
-          </MenuItem>
-          <MenuItem value="TikTok">
-            <TikTokIcon sx={{ marginRight: 1 }} /> TikTok
-          </MenuItem>
-          {/* Add more platforms here if needed */}
-        </TextField>
-        <TextField
-          value={link}
-          onChange={handleLinkChange}
-          variant="outlined"
-          fullWidth
-          sx={{ flex: 4, color: 'white' }}
-        />
-        <IconButton color="primary" sx={{ marginLeft: 2 }} onClick={addPlatform}>
-          <AddIcon />
-        </IconButton>
-      </Box>
-      <List>
-        {platforms.map((platform, index) => (
-          <ListItem key={index} sx={{ backgroundColor: '#424242', marginBottom: 1, borderRadius: 1 }}>
-            <ListItemIcon>{renderIcon(platform.name)}</ListItemIcon>
-            <ListItemText>
-              <Link href={platform.link} target="_blank" rel="noopener noreferrer" style={{color:'white'}}>
-                {platform.link}
-              </Link>
-            </ListItemText>
-            <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="delete" onClick={() => removePlatform(index)}>
-                <CloseIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-       
+            Social media Platforms
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MenuItem value="Facebook" sx={{ width: "180px" }}>
+              <FacebookIcon sx={{ marginRight: 1 }} /> Facebook
+            </MenuItem>
+
+            <TextField
+              value={facebookLink}
+              onChange={(e) => {
+                setFacebookLink(e.target.value);
+              }}
+              variant="outlined"
+              fullWidth
+              sx={{ flex: 4, color: "white" }}
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MenuItem value="Twitter" sx={{ width: "180px" }}>
+              <TwitterIcon sx={{ marginRight: 1 }} /> Twitter
+            </MenuItem>
+
+            <TextField
+              value={twitterLink}
+              onChange={(e) => {
+                setTwitterLink(e.target.value);
+              }}
+              variant="outlined"
+              fullWidth
+              sx={{ flex: 4, color: "white" }}
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MenuItem value="Instagram" sx={{ width: "180px" }}>
+              <InstagramIcon sx={{ marginRight: 1 }} /> Instagram
+            </MenuItem>
+            {/* Add more platforms here if needed */}
+
+            <TextField
+              value={instagramLink}
+              onChange={(e) => {
+                setInstagramLink(e.target.value);
+              }}
+              variant="outlined"
+              fullWidth
+              sx={{ flex: 4, color: "white" }}
+            />
+          </Box>
+        </Box>
 
         <Stack
           direction="row"
@@ -1150,7 +1174,13 @@ const ADHomePage = () => {
             Log Out
           </Button>
           <Button variant="outlined">Close</Button>
-          <Button variant="contained">Save</Button>
+          <LoadingButton
+            loading={loading}
+            onClick={handleUpdate}
+            variant="contained"
+          >
+            Save
+          </LoadingButton>
         </Stack>
       </Card>
     </>
