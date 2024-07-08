@@ -50,62 +50,6 @@ import {
   OptionBox,
 } from "../../../../../styles/eventsMW.styles";
 
-const recommendEvents = [
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-  {
-    event_id: "e1",
-    name: "Beats",
-    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-    date: "Jan 12",
-    day: "Wed",
-    time: "8:00 PM",
-    artist: "Kaizer Kaize",
-  },
-];
 
 export default function Tickets() {
   const router = useRouter();

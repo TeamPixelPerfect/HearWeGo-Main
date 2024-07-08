@@ -22,6 +22,7 @@ import {
   Select,
   Switch,
   SwitchProps,
+  FilledInput,
 } from "@mui/material";
 import { GridColDef, GridRowSelectionModel, DataGrid } from "@mui/x-data-grid";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -43,88 +44,88 @@ import { updateEvent } from "@/app/services/EventServices";
 import { set } from "date-fns";
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    border: `1px solid ${theme.palette.divider}`,
-    '& .MuiDataGrid-columnsContainer': {
-      backgroundColor: theme.palette.background.default,
+  border: `1px solid ${theme.palette.divider}`,
+  "& .MuiDataGrid-columnsContainer": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.primary.main, // Change to darker shade if needed
+    color: theme.palette.common.white,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.dark,
     },
-    '& .MuiDataGrid-columnHeader': {
-      backgroundColor: theme.palette.primary.main, // Change to darker shade if needed
-      color: theme.palette.common.white,
-      '&:hover': {
-        backgroundColor: theme.palette.primary.dark,
-      },
+  },
+  "& .MuiDataGrid-cell": {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiDataGrid-row": {
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.action.hover,
     },
-    '& .MuiDataGrid-cell': {
-      borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiDataGrid-footerContainer": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "& .MuiCheckbox-root": {
+    color: `${theme.palette.primary.main} !important`,
+  },
+  "& .MuiDataGrid-toolbarContainer": {
+    "& .MuiButton-text": {
+      color: theme.palette.primary.main,
     },
-    '& .MuiDataGrid-row': {
-      '&:nth-of-type(even)': {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-    '& .MuiDataGrid-footerContainer': {
-      backgroundColor: theme.palette.background.default,
-    },
-    '& .MuiCheckbox-root': {
-      color: `${theme.palette.primary.main} !important`,
-    },
-    '& .MuiDataGrid-toolbarContainer': {
-      '& .MuiButton-text': {
-        color: theme.palette.primary.main,
-      },
-    },
-  }));
+  },
+}));
 
 const IOSSwitch = styled((props: SwitchProps) => (
-    <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
-  ))(({ theme }) => ({
-    width: 42,
-    height: 26,
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  "& .MuiSwitch-switchBase": {
     padding: 0,
-    '& .MuiSwitch-switchBase': {
-      padding: 0,
-      margin: 2,
-      transitionDuration: '300ms',
-      '&.Mui-checked': {
-        transform: 'translateX(16px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
-          backgroundColor: theme.palette.mode === 'dark' ? '#4338ca' : '#4338ca',
-          opacity: 1,
-          border: 0,
-        },
-        '&.Mui-disabled + .MuiSwitch-track': {
-          opacity: 0.5,
-        },
+    margin: 2,
+    transitionDuration: "300ms",
+    "&.Mui-checked": {
+      transform: "translateX(16px)",
+      color: "#fff",
+      "& + .MuiSwitch-track": {
+        backgroundColor: theme.palette.mode === "dark" ? "#4338ca" : "#4338ca",
+        opacity: 1,
+        border: 0,
       },
-      '&.Mui-focusVisible .MuiSwitch-thumb': {
-        color: '#33cf4d',
-        border: '6px solid #fff',
-      },
-      '&.Mui-disabled .MuiSwitch-thumb': {
-        color:
-          theme.palette.mode === 'light'
-            ? theme.palette.grey[100]
-            : theme.palette.grey[600],
-      },
-      '&.Mui-disabled + .MuiSwitch-track': {
-        opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
+      "&.Mui-disabled + .MuiSwitch-track": {
+        opacity: 0.5,
       },
     },
-    '& .MuiSwitch-thumb': {
-      boxSizing: 'border-box',
-      width: 22,
-      height: 22,
+    "&.Mui-focusVisible .MuiSwitch-thumb": {
+      color: "#33cf4d",
+      border: "6px solid #fff",
     },
-    '& .MuiSwitch-track': {
-      borderRadius: 26 / 2,
-      backgroundColor: theme.palette.mode === 'light' ? '#39393D' : '#39393D',
-      opacity: 1,
-      transition: theme.transitions.create(['background-color'], {
-        duration: 500,
-      }),
+    "&.Mui-disabled .MuiSwitch-thumb": {
+      color:
+        theme.palette.mode === "light"
+          ? theme.palette.grey[100]
+          : theme.palette.grey[600],
     },
-  }));
+    "&.Mui-disabled + .MuiSwitch-track": {
+      opacity: theme.palette.mode === "light" ? 0.7 : 0.3,
+    },
+  },
+  "& .MuiSwitch-thumb": {
+    boxSizing: "border-box",
+    width: 22,
+    height: 22,
+  },
+  "& .MuiSwitch-track": {
+    borderRadius: 26 / 2,
+    backgroundColor: theme.palette.mode === "light" ? "#39393D" : "#39393D",
+    opacity: 1,
+    transition: theme.transitions.create(["background-color"], {
+      duration: 500,
+    }),
+  },
+}));
 
 export default function EventDetails() {
   const { event_id } = useParams();
@@ -238,7 +239,7 @@ export default function EventDetails() {
   const handleSwitchChange = (event) => {
     setEventData((prevEventData) => ({
       ...prevEventData,
-      event_status: event.target.checked ? 'public' : 'private',
+      event_status: event.target.checked ? "public" : "private",
     }));
   };
 
@@ -288,34 +289,35 @@ export default function EventDetails() {
           </Box>
           <Box sx={{ width: "50%" }}>
             <Stack spacing={2}>
-              <TextField
-                id="event_name"
-                label="Event Name"
-                variant="filled"
-                sx={{ width: "100%" }}
-                value={eventData.event_name}
+              <FormControl variant="filled">
+                <InputLabel htmlFor="component-filled">Event Name</InputLabel>
+                <FilledInput
+                  id="event_name"
+                  value={eventData.event_name}
+                  sx={{ width: "100%" }}
                 onChange={(e) =>
                   setEventData((data) => ({
                     ...data,
                     event_name: e.target.value,
                   }))
                 }
-              />
+                />
+              </FormControl>
 
-              <TextField
-                id="event_type"
-                label="Event Type"
-                variant="filled"
-                sx={{ width: "100%" }}
-                //   defaultValue={eventData.event_type}
-                value={eventData.event_type}
+              <FormControl variant="filled">
+                <InputLabel htmlFor="component-filled">Event Name</InputLabel>
+                <FilledInput
+                  id="event_type"
+                  value={eventData.event_type}
+                  sx={{ width: "100%" }}
                 onChange={(e) =>
                   setEventData((data) => ({
                     ...data,
                     event_type: e.target.value,
                   }))
                 }
-              />
+                />
+              </FormControl>
 
               <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
                 <Box
@@ -376,8 +378,21 @@ export default function EventDetails() {
               </Stack>
 
               <FormControlLabel
-                control={<IOSSwitch sx={{ m: 1 }} disabled={eventData.event_status=="blocked"} checked={eventData.event_status=="public"} onChange={handleSwitchChange} />}
-                label={eventData.event_status=="public" ? "Public" : (eventData.event_status=="private" ? "Private" : "Blocked")}
+                control={
+                  <IOSSwitch
+                    sx={{ m: 1 }}
+                    disabled={eventData.event_status == "blocked"}
+                    checked={eventData.event_status == "public"}
+                    onChange={handleSwitchChange}
+                  />
+                }
+                label={
+                  eventData.event_status == "public"
+                    ? "Public"
+                    : eventData.event_status == "private"
+                    ? "Private"
+                    : "Blocked"
+                }
               />
             </Stack>
           </Box>

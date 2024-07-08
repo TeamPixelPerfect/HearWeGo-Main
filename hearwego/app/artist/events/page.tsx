@@ -252,7 +252,7 @@ function EventArea(tab: number) {
         );
       }
     }
-  }, [artist?.user?.artist_id, artist?.token, upcomingEvents.length, tab]);
+  }, [artist?.user?.artist_id, artist?.token, page, upcomingEvents.length, tab]);
 
   const handleDeleteEvent = async (event_id: string) => {
     try {

@@ -514,8 +514,9 @@ export default function Page() {
           sx={{ marginTop: "20px" }}
           endIcon={<PaymentIcon />}
           onClick={() => {
-            // handleUpdateRemainingTickets();
-            // handleCreateSoldTicket();
+            handleUpdateRemainingTickets();
+            handleCreateSoldTicket();
+            handleOpenTicketModal();
             // handlePaymentGateway();
           }}
         >
@@ -523,7 +524,7 @@ export default function Page() {
         </Button>
       </Box>
 
-      <Button onClick={handleOpenTicketModal}>Click</Button>
+      {/* <Button onClick={handleOpenTicketModal}>Click</Button> */}
       <Button onClick={handleOpenCheckout} variant="contained" color="primary">
         Open Checkout
       </Button>
