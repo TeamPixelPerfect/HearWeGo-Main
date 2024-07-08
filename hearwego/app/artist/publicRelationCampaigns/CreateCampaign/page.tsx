@@ -36,6 +36,7 @@ import DropFile from "@/app/components/DropFile";
 interface CreateCampaignPopProps {
   open: boolean;
   onClose: () => void;
+  setIsChanged: (value: boolean) => void;
 }
 
 const initialCampaignData = (artistId: string): PRCampaigns => ({
@@ -52,6 +53,7 @@ const initialCampaignData = (artistId: string): PRCampaigns => ({
 const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
   open,
   onClose,
+  setIsChanged,
 }) => {
   const artist = useAppSelector((state) => state.artist.user);
   const [step, setStep] = useState(0);
@@ -71,9 +73,9 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
     validationSchema: Yup.object({
       Campaign_Name: Yup.string().required("Campaign name is required"),
     }),
-    onSubmit: (values) => {
-      handleNext();
-    },
+    validateOnChange: false,
+    validateOnBlur: false,
+    onSubmit: () => handleNext(),
   });
 
   const steps = ["Enter Campaign Name", "Create Campaign", "Review & Save"];
@@ -82,8 +84,13 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
     setTaskError(null);
     if (step === 0) {
       await formik.validateForm();
-      if (!formik.errors.Campaign_Name) {
+      if (formik.isValid && campaignImg) {
         setStep(step + 1);
+      } else {
+        formik.setTouched({ Campaign_Name: true });
+        if (!campaignImg) {
+          setTaskError("Campaign image is required");
+        }
       }
     } else if (step === 1) {
       const emptyTask =
@@ -179,6 +186,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
         campaignToSubmit
       );
       console.log(res);
+      setIsChanged(true);
       onClose();
     } catch (error) {
       console.error(error);
@@ -198,9 +206,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
               id="Campaign_Name"
               name="Campaign_Name"
               value={formik.values.Campaign_Name}
-              onChange={(e) =>
-                formik.setFieldValue("Campaign_Name", e.target.value)
-              }
+              onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={
                 formik.touched.Campaign_Name &&
@@ -210,7 +216,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
                 formik.touched.Campaign_Name && formik.errors.Campaign_Name
               }
             />
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <DropFile
                 fileTypes="image"
                 fileExtensions="JPEG,PNG,WEBP,SVG"
@@ -224,6 +230,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
                 setFile={setCampaignImg}
               />
             </Box>
+            {taskError && <FormHelperText error>{taskError}</FormHelperText>}
           </form>
         );
       case 1:
@@ -326,7 +333,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
       setCampaignData(initialCampaignData(artist?.user.artist_id ?? ""));
       setTaskError(null);
     }
-  }, [open]);
+  }, [open, artist]);
 
   useEffect(() => {
     if (campaignImg) {
@@ -361,7 +368,7 @@ const CreateCampaignPop: React.FC<CreateCampaignPopProps> = ({
           Cancel
         </Button>
         {step === steps.length - 1 ? (
-          <Button onClick={submitCampaign} color="primary">
+          <Button onClick={handleSave} color="primary">
             Save
           </Button>
         ) : (
