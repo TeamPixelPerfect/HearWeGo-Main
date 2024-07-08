@@ -1,21 +1,23 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   PaymentElement,
   Elements,
   useStripe,
   useElements,
-} from '@stripe/react-stripe-js';
-import { base_url } from '../constants/keys';
-import { Box, Button } from '@mui/material';
+
+} from "@stripe/react-stripe-js";
+import { base_url } from "../constants/keys";
+import { Box, Button } from "@mui/material";
+import { Paper, TextField, Typography,Grid} from "@mui/material";
 
 export const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const [errorMessage, setErrorMessage] = useState('');
-  const [emailInput, setEmailInput] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [emailInput, setEmailInput] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -36,15 +38,15 @@ export const CheckoutForm = () => {
 
     // Create the PaymentIntent and obtain clientSecret from your server endpoint
     const res = await fetch(`${base_url}/Payment/makePayment`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        currency: 'usd',
+        currency: "usd",
         email: emailInput,
         amount: price * 100,
-        paymentMethodType: "card"
+        paymentMethodType: "card",
       }),
     });
 
@@ -72,19 +74,49 @@ export const CheckoutForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{padding: "0 4em"}}>
-      <Box sx={{mb: 3}}>
-        <label htmlFor="email-input">Email</label>
-        <div>
-          <input style={{padding: "16px 8px"}} value={emailInput} onChange={(e => setEmailInput(e.target.value))} type="email" id="email-input" placeholder='johndoe@gmail.com' />
-        </div>
-      </Box>
-      <PaymentElement />
-      <Button type="submit" variant='contained' disabled={!stripe || !elements}>
-        Pay
-      </Button>
-      {/* Show error message to your customers */}
-      {errorMessage && <div>{errorMessage}</div>}
-    </form>
+    <Paper elevation={3} style={{ padding: '2em', maxWidth: '600px', margin: 'auto' }}>
+      <Grid container spacing={3} alignItems="center" justifyContent="center">
+        <Grid item xs={12}>
+          <Typography variant="h5" align="center" gutterBottom>
+            Payment Information
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <form onSubmit={handleSubmit} style={{ padding: '0 1em' }}>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                id="email-input"
+                type="email"
+                label="Email"
+                placeholder="johndoe@gmail.com"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                variant="outlined"
+                InputProps={{ style: { padding: '12px' } }}
+              />
+            </Box>
+            <Box sx={{ mb: 3 }}>
+              <PaymentElement />
+            </Box>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={!stripe || !elements}
+              sx={{ padding: '12px', marginTop: '1em' }}
+            >
+              Pay Now
+            </Button>
+            {errorMessage && (
+              <Typography variant="body2" color="error" sx={{ mt: 2, textAlign: 'center' }}>
+                {errorMessage}
+              </Typography>
+            )}
+          </form>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 };

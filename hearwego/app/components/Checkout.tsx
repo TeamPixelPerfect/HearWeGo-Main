@@ -25,7 +25,7 @@ const Checkout = (props: Props) => {
   // import meta.env.VITE_STRIPE_PK is the publishable key you can either directly paste your stripe key here but not recommending if you are planning to upload the code on github as it should remain only available to you or save the key in .env file
 
   return (
-    <Box sx={{ display: "flex", mt: 8 }}>
+    <Box sx={{ display: "flex"}}>
       <Elements stripe={stripePromise} options={options}>
         <CheckoutForm />
       </Elements>

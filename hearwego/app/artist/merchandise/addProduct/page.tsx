@@ -21,6 +21,7 @@ import {
   FormHelperText,
   InputLabel,
   FormControl,
+  IconButton,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import DropFile from "@/app/components/DropFile";
@@ -35,6 +36,15 @@ import { useAppSelector } from "@/lib/hooks";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { isDraft } from "@reduxjs/toolkit";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+
+interface ProductVariant {
+  variation_name?: string;
+  variation_value?: string;
+  variation_price?: number;
+  variation_quantity?: number;
+}
 
 const AddProduct = ({
   handleAddProduct,
@@ -51,6 +61,7 @@ const AddProduct = ({
   );
   const [successMessage, setSuccessMessage] = useState("");
   const [categories, setCategories] = useState([]);
+  const [variations, setVariations] = useState<ProductVariant[]>([]);
 
   const handleClose = () => {
     setConfirmDialogOpen(true);
@@ -98,10 +109,23 @@ const AddProduct = ({
       .min(0, "Rating must be between 0 and 5")
       .max(5, "Rating must be between 0 and 5"),
     product_Main_image: Yup.mixed().required("Main product image is required"),
-
     product_Additional_image: Yup.mixed().required(
       "Additional product image is required"
     ),
+    variations: Yup.array()
+      .of(
+        Yup.object({
+          variation_name: Yup.string().required("Variation name is required"),
+          variation_value: Yup.string().required("Variation value is required"),
+          variation_price: Yup.number()
+            .required("Variation price is required")
+            .min(0, "Price must be a positive number"),
+          variation_quantity: Yup.number()
+            .required("Variation quantity is required")
+            .min(0, "Quantity must be a positive number"),
+        })
+      )
+      .required("At least one variation is required"),
   });
 
   const formik = useFormik({
@@ -115,6 +139,7 @@ const AddProduct = ({
       product_quantity: "",
       product_rating: "",
       store_id: "",
+      variations: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -165,6 +190,36 @@ const AddProduct = ({
       }
     );
   }, []);
+
+  const handleAddVariation = () => {
+    setVariations([
+      ...variations,
+      {
+        variation_name: "",
+        variation_value: "",
+        variation_price: 0,
+        variation_quantity: 0,
+      },
+    ]);
+  };
+
+  const handleRemoveVariation = (index: number) => {
+    const newVariations = [...variations];
+    newVariations.splice(index, 1);
+    setVariations(newVariations);
+    formik.setFieldValue("variations", newVariations);
+  };
+
+  const handleVariationChange = (
+    index: number,
+    field: keyof ProductVariant,
+    value: string | number
+  ) => {
+    const newVariations = [...variations];
+    newVariations[index][field] = value;
+    setVariations(newVariations);
+    formik.setFieldValue("variations", newVariations);
+  };
 
   return (
     <Box
@@ -380,6 +435,96 @@ const AddProduct = ({
                       />
                     </Grid>
                   </Grid>
+                </Grid>
+
+                {/* Variation Fields */}
+                <Grid item xs={12}>
+                  <Typography variant="h6">Product Variations</Typography>
+                  {variations.map((variation, index) => (
+                    <Card key={index} sx={{ my: 2, p: 2 }}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={3}>
+                          <TextField
+                            label="Variation Name"
+                            value={variation.variation_name}
+                            onChange={(e) =>
+                              handleVariationChange(
+                                index,
+                                "variation_name",
+                                e.target.value
+                              )
+                            }
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={3}>
+                          <TextField
+                            label="Variation Value"
+                            value={variation.variation_value}
+                            onChange={(e) =>
+                              handleVariationChange(
+                                index,
+                                "variation_value",
+                                e.target.value
+                              )
+                            }
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </Grid>
+                        {/* <Grid item xs={12} md={3}>
+                          <TextField
+                            label="Variation Price"
+                            type="number"
+                            value={variation.variation_price}
+                            onChange={(e) =>
+                              handleVariationChange(
+                                index,
+                                "variation_price",
+                                Number(e.target.value)
+                              )
+                            }
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </Grid> */}
+                        <Grid item xs={12} md={2}>
+                          <TextField
+                            label="Variation Quantity"
+                            type="number"
+                            value={variation.variation_quantity}
+                            onChange={(e) =>
+                              handleVariationChange(
+                                index,
+                                "variation_quantity",
+                                Number(e.target.value)
+                              )
+                            }
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={1}>
+                          <IconButton
+                            onClick={() => handleRemoveVariation(index)}
+                            color="error"
+                          >
+                            <RemoveIcon />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  ))}
+                  <Button
+                    onClick={handleAddVariation}
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    sx={{ mt: 2 }}
+                  >
+                    Add Variation
+                  </Button>
                 </Grid>
 
                 <Grid item xs={12}>
