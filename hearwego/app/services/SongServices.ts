@@ -265,3 +265,21 @@ export const deleteAlbum = async (token: string, albumId: string) => {
     throw new Error(error.message);
   }
 };
+
+export const getSongDuration = async (url: string) => {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(url);
+    audio.preload = 'metadata';
+
+    const handleLoadedMetadata = () => {
+      resolve(audio.duration);
+    };
+
+    const handleError = (error: any) => {
+      reject(error);
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('error', handleError);
+  });
+}

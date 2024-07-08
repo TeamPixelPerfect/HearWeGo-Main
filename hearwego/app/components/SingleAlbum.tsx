@@ -40,6 +40,7 @@ export default function SingleAlbum({
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             borderRadius: "14px",
+
             //position:'relavant'
           }}
         >
@@ -50,13 +51,14 @@ export default function SingleAlbum({
               height: "100%",
               borderRadius: "14px",
               opacity: "0.7",
+              padding: "1em",
               // position:'fixed'
             }}
           >
             <Box
               style={{
                 position: "relative",
-                padding: "2%",
+                // padding: "2%",
                 justifyContent: "space-between",
                 //backgroundColor: "yellow",
                 borderRadius: "14px",

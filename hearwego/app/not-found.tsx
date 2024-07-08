@@ -4,10 +4,10 @@ import { Container, Typography, Box, Button, styled } from "@mui/material";
 import Image from "next/image";
 
 const CustomBox = styled(Box)(({ theme }) => ({
-//   backgroundColor: theme.palette.background.paper,
+  //   backgroundColor: theme.palette.background.paper,
   padding: theme.spacing(4),
   borderRadius: theme.shape.borderRadius,
-//   boxShadow: theme.shadows[3],
+  //   boxShadow: theme.shadows[3],
   textAlign: "center",
   display: "flex",
   alignItems: "center",
@@ -32,8 +32,8 @@ const NotFound = () => {
         <Image
           src="/imgs/thinking.png"
           alt="Thinking Dolphin"
-          width={150}
-          height={150}
+          width={200}
+          height={200}
           style={{ marginRight: "2em" }}
         />
         <Box
@@ -44,8 +44,15 @@ const NotFound = () => {
           }}
         >
           <Typography
-            variant="h6"
+            variant="h2"
             component="p"
+            paragraph
+            sx={{ textAlign: "left", fontSize: "100px", fontWeight: 600 }}
+          >
+            404
+          </Typography>
+          <Typography
+            variant="h6"
             paragraph
             sx={{ textAlign: "left" }}
           >

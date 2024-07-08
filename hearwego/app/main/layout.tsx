@@ -3,17 +3,21 @@ import { AppItem } from "../constants/models";
 import { base_url } from "../constants/keys";
 import Footer from "../components/Footer";
 import { Box } from "@mui/material";
+import FanMusicPlayer from "../components/FanMusicPlayer";
 
-export default async function Layout({ children }: Readonly<{ children: React.ReactNode; }>) {
-    const res = await fetch(`${base_url}/app`);
-    const app: AppItem = await res.json();
-    return (
-        <>
-            <Header app={app} />
-            <Box sx={{minHeight:"100vh"}}>
-                {children}
-            </Box>
-            <Footer />
-        </>
-    )
+export default async function Layout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const res = await fetch(`${base_url}/app`);
+  const app: AppItem = await res.json();
+  return (
+    <>
+      <Header app={app} />
+      <Box sx={{ minHeight: "100vh" }}>
+        {children}
+        <FanMusicPlayer />
+      </Box>
+      <Footer />
+    </>
+  );
 }

@@ -18,6 +18,9 @@ export const CoverCardMedia = styled(CardMedia)(({ theme }) => ({
   marginTop: "0px",
   position: "relative",
   display: "flex",
+  "@media (max-width: 960px)": {
+    height: "1000px",
+  },
 }));
 export const AllMiddleBox = styled(Box)(({ theme }) => ({
   //backgroundColor: "red",
@@ -27,6 +30,9 @@ export const AllMiddleBox = styled(Box)(({ theme }) => ({
   width: "90%",
   height: "60%",
   display: "flex",
+  "@media (max-width: 960px)": {
+    top: "10%",
+  },
   //flexDirection: "column",
 }));
 
@@ -44,6 +50,11 @@ export const ArtistDetailBox = styled(Box)(({ theme }) => ({
   height: "100%",
   padding: "2em 3em 1em 3em",
   justifyContent: "space-between",
+  "@media (max-width: 960px)": {
+    width: "100%",
+    flexDirection: "column",
+    padding: 0,
+  },
   //backgroundColor:'blue'
 }));
 
@@ -86,6 +97,10 @@ export const SocialMediaBox = styled(Box)(({ theme }) => ({
   position: "relative",
   display: "flex",
   textAlign: "center",
+  padding: "4px 0",
+  "@media (max-width: 960px)": {
+    padding: "1em 0",
+  },
 
   //backgroundColor:'red'
 }));
@@ -95,6 +110,11 @@ export const OptionBox = styled(Box)(({ theme }) => ({
   width: "20%",
   top: "30%",
   left: "80%",
+  "@media (max-width: 960px)": {
+    width: "100%",
+    top: "90%",
+    left: "0%",
+  },
   //backgroundColor:'red',
 }));
 
@@ -112,18 +132,20 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
 
 //Tabal
 export const TableContainer = styled("table")({
-  margin: "80px",
   padding: "10px",
   //backgroundColor: "red",
   width: "50%",
-  height: "70%",
+  // height: "70%",
   display: "flex",
   //borderRadius:'20px'
+  "@media (max-width: 960px)": {
+    width: "100%",
+  },
 });
 
 export const TableRow = styled("tr")({});
 
-export const TableCell = styled("td")({
+export const TableCell = styled("td")(({ theme }) => ({
   padding: "8px",
   textAlign: "left",
   fontSize: "16px",
@@ -135,19 +157,20 @@ export const TableCell = styled("td")({
     color: "white",
   },
   "&:nth-child(even)": {
-    backgroundColor: "white",
+    backgroundColor: theme.palette.background.default,
     width: "70%",
-    color: "#4B4B4B",
     borderLeft: "none",
   },
-});
+}));
 
-export const RightBox = styled(Box)({
-  backgroundColor: "#3B0764",
-  width: "40%",
-  height: "500px",
-  padding: "20px",
-  borderRadius: "15px",
-  margin: "10px 50px",
-  position: "relative",
-});
+export const RightBox = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+  width: "50%",
+  padding: "1em",
+  marginLeft: "0em",
+  margin: "10px",
+  "@media (max-width: 960px)": {
+    width: "100%",
+  },
+}));
