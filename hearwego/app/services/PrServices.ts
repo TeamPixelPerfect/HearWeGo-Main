@@ -1,3 +1,4 @@
+import exp from "constants";
 import { base_url } from "../constants/keys";
 import { PRCampaigns, PRPosts, PRtask } from "../constants/models";
 
@@ -154,5 +155,63 @@ export const getPRPostsByArtist = async (token: string, artistId: string) => {
   } else {
     const error = await res.json();
     throw new Error(error.message);
+  }
+};
+
+export const deletePRPost = async (token: string, id: string) => {
+  const res = await fetch(`${base_url}/PRManager/PRPosts/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return "Post Deleted";
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getPrPostsByCampaign = async (
+  token: string,
+  campaignId: string
+) => {
+  const res = await fetch(
+    `${base_url}/PRManager/PRPosts/campaign/${campaignId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const PRPosts = await res.json();
+    return PRPosts;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const deleteAllPostsForCampaign = async (
+  token: string,
+  campaignId: string
+) => {
+  try {
+    const response = await getPrPostsByCampaign(token, campaignId);
+    const posts = response.data;
+
+    console.log("posts", posts);
+
+    if (!posts) return;
+    for (const post of posts) {
+      await deletePRPost(token, post.PrPostID);
+    }
+  } catch (error) {
+    console.error("Error deleting posts for campaign:", error);
   }
 };

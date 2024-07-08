@@ -468,7 +468,6 @@ export const getAllBudgets = async (): Promise<Budget[]> => {
   }
 };
 
-<<<<<<< HEAD
 export const getBudgetByEventId = async (id: string) => {
   try {
     const res = await fetch(`${base_url}/EventsManager/budget/${id}`, {
@@ -489,7 +488,6 @@ export const getBudgetByEventId = async (id: string) => {
     throw error; // Rethrow the error to handle it in the calling function
   }
 }
-=======
 export const getEventsByArtist = async (token: string, artistId: string) => {
   const res = await fetch(
     `${base_url}/EventsManager/events/Artist/${artistId}`,
@@ -512,4 +510,3 @@ export const getEventsByArtist = async (token: string, artistId: string) => {
     throw new Error(error.message);
   }
 };
->>>>>>> AR-01-FanClub_BackendConnect

@@ -1,7 +1,11 @@
 "use client";
 import CustomTabPanel from "@/app/components/CustomeTabPanel";
 import { Album } from "@/app/constants/models";
-import { getAlbumForArtists, getAlbums } from "@/app/services/SongServices";
+import {
+  deleteAlbum,
+  getAlbumForArtists,
+  getAlbums,
+} from "@/app/services/SongServices";
 import { ADHomeTabBox, ADTabBox } from "@/app/styles/artistDashboard.styles";
 import {
   AlbumCard,
@@ -10,10 +14,16 @@ import {
   SongCardItem,
 } from "@/app/styles/songCard.styles";
 import { useAppSelector } from "@/lib/hooks";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Box,
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   Pagination,
@@ -40,9 +50,34 @@ const MainAlbumCard = ({
   albumLength,
   impressions,
   listners,
+  setIsDeleted,
 }: any) => {
+  const artist = useAppSelector((state) => state.artist.user);
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState("to-delete");
+
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleAlbumDelete();
+    handleCloseDeleteModal();
+  };
+
+  const handleAlbumDelete = () => {
+    setDeleting("deleting");
+    deleteAlbum(artist?.token as string, albumId as string).then((res) => {
+      setDeleting("deleted");
+      if (setIsDeleted) setIsDeleted(true);
+    });
+  };
 
   // Function to toggle the open state
   const handleOpen = () => {
@@ -51,11 +86,7 @@ const MainAlbumCard = ({
 
   return (
     // Album card with album details and action buttons
-    <AlbumCard
-      onClick={() => {
-        router.push("/artist/albums/" + albumId);
-      }}
-    >
+    <AlbumCard>
       <Box sx={{ display: "flex", alignItems: "center", width: "50%" }}>
         <AlbumCardCoverArt imgUrl={albumCoverArt ? albumCoverArt : ""} />
         <Typography variant="h6">{albumName}</Typography>
@@ -87,14 +118,58 @@ const MainAlbumCard = ({
           style={{ marginRight: "1em" }}
           // orientation="vertical"
         >
-          <IconButton>
+          <IconButton
+            onClick={() => {
+              router.push("/artist/albums/" + albumId);
+            }}
+          >
+            <FaEye />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              router.push("/artist/albums/edit/" + albumId);
+            }}
+          >
             <FaEdit />
           </IconButton>
-          <IconButton color="error">
+          <IconButton onClick={handleDeleteModal} color="error">
             <MdDelete />
           </IconButton>
         </SongCardButtonGroup>
       )}
+      <Dialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        sx={{ borderRadius: 20 }}
+      >
+        <DialogTitle id="alert-dialog-title" color="error">
+          {"Delete Album"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {deleting === "deleting"
+              ? "Deleting Album..."
+              : deleting === "deleted"
+              ? "Album Deleted Successfully!"
+              : "Are you sure you want to delete this album?"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal} color="secondary">
+            No
+          </Button>
+          <LoadingButton
+            loading={deleting === "deleting"}
+            onClick={handleConfirmDelete}
+            color="error"
+            autoFocus
+          >
+            Yes
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </AlbumCard>
   );
 };
@@ -108,6 +183,8 @@ const ArtistAlbums = () => {
   const [tabValue, setTabValue] = useState(0);
 
   const [albums, setAlbums] = useState<Album[]>([]);
+
+  const [isDeleted, setIsDeleted] = useState(false);
 
   // Function to handle tab change
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -134,7 +211,7 @@ const ArtistAlbums = () => {
         }
       );
     }
-  }, []);
+  }, [isDeleted]);
 
   return (
     // Grid container for layout
@@ -187,16 +264,17 @@ const ArtistAlbums = () => {
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
             {/* Display albums or message if no albums available */}
             {albums.length > 0 ? (
-              albums.map((album) => {
+              albums?.map((album) => {
                 return (
                   <MainAlbumCard
-                    albumId={album.album_id}
-                    albumName={album.album_title}
-                    albumCoverArt={album.album_img}
-                    albumTracks={album.no_of_tracks}
-                    albumLength={album.album_length}
-                    impressions={album.no_of_impressions}
-                    listners={album.no_of_plays}
+                    albumId={album?.album_id}
+                    albumName={album?.album_title}
+                    albumCoverArt={album?.album_img}
+                    albumTracks={album?.no_of_tracks}
+                    albumLength={album?.album_length}
+                    impressions={album?.no_of_impressions}
+                    listners={album?.no_of_plays}
+                    setIsDeleted={setIsDeleted}
                   />
                 );
               })

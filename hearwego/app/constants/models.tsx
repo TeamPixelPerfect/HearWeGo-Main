@@ -101,11 +101,12 @@ export interface Artist {
 }
 
 export interface Song {
+  _id?: string;
   song_id?: string;
   song_title?: string;
   album_title?: string;
   song_length?: number;
-  song_track: string;
+  song_track?: string;
   song_img?: string;
   no_of_impressions?: number;
   no_of_plays?: number;
@@ -132,6 +133,7 @@ export interface Song {
 }
 
 export interface Album {
+  _id?: string;
   album_id?: string;
   album_title?: string;
   artist?: { artist_id: string; artist_name: string }[];
@@ -188,18 +190,6 @@ export interface Event {
   description?: string;
   event_status?: string;
   event_created_by?: string;
-}
-
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias?: string[];
 }
 
 export interface Ticket {
@@ -352,6 +342,14 @@ export interface MerchStore {
   artist_id?: string;
 }
 
+export interface Artistcover {
+ 
+  store_banner?: string;
+  promo_banner?: string[];
+  
+  artist_id?: string;
+}
+
 export interface MerchCategory {
   store_id?: string;
   category_id?: string;
@@ -456,7 +454,7 @@ export interface PRPosts {
   artist_id?: string;
   PrPostID?: string;
   ArtistName?: string;
-  Campaign?: string;
+  Campaigns?: string;
   Description?: string;
   Scheduled_Date?: Date;
   Scheduled_Time?: string;
@@ -465,14 +463,13 @@ export interface PRPosts {
   CampaignID?: string;
 }
 
-
 export interface PRtask {
   TaskID?: string;
   TaskName?: string;
   TaskDescription?: string;
   TaskStatus?: string;
   CampaignID?: string;
-  isEdit?: boolean; 
+  isEdit?: boolean;
   timestamps?: string;
 }
 

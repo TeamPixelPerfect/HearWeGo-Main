@@ -1,10 +1,12 @@
 "use client";
 import {
+  Alert,
   Box,
   Card,
   Grid,
   Icon,
   IconButton,
+  Snackbar,
   Tab,
   Tabs,
   Typography,
@@ -48,6 +50,7 @@ import {
   getSongsForArtist,
 } from "../services/SongServices";
 import { Home } from "@mui/icons-material";
+import { site_url } from "../constants/keys";
 
 interface HomeSongCardProps {
   songName: string;
@@ -73,7 +76,12 @@ const HomeSongCard = ({
 }: HomeSongCardProps) => {
   const artist = useAppSelector((state) => state.artist.user);
 
-  const { playing, toggle } = useAudio({ url: songUrl, songName, artist: artist?.user?.artistName as string, coverArt});
+  const { playing, toggle } = useAudio({
+    url: songUrl,
+    songName,
+    artist: artist?.user?.artistName as string,
+    coverArt,
+  });
   const matches = useMediaQuery("(max-width:960px)");
 
   return (
@@ -131,15 +139,6 @@ const HomeAlbumCard = ({
 const ADHomePage = () => {
   const matches = useMediaQuery("(max-width:960px)");
 
-  const [profilePic, setProfilePic] = useState<string>(
-    // "https://placehold.co/600x600/png"
-    "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-  );
-  const [coverPic, setCoverPic] = useState<string>(
-    // "https://placehold.co/1280x720/png"
-    "https://londonmumsmagazine.com/wp-content/uploads/2019/07/The-Rembrandts-Via-Satellite-2.jpg"
-  );
-
   const [tabValue, setTabValue] = React.useState(0);
 
   const artist = useAppSelector((state) => state.artist.user);
@@ -150,8 +149,33 @@ const ADHomePage = () => {
 
   const [albums, setAlbums] = useState<Album[]>();
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(
+      site_url + "main/artists/" + artist?.user?.artist_id
+    );
+    setSnackbarOpen(true);
+    setSnackbarMessage("Link copied to clipboard!");
+    setSnackbarSeverity("success");
   };
 
   useEffect(() => {
@@ -212,8 +236,12 @@ const ADHomePage = () => {
                 )}
 
                 <ADArtistPageUrl>
-                  <Link href="">http://www.hearwego.com/wq23s</Link>
-                  <FaCopy />
+                  <Link href="">
+                    {site_url + "main/artists/" + artist?.user?.artist_id}
+                  </Link>
+                  <IconButton onClick={handleCopyLink}>
+                    <FaCopy style={{ fontSize: "12px" }} />
+                  </IconButton>
                 </ADArtistPageUrl>
               </Box>
             </Box>
@@ -227,9 +255,15 @@ const ADHomePage = () => {
               }}
             >
               <ADHomeSocialIcons>
-                <FaFacebook />
-                <AiFillInstagram />
-                <FaSquareXTwitter />
+                <IconButton>
+                  <FaFacebook style={{ fontSize: "32px" }} />
+                </IconButton>
+                <IconButton>
+                  <AiFillInstagram style={{ fontSize: "32px" }} />
+                </IconButton>
+                <IconButton>
+                  <FaSquareXTwitter style={{ fontSize: "32px" }} />
+                </IconButton>
               </ADHomeSocialIcons>
               <Box
                 sx={{
@@ -347,6 +381,15 @@ const ADHomePage = () => {
           </Box>
         </FeaturedAlbumCard>
       </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 };
