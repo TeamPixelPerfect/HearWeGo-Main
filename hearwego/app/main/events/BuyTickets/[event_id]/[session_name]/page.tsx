@@ -34,6 +34,7 @@ import { Snackbar } from "@mui/material";
 import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import QRCode from "qrcode.react";
+import {QRCodeSVG} from 'qrcode.react';
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import "jspdf-autotable";
@@ -46,6 +47,7 @@ const ticketModalStyle = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 1000,
+  // height: "80vh",
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
@@ -71,9 +73,10 @@ interface CartTickets {
 }
 
 const QRCodeComponent = ({ value }) => {
+  // const qrValue = `${url}\n\n${value}`;
   return (
     <div>
-      <QRCode value={value} />
+      <QRCode value={value} renderAs="svg" />
     </div>
   );
 };
@@ -90,14 +93,20 @@ function SingleTicket(
   ticket_img: string,
   ticket_count: number
 ) {
-  console.log("Ticket ID: ", ticket_id);
+  const currentUrl = window.location.href; // Get current window URL
+  const textDetails = `Ticket ID: ${ticket_id}, Ticket Type: ${ticket_type}, Event: ${event_name}, Session: ${session_name}, Date: ${session_date}, Time: ${session_time}, Venue: ${session_venue}, Price: LKR ${ticket_price}, Count: ${ticket_count}`;
+
+  // Create a URL with text details as query parameters
+  const qrUrl = `${currentUrl}?details=${encodeURIComponent(textDetails)}`;
   const generateQRCode = () => {
+    
     return `
+    URL: ${currentUrl}\n
     Ticket ID: ${ticket_id}\n
     Ticket Type: ${ticket_type}\n
     Event: ${event_name}\n
     Session: ${session_name}\n
-    No of Tickets: ${ticket_count}\n
+    No of Tickets: ${ticket_count}\n  
     `;
   };
   return (
@@ -119,7 +128,7 @@ function SingleTicket(
       <Box sx={{ width: "35%" }}>
         <Typography
           variant="subtitle1"
-          sx={{ fontSize: "16px", marginBottom: 2, marginTop: 2 }}
+          sx={{ fontSize: "12px", marginBottom: 2, marginTop: 2 }}
         >
           Ticket ID: {ticket_id}
         </Typography>
@@ -183,7 +192,9 @@ function SingleTicket(
           alignItems: "center",
         }}
       >
+        {/* <QRCodeComponent value={qrValue} url={currentUrl} /> */}
         <QRCodeComponent value={generateQRCode()} />
+        
       </Box>
     </Paper>
   );
@@ -568,23 +579,24 @@ export default function Page() {
             <Typography id="transition-modal-title" variant="h6" component="h2">
               Your Tickets
             </Typography>
-            <Box sx={{ width: "100%", height: "75vh" }}>
-              <Box
-                ref={boxRef}
-                id="tickets"
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  overflow: "scroll",
+            <Box sx={{ width: "100%", height: "75vh", overflow: "scroll",
                   "&::-webkit-scrollbar": {
                     display: "none",
                   },
                   "-ms-overflow-style": "none", // IE and Edge
-                  "scrollbar-width": "none",
+                  "scrollbar-width": "none", }}>
+              <Box
+                ref={boxRef}
+                id="cart-tickets"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  // marginTop: 10,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  // alignItems: "center",
+                  
                 }}
               >
                 {cartTickets.map((ticket, index) => {
