@@ -29,8 +29,11 @@ export const songSlice = createSlice({
     playSong: (state, action: PayloadAction<SongState>) => {
       return { ...state, ...action.payload };
     },
+    pauseSong: (state) => {
+      return { ...state, playing: false };
+    },
   },
 });
 
-export const { setSong, playSong } = songSlice.actions;
+export const { setSong, playSong, pauseSong } = songSlice.actions;
 export default songSlice.reducer;
