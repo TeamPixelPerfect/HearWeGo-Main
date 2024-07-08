@@ -28,6 +28,7 @@ import PublicIcon from '@mui/icons-material/Public';
 import LockIcon from '@mui/icons-material/Lock';
 import { Artist } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
+import { useRouter } from "next/navigation";
 
 function switchStatus (status: string) {
   switch(status) {
@@ -41,6 +42,7 @@ function switchStatus (status: string) {
 }
 
 const ArtistSingleEventPage = () => {
+    const router = useRouter();
     const theme = useTheme();
     const [filter, setFilter] = useState("event_id");
     const { event_id } = useParams();
@@ -329,7 +331,9 @@ const ArtistSingleEventPage = () => {
                 <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
                   Delete
                 </Button>
-                <Button variant="outlined" color="secondary" startIcon={<EditIcon />}>
+                <Button onClick={()=>{
+                  router.push(`/artist/events/editEvent/${event_id}`);
+                }} variant="outlined" color="secondary" startIcon={<EditIcon />}>
                   Update
                 </Button>
                 <Button variant="contained" color="primary" endIcon={<LocalActivityIcon />}>
