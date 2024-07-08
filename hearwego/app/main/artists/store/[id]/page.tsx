@@ -470,16 +470,19 @@ const ArtistStore = ({ params: { id } }: Props) => {
   ) => {
     setSearchQuery(event.target.value);
   };
-  const filteredProducts = productsData?.filter((product) =>
-    product?.product_name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = productsData
+    .filter((product) =>
+      product?.product_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(0, 12);
+    
   const filteredCategories = categories?.filter((category) =>
     category?.category_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => {
     getProductsforStore(id).then((data) => {
-      console.log(id, data);
+      console.log("Products for Store....",data);
       setProductsData(data);
     });
 
@@ -576,7 +579,7 @@ const ArtistStore = ({ params: { id } }: Props) => {
               color="inherit"
               sx={{ marginLeft: "10px" }}
               onClick={() => {
-                router.push("/main/user/cart/" );
+                router.push("/main/user/cart/");
               }}
             >
               <Badge badgeContent={4} color="error">
@@ -634,7 +637,7 @@ const ArtistStore = ({ params: { id } }: Props) => {
               variant="contained"
               color="primary"
               onClick={() => {
-                router.push("/main/artists/store/1/productSeeMore");
+                router.push(`/main/artists/store/${id}/productSeeMore`);
               }}
             >
               See More
@@ -643,7 +646,7 @@ const ArtistStore = ({ params: { id } }: Props) => {
           </div>
 
           <Grid container spacing={4}>
-            {filteredProducts?.map((product) => (
+            {filteredProducts?.map((product, index) => (
               <Grid item xs={5} sm={4} md={2} lg={2} key={product?.product_id}>
                 <ProductCard product={product} />
               </Grid>

@@ -146,7 +146,7 @@ export const getCategories = async () => {
     },
   });
   if (res.ok) {
-    const category = await res.json();
+    const category = await res.json();  
     return category;
   } else {
     const error = await res.json();
@@ -403,6 +403,38 @@ export const deleteCartItem = async (token: string, cartItemId: string) => {
   if (res.ok) {
     const product = await res.json();
     return product;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getProductsByCategory = async (category_name: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/products/category/${category_name}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const products = await res.json();
+    return products;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getProducts = async () => {
+  const res = await fetch(`${base_url}/MerchsManager/products`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const products = await res.json();
+    return products;
   } else {
     const error = await res.json();
     throw new Error(error.message);

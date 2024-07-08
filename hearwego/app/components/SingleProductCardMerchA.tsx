@@ -18,7 +18,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppSelector } from "@/lib/hooks";
 import { deleteProduct, editProduct } from "../services/StoreServices";
 
-const SingleProductCard = ({ product, setEditComplete, handleSnackbarOpen }: any) => {
+const SingleProductCard = ({
+  product,
+  setEditComplete,
+  handleSnackbarOpen,
+}: any) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editedProduct, setEditedProduct] = useState(product);

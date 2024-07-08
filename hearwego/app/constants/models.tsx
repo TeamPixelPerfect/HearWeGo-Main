@@ -371,7 +371,7 @@ export interface MerchProduct {
   product_rating?: string;
   store_id?: string;
   rating_count?: number;
-  product_variations?: ProductVariant[];
+  variations?: ProductVariant[];
   review_count?: number;
   product_sold?: number;
 }
@@ -398,6 +398,9 @@ export interface Product {
   product_quantity?: string;
   product_rating?: string;
   store_id?: string;
+  variations?: ProductVariant[];
+  review_count?: number;
+  product_sold?: number;
 }
 
 export interface Cart {
@@ -409,9 +412,10 @@ export interface Cart {
 export interface CartItem {
   cart_item_id?: string;
   product_id?: string;
-  product_variation?: string;
+  variation?:  ProductVariant[];
   product_quantity?: number;
   product_price?: number;
+  product_name?: string;
   cart_id?: string;
   cart_item_image?: string;
   cart_item_name?: string;
