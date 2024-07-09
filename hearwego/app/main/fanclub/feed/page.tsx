@@ -1,12 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   IconButton,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   TextField,
   Container,
   Grid,
@@ -14,69 +10,80 @@ import {
   Button,
   Avatar,
   Box,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
-import SinglePost from "../../../components/SinglePost";
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Send as SendIcon,
+  Reply as ReplyIcon,
+  ThumbUp as ThumbUpIcon,
+  Comment as CommentIcon,
+} from "@mui/icons-material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useAppSelector } from "@/lib/hooks";
+import { getClubPostsByArtist } from "@/app/services/FanClubServices";
+import {
+  ClubPost,
+  comments,
+  replies,
+  reacts,
+  Artist,
+} from "../../../constants/models";
+import { getArtist, getArtistV2 } from "@/app/services/ArtistServices";
 
-const ArtistPage: React.FC = () => {
+type Comment = {
+  id: number;
+  user: string;
+  content: string;
+  profilePicture: string;
+  timestamp: string;
+  isArtist?: boolean;
+  replies?: Comment[];
+};
+
+type Post = {
+  id: number;
+  title: string;
+  content: string;
+  image?: string;
+  profilePicture: string;
+  user: string;
+  timestamp: string;
+  comments: Comment[];
+};
+
+interface Props {
+  artist_id: string;
+}
+const FanClubFanPage = ({ artist_id }: Props) => {
+  const user = useAppSelector((state) => state.user.user);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [clubPost, setClubPost] = useState<ClubPost[]>([]);
+  const [artist, setArtist] = useState<any>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"post" | "news" | null>(null);
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "First Post",
-      content: "Exciting news about the upcoming album!",
-      image:
-        "https://res.heraldm.com/content/image/2022/12/01/20221201000743_0.jpg",
-      profilePicture: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTHnaJf7dVGS4_YJ7OwOyWC7F7yia--3nJSR7LULSGIS2VpiYFo", // Dummy path
-      user: "The Rembrandts",
-      timestamp: new Date().toISOString(),
-      comments: [
-        {
-          id: 1,
-          user: "Alice",
-          content: "Great news! Looking forward to it.",
-          profilePicture: "https://randomuser.me/api/portraits/women/11.jpg", // Dummy path
-          timestamp: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          user: "John",
-          content: "Tour dates and locations revealed!",
-          profilePicture: "https://randomuser.me/api/portraits/women/13.jpg", // Dummy path
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Second Post with Image",
-      content: "Content of the second post.",
-      image:
-        "https://www.billboard.com/wp-content/uploads/2021/06/maroon-5-superbowl-2019-billboard-1548-1623086440.jpg",
-      profilePicture: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTHnaJf7dVGS4_YJ7OwOyWC7F7yia--3nJSR7LULSGIS2VpiYFo", // Dummy path
-      user: "The Rembrandts",
-      timestamp: new Date().toISOString(),
-      comments: [
-        {
-          id: 3,
-          user: "User C",
-          content: "Third comment",
-          profilePicture: "path/to/user/profile/picture3.jpg", // Dummy path
-          timestamp: new Date().toISOString(),
-        },
-        {
-          id: 4,
-          user: "User D",
-          content: "Fourth comment",
-          profilePicture: "path/to/user/profile/picture4.jpg", // Dummy path
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    },
-  ]);
+
+  useEffect(() => {
+    if (user?.token) {
+      getClubPostsByArtist(user?.token as string, artist_id)
+        .then((post) => {
+          console.log("Club Posts: ", post);
+          setClubPost(post.data);
+        })
+        .catch((error) => console.log(error));
+    }
+
+    getArtistV2(artist_id).then((res) => {
+      setArtist(res.user);
+    });
+  }, [artist_id, user?.token]);
 
   const handleDialogOpen = (type: "post" | "news") => {
     setDialogType(type);
@@ -90,19 +97,19 @@ const ArtistPage: React.FC = () => {
   };
 
   const handleDeletePost = (postId: number) => {
-    const updatedPosts = posts.filter((post) => post.id !== postId);
-    setPosts(updatedPosts);
+    const updatedPosts = clubPost.filter((post) => post.id !== postId);
+    setClubPost(updatedPosts);
   };
 
-  const handleEditPost = (postId: number, updatedPost: any) => {
-    const updatedPosts = posts.map((post) =>
+  const handleEditPost = (postId: number, updatedPost: Post) => {
+    const updatedPosts = clubPost.map((post: any) =>
       post.id === postId ? updatedPost : post
     );
-    setPosts(updatedPosts);
+    setClubPost(updatedPosts);
   };
 
-  const handleAddComment = (postId: number, comment: any) => {
-    const updatedPosts = posts.map((post) => {
+  const handleAddComment = (postId: number, comment: Comment) => {
+    const updatedPosts = clubPost.map((post: any) => {
       if (post.id === postId) {
         return {
           ...post,
@@ -111,45 +118,118 @@ const ArtistPage: React.FC = () => {
       }
       return post;
     });
-    setPosts(updatedPosts);
+    setClubPost(updatedPosts);
   };
 
- 
+  const handleReplyToComment = (
+    postId: number,
+    commentId: number,
+    replyContent: string
+  ) => {
+    const reply: Comment = {
+      id: Date.now(),
+      user: "Artist",
+      content: replyContent,
+      profilePicture: "path/to/artist/profile/picture.jpg", // Replace with actual path
+      timestamp: new Date().toISOString(),
+      isArtist: true,
+    };
 
-  
+    const updatedPosts = clubPost.map((post: any) => {
+      if (post.id === postId) {
+        const updatedComments = post.comments.map((comment: any) =>
+          comment.id === commentId
+            ? { ...comment, replies: [...(comment.replies || []), reply] }
+            : comment
+        );
+        return { ...post, comments: updatedComments };
+      }
+      return post;
+    });
+
+    setClubPost(updatedPosts);
+  };
+
+  const handleLikePost = (postId: number) => {
+    // Placeholder for future backend integration
+    // Find the post and update its likes
+    const updatedPosts = clubPost.map((post: any) =>
+      post.id === postId ? { ...post, likes: (post.likes || 0) + 1 } : post
+    );
+    setClubPost(updatedPosts);
+  };
+
+  const handleShowComments = (postId: number) => {
+    const updatedPosts = clubPost.map((post: any) =>
+      post.id === postId ? { ...post, showComments: !post.showComments } : post
+    );
+    setClubPost(updatedPosts);
+  };
 
   return (
     <Container maxWidth="lg">
       <Grid container spacing={2}>
         <Grid item xs={12}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold"}}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
             Feed
           </Typography>
-          {/* <Paper sx={{ p: 2 }}>
-        
-            <Typography variant="body1" component="p">
-              This is a place where you can share your latest posts, updates,
-              and news with your audience.
-            </Typography>
-          </Paper> */}
         </Grid>
-        {posts.map((post) => (
-          <Grid item xs={12} key={post.id}>
-            <SinglePost
-              post={post}
-              onDeletePost={handleDeletePost}
-              onEditPost={handleEditPost}
-              onAddComment={handleAddComment}
-            
-            />
-          </Grid>
-        ))}
+        {artist &&
+          clubPost.map((post) => {
+            return (
+              <Grid item xs={12} key={post?.artistId}>
+                <Paper sx={{ p: 2, marginBottom: 2, borderRadius: "10px" }}>
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <Avatar
+                      alt="Poster Profile Picture"
+                      src={artist?.profilePicture as string}
+                      sx={{ marginRight: 2 }}
+                    />
+                    <Box>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        {artist?.artistName}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {new Date(post?.createdAt as string).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Typography variant="body1" gutterBottom>
+                    {post.postDescription}
+                  </Typography>
+
+                  {post.postImage_URL && (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        marginTop: 16,
+                        marginBottom: 16,
+                      }}
+                    >
+                      <img
+                        src={post.postImage_URL}
+                        alt={post.postType}
+                        style={{ maxWidth: "70%", minWidth: "70%" }}
+                      />
+                    </div>
+                  )}
+                </Paper>
+              </Grid>
+            );
+          })}
       </Grid>
-
-      
-
     </Container>
   );
 };
 
-export default ArtistPage;
+export default FanClubFanPage;

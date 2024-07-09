@@ -26,8 +26,6 @@ export const getEvents = async (
   }
 };
 
-
-
 export const getAllEvents = async (): Promise<Event[]> => {
   const res = await fetch(`${base_url}/EventsManager/events`, {
     method: "GET",
@@ -253,7 +251,7 @@ export const getUpcomingEventsByInterest = async () => {
 }
 
 export const addEvent = async (token: string, data: any) => {
-  console.log("Sending event data:", data); 
+  console.log("Sending event data:", data);
   const res = await fetch(`${base_url}/EventsManager/events`, {
     method: "POST",
     headers: {
@@ -457,7 +455,7 @@ export const addRemainTicket = async (token: string, data: any) => {
 };
 
 export const addTicket = async (token: string, data: any) => {
-  console.log("Sending ticket data:", data); 
+  console.log("Sending ticket data:", data);
   const res = await fetch(`${base_url}/EventsManager/ticket`, {
     method: "POST",
     headers: {
@@ -471,7 +469,7 @@ export const addTicket = async (token: string, data: any) => {
     return ticket;
   } else {
     const error = await res.json();
-    console.error("Error response:", error); 
+    console.error("Error response:", error);
     throw new Error(error.message);
   }
 };
@@ -514,7 +512,7 @@ export const deleteEvent = async (token: string, id: string) => {
 };
 
 export const addBudget = async (token: string, data: any) => {
-  console.log("Sending budget data:", data); 
+  console.log("Sending budget data:", data);
   const res = await fetch(`${base_url}/EventsManager/budget`, {
     method: "POST",
     headers: {
@@ -528,7 +526,7 @@ export const addBudget = async (token: string, data: any) => {
     return budget;
   } else {
     const error = await res.json();
-    console.error("Error response:", error); 
+    console.error("Error response:", error);
     throw new Error(error.message);
   }
 };
@@ -777,3 +775,26 @@ export const createSoldTicket = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 }
+
+export const getEventsByArtist = async (token: string, artistId: string) => {
+  const res = await fetch(
+    `${base_url}/EventsManager/events/Artist/${artistId}`,
+  {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const events = await res.json();
+    console.log("Events Services: ", events);
+    return events;
+  } else {
+    const error = await res.json();
+    console.log("Events Services Error: ", error);
+    throw new Error(error.message);
+  }
+};

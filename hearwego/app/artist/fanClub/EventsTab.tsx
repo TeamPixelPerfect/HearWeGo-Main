@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useEffect } from "react";  
 import {
   CssBaseline,
   ThemeProvider,
@@ -25,61 +26,36 @@ import {
   Slide,
   useTheme,
 } from "@mui/material";
+import {useRouter} from "next/navigation";
 import EventIcon from "@mui/icons-material/Event";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
+import { Event } from "@/app/constants/models";
+import { getEventsByArtist } from "@/app/services/EventServices";
+import { useAppSelector } from "@/lib/hooks";
 
-// Define the event data
-const events = [
-  {
-    title: "Event One",
-    date: "June 20, 2024",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",
-    description:
-      "Description for event one. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non justo non ante pulvinar ultricies sed nec urna.",
-    location: "Location One",
-    tickets:
-      "Tickets available at $20 per person. Purchase at the venue or online.",
-    sponsors: ["Sponsor One", "Sponsor Two"],
-    ticketLink: "https://example.com/event-one-tickets",
-  },
-  {
-    title: "Event Two",
-    date: "July 15, 2024",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFYDy0dtqY-GmpwssQR-DKlQgrvsRy47FokQ&s",
-    description:
-      "Description for event two. Sed imperdiet odio a leo ultricies, vel pretium felis lobortis. Fusce rhoncus convallis ex, in varius ex tincidunt non.",
-    location: "Location Two",
-    tickets:
-      "Tickets available at $30 per person. Purchase at the venue or online.",
-    sponsors: ["Sponsor Three", "Sponsor Four"],
-    ticketLink: "https://example.com/event-two-tickets",
-  },
-  {
-    title: "Event Three",
-    date: "August 10, 2024",
-    image:
-      "https://content.jdmagicbox.com/comp/ernakulam/m4/0484px484.x484.140206113128.a9m4/catalogue/we-create-events-panampilly-nagar-ernakulam-event-management-companies-nsobpzm660.jpg",
-    description:
-      "Description for event three. Donec nec nunc nec purus ultricies tincidunt. Nullam non justo non ante pulvinar ultricies sed nec urna.",
-    location: "Location Three",
-    tickets:
-      "Tickets available at $25 per person. Purchase at the venue or online.",
-    sponsors: ["Sponsor Five", "Sponsor Six"],
-    ticketLink: "https://example.com/event-three-tickets",
-  },
-  // Add more events as needed
-];
+const EventsTab = () => {
 
-// Define the theme
-
-const EventsTab: React.FC = () => {
   const theme = useTheme();
+  const artist = useAppSelector((state) => state.artist.user);
+  const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (artist?.token){
+      getEventsByArtist(artist.token,artist?.user?.artist_id? artist.user.artist_id:"")
+      .then((events) => {
+        console.log("Events: ", events);
+        setEvents(events.data);
+      })
+
+      .catch((error) => console.log(error));
+    }
+  },[]);
 
   const handleLearnMoreClick = (event: any) => {
     setSelectedEvent(event);
@@ -99,7 +75,7 @@ const EventsTab: React.FC = () => {
           Events
         </Typography>
         <Grid container spacing={3}>
-          {events.map((event, index) => (
+          {events.map((Event, index) => (
             <Grid item key={index} xs={12} sm={6} md={4}>
               <Slide direction="up" in={true} timeout={index * 250}>
                 <Card
@@ -113,36 +89,38 @@ const EventsTab: React.FC = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={event.image}
-                    alt={event.title}
+                    image={Event.event_img}
+                    alt={Event.event_name}
                     sx={{ objectFit: "cover" }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" component="div" gutterBottom>
-                      {event.title}
+                      {Event.event_name}
                     </Typography>
                     <Typography
                       variant="body2"
                       color="text.secondary"
                       gutterBottom
                     >
-                      <EventIcon fontSize="small" /> {event.date}
+                      <EventIcon fontSize="small" />   {new Date(Event.sessions?.[0]?.session_date ?? "").toLocaleDateString()}
                     </Typography>
                     <Typography
                       variant="body2"
                       color="text.secondary"
                       gutterBottom
                     >
-                      <LocationOnIcon fontSize="small" /> {event.location}
+                      <LocationOnIcon fontSize="small" /> {Event.sessions?.[0]?.venue ?? ""}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {event.description}
+                      {Event.description}
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button
                       size="small"
-                      onClick={() => handleLearnMoreClick(event)}
+                      onClick={() => {
+                        router.push("/artist/events");
+                      }}
                       startIcon={<InfoIcon />}
                       variant="contained"
                       color="primary"
@@ -156,88 +134,7 @@ const EventsTab: React.FC = () => {
           ))}
         </Grid>
 
-        <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth>
-          <DialogTitle>
-            {selectedEvent?.title}
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDialog}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers>
-            <DialogContentText>{selectedEvent?.description}</DialogContentText>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 2 }}
-            >
-              <EventIcon fontSize="small" /> {selectedEvent?.date}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 1 }}
-            >
-              <LocationOnIcon fontSize="small" /> {selectedEvent?.location}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 1 }}
-            >
-              {selectedEvent?.tickets}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 1 }}
-            >
-              Ticket Link:{" "}
-              <a
-                href={selectedEvent?.ticketLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: theme.palette.primary.main }}
-              >
-                {selectedEvent?.ticketLink}
-              </a>
-            </Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h6" gutterBottom>
-              Sponsors:
-            </Typography>
-            <List>
-              {selectedEvent?.sponsors.map((sponsor: string, index: number) => (
-                <ListItem key={index} disableGutters>
-                  <ListItemText primary={sponsor} />
-                </ListItem>
-              ))}
-            </List>
-          </DialogContent>
-          <DialogActions sx={{ paddingBottom: 3 }}>
-            <Button
-              onClick={handleCloseDialog}
-              color="primary"
-              variant="contained"
-            >
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+        
       </Container>
     </ThemeProvider>
   );

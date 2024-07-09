@@ -168,7 +168,7 @@ const AddSongData = () => {
   const dispatch = useAppDispatch();
 
   //switch between tags
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (event: any, newValue: number) => {
     setValue(newValue);
   };
 
@@ -948,7 +948,7 @@ function ElectrinocGenreSelect({ songData, setSongData }: InputProps) {
           multiple
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={songData.electronic_sub_genre}
+          value={songData.electronic_sub_genre as any}
           label="Primary Genre"
           onChange={handleChange}
           variant="filled"
@@ -1071,11 +1071,8 @@ function ArtistTags({ songData, setSongData, error }: InputProps) {
     { label: "Shawn Mendes", _id: "ar4" },
   ]);
 
-  const handleChange = (
-    event: React.SyntheticEvent<Element>,
-    value: { label: string; _id: string }[]
-  ) => {
-    const artists = value.map((artist) => ({
+  const handleChange = (event: any, value: any) => {
+    const artists = value.map((artist: any) => ({
       artist_name: artist.label,
       artist_id: artist._id,
     }));
@@ -1134,11 +1131,8 @@ function ComposerTags({ songData, setSongData, error }: InputProps) {
     });
   };
 
-  const handleChange = (
-    event: React.SyntheticEvent<Element>,
-    value: { label: string; _id?: string }[]
-  ) => {
-    const composers = value.map((artist) => ({
+  const handleChange = (event: any, value: any) => {
+    const composers = value.map((artist: any) => ({
       artist_name: artist.label,
     }));
     setSongData((data: any) => {
@@ -1196,14 +1190,11 @@ function SongWriterTags({ songData, setSongData, error }: InputProps) {
     });
   };
 
-  const handleChange = (
-    event: React.SyntheticEvent<Element>,
-    value: { label: string; _id?: string }[]
-  ) => {
-    const writers = value.map((artist) => ({
+  const handleChange = (event: any, value: any) => {
+    const writers = value.map((artist: any) => ({
       artist_name: artist.label,
     }));
-    setSongData((data) => {
+    setSongData((data: any) => {
       return { ...data, song_writers: writers };
     });
   };
