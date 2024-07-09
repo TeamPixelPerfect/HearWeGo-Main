@@ -32,6 +32,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaEye } from "react-icons/fa";
@@ -183,6 +184,9 @@ const ArtistAlbums = () => {
   const [tabValue, setTabValue] = useState(0);
 
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [publicAlbums, setPublicAlbums] = useState<Album[]>([]);
+  const [privateAlbums, setPrivateAlbums] = useState<Album[]>([]);
+  const [toReleaseAlbums, setToReleaseAlbums] = useState<Album[]>([]);
 
   const [isDeleted, setIsDeleted] = useState(false);
 
@@ -201,17 +205,39 @@ const ArtistAlbums = () => {
     setPage(value);
   };
 
+  const fetchAlbums = () => {
+    getAlbumForArtists(
+      artist?.token as string,
+      artist?.user?.artist_id as string
+    ).then((albums) => {
+      console.log("Albums:::", albums);
+      setAlbums(albums.data);
+      setPublicAlbums(getPublicAlbums(albums.data));
+      setPrivateAlbums(getPrivateAlbums(albums.data));
+      setToReleaseAlbums(getToReleaseAlbums(albums.data));
+    });
+  };
+
+  const getPublicAlbums = (albums: Album[]) => {
+    return albums.filter((album) => album?.privacy === "Public");
+  };
+
+  const getPrivateAlbums = (albums: Album[]) => {
+    return albums.filter((album) => album?.privacy === "Private");
+  };
+
+  const getToReleaseAlbums = (albums: Album[]) => {
+    return albums.filter((album) =>
+      dayjs(album?.release_date).isAfter(dayjs())
+    );
+  };
+
   // Effect hook to fetch albums data
   useEffect(() => {
     if (artist?.token && artist?.user?.artist_id) {
-      getAlbumForArtists(artist?.token, artist?.user?.artist_id).then(
-        (albums) => {
-          console.log("Albums:::", albums);
-          setAlbums(albums.data);
-        }
-      );
+      fetchAlbums();
     }
-  }, [isDeleted]);
+  }, [artist?.token, artist?.user?.artist_id, isDeleted]);
 
   return (
     // Grid container for layout
@@ -256,15 +282,84 @@ const ArtistAlbums = () => {
         </Box>
         <ADTabBox>
           <Tabs value={tabValue} onChange={handleChange}>
-            <Tab label="Popular" />
-            <Tab label="Recent" />
+            <Tab label="All" />
+            <Tab label="Public" />
+            <Tab label="Private" />
             <Tab label="Upcoming" />
-            <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
             {/* Display albums or message if no albums available */}
             {albums.length > 0 ? (
               albums?.map((album) => {
+                return (
+                  <MainAlbumCard
+                    albumId={album?.album_id}
+                    albumName={album?.album_title}
+                    albumCoverArt={album?.album_img}
+                    albumTracks={album?.no_of_tracks}
+                    albumLength={album?.album_length}
+                    impressions={album?.no_of_impressions}
+                    listners={album?.no_of_plays}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
+              })
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No albums available yet!</em>
+              </Typography>
+            )}
+          </CustomTabPanel>
+          <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
+            {/* Display albums or message if no albums available */}
+            {publicAlbums.length > 0 ? (
+              publicAlbums?.map((album) => {
+                return (
+                  <MainAlbumCard
+                    albumId={album?.album_id}
+                    albumName={album?.album_title}
+                    albumCoverArt={album?.album_img}
+                    albumTracks={album?.no_of_tracks}
+                    albumLength={album?.album_length}
+                    impressions={album?.no_of_impressions}
+                    listners={album?.no_of_plays}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
+              })
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No albums available yet!</em>
+              </Typography>
+            )}
+          </CustomTabPanel>
+          <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
+            {/* Display albums or message if no albums available */}
+            {privateAlbums.length > 0 ? (
+              privateAlbums?.map((album) => {
+                return (
+                  <MainAlbumCard
+                    albumId={album?.album_id}
+                    albumName={album?.album_title}
+                    albumCoverArt={album?.album_img}
+                    albumTracks={album?.no_of_tracks}
+                    albumLength={album?.album_length}
+                    impressions={album?.no_of_impressions}
+                    listners={album?.no_of_plays}
+                    setIsDeleted={setIsDeleted}
+                  />
+                );
+              })
+            ) : (
+              <Typography variant="body1" sx={{ p: 2 }}>
+                <em>Sorry, No albums available yet!</em>
+              </Typography>
+            )}
+          </CustomTabPanel>
+          <CustomTabPanel value={tabValue} index={3} fullWidth={true}>
+            {/* Display albums or message if no albums available */}
+            {toReleaseAlbums.length > 0 ? (
+              toReleaseAlbums?.map((album) => {
                 return (
                   <MainAlbumCard
                     albumId={album?.album_id}

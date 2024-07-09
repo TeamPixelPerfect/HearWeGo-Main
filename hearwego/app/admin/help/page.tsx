@@ -1,11 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Card,
   Grid,
-  Pagination,
   Tab,
   Tabs,
   Typography,
@@ -19,117 +17,79 @@ import {
   useTheme,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { HelpComplaints } from "../../constants/models";
+import { getComplaints, updateComplaint } from "../../services/HelpServices";
+import { HelpDialog, AddCategoryDialog } from "./HelpForm/page";
 
-interface HelpTicket {
-  id: number;
-  title: string;
-  senderName: string;
-  senderId: string | number;
-  description: string;
-  status: "to_solve" | "in_progress" | "solved";
-  solution?: string;
-}
+const CardContainer = styled(Card)(({ theme }) => ({
+  width: "100%",
+  minHeight: "100vh",
+  padding: theme.spacing(2),
+  color: theme.palette.text.primary,
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+  borderRadius: theme.spacing(2),
+}));
+
+const TabsContainer = styled(Tabs)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  borderBottom: `1px solid ${theme.palette.divider}`,
+}));
+
+const DataGridContainer = styled(Box)(({ theme }) => ({
+  height: 400,
+  width: "100%",
+  marginTop: theme.spacing(2),
+  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+  borderRadius: theme.spacing(1),
+}));
+
+const PaginationContainer = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(2, 0),
+}));
+
+const DialogContentStyled = styled(DialogContent)({
+  display: "grid",
+  gridTemplateColumns: "120px auto",
+  gap: "16px",
+});
+
+const LabelTypography = styled(Typography)({
+  fontWeight: "bold",
+  color: "#3f51b5",
+  marginBottom: "4px",
+});
+
+const SolutionTextField = styled(TextField)({
+  gridColumn: "span 2",
+  marginBottom: "16px",
+});
 
 const AdminHelpPage: React.FC = () => {
   const theme = useTheme();
 
   const [tabValue, setTabValue] = useState<number>(-1);
   const [page, setPage] = useState<number>(1);
-  const [helpTickets, setHelpTickets] = useState<HelpTicket[]>([
-    {
-      id: 1,
-      title: "Issue with merchandise purchase",
-      senderName: "Sender Name 1",
-      senderId: 101,
-      description: "Description of the issue...",
-      status: "to_solve",
-    },
-    {
-      id: 2,
-      title: "Issue with account login",
-      senderName: "Sender Name 2",
-      senderId: 102,
-      description: "Description of the issue...",
-      status: "in_progress",
-    },
-    {
-      id: 3,
-      title: "Issue with payment",
-      senderName: "Sender Name 3",
-      senderId: 103,
-      description: "Description of the issue...",
-      status: "solved",
-      solution: "Payment issue resolved.",
-    },
-
-    {
-      id: 4,
-      title: "Issue with merchandise purchase",
-      senderName: "Sender Name 4",
-      senderId: 104,
-      description: "Description of the issue...",
-      status: "to_solve",
-    },
-
-    {
-      id: 5,
-      title: "Issue with account login",
-      senderName: "Sender Name 5",
-      senderId: 105,
-      description: "Description of the issue...",
-      status: "in_progress",
-    },
-    {
-      id: 6,
-      title: "Issue with payment",
-      senderName: "Sender Name 6",
-      senderId: 106,
-      description: "Description of the issue...",
-      status: "solved",
-      solution: "Payment issue resolved.",
-    },
-    {
-      id: 7,
-      title: "Issue with merchandise purchase",
-      senderName: "Sender Name 7",
-      senderId: 107,
-      description: "Description of the issue...",
-      status: "to_solve",
-    },
-    {
-      id: 8,
-      title: "Issue with account login",
-      senderName: "Sender Name 8",
-      senderId: 108,
-      description: "Description of the issue...",
-      status: "in_progress",
-    },
-    {
-      id: 9,
-      title: "Issue with payment",
-      senderName: "Sender Name 9",
-      senderId: 109,
-      description: "Description of the issue...",
-      status: "solved",
-      solution: "Payment issue resolved.",
-    },
-    {
-      id: 10,
-      title: "Issue with merchandise purchase",
-      senderName: "Sender Name 10",
-      senderId: 110,
-      description: "Description of the issue...",
-      status: "to_solve",
-    },
-
-    
-  ]);
-
-  const [selectedTicket, setSelectedTicket] = useState<HelpTicket | null>(null);
+  const [Complaints, setComplaints] = useState<HelpComplaints[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<HelpComplaints | null>(
+    null
+  );
   const [solutionDialogOpen, setSolutionDialogOpen] = useState<boolean>(false);
-  const [solutionText, setSolutionText] = useState<string>("");
-
+  const [solutionText, setSolutionText] = useState("");
   const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [setChanged, setSetChanged] = useState<boolean>(false);
+  const [helpDialogOpen, setHelpDialogOpen] = useState<boolean>(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState<boolean>(false); // State for category dialog
+
+  useEffect(() => {
+    getComplaints().then((complaints) => {
+      setComplaints(complaints.data);
+    });
+    if (setChanged) setSetChanged(false);
+  }, [setChanged]);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -144,10 +104,39 @@ const AdminHelpPage: React.FC = () => {
     setShowDetails(false);
   };
 
-  const handleRowClick = (params: { row: HelpTicket }) => {
-    setSelectedTicket(params.row);
+  const handleHelpDialogClose = () => {
+    setHelpDialogOpen(false);
+  };
+
+  const handleHelpDialogOpen = () => {
+    setHelpDialogOpen(true);
+  };
+
+  const handleCategoryDialogClose = () => {
+    setCategoryDialogOpen(false);
+  };
+
+  const handleCategoryDialogOpen = () => {
+    setCategoryDialogOpen(true);
+  };
+
+  const handleRowClick = (params: { row: HelpComplaints }) => {
+    console.log("Row clicked:", params.row);
+    setSelectedTicket({
+      ComplaintFormId: params.row.id,
+      ComplaintTitle: params.row.title,
+      userName: params.row.senderName,
+      userId: params.row.senderId,
+      ProblemInBrief: params.row.description,
+      status: params.row.status,
+      solution: params.row.solution, // Ensure the solution is assigned
+    });
     setSolutionDialogOpen(true);
   };
+
+  useEffect(() => {
+    console.log("Selected Ticket:", selectedTicket);
+  }, [selectedTicket]);
 
   const handleCloseDetails = () => {
     setSelectedTicket(null);
@@ -166,18 +155,34 @@ const AdminHelpPage: React.FC = () => {
     setSolutionText(event.target.value);
   };
 
-  const handleAddSolution = () => {
+  const handleAddSolution = async () => {
     if (selectedTicket) {
-      const updatedTickets = helpTickets.map((ticket) =>
-        ticket.id === selectedTicket.id
-          ? { ...ticket, status: "solved", solution: solutionText }
-          : ticket
-      );
-      setHelpTickets(updatedTickets);
-      setSolutionText("");
-      setSolutionDialogOpen(false);
-      setSelectedTicket(null);
-      setShowDetails(false);
+      try {
+        const updatedTicket = {
+          ...selectedTicket,
+          status: "solved",
+          solution: solutionText,
+        };
+
+        await updateComplaint(
+          updatedTicket.ComplaintFormId as string,
+          updatedTicket
+        );
+        setSetChanged(true);
+        const updatedTickets = Complaints.map((ticket) =>
+          ticket.ComplaintFormId === selectedTicket.ComplaintFormId
+            ? updatedTicket
+            : ticket
+        );
+
+        setComplaints(updatedTickets);
+        setSolutionText("");
+        setSolutionDialogOpen(false);
+        setSelectedTicket(null);
+        setShowDetails(false);
+      } catch (error) {
+        console.error("Failed to update complaint:", error);
+      }
     }
   };
 
@@ -196,9 +201,6 @@ const AdminHelpPage: React.FC = () => {
         switch (params.value) {
           case "to_solve":
             statusColor = "#f44336"; // Red
-            break;
-          case "in_progress":
-            statusColor = "#ff9800"; // Orange
             break;
           case "solved":
             statusColor = "#4caf50"; // Green
@@ -238,61 +240,32 @@ const AdminHelpPage: React.FC = () => {
     },
   ];
 
-  const rows = helpTickets.map((ticket) => ({
-    id: ticket.id,
-    title: ticket.title,
-    senderName: ticket.senderName || "",
-    senderId: ticket.senderId || "",
-    description: ticket.description,
-    status: ticket.status,
-  }));
+  const rows = useMemo(
+    () => 
+      Complaints.map((ticket) => ({
+        id: ticket.ComplaintFormId || 0,
+        title: ticket.ComplaintTitle || "",
+        senderName: ticket.userName || "",
+        senderId: ticket.userId || "",
+        description: ticket.ProblemInBrief,
+        status: ticket.status,
+        solution: ticket.solution, // Ensure the solution is included
+      })),
+    [Complaints]
+  );
 
-  const CardContainer = styled(Card)(({ theme }) => ({
-    width: "100%",
-    minHeight: "100vh",
-    padding: theme.spacing(2),
-    color: theme.palette.text.primary,
-    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-    borderRadius: theme.spacing(2),
-  }));
-
-  const TabsContainer = styled(Tabs)(({ theme }) => ({
-    marginTop: theme.spacing(2),
-    borderBottom: `1px solid ${theme.palette.divider}`,
-  }));
-
-  const DataGridContainer = styled(Box)(({ theme }) => ({
-    height: 400,
-    width: "100%",
-    marginTop: theme.spacing(2),
-    boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-    borderRadius: theme.spacing(1),
-  }));
-
-  const PaginationContainer = styled(Box)(({ theme }) => ({
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: theme.spacing(2, 0),
-  }));
-
-  const DialogContentStyled = styled(DialogContent)({
-    display: "grid",
-    gridTemplateColumns: "120px auto",
-    gap: "16px",
-  });
-
-  const LabelTypography = styled(Typography)({
-    fontWeight: "bold",
-    color: "#3f51b5",
-    marginBottom: "4px",
-  });
-
-  const SolutionTextField = styled(TextField)({
-    gridColumn: "span 2",
-    marginBottom: "16px",
-  });
+  const filteredRows = useMemo(() => {
+    switch (tabValue) {
+      case -1:
+        return rows;
+      case 0:
+        return rows.filter((row) => row.status === "to_solve");
+      case 2:
+        return rows.filter((row) => row.status === "solved");
+      default:
+        return rows;
+    }
+  }, [rows, tabValue]);
 
   return (
     <Grid container spacing={2}>
@@ -305,51 +278,56 @@ const AdminHelpPage: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: "30px",
-             
-              
             }}
           >
-            <Typography variant="h4" sx={{fontWeight: "bold"}}>Help Center</Typography>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              Help Center
+            </Typography>
           </Box>
           <TabsContainer value={tabValue} onChange={handleChange}>
             <Tab label="All" value={-1} />
             <Tab label="To Solve" value={0} />
-            <Tab label="In Progress" value={1} />
             <Tab label="Solved" value={2} />
           </TabsContainer>
-
-          <DataGridContainer 
-          sx={{
-           height:"100%"}}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "8px",
+              marginTop: "16px",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleHelpDialogOpen}
+              sx={{ padding: "8px 16px" }}
+            >
+              Add Q&A
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleCategoryDialogOpen}
+              sx={{ padding: "8px 16px" }}
+            >
+              Add Help Category
+            </Button>
+          </Box>
+          <DataGridContainer
+            sx={{
+              height: "100%",
+            }}
+          >
             <DataGrid
-              rows={
-                tabValue === -1
-                  ? rows
-                  : rows.filter((row) =>
-                      tabValue === 0
-                        ? row.status === "to_solve"
-                        : tabValue === 1
-                        ? row.status === "in_progress"
-                        : row.status === "solved"
-                    )
-              }
+              rows={filteredRows}
               columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5, 10, 20]}
+              pageSizeOptions={[25, 50]}
               pagination
               autoHeight
-              onRowClick={handleRowClick}
+              onRowClick={(params) => handleRowClick(params)}
             />
           </DataGridContainer>
-
-          {/* <PaginationContainer>
-            <Pagination
-              count={Math.ceil(helpTickets.length / 5)}
-              page={page}
-              onChange={handlePageChange}
-              color="secondary"
-            />
-          </PaginationContainer> */}
         </CardContainer>
 
         <Dialog open={solutionDialogOpen} onClose={handleCloseSolutionDialog}>
@@ -362,27 +340,27 @@ const AdminHelpPage: React.FC = () => {
             {selectedTicket && (
               <>
                 <LabelTypography>Title:</LabelTypography>
-                <Typography>{selectedTicket.title}</Typography>
+                <Typography>{selectedTicket?.ComplaintTitle}</Typography>
 
                 <LabelTypography>Sender Name:</LabelTypography>
-                <Typography>{selectedTicket.senderName}</Typography>
+                <Typography>{selectedTicket?.userName}</Typography>
 
                 <LabelTypography>Sender ID:</LabelTypography>
-                <Typography>{selectedTicket.senderId}</Typography>
+                <Typography>{selectedTicket?.userId}</Typography>
 
                 <LabelTypography>Description:</LabelTypography>
-                <Typography>{selectedTicket.description}</Typography>
+                <Typography>{selectedTicket?.ProblemInBrief}</Typography>
 
                 {selectedTicket.status === "to_solve" && (
                   <>
                     <LabelTypography>Solution:</LabelTypography>
                     <SolutionTextField
+                      focused
                       value={solutionText}
                       onChange={handleSolutionChange}
                       multiline
                       rows={3}
                       variant="outlined"
-                      autoFocus
                     />
                   </>
                 )}
@@ -390,8 +368,7 @@ const AdminHelpPage: React.FC = () => {
                 {selectedTicket.status === "solved" && (
                   <>
                     <LabelTypography>Solution:</LabelTypography>
-
-                    {selectedTicket.solution}
+                    <Typography>{selectedTicket.solution}</Typography>
                   </>
                 )}
               </>
@@ -410,20 +387,24 @@ const AdminHelpPage: React.FC = () => {
             )}
           </DialogActions>
         </Dialog>
+        <HelpDialog open={helpDialogOpen} onClose={handleHelpDialogClose} />
+        <AddCategoryDialog
+          open={categoryDialogOpen}
+          onClose={handleCategoryDialogClose}
+        />
+
         {selectedTicket &&
           showDetails &&
           selectedTicket.status !== "to_solve" && (
             <CardContainer sx={{ marginTop: "16px" }}>
               <Typography variant="h5">Ticket Details</Typography>
               <Box sx={{ marginBottom: "8px" }}>
-                <Typography>ID: {selectedTicket.id}</Typography>
-                <Typography>Title: {selectedTicket.title}</Typography>
+                <Typography>ID: {selectedTicket.ComplaintFormId}</Typography>
+                <Typography>Title: {selectedTicket.ComplaintTitle}</Typography>
+                <Typography>Sender Name: {selectedTicket.userName}</Typography>
+                <Typography>Sender ID: {selectedTicket.userId}</Typography>
                 <Typography>
-                  Sender Name: {selectedTicket.senderName}
-                </Typography>
-                <Typography>Sender ID: {selectedTicket.senderId}</Typography>
-                <Typography>
-                  Description: {selectedTicket.description}
+                  Description: {selectedTicket.ProblemInBrief}
                 </Typography>
               </Box>
               {selectedTicket.status === "solved" && (

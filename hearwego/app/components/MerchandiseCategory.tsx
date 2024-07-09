@@ -50,11 +50,11 @@ const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
           {/* <Link href="/main/artists/store/1/category/1"> */}
             <Button 
                onClick={() => {
-                router.push("/main/artists/store/1/category/1");
+                router.push(`/main/artists/store/1/category/${category?.category_name}`);
               }}
               >
            
-          <Typography variant="h4" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+          <Typography variant="h3" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
             {category?.category_name}
           </Typography>
           </Button>

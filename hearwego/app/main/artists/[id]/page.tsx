@@ -3,7 +3,7 @@
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { Stack } from "@mui/material";
+import { Stack, useMediaQuery } from "@mui/material";
 import Button from "@mui/material/Button";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -53,6 +53,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
   const [songByArtist, setSongByArtist] = React.useState<Song[]>([]); // This is the state for song by artist
 
   const router = useRouter();
+  const matches = useMediaQuery("(max-width:960px)");
 
   // This is the useEffect for get artist
   React.useEffect(() => {
@@ -68,12 +69,17 @@ export default function SingleArtistPage({ params: { id } }: Props) {
   React.useEffect(() => {
     getAlbumForArtists(artist?.token as string, id).then((res) => {
       console.log("Albums:::", res);
-      setAlbumByArtist(res.data);
+      if (res?.data) {
+        const albums = res.data.filter((album: Album) => album.privacy === "Public");
+        setAlbumByArtist(albums);
+      }
     });
 
     getSongsForArtist(artist?.token as string, id).then((res) => {
-      console.log("Songs:::", res);
-      setSongByArtist(res.data);
+      if (res?.data) {
+        const songs = res.data.filter((song: Song) => song.privacy_status === "Public");
+        setSongByArtist(songs);
+      }
     });
 
     getStoreForArtist(id).then((res) => {
@@ -97,14 +103,18 @@ export default function SingleArtistPage({ params: { id } }: Props) {
             <div
               style={{
                 background: "black",
-                height: "500px",
+                height: matches ? "1000px" : "500px",
                 width: "100%",
                 opacity: "0.8",
               }}
             ></div>
 
             <AllMiddleBox>
-              <Stack direction="row" width="100%" spacing={"1px"}>
+              <Stack
+                direction={matches ? "column" : "row"}
+                width="100%"
+                spacing={1}
+              >
                 {/* This is the profilepictureavtar for artist profile pic*/}
 
                 <ProfilePicAvatar
@@ -144,6 +154,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                       height: "50%",
                       display: "flex",
                       padding: "30px 0px",
+                      maxHeight: "50%",
                     }}
                   >
                     {artistData?.user.artistBio}
@@ -187,7 +198,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           </CoverCardMedia>
 
           {/* This is the searchpaper for searchbar*/}
-          <Box
+          {/* <Box
             style={{
               display: "flex",
               padding: "15px",
@@ -204,14 +215,14 @@ export default function SingleArtistPage({ params: { id } }: Props) {
               </IconButton>
                 
             </SearchPaper>
-          </Box>
+          </Box> */}
 
           {/* This is the box for album caption*/}
           <Box
             style={{
-              padding: "10px 0px 0px 20px",
+              padding: "1em",
               color: "primary.default",
-              fontSize: "20px",
+              fontSize: "24px",
               fontWeight: "bold",
             }}
           >
@@ -219,9 +230,9 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           </Box>
 
           {/* This is the grid for show albums*/}
-          <Grid container spacing={5} sx={{ margin: "1em auto", width: "95%" }}>
+          <Grid container spacing={2} sx={{ margin: "auto", width: "95%" }}>
             {albumByArtist.map((albums, index) => (
-              <Grid item xs={2} md={2} style={{ paddingLeft: 3 }}>
+              <Grid item xs={6} sm={4} md={3}>
                 {/* This is the singlealbum component for show single album*/}
                 <SingleAlbum
                   album_id={albums?.album_id as string}
@@ -246,9 +257,9 @@ export default function SingleArtistPage({ params: { id } }: Props) {
           {/* This is the box for song caption*/}
           <Box
             style={{
-              padding: "0px 0px 0px 20px",
+              padding: "1em",
               color: "prmary.default",
-              fontSize: "20px",
+              fontSize: "24px",
               fontWeight: "bold",
             }}
           >
@@ -263,6 +274,12 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                 songImg={songs?.song_img as string}
                 songName={songs?.song_title as string}
                 noOfFollowers={songs?.no_of_impressions as number}
+                songUrl={songs?.song_track as string}
+                artist={
+                  songs?.artist
+                    ?.map((artist) => artist.artist_name)
+                    .join(", ") as string
+                }
               ></SingleSongRow>
             ))}
           </Stack>
