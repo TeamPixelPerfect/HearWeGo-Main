@@ -179,7 +179,13 @@ export default function AddAlbumTracks() {
                 </Box>
 
                 <Box sx={{ width: "100%", marginTop: "1em" }}>
-                  <Button variant="contained" startIcon={<AddCircleIcon />}>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddCircleIcon />}
+                    onClick={() => {
+                      router.push("/artist/songs/add");
+                    }}
+                  >
                     Add New Song
                   </Button>
                 </Box>
@@ -193,9 +199,16 @@ export default function AddAlbumTracks() {
                   }}
                 >
                   <Stack direction="row" spacing={2}>
-                    <Button variant="outlined">Reset</Button>
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        window.location.reload();
+                      }}
+                    >
+                      Reset
+                    </Button>
+                    {/* Button to save album tracks  */}
 
-                    {/* Button to save album tracks */}
                     <LoadingButton
                       loading={uploading}
                       startIcon={<SaveIcon />}

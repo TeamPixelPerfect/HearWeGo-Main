@@ -173,8 +173,8 @@ const purchases = [
         <Tab label="Profile" {...a11yProps(0)} />
         <Tab label="Password" {...a11yProps(1)} />
         <Tab label="General" {...a11yProps(2)} />
-        <Tab label="Payment" {...a11yProps(3)} />
-        <Tab label="Delete Account" {...a11yProps(4)} />
+       
+       
       </Tabs>
       <TabPanel value={value} index={0}>
         <Card
@@ -209,7 +209,7 @@ const purchases = [
       <TabPanel value={value} index={1}>
         <FormContainer component="main" maxWidth="xs">
           <Card
-            sx={{ borderRadius: "20px", width: "600px", marginLeft: "500px" }}
+            sx={{ borderRadius: "20px", width: "600px", marginLeft: "500px",marginTop:'50px' }}
           >
             <CardContent>
               <Typography component="h1" variant="h5">
@@ -352,19 +352,7 @@ const purchases = [
                   sx={{ display: "block", marginTop: 2 }}
                 />
 
-                <Typography variant="h6" sx={{ marginTop: 2 }}>
-                  Tab hover preview card
-                </Typography>
-                <FormControlLabel
-                  control={<Switch defaultChecked={true} />}
-                  label="Show tab preview images"
-                  sx={{ display: "block", marginTop: 1 }}
-                />
-                <FormControlLabel
-                  control={<Switch defaultChecked={true} />}
-                  label="Show tab memory usage"
-                  sx={{ display: "block", marginTop: 1 }}
-                />
+              
               </Box>
 
               <Box sx={{ flex: 1, paddingLeft: 2 }}>
@@ -410,160 +398,10 @@ const purchases = [
           </CardContent>
         </Card>
       </TabPanel>
-      <TabPanel value={value} index={3}>
-        <Card
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "10px",
-            marginLeft: "50px",
-            borderRadius: "10px",
-          }}
-        >
-          <Box sx={{}}>
-            <form
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                width: "60ch",
-                marginLeft: "10px",
-              }}
-            >
-              <Typography
-                sx={{ marginTop: "10px",}}
-                variant="h5"
-                gutterBottom
-              >
-                Bank Details
-              </Typography>
-              <TextField
-                id="bank-account-name"
-                label="Bank Account Name"
-                variant="filled"
-                style={{ boxSizing: "initial", marginTop: "10px" }}
-                value={artistBankDetails.bankDetails.accountName}
-                onChange={(e) => {
-                  setArtistBankDetails({
-                    ...artistBankDetails,
-                    bankDetails: {
-                      ...artistBankDetails.bankDetails,
-                      accountName: e.target.value,
-                    },
-                  });
-                }}
-              />
-
-              <TextField
-                id="bank-account-no"
-                label="Bank Account Number"
-                variant="filled"
-                style={{ boxSizing: "initial", marginTop: "10px" }}
-                value={artistBankDetails.bankDetails.accountNumber}
-                onChange={(e) => {
-                  setArtistBankDetails({
-                    ...artistBankDetails,
-                    bankDetails: {
-                      ...artistBankDetails.bankDetails,
-                      accountNumber: e.target.value,
-                    },
-                  });
-                }}
-              />
-
-              <TextField
-                id="bank"
-                label="Bank"
-                variant="filled"
-                style={{ boxSizing: "initial", marginTop: "10px" }}
-                value={artistBankDetails.bankDetails.bankName}
-                onChange={(e) => {
-                  setArtistBankDetails({
-                    ...artistBankDetails,
-                    bankDetails: {
-                      ...artistBankDetails.bankDetails,
-                      bankName: e.target.value,
-                    },
-                  });
-                }}
-              />
-
-              <TextField
-                id="bank-branch"
-                label="Bank Branch"
-                variant="filled"
-                style={{ boxSizing: "initial", marginTop: "10px" }}
-                value={artistBankDetails.bankDetails.bankBranch}
-                onChange={(e) => {
-                  setArtistBankDetails({
-                    ...artistBankDetails,
-                    bankDetails: {
-                      ...artistBankDetails.bankDetails,
-                      bankBranch: e.target.value,
-                    },
-                  });
-                }}
-              />
-            </form>
-          </Box>
-          <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "flex-start",
-          marginTop:'20px',
-          marginLeft:'25px'
-
-
-        }}
-      >
-        <Stack direction="row" spacing={2}>
-          <Button variant="outlined">Cansel</Button>
-          <Button variant="contained">Save</Button>
-        </Stack>
-      </div>
-        </Card>
-        <Card sx={{marginTop:'20px',marginLeft:'50px'}}>
-        <Typography
-                sx={{ marginTop: "10px", marginLeft: "10px" }}
-                variant="h5"
-                gutterBottom
-              >
-              Payment History
-              </Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 800 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Item Name</TableCell>
-             
-              <TableCell align="right">Date of Purchase</TableCell>
-              <TableCell align="right">Details</TableCell>
-              <TableCell align="right">Price (USD)</TableCell>
-              <TableCell align="right">Payment Method</TableCell>
-              <TableCell align="right">Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {purchases.map((purchase, index) => (
-              <TableRow key={index}>
-                <TableCell component="th" scope="row">
-                  {purchase.itemName}
-                </TableCell>
-                
-                <TableCell align="right">{purchase.dateOfPurchase}</TableCell>
-                <TableCell align="right">{purchase.details}</TableCell>
-                <TableCell align="right">{purchase.price}</TableCell>
-                <TableCell align="right">{purchase.paymentMethod}</TableCell>
-                <TableCell align="right">{purchase.status}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+     
   
-    </Card>
-      </TabPanel>
+    
+    
       <TabPanel value={value} index={4}>
         <Card
           sx={{
