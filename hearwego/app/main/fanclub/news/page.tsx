@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -13,6 +13,7 @@ import {
   Box,
   IconButton,
   Paper,
+  Divider,
 } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import {
@@ -22,7 +23,26 @@ import {
   AddComment as AddCommentIcon,
 } from "@mui/icons-material";
 import SendIcon from "@mui/icons-material/Send";
-
+import InputAdornment from "@mui/material/InputAdornment";
+import {
+  ClubNews,
+  Newscomments,
+  newsreplies,
+  newsreacts,
+  Artist,
+} from "@/app/constants/models";
+import { useAppSelector } from "@/lib/hooks";
+import {
+  getClubNewsByArtist,
+  addNewsComments,
+  getCommentsByNews,
+  addNewsReplies,
+  getRepliesByNewsComment,
+  addNewsReacts,
+  getReactsByNews,
+} from "@/app/services/FanClubServices";
+import { getArtist, getArtistV2 } from "@/app/services/ArtistServices";
+import { getAllArtists } from "@/app/services/ArtistServices";
 // Dummy data for posts
 const initialPosts = [
   {
@@ -63,348 +83,542 @@ const initialPosts = [
   },
 ];
 
-interface Post {
-  id: number;
-  artistName: string;
-  profileImageUrl: string;
-  title: string;
-  content: string;
-  imageUrl: string;
-  postTime: string;
-  likes: number;
-  comments: Comment[];
-  showComments: boolean;
-}
+// interface Post {
+//   id: number;
+//   artistName: string;
+//   profileImageUrl: string;
+//   title: string;
+//   content: string;
+//   imageUrl: string;
+//   postTime: string;
+//   likes: number;
+//   comments: Comment[];
+//   showComments: boolean;
+// }
 
-interface Comment {
-  id: number;
-  commenterName: string;
-  commenterImageUrl: string;
-  commentTime: string;
-  commentText: string;
-  replies: Reply[];
+interface Props {
+  artist_id: string;
 }
-
-interface Reply {
-  id: number;
-  replierName: string;
-  replierImageUrl: string;
-  replyTime: string;
-  replyText: string;
-}
-
-const NewsPage: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+const NewsPage = ({ artist_id }: Props) => {
+  const user = useAppSelector((state) => state.user.user);
+  const [menuPostId, setMenuPostId] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [clubNews, setClubNews] = useState<ClubNews[]>([]);
   const [replyingTo, setReplyingTo] = useState<{
     postId: number;
     commentId: number;
   } | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [likedPosts, setLikedPosts] = useState<number[]>([]); // Array to store liked post IDs
+  const [likedPosts, setLikedPosts] = useState<number[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [artist, setArtist] = useState<any>();
+  const [selectedNews, setSelectedNews] = useState<ClubNews | null>(null);
+  const [commentsData, setCommentsData] = useState<Newscomments[]>([]);
+  const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>(
+    {}
+  );
+  const [reactsCount, setReactsCount] = useState<{ [key: string]: number }>({});
 
-  const handleLike = (postId: number) => {
-    if (likedPosts.includes(postId)) {
-      // User has already liked the post, so unlike it
-      setLikedPosts(likedPosts.filter((id) => id !== postId));
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postId ? { ...post, likes: post.likes - 1 } : post
-        )
-      );
+  const [repliesData, setRepliesData] = useState<{
+    [key: string]: newsreplies[];
+  }>({});
+  const [userReactedNews, setUserReactedNews] = useState<Set<string>>(
+    new Set()
+  );
+  
+  const [commentFormData, setCommentFormData] = useState({
+    newscommenter:user?.name as string,
+    newscommentBody: "",
+    newscommenter_ProfilePic: user?.profilePicture || "",
+    newsId: "",
+    timestamps: new Date().toISOString(),
+  });
+  const getArtistName = (artistId) => {
+    const artist = artists.find(artist => artist.artist_id === artistId);
+    return artist ? artist.artistName : 'Unknown';
+  };
+
+useEffect(() => {
+  if(user?.token) {
+    setCommentFormData((prevData) => ({
+      ...prevData,
+      newscommenter: user.name,
+      newscommenter_ProfilePic: user.profilePicture,
+    }));
+  }
+}
+, [user?.name, user?.profilePicture]);
+
+  const [replyFormData, setReplyFormData] = useState({
+    newsreplier: "",
+    newsreplyBody: "",
+    newsreplier_ProfilePic: user?.profilePicture || "",
+    newscommentId: "",
+    timestamps: new Date().toISOString(),
+  });
+
+  const [reactsData, setReactsData] = useState({
+    newsreacter: "",
+    newId: "",
+    timestamps: new Date().toISOString(),
+  });
+
+  const [selectedComment, setSelectedComment] = useState<Newscomments | null>(
+    null
+  );
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState<string>("");
+
+  useEffect(() => {
+    if (user?.token) {
+      getClubNewsByArtist(user?.token as string, artist_id)
+        .then(async (news) => {
+          console.log("Club news: ", news);
+          setClubNews(news.data);
+
+          // Fetch comment and react counts for each news
+          const commentCounts = {};
+          const reactCounts = {};
+          for (const item of news.data) {
+            const comments = await getCommentsByNews(user?.token? user.token:"", item.newsId);
+            commentCounts[item.newsId ] = comments.data.length;
+
+            const reacts = await getReactsByNews(user?.token? user.token:"", item.newsId);
+            reactCounts[item.newsId] = reacts.data.length;
+          }
+          setCommentCounts(commentCounts);
+          setReactsCount(reactCounts);
+        })
+        .catch((error) => console.log(error));
+    }
+
+    getArtistV2(artist_id).then((res) => {
+      setArtist(res.user);
+    });
+  }, [artist_id, user?.token]);
+
+  useEffect(() => {
+    if (selectedNews) {
+      getCommentsByNews(user?.token? user.token:"", selectedNews.newsId || "")
+        .then((newscomments) => {
+          console.log("NewsComments: ", newscomments);
+          setCommentsData(newscomments.data);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [selectedNews, user?.token]);
+
+  const handleCommentClick = (news: ClubNews) => {
+    if (selectedNews && selectedNews.newsId === news.newsId) {
+      setSelectedNews(null);
     } else {
-      // User is liking the post for the first time
-      setLikedPosts([...likedPosts, postId]);
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postId ? { ...post, likes: post.likes + 1 } : post
-        )
-      );
+      setSelectedNews(news);
     }
   };
 
-  const handleComment = (postId: number, commentText: string) => {
-    if (!commentText.trim()) return; // Prevent adding empty comments
+  useEffect(() => {
+    setReplyFormData((prevData) => ({
+      ...prevData,
+      newsreplier: user?.name as string,
+      newsreplier_ProfilePic: user?.profilePicture as string,
+    }));
+  }
+  , [user?.name, user?.profilePicture]);
 
-    const newComment: Comment = {
-      id: getNextCommentId(postId),
-      commenterName: "User", // Replace with actual commenter's name
-      commenterImageUrl: "https://randomuser.me/api/portraits/men/10.jpg",
-      commentTime: new Date().toISOString(),
-      commentText,
-      replies: [],
-    };
-
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? { ...post, comments: [...post.comments, newComment] }
-          : post
-      )
-    );
+  const handleCommentSubmit = async () => {
+    try {
+      await addNewsComments(user?.token? user.token:"", {
+        ...commentFormData,
+        newsId: selectedNews?.newsId || "",
+      });
+      setCommentFormData({
+        ...commentFormData,
+        newscommentBody: "",
+      });
+      if (selectedNews) {
+        const comments = await getCommentsByNews(
+          user?.token? user.token:"",
+          selectedNews.newsId || ""
+        );
+        console.log("Updated Comments: ", comments);
+        setCommentsData(comments.data);
+        setCommentCounts((prevCounts) => ({
+          ...prevCounts,
+          [selectedNews.newsId as string]: comments.data.length,
+        }));
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
   };
 
-  const handleReply = () => {
-    if (!replyingTo || !replyText.trim()) return;
-
-    const { postId, commentId } = replyingTo;
-
-    const newReply: Reply = {
-      id: getNextReplyId(postId, commentId),
-      replierName: "User", // Replace with actual replier's name
-      replierImageUrl: "https://randomuser.me/api/portraits/women/12.jpg",
-      replyTime: new Date().toISOString(),
-      replyText,
-    };
-
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: post.comments.map((comment) =>
-                comment.id === commentId
-                  ? { ...comment, replies: [...comment.replies, newReply] }
-                  : comment
-              ),
-            }
-          : post
-      )
-    );
-
-    setReplyingTo(null);
-    setReplyText("");
+  const handleReplyClick = async (comment: Newscomments) => {
+    if (
+      selectedComment &&
+      selectedComment.newscommentId === comment.newscommentId
+    ) {
+      setSelectedComment(null);
+    } else {
+      setSelectedComment(comment);
+      try {
+        const newsreplies = await getRepliesByNewsComment(
+          user?.token? user.token:"",
+          comment.newscommentId || ""
+        );
+        setRepliesData((prevReplies) => ({
+          ...prevReplies,
+          [comment?.newscommentId || ""]: newsreplies.data,
+        }));
+      } catch (error) {
+        console.error("Error fetching replies:", error);
+      }
+    }
   };
 
-  const handleReplyButtonClick = (postId: number, commentId: number) => {
-    setReplyingTo({ postId, commentId });
+  const handleReplySubmit = async () => {
+    try {
+      await addNewsReplies(user?.token? user.token:"", {
+        ...replyFormData,
+        newscommentId: selectedComment?.newscommentId || "",
+      });
+      setReplyFormData({
+        ...replyFormData,
+        newsreplyBody: "",
+      });
+      if (selectedComment) {
+        getRepliesByNewsComment(
+          user?.token? user.token:"",
+          selectedComment.newscommentId || ""
+        )
+          .then((newsreplies) => {
+            console.log("Updated Replies: ", newsreplies);
+            setRepliesData((prevReplies) => ({
+              ...prevReplies,
+              [selectedComment?.newscommentId || ""]: newsreplies.data,
+            }));
+          })
+          .catch((error) => console.log(error));
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
+    }
   };
 
-  const handleCommentExpand = (postId: number) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? { ...post, showComments: !post.showComments }
-          : post
-      )
-    );
+  const handleReactClick = async (news: ClubNews) => {
+    if (userReactedNews.has(news.newsId as string)) {
+      console.log("User has already reacted to this post");
+      return;
+    }
+
+    try {
+      await addNewsReacts(user?.token? user.token:"", {
+        newsreacter: user?.name,
+        newsId: news.newsId,
+        timestamps: new Date().toISOString(),
+      });
+
+      const reacts = await getReactsByNews(user?.token? user.token:"", news.newsId || "");
+      setReactsCount((prevCount) => ({
+        ...prevCount,
+        [news.newsId as string]: reacts.data.length,
+      }));
+
+      setUserReactedNews((prevSet) => new Set(prevSet).add(news.newsId as string));
+    } catch (error) {
+      console.error("Error adding react:", error);
+    }
   };
 
-  const handleAddComment = (postId: number) => {
-    handleComment(postId, replyText);
-    setReplyText("");
-  };
-
-  const getNextCommentId = (postId: number) => {
-    const post = posts.find((post) => post.id === postId);
-    if (!post) return 1;
-
-    return post.comments.length + 1;
-  };
-
-  const getNextReplyId = (postId: number, commentId: number) => {
-    const post = posts.find((post) => post.id === postId);
-    if (!post) return 1;
-
-    const comment = post.comments.find((comment) => comment.id === commentId);
-    if (!comment) return 1;
-
-    return comment.replies.length + 1;
+  const handleMoreClick = (
+    event: React.MouseEvent<HTMLElement>,
+    post: ClubNews
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setMenuPostId(news?.newsId || "");
   };
 
   return (
-    <Container>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold"}}>
-        News
-      </Typography>
-      <Grid container spacing={3}>
-        {posts.map((post) => (
-          <Grid item key={post.id} xs={12}>
-            <Card variant="outlined" sx={{ margin: "10px" }}>
-              <CardContent>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item>
-                    <Avatar
-                      sx={{ bgcolor: deepPurple[500] }}
-                      src={post.profileImageUrl}
-                      alt={post.artistName}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="subtitle1">
-                      {post.artistName}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(post.postTime).toLocaleString()}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </CardContent>
-              <CardContent>
-                <Typography variant="h5" color="text.secondary">
-                  {post.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {post.content}
-                </Typography>
-              </CardContent>
-              <Box position="relative">
-                <img
-                  src={post.imageUrl}
-                  alt={post.title}
-                  style={{ width: "100%", height: "250px", objectFit: "cover" }}
-                />
-                <Box
-                  position="absolute"
-                  bottom={0}
-                  left={0}
-                  right={0}
-                  bgcolor="rgba(0, 0, 0, 0.5)"
-                  color="white"
-                  p={2}
-                >
-                  <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                    {post.title}
-                  </Typography>
-                </Box>
-              </Box>
-              <CardActions sx={{margin:"10px"}}>
-                <Button
-                  size="small"
-                  startIcon={<FavoriteIcon />}
-                  onClick={() => handleLike(post.id)}
-                  sx={{
-                    color: likedPosts.includes(post.id) ? "red" : "inherit",
-                  }}
-                >
-                  Like ({post.likes})
-                </Button>
-                <Button
-                  size="small"
-                  startIcon={<CommentIcon />}
-                  onClick={() => handleCommentExpand(post.id)}
-                >
-                  Comments ({post.comments.length})
-                </Button>
-              </CardActions>
-              {post.showComments && (
-                <CardContent sx={{ height: "225px", overflow: "auto" }}>
-                  {post.comments.map((comment) => (
-                    <Paper key={comment.id} elevation={3} sx={{ p: 2, mb: 2 }}>
-                      <Grid container alignItems="center" spacing={2}>
-                        <Grid item>
-                          <Avatar
-                            src={comment.commenterImageUrl}
-                            alt={comment.commenterName}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <Typography variant="subtitle2">
-                            {comment.commenterName}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(comment.commentTime).toLocaleString()}
-                          </Typography>
-                        </Grid>
+    <Container maxWidth="lg">
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+            Latest News
+          </Typography>
+        </Grid>
+        {artist &&
+          clubNews.map((news) => {
+            return (
+              <Grid item xs={12} key={ClubNews?.artistId}>
+                <Card variant="outlined" sx={{ margin: "10px",height:"100%"}}>
+                  <CardContent>
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid item>
+                        <Avatar
+                          alt="Poster Profile Picture"
+                          src={artist?.profilePicture as string}
+                          sx={{ marginRight: 2 }}
+                        />
                       </Grid>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        {comment.commentText}
+                      <Grid item>
+                        <Typography variant="subtitle1">
+                          {artist?.artistName}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(news.createdAt).toLocaleString()}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                  <CardContent>
+                    <Typography variant="h5" color="text.secondary">
+                      {news.newsTitle || ""}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {news.newsBody || ""}
+                    </Typography>
+                  </CardContent>
+                  <Box position="relative">
+                    <img
+                      src={news.newsImage_URL}
+                      alt={news.newsPublisher}
+                      style={{
+                        width: "100%",
+                        height: "250px",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <Box
+                      position="absolute"
+                      bottom={0}
+                      left={0}
+                      right={0}
+                      bgcolor="rgba(0, 0, 0, 0.5)"
+                      color="white"
+                      p={2}
+                    >
+                      <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                        {news.newsTitle || ""}
                       </Typography>
-                      {comment.replies.map((reply) => (
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginTop: "1rem",
+                      alignItems: "center",
+                    }}
+                  >
+                    <IconButton
+                      onClick={() => handleReactClick(news)}
+                      color="primary"
+                    >
+                      <FavoriteIcon />
+                      <Typography variant="body2" style={{ marginLeft: 8 }}>
+                        {reactsCount[news.newsId as string] || 0}
+                      </Typography>
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleCommentClick(news)}
+                      sx={{ marginLeft: "10px" }}
+                    >
+                      <CommentIcon />
+                      <Typography variant="body2" style={{ marginLeft: 8 }}>
+                        Comments  {commentCounts[news.newsId as string] || 0}
+                      </Typography>
+                    </IconButton>
+                  </Box>
+                  {selectedNews && selectedNews.newsId === news.newsId && (
+                    <>
+                      <Divider sx={{ my: 2 }} />
+                      {commentsData.map((comment, index) => (
                         <Paper
-                          key={reply.id}
+                          key={index}
+                          sx={{
+                            mb: 2,
+                            p: 2,
+                            // backgroundColor: "#f9f9f9",
+                            borderRadius: "10px",
+                          }}
                           elevation={1}
-                          sx={{ p: 2, mt: 1, ml: 3 }}
                         >
-                          <Grid container alignItems="center" spacing={2}>
-                            <Grid item>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              mb: 1,
+                            }}
+                          >
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
                               <Avatar
-                                src={reply.replierImageUrl}
-                                alt={reply.replierName}
+                                src={comment.newscommenter_ProfilePic}
+                                sx={{ marginRight: 2 }}
                               />
-                            </Grid>
-                            <Grid item>
-                              <Typography variant="subtitle2">
-                                {reply.replierName}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
+                              <Box>
+                                <Typography variant="subtitle2">
+                                  {comment.newscommenter}                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="textSecondary"
+                                >
+                                  {new Date(comment.createdAt).toLocaleString()}
+                                </Typography>
+                                <Typography variant="body2">
+                                  {comment.newscommentBody}
+                                </Typography>
+                              </Box>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "right",
+                              }}
+                            >
+                              <IconButton
+                                onClick={() => handleReplyClick(comment)}
                               >
-                                {new Date(reply.replyTime).toLocaleString()}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Typography variant="body2" sx={{ mt: 1 }}>
-                            {reply.replyText}
-                          </Typography>
+                                <ReplyIcon />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                          {selectedComment &&
+                            selectedComment.newscommentId ===
+                              comment.newscommentId && (
+                              <Box sx={{ ml: 4 }}>
+                                {repliesData[comment.newscommentId || ""]?.map(
+                                  (reply, index) => (
+                                    <Box
+                                      key={index}
+                                      sx={{ display: "flex", mb: 1 }}
+                                    >
+                                      <Avatar
+                                        src={reply.newsreplier_ProfilePic}
+                                        sx={{
+                                          marginRight: 2,
+                                          marginTop: "8px",
+                                          marginLeft: "5px",
+                                        }}
+                                      />
+                                      <Box sx={{ marginTop: "5px" }}>
+                                        <Typography variant="subtitle1">
+                                          {reply.newsreplier}
+                                        </Typography>
+                                        <Typography
+                                          variant="caption"
+                                          color="textSecondary"
+                                        >
+                                          {new Date(
+                                            reply.createdAt
+                                          ).toLocaleString()}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                          {reply.newsreplyBody}
+                                        </Typography>
+                                      </Box>
+                                    </Box>
+                                  )
+                                )}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    p: 1,
+                                    borderRadius: 1,
+                                    // backgroundColor: "#f1f1f1",
+                                  }}
+                                >
+                                  <Avatar
+                                    src={user?.profilePicture}
+                                    sx={{ marginRight: 2 }}
+                                  />
+                                  <TextField
+                                    placeholder="Write your reply..."
+                                    fullWidth
+                                    value={replyFormData.newsreplyBody}
+                                    onChange={(e) =>
+                                      setReplyFormData({
+                                        ...replyFormData,
+                                        newsreplyBody: e.target.value,
+                                      })
+                                    }
+                                    variant="outlined"
+                                    InputProps={{
+                                      endAdornment: (
+                                        <InputAdornment position="end">
+                                          <IconButton
+                                            onClick={handleReplySubmit}
+                                            color="primary"
+                                          >
+                                            <SendIcon />
+                                          </IconButton>
+                                        </InputAdornment>
+                                      ),
+                                    }}
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                          borderRadius: "20px",
+                                        },
+                                      },
+                                    }}
+                                  />
+                                </Box>
+                              </Box>
+                            )}
                         </Paper>
                       ))}
-                      {replyingTo?.postId === post.id &&
-                        replyingTo.commentId === comment.id && (
-                          <Box sx={{ mt: 2, ml: 2 }}>
-                            <TextField
-                              fullWidth
-                              variant="outlined"
-                              placeholder={`Replying to ${comment.commenterName}`}
-                              value={replyText}
-                              onChange={(e) => setReplyText(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  handleReply();
-                                }
-                              }}
-                            />
-                            <Button
-                              variant="contained"
-                              size="small"
-                              onClick={handleReply}
-                              sx={{ mt: 1 }}
-                            >
-                              Reply
-                            </Button>
-                          </Box>
-                        )}
-                      {!replyingTo && (
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleReplyButtonClick(post.id, comment.id)
+                      <Divider sx={{ my: 2 }} />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          p: 1,
+                          borderRadius: 1,
+                          // backgroundColor: "#f1f1f1",
+                        }}
+                      >
+                        <Avatar
+                          src={user?.profilePicture}
+                          sx={{ marginRight: 2 }}
+                        />
+                        <TextField
+                          placeholder="Write your comment..."
+                          fullWidth
+                          value={commentFormData.newscommentBody}
+                          onChange={(e) =>
+                            setCommentFormData({
+                              ...commentFormData,
+                              newscommentBody: e.target.value,
+                            })
                           }
-                          sx={{ ml: 2, mt: 1 }}
-                        >
-                          <ReplyIcon />
-                        </IconButton>
-                      )}
-                    </Paper>
-                  ))}
-                  <TextField
-                    label="Add a comment"
-                    variant="outlined"
-                    // fullWidth
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleAddComment(post.id);
-                      }
-                    }}
-                    sx={{width:"100%"}}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton
-                          onClick={() => handleAddComment(post.id)}
-                          edge="end"
-                        >
-                          <SendIcon />
-                        </IconButton>
-                      ),
-                    }}
-                  />
-                </CardContent>
-              )}
-            </Card>
-          </Grid>
-        ))}
+                          variant="outlined"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  onClick={handleCommentSubmit}
+                                  color="primary"
+                                >
+                                  <SendIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              "& fieldset": {
+                                borderRadius: "20px",
+                              },
+                            },
+                          }}
+                        />
+                      </Box>
+                    </>
+                  )}
+                </Card>
+              </Grid>
+            );
+          })}
       </Grid>
     </Container>
   );

@@ -30,15 +30,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "@/lib/hooks";
 import { getCartByUser, getCartItems } from "@/app/services/StoreServices";
-import { CartItem } from "@/app/constants/models";
+import { CartItem, Order } from "@/app/constants/models";
 import Checkout from "@/app/components/Checkout";
 import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
 const Payment = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state?.user?.user);
 
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartId, setCartId] = useState<string>("");
   const [total, setTotal] = useState<number>(0);
 
   const [shippingAddress, setShippingAddress] = useState<string | null>(null);
@@ -53,6 +55,21 @@ const Payment = () => {
   const [postalCode, setPostalCode] = useState<string>("");
   const [shippingMethod, setShippingMethod] = useState<string | null>(null);
 
+  const [orderDetails, setOrderdetails] = useState<Order>({
+    user_id: user?.user_id,
+    order_total: total,
+    order_status: "to prepare",
+    order_date: dayjs().format("YYYY-MM-DD"),
+    order_time: dayjs().format("HH:mm:ss"),
+    delivery_date: dayjs().add(7, "day").format("YYYY-MM-DD"),
+    order_address: shippingAddress as string,
+    order_contact: user?.mobileNumber,
+    order_email: user?.email,
+    is_returned: false,
+    cart_items: cart,
+    cart_id: cartId,
+  });
+
   const [stripOpen, setStripeOpen] = useState(false);
 
   const handleAddShippingAddress = () => {
@@ -66,6 +83,7 @@ const Payment = () => {
   const handleSaveAddress = () => {
     const fullAddress = `${addressLine1}, ${addressLine2}, ${city}, ${country}, ${postalCode}`;
     setShippingAddress(fullAddress);
+    setOrderdetails({ ...orderDetails, order_address: fullAddress });
     setAddressDialogOpen(false);
   };
 
@@ -101,6 +119,7 @@ const Payment = () => {
   const fetchCart = () => {
     getCartByUser(user?.user_id as string).then((res) => {
       if (res) {
+        setCartId(res.cart_id);
         getCartItems(res.cart_id).then((items) => {
           if (items) {
             setCart(items.data);
@@ -112,6 +131,21 @@ const Payment = () => {
             );
 
             setTotal(total);
+
+            setOrderdetails({
+              user_id: user?.user_id,
+              order_total: total,
+              order_status: "to prepare",
+              order_date: dayjs().format("YYYY-MM-DD"),
+              order_time: dayjs().format("HH:mm:ss"),
+              delivery_date: dayjs().add(7, "day").format("YYYY-MM-DD"),
+              order_address: shippingAddress as string,
+              order_contact: user?.mobileNumber,
+              order_email: user?.email,
+              is_returned: false,
+              cart_items: items?.data,
+              cart_id: res?.cart_id,
+            });
           }
         });
       }
@@ -134,7 +168,7 @@ const Payment = () => {
       >
         <DialogTitle>Checkout</DialogTitle>
         <DialogContent>
-          <Checkout />
+          <Checkout amount={total} orderDetails={orderDetails} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleStripeClose}>Cancel</Button>
@@ -219,7 +253,7 @@ const Payment = () => {
                   }
                 >
                   <FormControlLabel
-                    value="Payhere"
+                    value="Stripe"
                     control={<Radio />}
                     label={
                       <Box
@@ -230,10 +264,10 @@ const Payment = () => {
                           width: "100%",
                         }}
                       >
-                        <span>Payhere</span>
+                        <span>Stripe</span>
                         <img
-                          src="https://payherestorage.blob.core.windows.net/payhere-resources/www/images/PayHere-Logo.png"
-                          alt="Payhere"
+                          src="https://i0.wp.com/www.frenchweb.fr/wp-content/uploads/2023/02/LOGO-850-stripe.png?fit=850%2C478&ssl=1"
+                          alt="Stripe"
                           style={{ width: "60px" }}
                         />
                       </Box>

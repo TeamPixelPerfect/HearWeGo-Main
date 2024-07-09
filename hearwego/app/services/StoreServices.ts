@@ -440,3 +440,37 @@ export const getProducts = async () => {
     throw new Error(error.message);
   }
 };
+
+export const getOrder = async (token: string, orderId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/orders/${orderId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const order = await res.json();
+    return order;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
+
+export const getOrdersForUser = async (token: string, userId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/orders/user/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const orders = await res.json();
+    return orders;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}

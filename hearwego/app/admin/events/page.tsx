@@ -33,6 +33,8 @@ import { IoAddOutline, IoClose } from "react-icons/io5";
 import { IoIosPause, IoIosPlay, IoMdMore } from "react-icons/io";
 import { MdAlbum, MdDelete } from "react-icons/md";
 import { GiSoundWaves } from "react-icons/gi";
+import KeyIcon from "@mui/icons-material/Key";
+import BlockIcon from "@mui/icons-material/Block";
 import {
   SongCard,
   SongCardButtonGroup,
@@ -49,7 +51,7 @@ import { useRouter } from "next/navigation";
 import { getSongs, getSongsForArtist } from "@/app/services/SongServices";
 import { useAppSelector } from "@/lib/hooks";
 import { GridActionsCellItem, DataGrid, GridToolbar } from "@mui/x-data-grid";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { getEvents } from "@/app/services/EventServices";
 import { getAllEvents } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
@@ -57,16 +59,18 @@ import { render } from "react-dom";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { getEvent } from "@/app/services/EventServices";
 import { Artist } from "@/app/constants/models";
-import Link from 'next/link';
+import { updateEventByAdmin } from "@/app/services/EventServices";
+import Link from "next/link";
+import { ro } from "date-fns/locale";
 // import router, { Router } from "next/router";
 
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 600,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
 };
@@ -77,22 +81,38 @@ function EventDataGrid() {
 
   const [events, setEvents] = useState<Event[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
-  const [eventId, setEventId] = useState("")
+  const [isChanged, setIsChanged] = useState(false);
+  const [eventId, setEventId] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getAllEvents().then((events) => {
-      console.log("Events......",events);
+      console.log("Events......", events);
       setEvents(events.data);
     });
 
     getAllArtists().then((artists) => {
-      console.log("Artists......",artists);
+      console.log("Artists......", artists);
       setArtists(artists.data);
     });
-  }
-  , []);
+  }, [isChanged]);
+
+  const handleStatusUpdate = (event_id: string, eventStatus: string) => {
+    let status = eventStatus;
+    if (eventStatus !== "blocked") {
+      status = "blocked";
+    } else {
+      status = "private";
+    }
+
+    updateEventByAdmin(event_id, { event_status: status }).then((response) => {
+      console.log("Event Status Updated......", response);
+      setIsChanged(!isChanged);
+
+      // setEvents(events.data);
+    });
+  };
 
   function createEventData(
     event_id: string,
@@ -106,9 +126,24 @@ function EventDataGrid() {
     event_created_by: string,
     createdAt: string,
     updatedAt: string
-  ){return { event_id, event_img, event_name, event_type, age_from, age_to, no_of_sessions: sessions.length, sessions, event_status, event_created_by, createdAt, updatedAt };}
+  ) {
+    return {
+      event_id,
+      event_img,
+      event_name,
+      event_type,
+      age_from,
+      age_to,
+      no_of_sessions: sessions.length,
+      sessions,
+      event_status,
+      event_created_by,
+      createdAt,
+      updatedAt,
+    };
+  }
 
-  const eventRows = events.map((event) => 
+  const eventRows = events.map((event) =>
     createEventData(
       event.event_id,
       event.event_img,
@@ -125,18 +160,25 @@ function EventDataGrid() {
   );
 
   const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
   };
 
   const columns = [
     { field: "event_id", headerName: "Event ID", flex: 1 },
-    { field: "event_img", headerName: "Event Image", flex: 1, renderCell: (params) => (<img src={params.row.event_img} style={{ width: 50, height: 50 }} />)},
+    {
+      field: "event_img",
+      headerName: "Event Image",
+      flex: 1,
+      renderCell: (params) => (
+        <img src={params.row.event_img} style={{ width: 50, height: 50 }} />
+      ),
+    },
     { field: "event_name", headerName: "Event Name", flex: 2 },
     { field: "event_type", headerName: "Event Type", flex: 1 },
     { field: "age_from", headerName: "Age From", flex: 1 },
     { field: "age_to", headerName: "Age To", flex: 1 },
-    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1},
+    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1 },
     {
       field: "event_status",
       headerName: "Event Status",
@@ -157,8 +199,13 @@ function EventDataGrid() {
           default:
             chipColor = "default";
         }
-        return <Chip label={status.charAt(0).toUpperCase() + status.slice(1)} color={chipColor} />;
-      }
+        return (
+          <Chip
+            label={status.charAt(0).toUpperCase() + status.slice(1)}
+            color={chipColor}
+          />
+        );
+      },
     },
     { field: "event_created_by", headerName: "Artist ID", flex: 1 },
     {
@@ -175,26 +222,44 @@ function EventDataGrid() {
       flex: 2,
       renderCell: (params) => (
         <ButtonGroup>
-          <IconButton color="primary" sx={{ fontSize: "16px" }}>
-            <FaEdit />
-          </IconButton>
           {/* <Link href={`/app/admin/events/${params.row.event_id}`}> */}
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick= {()=> {router.push(`/admin/events/${params.row.event_id}`)}}
+            onClick={() => {
+              router.push(`/admin/events/${params.row.event_id}`);
+            }}
           >
             <FaEye />
           </IconButton>
           {/* </Link> */}
-          <IconButton color="error" sx={{ fontSize: "16px" }}>
-            <MdDelete />
+          <IconButton
+            disabled={
+              params.row.event_status == "public" ||
+              params.row.event_status == "private"
+            }
+            color="success"
+            sx={{ fontSize: "16px" }}
+            onClick={() =>
+              handleStatusUpdate(params.row.event_id, params.row.event_status)
+            }
+          >
+            <KeyIcon />
+          </IconButton>
+          <IconButton
+            disabled={params.row.event_status == "blocked"}
+            color="error"
+            sx={{ fontSize: "16px" }}
+            onClick={() =>
+              handleStatusUpdate(params.row.event_id, params.row.event_status)
+            }
+          >
+            <BlockIcon />
           </IconButton>
         </ButtonGroup>
       ),
     },
   ];
-
 
   const handleView = (id) => {
     setIsModalOpen(true);
@@ -217,14 +282,14 @@ function EventDataGrid() {
   };
 
   return (
-    <div style={{ height: 600, width: '100%' }}>
+    <div style={{ height: 600, width: "100%" }}>
       <DataGrid
         rows={eventRows}
         columns={columns}
         pageSize={10}
         rowsPerPageOptions={[10]}
         components={{ Toolbar: GridToolbar }}
-        getRowId={(row) => row.event_id}  // Specify the custom id field
+        getRowId={(row) => row.event_id} // Specify the custom id field
       />
     </div>
   );
@@ -277,21 +342,52 @@ const AdminUserPage = () => {
           >
             Events
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<IoAddOutline />}
-            sx={{
-              textTransform: "capitalize",
-              background: "#000",
-              color: "#fff",
-            }}
-            onClick={() => {}}
-          >
-            Add New Event
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              startIcon={<IoAddOutline />}
+              sx={{
+                textTransform: "capitalize",
+                background: "#000",
+                color: "#fff",
+              }}
+              onClick={() => {}}
+              disabled
+            >
+              Add New Event
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                textTransform: "capitalize",
+                background: "#000",
+                color: "#fff",
+              }}
+              onClick={() => {
+                router.push(`/admin/events/soldTickets`);
+              }}
+              // disabled
+            >
+              Tickets Sold
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                textTransform: "capitalize",
+                background: "#000",
+                color: "#fff",
+              }}
+              onClick={() => {
+                router.push(`/admin/events/autoTickets`);
+              }}
+              // disabled
+            >
+              Generated Tickets
+            </Button>
+          </Stack>
         </Box>
         <ADTabBox>
-        <EventDataGrid />
+          <EventDataGrid />
         </ADTabBox>
 
         <Box
@@ -302,9 +398,7 @@ const AdminUserPage = () => {
             alignItems: "center",
             padding: "2em 0",
           }}
-        >
-          
-        </Box>
+        ></Box>
       </Card>
     </Grid>
   );

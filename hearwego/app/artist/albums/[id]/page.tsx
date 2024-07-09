@@ -52,6 +52,7 @@ import {
 import { site_url } from "@/app/constants/keys";
 import { deleteAdmin } from "@/app/services/UserServices";
 import LoadingButton from "@mui/lab/LoadingButton";
+import dayjs from "dayjs";
 
 // Defining interface for props
 interface Props {
@@ -151,17 +152,13 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
         <Alert
           variant="filled"
           severity={
-            albumData?.album_status === "Released"
-              ? "success"
-              : albumData?.album_status === "To Release"
-              ? "warning"
-              : albumData?.album_status === "Draft"
-              ? "info"
-              : "info"
+            dayjs(albumData?.release_date).isAfter(dayjs()) ? "info" : "success"
           }
-          sx={{ width: "200px" }}
+          sx={{ width: "200px", marginBottom: "1em" }}
         >
-          {albumData?.album_status}
+          {dayjs(albumData?.release_date).isAfter(dayjs())
+            ? "To Release"
+            : "Released"}
         </Alert>
       </SongPreviewDetails>
 

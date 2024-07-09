@@ -47,8 +47,8 @@ const ADCompareAnalytics = () => {
   const [shares2, setShares2] = useState<string>("1.2K");
 
   const [rangeValue, setrangeValue] = useState(0);
-  const [songValue1, setSongValue1] = useState<string>();
-  const [songValue2, setSongValue2] = useState<string>();
+  const [songValue1, setSongValue1] = useState<string>("");
+  const [songValue2, setSongValue2] = useState<string>("");
   const [dataKey, setDataKey] = useState("Impressions");
   const [dataset1, setDataset1] = useState<any[]>([
     { hour: "00:00", impressions: 182, plays: 102, shares: 29 },
@@ -406,7 +406,7 @@ const ADCompareAnalytics = () => {
                 sx={{ color: theme.palette.secondary.light, fontSize: "12px" }}
               />
               <Typography variant="body1" fontWeight={700}>
-                {impressions1}
+                {songValue1 && impressions1}
               </Typography>
             </Stack>
             <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
@@ -414,7 +414,7 @@ const ADCompareAnalytics = () => {
                 sx={{ color: theme.palette.secondary.dark, fontSize: "12px" }}
               />
               <Typography variant="body1" fontWeight={700}>
-                {impressions2}
+                {songValue2 && impressions2}
               </Typography>
             </Stack>
           </ADGraphTab>
@@ -440,7 +440,7 @@ const ADCompareAnalytics = () => {
                 sx={{ color: theme.palette.secondary.light, fontSize: "12px" }}
               />
               <Typography variant="body1" fontWeight={700}>
-                {plays1}
+                {songValue1 && plays1}
               </Typography>
             </Stack>
             <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
@@ -448,7 +448,7 @@ const ADCompareAnalytics = () => {
                 sx={{ color: theme.palette.secondary.dark, fontSize: "12px" }}
               />
               <Typography variant="body1" fontWeight={700}>
-                {plays2}
+                {songValue2 && plays2}
               </Typography>
             </Stack>
           </ADGraphTab>
@@ -474,7 +474,7 @@ const ADCompareAnalytics = () => {
                 sx={{ color: theme.palette.secondary.light, fontSize: "12px" }}
               />
               <Typography variant="body1" fontWeight={700}>
-                {shares1}
+                {songValue1 && shares1}
               </Typography>
             </Stack>
             <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
@@ -482,7 +482,7 @@ const ADCompareAnalytics = () => {
                 sx={{ color: theme.palette.secondary.dark, fontSize: "12px" }}
               />
               <Typography variant="body1" fontWeight={700}>
-                {shares2}
+                {songValue2 && shares2}
               </Typography>
             </Stack>
           </ADGraphTab>
@@ -534,22 +534,46 @@ const ADCompareAnalytics = () => {
                   data: getXAxisData(),
                 },
               ]}
-              series={[
-                {
-                  data: getYAxisData(dataset1),
-                  color: theme.palette.secondary.light,
-                  type: "line",
-                  curve: "linear",
-                  label: dataKey,
-                },
-                {
-                  data: getYAxisData(dataset2),
-                  color: theme.palette.secondary.dark,
-                  type: "line",
-                  curve: "linear",
-                  label: dataKey,
-                },
-              ]}
+              series={
+                songValue1 && songValue2
+                  ? [
+                      {
+                        data: getYAxisData(dataset1),
+                        color: theme.palette.secondary.light,
+                        type: "line",
+                        curve: "linear",
+                        label: dataKey,
+                      },
+                      {
+                        data: getYAxisData(dataset2),
+                        color: theme.palette.secondary.dark,
+                        type: "line",
+                        curve: "linear",
+                        label: dataKey,
+                      },
+                    ]
+                  : songValue2
+                  ? [
+                      {
+                        data: getYAxisData(dataset2),
+                        color: theme.palette.secondary.dark,
+                        type: "line",
+                        curve: "linear",
+                        label: dataKey,
+                      },
+                    ]
+                  : songValue1
+                  ? [
+                      {
+                        data: getYAxisData(dataset1),
+                        color: theme.palette.secondary.light,
+                        type: "line",
+                        curve: "linear",
+                        label: dataKey,
+                      },
+                    ]
+                  : []
+              }
               width={1000}
               height={400}
               leftAxis={null}

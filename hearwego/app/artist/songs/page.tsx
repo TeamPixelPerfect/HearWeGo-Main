@@ -50,6 +50,7 @@ import { useAppSelector } from "@/lib/hooks";
 import { set } from "date-fns";
 import { setSong } from "@/lib/features/song.slice";
 import LoadingButton from "@mui/lab/LoadingButton";
+import dayjs from "dayjs";
 
 interface HomeSongCardProps {
   songData: Song;
@@ -101,10 +102,10 @@ export const MainSongCard = ({ songData, setIsDeleted }: HomeSongCardProps) => {
         <SongCardCoverArt imgUrl={songData.song_img ? songData.song_img : ""} />
         <Typography variant="h6">{songData.song_title}</Typography>
       </Box>
-      <SongCardItem width="20%">
+      {/* <SongCardItem width="20%">
         <MdAlbum />
         <Typography variant="body1">{songData.album_title}</Typography>
-      </SongCardItem>
+      </SongCardItem> */}
       <SongCardItem width="15%">
         <FaEye />
         <Typography variant="body1">{songData.no_of_impressions}</Typography>
@@ -196,11 +197,11 @@ const ArtistSongs = () => {
   const artist = useAppSelector((state) => state.artist.user);
   const [tabValue, setTabValue] = useState(0);
 
-  const [popularSongs, setPopularSongs] = useState<Song[]>([]);
+  const [allSongs, setAllSongs] = useState<Song[]>([]);
 
-  const [recentSongs, setRecentSongs] = useState<Song[]>([]);
-  const [upcomingSongs, setUpcomingSongs] = useState<Song[]>([]);
-  const [draftSongs, setDraftSongs] = useState<Song[]>([]);
+  const [privateSongs, setPrivateSongs] = useState<Song[]>([]);
+  const [publicSongs, setPublicSongs] = useState<Song[]>([]);
+  const [toReleaseSongs, setToReleaseSongs] = useState<Song[]>([]);
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
@@ -218,83 +219,44 @@ const ArtistSongs = () => {
     setTabValue(newValue);
   };
 
+  const fetchSongs = () => {
+    getSongsForArtist(
+      artist?.token as string,
+      artist?.user?.artist_id as string,
+      page,
+      limit
+    ).then((songs) => {
+      console.log("Songs:::", songs);
+      setAllSongs(songs.data);
+      setPrivateSongs(getPrivateSongs(songs.data));
+      setPublicSongs(getPublicSongs(songs.data));
+      setToReleaseSongs(getUpcomingSongs(songs.data));
+    });
+  };
+
+  const getPublicSongs = (songs: Song[]) => {
+    return songs.filter((song) => song?.privacy_status === "Public");
+  };
+
+  const getPrivateSongs = (songs: Song[]) => {
+    return songs.filter((song) => song?.privacy_status === "Private");
+  };
+
+  const getUpcomingSongs = (songs: Song[]) => {
+    return songs.filter((song) => dayjs(song?.release_date).isAfter(dayjs()));
+  };
+
   useEffect(() => {
     console.log("Artist:::", artist);
     if (artist?.token && artist?.user?.artist_id) {
-      // fetch popular songs
-      getSongsForArtist(
-        artist?.token,
-        artist?.user?.artist_id,
-        page,
-        limit
-      ).then((songs) => {
-        console.log("Songs:::", songs);
-        setPopularSongs(songs.data);
-      });
-
-      // fetch recent songs
-      getSongsForArtist(
-        artist?.token,
-        artist?.user?.artist_id,
-        page,
-        limit
-      ).then((songs) => {
-        console.log("Songs:::", songs);
-        setRecentSongs(songs.data);
-      });
-
-      // fetch upcoming songs
-      getSongsForArtist(
-        artist?.token,
-        artist?.user?.artist_id,
-        page,
-        limit
-      ).then((songs) => {
-        console.log("Songs:::", songs);
-        setUpcomingSongs(songs.data);
-      });
-
-      // fetch draft songs
+      fetchSongs();
     }
   }, [page]);
 
   useEffect(() => {
     if (isDeleted) {
-      // fetch popular songs
-      getSongsForArtist(
-        artist?.token as string,
-        artist?.user?.artist_id as string,
-        page,
-        limit
-      ).then((songs) => {
-        console.log("Songs:::", songs);
-        setPopularSongs(songs.data);
-      });
-
-      // fetch recent songs
-      getSongsForArtist(
-        artist?.token as string,
-        artist?.user?.artist_id as string,
-        page,
-        limit
-      ).then((songs) => {
-        console.log("Songs:::", songs);
-        setRecentSongs(songs.data);
-      });
-
-      // fetch upcoming songs
-      getSongsForArtist(
-        artist?.token as string,
-        artist?.user?.artist_id as string,
-        page,
-        limit
-      ).then((songs) => {
-        console.log("Songs:::", songs);
-        setUpcomingSongs(songs.data);
-      });
-
+      fetchSongs();
       setIsDeleted(false);
-      // fetch draft songs
     }
   }, [isDeleted]);
 
@@ -339,14 +301,14 @@ const ArtistSongs = () => {
         </Box>
         <ADTabBox>
           <Tabs value={tabValue} onChange={handleChange}>
-            <Tab label="Popular" />
-            <Tab label="Recent" />
+            <Tab label="All" />
+            <Tab label="Public" />
+            <Tab label="Private" />
             <Tab label="Upcoming" />
-            <Tab label="Drafts" />
           </Tabs>
           <CustomTabPanel value={tabValue} index={0} fullWidth={true}>
-            {popularSongs?.length > 0 ? (
-              popularSongs?.map((song) => {
+            {allSongs?.length > 0 ? (
+              allSongs?.map((song) => {
                 return (
                   <MainSongCard
                     key={song.song_id}
@@ -363,8 +325,8 @@ const ArtistSongs = () => {
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={1} fullWidth={true}>
-            {recentSongs.length > 0 ? (
-              recentSongs.map((song) => {
+            {publicSongs.length > 0 ? (
+              publicSongs.map((song) => {
                 return (
                   <MainSongCard
                     key={song.song_id}
@@ -381,8 +343,8 @@ const ArtistSongs = () => {
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={2} fullWidth={true}>
-            {upcomingSongs.length > 0 ? (
-              upcomingSongs.map((song) => {
+            {privateSongs.length > 0 ? (
+              privateSongs.map((song) => {
                 return (
                   <MainSongCard
                     key={song.song_id}
@@ -399,8 +361,8 @@ const ArtistSongs = () => {
           </CustomTabPanel>
 
           <CustomTabPanel value={tabValue} index={3} fullWidth={true}>
-            {draftSongs.length > 0 ? (
-              draftSongs.map((song) => {
+            {toReleaseSongs.length > 0 ? (
+              toReleaseSongs.map((song) => {
                 return (
                   <MainSongCard
                     key={song.song_id}

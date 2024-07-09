@@ -436,7 +436,7 @@ const AddAlbumData = () => {
                       window.history.back();
                      }}
                   >
-                    Cansel
+                    Cancel
                   </Button>
                   <LoadingButton
                     loading={uploading}
