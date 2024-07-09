@@ -397,7 +397,7 @@ export default function Tickets() {
         </Box>
         <CardActions style={{ padding: "20px" }}>
           <Button
-            href="/main/events/MoreInterestEvents"
+            onClick={() => router.push(`/main/events/allArtistEvents/${event?.event_created_by}`)}
             //variant="contained"
             size="small"
           >
