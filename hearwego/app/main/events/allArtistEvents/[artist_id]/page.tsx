@@ -4,6 +4,7 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
+import { useParams } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleEvent from "@/app/components/SingleEvent";
@@ -11,11 +12,12 @@ import { getUpcomingEventsSortByDate } from "@/app/services/EventServices";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { Event } from "@/app/constants/models";
 import { Artist } from "@/app/constants/models";
-
-import { Maindiv, SearchPaper } from "../../../styles/eventsMW.styles";
+import { getUpcomingEventsForGivenArtistByFan } from "@/app/services/EventServices";
+import { Maindiv, SearchPaper } from "../../../../styles/eventsMW.styles";
 import { Pagination, Typography } from "@mui/material";
 
 export default function MoreAlbums() {
+    const { artist_id } = useParams();
   const [allEvents, setAllEvents] = React.useState<Event[]>([]);
   const [artists, setArtists] = React.useState<Artist[]>([]);
   const [page, setPage] = React.useState(1);
@@ -23,13 +25,13 @@ export default function MoreAlbums() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [pageCount, setPageCount] = React.useState(0);
 
-  React.useEffect(() => {
-    getUpcomingEventsSortByDate(page, limit).then((events) => {
-      console.log("Events......", events);
-      setAllEvents(events.data);
-      setPageCount(Math.ceil(events.total / limit));
-    });
-  }, [page, allEvents.length]);
+//   React.useEffect(() => {
+//     getUpcomingEventsSortByDate(page, limit).then((events) => {
+//       console.log("Events......", events);
+//       setAllEvents(events.data);
+//       setPageCount(Math.ceil(events.total / limit));
+//     });
+//   }, [page, allEvents.length]);
 
   React.useEffect(() => {
     getAllArtists().then((artists) => {
@@ -37,6 +39,17 @@ export default function MoreAlbums() {
       setArtists(artists.data);
     });
   }, []);
+
+  React.useEffect(() => {
+    if (artist_id) {
+      getUpcomingEventsForGivenArtistByFan(page, limit, artist_id as string).then(
+        (events) => {
+          setAllEvents(events.data);
+          setPageCount(Math.ceil(events.total / limit));
+        }
+      );
+    }
+  }, [artist_id, page, allEvents.length]);
 
   const getArtistName = (artistId) => {
     const artist = artists.find((artist) => artist.artist_id === artistId);
@@ -74,10 +87,17 @@ export default function MoreAlbums() {
           color: "primary.default",
           fontSize: "32px",
           fontWeight: "bold",
+          display: "flex",
+          alignItems: "center",
           //backgroundColor: "yellow",
         }}
       >
-        All Events
+        <Typography variant="h4">
+        Events of 
+        </Typography>
+        <Typography variant="h4" fontWeight={600} color="secondary" sx={{ml: 2, fontSize: "1.5em"}}>
+            {getArtistName(artist_id)}
+        </Typography>
       </Box>
       <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
       {filteredEvents.length > 0 ? (

@@ -99,7 +99,7 @@ export const CoverEventCardMedia = styled(CardMedia)(({ theme }) => ({
 export const EventBox = styled(Box)(({ theme }) => ({
   position: "absolute",
   display: "flex",
-  width: "40%",
+  width: "60%",
   height: "35%",
   padding: "1em",
   margin: "0px 0px 0px 2%",

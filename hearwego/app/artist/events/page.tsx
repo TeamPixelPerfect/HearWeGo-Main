@@ -19,6 +19,7 @@ import Card from "@mui/material/Card";
 import {
   CardActionArea,
   CardActions,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -50,6 +51,8 @@ import { Event } from "@/app/constants/models";
 import { deleteEvent } from "@/app/services/EventServices";
 import { getPastEventsForGivenArtist } from "@/app/services/EventServices";
 import VpnLockIcon from '@mui/icons-material/VpnLock';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -126,6 +129,17 @@ function a11yProps(index: number) {
   };
 }
 
+function switchStatus (status: string) {
+  switch(status) {
+    case "public":
+      return <Chip color="success" icon={<PublicIcon />} label="Public" />;
+    case "private":
+      return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
+    default:
+      return <Chip icon={<LockIcon />} label="Private" />;
+  }
+}
+
 //event tab bar
 function EventTabs() {
   const [value, setValue] = React.useState(0);
@@ -187,7 +201,7 @@ function HeaderChange(tab: number) {
 
 //event details
 function EventArea(tab: number) {
-  const artist = useAppSelector((state) => state.artist.user);
+  const artist = useAppSelector((state) => state?.artist?.user);
   const router = useRouter();
 
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
@@ -200,13 +214,14 @@ function EventArea(tab: number) {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
 
+
   useEffect(() => {
     if (artist) {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
       if (tab === 0) {
-        getUpcomingEventsForGivenArtist(page, limit, artist.artist_id).then(
+        getUpcomingEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
           (events) => {
             setUpcomingEvents(events.data);
             setPageCount(Math.ceil(events.total / limit));
@@ -214,7 +229,7 @@ function EventArea(tab: number) {
         );
       }
       else if (tab === 1) {
-        getInterestedEventsForGivenArtist(page, limit, artist.artist_id).then(
+        getInterestedEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
           (events) => {
             setUpcomingEvents(events);
             setPageCount(Math.ceil(events.total / limit));
@@ -222,7 +237,7 @@ function EventArea(tab: number) {
         );
       }
       else if (tab === 2) {
-        getPastEventsForGivenArtist(page, limit, artist.artist_id).then(
+        getPastEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
           (events) => {
             setUpcomingEvents(events.data);
             setPageCount(Math.ceil(events.total / limit));
@@ -230,14 +245,14 @@ function EventArea(tab: number) {
         );
       }
       else if (tab === 3) {
-        getPrivateEventsForGivenArtist(page, limit, artist.artist_id).then((events) => {
+        getPrivateEventsForGivenArtist(page, limit, artist?.user?.artist_id).then((events) => {
           setUpcomingEvents(events.data);
           setPageCount(Math.ceil(events.total / limit));
         }
         );
       }
     }
-  }, [artist, page, upcomingEvents.length, tab]);
+  }, [artist?.user?.artist_id, artist?.token, page, upcomingEvents.length, tab]);
 
   const handleDeleteEvent = async (event_id: string) => {
     try {
@@ -308,7 +323,7 @@ function EventArea(tab: number) {
                 aria-controls="panel2-content"
                 id="panel2-header"
               >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Avatar
                       alt="event_img"
@@ -317,6 +332,10 @@ function EventArea(tab: number) {
                       variant="square"
                     />
                     <Typography>{events.event_name}</Typography>
+                  </Box>
+
+                  <Box sx={{marginRight: 2}}>
+                    {switchStatus(events.event_status as string)}
                   </Box>
                 </Box>
               </AccordionSummary>

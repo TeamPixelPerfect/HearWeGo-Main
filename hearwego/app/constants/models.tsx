@@ -275,6 +275,8 @@ export interface SoldTickets {
   user_name?: string;
   user_email?: string;
   user_contact?: string;
+  user_nic?: string;
+  order_ticket_id?: string;
 }
 
 export interface RemainingTickets {
@@ -427,6 +429,12 @@ export interface ProductVariant {
   variation_quantity?: Number;
 }
 
+export interface EventInterest  {
+  interest_id?: string;
+  event_id?: string;
+  user_id?: string;
+}
+  
 export interface Order {
   user_id?: string;
   order_total?: number;
