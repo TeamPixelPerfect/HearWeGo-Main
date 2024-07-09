@@ -603,6 +603,13 @@ function CreateEvent() {
   const validateBudgetDetails = () => {
     let isValid = true;
 
+    let Errors = [];
+
+    if (budgetRows.length == 0) {
+      isValid = false;
+      Errors.push("There is no budget details provided. You can skip this step and add budget details later.");
+    }
+
     return isValid;
   };
 
