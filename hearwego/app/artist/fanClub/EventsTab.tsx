@@ -32,8 +32,9 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
 import { Event } from "@/app/constants/models";
-import { getEventsByArtist } from "@/app/services/EventServices";
+import {getUpcomingEventsForGivenArtist } from "@/app/services/EventServices";
 import { useAppSelector } from "@/lib/hooks";
+
 
 const EventsTab = () => {
 
@@ -47,7 +48,7 @@ const EventsTab = () => {
 
   useEffect(() => {
     if (artist?.token){
-      getEventsByArtist(artist.token,artist?.user?.artist_id? artist.user.artist_id:"")
+      getUpcomingEventsForGivenArtist(1,10,artist?.user.artist_id as string)
       .then((events) => {
         console.log("Events: ", events);
         setEvents(events.data);
@@ -72,7 +73,7 @@ const EventsTab = () => {
       <CssBaseline />
       <Container>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
-          Events
+          Upcoming Events
         </Typography>
         <Grid container spacing={3}>
           {events.map((Event, index) => (
@@ -119,7 +120,7 @@ const EventsTab = () => {
                     <Button
                       size="small"
                       onClick={() => {
-                        router.push("/artist/events");
+                        router.push(`/artist/events/${Event.event_id}`);
                       }}
                       startIcon={<InfoIcon />}
                       variant="contained"

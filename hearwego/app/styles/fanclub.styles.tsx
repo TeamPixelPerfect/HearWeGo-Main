@@ -40,8 +40,8 @@ export const ArtistInfo = styled(Box)({
   // padding: "15px",
 });
 export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
-  width: "150px",
-  height: "150px",
+  width: "200px",
+  height: "200px",
   maxWidth: "20vw",
   maxHeight: "20vw",
   "@media (min-width: 600px)": {
