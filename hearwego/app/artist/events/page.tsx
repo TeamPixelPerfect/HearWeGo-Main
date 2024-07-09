@@ -38,6 +38,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import PaidIcon from "@mui/icons-material/Paid";
+import BlockIcon from "@mui/icons-material/Block";
 import Pagination from "@mui/material/Pagination";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -136,7 +137,7 @@ function switchStatus (status: string) {
     case "private":
       return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
     default:
-      return <Chip icon={<LockIcon />} label="Private" />;
+      return <Chip color="error" icon={<BlockIcon />} label="Blocked" />;
   }
 }
 
@@ -165,7 +166,7 @@ function EventTabs() {
           <Tab icon={<TrendingUpIcon />} label="Popular" {...a11yProps(1)} />
           <Tab icon={<CallMissedIcon />} label="Past" {...a11yProps(2)} />
           <Tab icon={<VpnLockIcon />} label="Private" {...a11yProps(3)} />
-          <Tab icon={<PeopleIcon />} label="Other" {...a11yProps(4)} />
+          {/* <Tab icon={<PeopleIcon />} label="Other" {...a11yProps(4)} /> */}
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -180,9 +181,9 @@ function EventTabs() {
       <CustomTabPanel value={value} index={3}>
       {EventArea(value)}
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={4}>
+      {/* <CustomTabPanel value={value} index={4}>
         Item Five
-      </CustomTabPanel>
+      </CustomTabPanel> */}
     </Box>
   );
 }

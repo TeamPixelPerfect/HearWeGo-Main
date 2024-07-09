@@ -466,7 +466,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     updateArtist(artist?.token, artist?.user._id, artistBankDetails).then(
       (res) => {
         if (res) {
-          const newData = { user: res, token: artist?.token };
+          const newData = { user: res, token: artist?.token, ...res };
           dispatch(logInArtist(newData));
           sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
           incrementStep(1);

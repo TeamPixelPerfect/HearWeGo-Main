@@ -113,7 +113,7 @@ const SingleProductCard = ({
               {product.product_description}
             </Typography>
             <Typography variant="body1" color="textPrimary" sx={{ mt: 1 }}>
-              ${product.product_price}
+              LKR {Number(product?.product_price).toFixed(2)}
             </Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
               Quantity: {product.product_quantity}

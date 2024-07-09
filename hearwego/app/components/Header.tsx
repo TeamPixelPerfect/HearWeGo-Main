@@ -19,6 +19,7 @@ import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import UserProfilePopup from "./UserProfilePopup";
+import Link from "next/link";
 
 interface Props {
   app: AppItem;
@@ -60,7 +61,9 @@ const Header = ({ app }: Props) => {
             menuItems={app.site_main_menu}
           />
         ) : null}
-        <Logo img_url={app.logo_url} />
+        <Link href="/">
+          <Logo img_url={app.logo_url} />
+        </Link>
       </Box>
       {matches ? <Navigation menuItems={app.site_main_menu} /> : null}
       <Box>

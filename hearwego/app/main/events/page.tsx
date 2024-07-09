@@ -71,13 +71,15 @@ export default function EventsPage() {
   const [loadingAllEvents, setLoadingAllEvents] = React.useState(true);
 
   React.useEffect(() => {
-    setLoadingInterestEvents(true);
-    getInterestedEventsByUser(1, 4, user?.user_id).then((events) => {
-      console.log("Events......", events);
-      setInterestEvents(events);
-      setLoadingInterestEvents(false);
-    });
-  }, [user]);
+    if (user?.user_id) {
+      setLoadingInterestEvents(true);
+      getInterestedEventsByUser(1, 4, user?.user_id).then((events) => {
+        console.log("Events......", events);
+        setInterestEvents(events);
+        setLoadingInterestEvents(false);
+      });
+    }
+  }, [user?.user_id]);
 
   React.useEffect(() => {
     setLoadingTrendingEvents(true);
@@ -194,7 +196,7 @@ export default function EventsPage() {
                 display: "flex",
                 justifyContent: "center",
                 margin: "1em auto",
-                height: "40vh"
+                height: "40vh",
               }}
             >
               <CircularProgress />
@@ -268,7 +270,7 @@ export default function EventsPage() {
                 display: "flex",
                 justifyContent: "center",
                 margin: "1em auto",
-                height: "40vh"
+                height: "40vh",
               }}
             >
               <CircularProgress />
@@ -342,7 +344,12 @@ export default function EventsPage() {
 
       {loadingAllEvents ? (
         <Box
-          sx={{ display: "flex", justifyContent: "center", margin: "1em auto", height: "40vh" }}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            margin: "1em auto",
+            height: "40vh",
+          }}
         >
           <CircularProgress />
         </Box>

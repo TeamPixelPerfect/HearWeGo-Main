@@ -125,7 +125,7 @@ export default function SingleEvent({ params: { id } }: Props) {
     if (isInterested) {
       // Remove interest
       try {
-        await deleteInterest(user.token, user.user_id, id);
+        await deleteInterest(user?.token, user?.user_id, id);
         setIsInterested(false);
         setInterestId(null);
         setSnackbarMessage("Interest removed successfully!");
@@ -141,9 +141,9 @@ export default function SingleEvent({ params: { id } }: Props) {
       try {
         const interestData = {
           event_id: event?.event_id,
-          user_id: user.user_id,
+          user_id: user?.user_id,
         };
-        const interest = await createInterest(user.token, interestData);
+        const interest = await createInterest(user?.token, interestData);
         setIsInterested(true);
         setInterestId(interest.interest_id);
         setSnackbarMessage("Interest added successfully!");

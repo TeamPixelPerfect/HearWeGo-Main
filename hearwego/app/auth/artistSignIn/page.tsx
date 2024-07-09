@@ -53,8 +53,8 @@ const ArtistSignIn = () => {
 
     handleArtistLogin(artistDetails).then((res) => {
       if (res) {
-        dispatch(logInArtist(res));
-        sessionStorage.setItem("hwg-artist", JSON.stringify(res));
+        dispatch(logInArtist({ ...res, ...res?.user}));
+        sessionStorage.setItem("hwg-artist", JSON.stringify({ ...res, ...res?.user}));
         router.replace("/artist");
       }
     });

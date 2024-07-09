@@ -81,6 +81,7 @@ const AddProduct = ({
       await addMerchProduct(artist?.token ? artist?.token : "", {
         isDraft: true,
         ...formik.values,
+        catagory_name: "test",
       });
       setSuccessMessage("Product saved to drafts successfully!");
       setSnackbarSeverity("success");
@@ -139,7 +140,7 @@ const AddProduct = ({
       product_quantity: "",
       product_rating: "",
       store_id: "",
-      variations: "",
+      variations: [] as ProductVariant[],
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
