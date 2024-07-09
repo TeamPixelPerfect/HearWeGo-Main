@@ -72,7 +72,7 @@ function switchStatus(status: string) {
     case "private":
       return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
     default:
-      return <Chip icon={<LockIcon />} label="Private" />;
+      return <Chip color="error" icon={<BlockIcon />} label="Blocked" />;
   }
 }
 
