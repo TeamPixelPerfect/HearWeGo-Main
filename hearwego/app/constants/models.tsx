@@ -542,3 +542,17 @@ export interface HelpArticle {
   QandA?: articalQandA[];
 }
 
+export interface PressReleaseData{
+  PressReleaseID?: string;
+  ArtistLogo_URL?: string;
+  Headline?: string;
+  SubHeadline?: string;
+  EventDate?: Date;
+  Venue?: string;
+  Description?: string;
+  Signature?: string;
+  ReleaseDate?: Date;
+  ArtistID?: string;
+  Status?: string;
+  emails?: string[];
+}
