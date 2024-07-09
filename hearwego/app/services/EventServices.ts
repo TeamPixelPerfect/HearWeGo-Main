@@ -494,6 +494,88 @@ export const updateEvent = async (token: string, id: string, data: any) => {
   }
 }
 
+export const getAllTicketTypes = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/ticketTypes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch ticket types:", error);
+    throw error;
+  }
+}
+
+export const getAllAutoTickets = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/autoTickets`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto tickets:", error);
+    throw error;
+  }
+}
+
+export const updateEventByAdmin = async ( id: string, data: any) => {
+  console.log("Sending updated event data:", data);
+  const res = await fetch(`${base_url}/EventsManager/events/admin/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const event = await res.json();
+    return event;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const getSoldTickets = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/soldTickets`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch sold tickets:", error);
+    throw error;
+  }
+}
+
 export const deleteEvent = async (token: string, id: string) => {
   const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
     method: "DELETE",
