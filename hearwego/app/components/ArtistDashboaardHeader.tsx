@@ -148,7 +148,7 @@ const ArtistDashboardHeader = () => {
           {/* )} */}
           <Link href="/artist/artistProfile">
             <Avatar
-              src={artist?.user.profilePicture as string}
+              src={artist?.profilePicture as string}
               style={{ height: "50px", width: "50px" }}
             />
           </Link>

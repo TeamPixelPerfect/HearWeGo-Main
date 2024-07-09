@@ -42,6 +42,7 @@ import EventCheckout from "@/app/components/EventCheckout";
 import { id } from "date-fns/locale";
 import * as htmlToImage from "html-to-image";
 import JSZip from "jszip";
+import { useRouter } from "next/navigation";
 // import { saveAs } from "file-saver";
 
 const ticketModalStyle = {
@@ -204,6 +205,7 @@ function SingleTicket(
 }
 
 export default function Page() {
+  const router = useRouter();
   const { event_id, session_name } = useParams();
   const boxRefs = useRef([]);
   const [id_list, setIdList] = useState<string[]>([]);
@@ -768,7 +770,12 @@ export default function Page() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleDownloadImages}
+                // onClick={handleDownloadImages}\
+                onClick={() => {
+                  handleDownloadImages();
+                  router.push(`/main/events/${event_id}`);
+                }
+              }
               >
                 Download Zip
               </Button>

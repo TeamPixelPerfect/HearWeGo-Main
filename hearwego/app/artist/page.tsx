@@ -213,7 +213,13 @@ const ADHomePage = () => {
         md={12}
         sx={{ height: matches ? "600px" : "400px", margin: "0" }}
       >
-        <ADHomeCoverBox imgUrl={artist?.artistCovers[0] as string}>
+        <ADHomeCoverBox
+          imgUrl={
+            artist?.artistCovers &&
+            artist?.artistCovers.length > 0 &&
+            (artist?.artistCovers[0] as string)
+          }
+        >
           <ADHomeNameArea>
             <Box
               sx={{

@@ -1517,10 +1517,10 @@ function SessionTable({ sessionRows, setSessionRows }) {
       isValid = false;
     }
 
-    if (!description) {
-      setDescriptionError("Description is required.");
-      isValid = false;
-    }
+    // if (!description) {
+    //   setDescriptionError("Description is required.");
+    //   isValid = false;
+    // }
 
     return isValid;
   };

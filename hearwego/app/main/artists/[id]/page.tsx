@@ -186,7 +186,7 @@ export default function SingleArtistPage({ params: { id } }: Props) {
                         />
                       </Button>
                     )}
-                    <Button>
+                    <Button onClick={()=> {router.push(`/main/events/allArtistEvents/${id}`)}}>
                       <LocalActivityIcon
                         style={{ color: "white", fontSize: "35px" }}
                       />
