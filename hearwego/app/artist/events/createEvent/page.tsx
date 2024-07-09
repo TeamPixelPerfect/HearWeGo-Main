@@ -1867,6 +1867,11 @@ function TeamTable({ teamRows, setTeamRows }) {
     return emailRegex.test(email);
   };
 
+  function validateSriLankanPhoneNumber(phoneNumber) {
+    const sriLankanPhoneNumberPattern = /^0\d{9}$/;
+    return sriLankanPhoneNumberPattern.test(phoneNumber);
+}
+
   const [teamType, setTeamType] = useState("");
   const [teamName, setTeamName] = useState("");
   const [teamContact, setTeamContact] = useState("");
@@ -1907,11 +1912,10 @@ function TeamTable({ teamRows, setTeamRows }) {
 
   const validateFields = () => {
     return (
-      teamType.trim() !== "" &&
-      teamName.trim() !== "" &&
-      teamContact.trim() !== "" &&
-      teamEmail.trim() !== "" &&
-      validateEmail(teamEmail)
+      (teamType.trim() !== "") &&
+      (teamName.trim() !== "") &&
+      (teamContact.trim() !== "" ? validateSriLankanPhoneNumber(teamContact): true) &&
+      (teamEmail.trim() !== "" ? validateEmail(teamEmail): true)
     );
   };
 
@@ -2249,13 +2253,17 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
     setSelectedRows(selectionModel);
   };
 
+  function validateSriLankanPhoneNumber(phoneNumber) {
+    const sriLankanPhoneNumberPattern = /^0\d{9}$/;
+    return sriLankanPhoneNumberPattern.test(phoneNumber);
+}
+
   const validateFields = () => {
     return (
-      sponsorType.trim() !== "" &&
-      sponsorName.trim() !== "" &&
-      sponsorContact.trim() !== "" &&
-      sponsorEmail.trim() !== "" &&
-      validateEmail(sponsorEmail)
+      (sponsorType.trim() !== "") &&
+      (sponsorName.trim() !== "") &&
+      (sponsorEmail.trim() !== "" ? (validateEmail(sponsorEmail)) : true) &&
+      (sponsorContact.trim() !== "" ? (validateSriLankanPhoneNumber(sponsorContact)) : true)
     );
   };
 
