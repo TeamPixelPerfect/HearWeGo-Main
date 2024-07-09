@@ -503,6 +503,14 @@ export interface reacts {
   timestamps?: string;
 }
 
+export interface newsreacts {
+  newsreactId?: string;
+  newsreacter?: string;
+  newsId?: string;
+  timestamps?: string;
+}
+
+
 export interface Newscomments {
   newscommentId?: string;
   newscommenter?: string;
@@ -522,6 +530,17 @@ export interface ClubVideos {
   clubId?: string;
   artistId?: string;
   timestamps?: string;
+}
+
+
+export interface newsreplies {
+  newsreplyId?: string;
+  newsreplier?: string;
+  newsreplyBody?: string;
+  newsId?: string;
+  newsreplier_ProfilePic?: string;
+  newscommenter_ProfilePic?: string;
+  newscommentId?: string;
 }
 
 export interface HelpComplaints {

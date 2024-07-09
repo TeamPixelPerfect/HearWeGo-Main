@@ -13,63 +13,93 @@ import {
   Menu,
   MenuItem,
   Snackbar,
+  Paper,
+  Divider,
   TextField,
   InputAdornment,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
 } from "@mui/material";
 import { deepPurple, grey } from "@mui/material/colors";
+import SendIcon from "@mui/icons-material/Send";
+import ReplyIcon from "@mui/icons-material/Reply";
 import {
   MoreVert as MoreVertIcon,
   ThumbUp as ThumbUpIcon,
-  Send as SendIcon,
-  Comment as CommentIcon,
 } from "@mui/icons-material";
 import MuiAlert from "@mui/material/Alert";
 import {
   getClubNewsByArtist,
   getReactsByNews,
   deleteNews,
-  getCommentsByNews,
   addNewsComments,
+  getCommentsByNews,
+  addNewsReplies,
+  getRepliesByNewsComment,
+  addNewsReacts,
+  deleteNewsComment,
 } from "@/app/services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
-import { ClubNews } from "@/app/constants/models";
 
-interface NewsComment {
-  newscommentId?: string;
-  newscommenter?: string;
-  newscommentBody?: string;
-  newscommenter_ProfilePic?: string;
-  newsId?: string;
-  timestamps?: string;
-  parentCommentId?: string;
-}
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import CommentIcon from "@mui/icons-material/Comment";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { ClubNews, Newscomments, newsreplies } from "@/app/constants/models";
 
 const NewsPage = () => {
   const artist = useAppSelector((state) => state.artist.user);
-  const user = useAppSelector((state) => state.user.user);
 
   const [clubNews, setClubNews] = useState<ClubNews[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedClubNewsId, setSelectedClubNewsId] = useState<string | null>(
     null
   );
+  const [menuPostId, setMenuPostId] = useState<string | null>(null);
   const [reactsCount, setReactsCount] = useState<{ [key: string]: number }>({});
   const [menuNewsId, setMenuNewsId] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState<string>("");
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedNews, setEditedNews] = useState<ClubNews | null>(null);
-  const [showCommentInput, setShowCommentInput] = useState<{
-    [key: string]: boolean;
-  }>({});
-  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
-  const [comments, setComments] = useState<{ [key: string]: NewsComment[] }>({});
   const [selectedNews, setSelectedNews] = useState<ClubNews | null>(null);
-  const [newscommentsData, setNewsCommentsData] = useState<newscomments[]>([]);
+  const [commentsData, setCommentsData] = useState<Newscomments[]>([]);
+  const [repliesData, setRepliesData] = useState<{ [key: string]: newsreplies[] }>(
+    {}
+  );
+  const user = useAppSelector((state) => state.user.user);
+
+  const [commentFormData, setCommentFormData] = useState({
+    newscommenter: artist?.user.artistName || "",
+    newscommentBody: "",
+    newscommenter_ProfilePic: artist?.user.profilePicture || "",
+    newsId: "",
+    timestamps: new Date().toISOString(),
+  });
+
+  const [replyFormData, setReplyFormData] = useState({
+    newsreplier: "",
+    newsreplyBody: "",
+    newsreplier_ProfilePic: artist?.user.profilePicture || "",
+    newscommentId: "",
+    timestamps: new Date().toISOString(),
+  });
+
+  const [reactsData, setReactsData] = useState({
+    reacter: "",
+    postId: "",
+    timestamps: new Date().toISOString(),
+  });
+
+  const [selectedComment, setSelectedComment] = useState<Newscomments | null>(
+    null
+  );
+  const [commentsCount, setCommentsCount] = useState<{ [key: string]: number }>(
+    {}
+  );
+
+  useEffect(() => {
+    setReplyFormData({
+      ...replyFormData,
+      newsreplier: artist?.user.artistName || "",
+      newsreplier_ProfilePic: artist?.user.profilePicture || "",
+    });
+  }, [user?.name, user?.profilePicture]);
 
   useEffect(() => {
     if (artist?.token) {
@@ -78,17 +108,6 @@ const NewsPage = () => {
         .catch(console.log);
     }
   }, [artist]);
-
-  useEffect(() => {
-    if (selectedNews) {
-  getCommentsByNews(artist?.token, selectedNews.newsId || "")
-        .then((newscomments) => {
-          console.log("Comments: ", newscomments);
-          setNewsCommentsData(newscomments.data);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [selectedNews, artist?.token]);
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -104,13 +123,120 @@ const NewsPage = () => {
     setSelectedClubNewsId(null);
   };
 
+  useEffect(() => {
+    if (selectedNews) {
+      getCommentsByNews(
+        artist?.token ? artist.token : "",
+        selectedNews.newsId || ""
+      )
+        .then((comments) => {
+          console.log("Comments: ", comments);
+          setCommentsData(comments.data);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [selectedNews, artist?.token]);
+
+  const handleMoreClick = (
+    event: React.MouseEvent<HTMLElement>,
+    news: ClubNews
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setMenuPostId(news?.newsId || "");
+  };
+
+  const handleCommentClick = (news: ClubNews) => {
+    if (selectedNews && selectedNews.newsId === news.newsId) {
+      setSelectedNews(null);
+    } else {
+      setSelectedNews(news);
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    try {
+      await addNewsComments(artist?.token ? artist.token : "", {
+        ...commentFormData,
+        newsId: selectedNews?.newsId || "",
+      });
+      setCommentFormData({
+        ...commentFormData,
+        newscommentBody: "",
+      });
+      if (selectedNews) {
+        getCommentsByNews(
+          artist?.token ? artist.token : "",
+          selectedNews.newsId || ""
+        )
+          .then((comments) => {
+            console.log("Updated Comments: ", comments);
+            setCommentsData(comments.data);
+          })
+          .catch((error) => console.log(error));
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
+  const handleReplyClick = async (comment: Newscomments) => {
+    if (
+      selectedComment &&
+      selectedComment.newscommentId === comment.newscommentId
+    ) {
+      setSelectedComment(null);
+    } else {
+      setSelectedComment(comment);
+      try {
+        const newsreplies = await getRepliesByNewsComment(
+          artist?.token ? artist.token : "",
+          comment.newscommentId || ""
+        );
+        setRepliesData((prevReplies) => ({
+          ...prevReplies,
+          [comment?.newscommentId || ""]: newsreplies.data,
+        }));
+      } catch (error) {
+        console.error("Error fetching replies:", error);
+      }
+    }
+  };
+
+  const handleReplySubmit = async () => {
+    try {
+      await addNewsReplies(artist?.token ? artist.token : "", {
+        ...replyFormData,
+        commentId: selectedComment?.newscommentId || "",
+      });
+      setReplyFormData({
+        ...replyFormData,
+        newsreplyBody: "",
+      });
+      if (selectedComment) {
+        getRepliesByNewsComment(
+          artist?.token ? artist.token : "",
+          selectedComment.newscommentId || ""
+        )
+          .then((newsreplies) => {
+            console.log("Updated newsreplies: ", newsreplies);
+            setRepliesData((prevReplies) => ({
+              ...prevReplies,
+              [selectedComment?.newscommentId || ""]: newsreplies.data,
+            }));
+          })
+          .catch((error) => console.log(error));
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
+    }
+  };
   const handleReactClick = async (news: ClubNews) => {
     if (artist?.token && news.newsId) {
       try {
         const reacts = await getReactsByNews(artist.token, news.newsId);
         setReactsCount((prevCount) => ({
           ...prevCount,
-          [news.newsId]: reacts.data.length,
+          [news.newsId as string]: reacts.data.length,
         }));
       } catch (error) {
         console.error("Error fetching reacts:", error);
@@ -137,67 +263,50 @@ const NewsPage = () => {
     }
   };
 
+  const handleDeleteClick = (commentId: string | undefined) => {
+    deleteNewsComment(artist?.token ? artist.token : "", commentId || "")
+      .then(() => {
+        console.log("Comment deleted successfully");
+        setDeleteSuccessMessage("Comment deleted successfully");
+        setSnackbarOpen(true);
+        setCommentsData(
+          commentsData.filter((comment) => comment.newscommentId !== commentId)
+        );
+      })
+      .catch((error) => console.log(error));
+  };
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
 
-  const handleEditNewsClick = (news: ClubNews) => {
-    setEditedNews(news);
-    setIsEditMode(true);
-    handleMenuClose(); // Close the menu after clicking edit
-  };
-
-  const handleCommentIconClick = async (newsId: string) => {
-    setShowCommentInput((prev) => ({
-      ...prev,
-      [newsId]: !prev[newsId],
-    }));
-
-    if (!comments[newsId]) {
-      try {
-        const response = await getCommentsByNews(artist.token, newsId);
-        setComments((prev) => ({
-          ...prev,
-          [newsId]: response.data || [], // Ensure response data is an array
-        }));
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      }
-    }
-  };
-
-  const handleCommentChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    newsId: string
+  const handleReplyToComment = (
+    newsId: string,
+    newscommentId: string,
+    replyContent: string
   ) => {
-    setCommentText((prev) => ({
-      ...prev,
-      [newsId]: event.target.value,
-    }));
-  };
+    const reply: Comment = {
+      id: Date.now(),
+      user: "User",
+      content: replyContent,
+      profilePicture: "path/to/artist/profile/picture.jpg", // Replace with actual path
+      timestamp: new Date().toISOString(),
+      isArtist: true,
+    };
 
-  const handleCommentSubmit = async (newsId: string) => {
-    if (artist?.token && commentText[newsId]) {
-      try {
-        const newComment = {
-          newscommenter: user?.userId,
-          newscommentBody: commentText[newsId],
-          postId: newsId,
-        };
-
-        const response = await addNewsComments(artist.token, newComment);
-        setComments((prev) => ({
-          ...prev,
-          [newsId]: [...(prev[newsId] || []), response],
-        }));
-        setCommentText((prev) => ({
-          ...prev,
-          [newsId]: "",
-        }));
-      } catch (error) {
-        console.error("Error posting comment:", error);
+    const updatedPosts = clubNews.map((news: any) => {
+      if (news.id === newsId) {
+        const updatedComments = news.comments.map((comment: any) =>
+          comment.id === newscommentId
+            ? { ...comment, newsreplies: [...(comment.newsreplies || []), reply] }
+            : comment
+        );
+        return { ...news, comments: updatedComments };
       }
-    }
+      return news;
+    });
+
+    setClubNews(updatedPosts);
   };
 
   return (
@@ -220,7 +329,9 @@ const NewsPage = () => {
                 aria-label="more"
                 aria-controls={`post-menu-${ClubNews.newsId}`}
                 aria-haspopup="true"
-                onClick={(event) => handleMenuOpen(event, ClubNews.newsId)}
+                onClick={(event) =>
+                  handleMenuOpen(event, ClubNews.newsId as string)
+                }
                 sx={{
                   position: "absolute",
                   top: 16,
@@ -238,9 +349,6 @@ const NewsPage = () => {
                 }
                 onClose={handleMenuClose}
               >
-                <MenuItem onClick={() => handleEditNewsClick(ClubNews)}>
-                  Edit
-                </MenuItem>
                 <MenuItem onClick={handleDeleteNewsClick}>Delete</MenuItem>
               </Menu>
 
@@ -303,74 +411,229 @@ const NewsPage = () => {
                 disableSpacing
                 sx={{ borderTop: "1px solid rgba(0, 0, 0, 0.12)" }}
               >
-                <IconButton onClick={() => handleReactClick(ClubNews)}>
-                  <ThumbUpIcon />
-                  <Typography sx={{ ml: 1 }}>
-                    {reactsCount[ClubNews.newsId || ""] || 0}
-                  </Typography>
-                </IconButton>
-                <IconButton onClick={() => handleCommentIconClick(ClubNews.newsId)}>
-                  <CommentIcon />
-                </IconButton>
+                <Box
+                  sx={{
+                    display: "flex",
+                    marginTop: "1rem",
+                    alignItems: "center",
+                  }}
+                >
+                  <IconButton
+                    onClick={() => handleReactClick(ClubNews)}
+                    color="primary"
+                  >
+                    <FavoriteIcon />
+                    <Typography variant="body2" style={{ marginLeft: 8 }}>
+                      {reactsCount[ClubNews.newsId as string] || 0}
+                    </Typography>
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleCommentClick(ClubNews)}
+                    sx={{ marginLeft: "10px" }}
+                  >
+                    <CommentIcon />
+                    <Typography variant="body2" style={{ marginLeft: 8 }}>
+                      Comments
+                    </Typography>
+                  </IconButton>
+                </Box>
               </CardActions>
-              {showCommentInput[ClubNews.newsId] && (
-                <CardContent>
-                  <List>
-                    {Array.isArray(comments[ClubNews.newsId]) &&
-                      comments[ClubNews.newsId].map((comment, index) => (
-                        <ListItem key={index} alignItems="flex-start">
-                          <ListItemAvatar>
-                            <Avatar src={comment.newscommenter_ProfilePic || ""} />
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={comment.newscommenter}
-                            secondary={
-                              <React.Fragment>
-                                <Typography
-                                  component="span"
-                                  variant="body2"
-                                  color="text.primary"
-                                >
-                                  {comment.newscommentBody}
-                                </Typography>
-                                <br />
-                                <Typography
-                                  component="span"
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {new Date(comment.timestamps || "").toLocaleString()}
-                                </Typography>
-                              </React.Fragment>
-                            }
+              {selectedNews && selectedNews.newsId === ClubNews.newsId && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  {commentsData.map((comment, index) => (
+                    <Paper
+                      key={index}
+                      sx={{
+                        mb: 2,
+                        p: 2,
+                        // backgroundColor: "#f9f9f9",
+                        borderRadius: "10px",
+                      }}
+                      elevation={1}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          mb: 1,
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Avatar
+                            src={comment.newscommenter_ProfilePic}
+                            sx={{ marginRight: 2 }}
                           />
-                        </ListItem>
-                      ))}
-                  </List>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    value={commentText[ClubNews.newsId] || ""}
-                    onChange={(e) => handleCommentChange(e, ClubNews.newsId)}
-                    placeholder="Add a comment..."
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
+                          <Box>
+                            <Typography variant="subtitle2">
+                              {comment.newscommenter}
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary">
+                              {new Date(comment.createdAt).toLocaleString()}
+                            </Typography>
+                            <Typography variant="body2">
+                              {comment.newscommentBody}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "right",
+                          }}
+                        >
                           <IconButton
-                            onClick={() => handleCommentSubmit(ClubNews.newsId)}
+                            onClick={() =>
+                              handleDeleteClick(comment.newscommentId)
+                            }
                           >
-                            <SendIcon />
+                            <DeleteIcon />
                           </IconButton>
-                        </InputAdornment>
-                      ),
+                          <IconButton onClick={() => handleReplyClick(comment)}>
+                            <ReplyIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                      {selectedComment &&
+                        selectedComment.newscommentId ===
+                          comment.newscommentId && (
+                          <Box sx={{ ml: 4 }}>
+                            {repliesData[comment.newscommentId || ""]?.map(
+                              (reply, index) => (
+                                <Box
+                                  key={index}
+                                  sx={{ display: "flex", mb: 1 }}
+                                >
+                                  <Avatar
+                                    src={reply.newsreplier_ProfilePic}
+                                    sx={{
+                                      marginRight: 2,
+                                      marginTop: "8px",
+                                      marginLeft: "5px",
+                                    }}
+                                  />
+                                  <Box sx={{ marginTop: "5px" }}>
+                                    <Typography variant="subtitle1">
+                                      {reply.newsreplier}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="textSecondary"
+                                    >
+                                      {new Date(
+                                        reply.createdAt
+                                      ).toLocaleString()}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                      {reply.newsreplyBody}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              )
+                            )}
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                p: 1,
+                                borderRadius: 1,
+                                // backgroundColor: "#f1f1f1",
+                              }}
+                            >
+                              <Avatar
+                                src={artist?.user.profilePicture}
+                                sx={{ marginRight: 2 }}
+                              />
+                              <TextField
+                                placeholder="Write your reply..."
+                                fullWidth
+                                value={replyFormData.newsreplyBody}
+                                onChange={(e) =>
+                                  setReplyFormData({
+                                    ...replyFormData,
+                                    newsreplyBody: e.target.value,
+                                  })
+                                }
+                                variant="outlined"
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        onClick={handleReplySubmit}
+                                        color="primary"
+                                      >
+                                        <SendIcon />
+                                      </IconButton>
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                sx={{
+                                  "& .MuiOutlinedInput-root": {
+                                    "& fieldset": {
+                                      borderRadius: "20px",
+                                    },
+                                  },
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                        )}
+                    </Paper>
+                  ))}
+                  <Divider sx={{ my: 2 }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      p: 1,
+                      borderRadius: 1,
+                      // backgroundColor: "#f1f1f1",
                     }}
-                  />
-                </CardContent>
+                  >
+                    <Avatar
+                      src={artist?.user.profilePicture}
+                      sx={{ marginRight: 2 }}
+                    />
+                    <TextField
+                      placeholder="Write your comment..."
+                      fullWidth
+                      value={commentFormData.newscommentBody}
+                      onChange={(e) =>
+                        setCommentFormData({
+                          ...commentFormData,
+                          newscommentBody: e.target.value,
+                        })
+                      }
+                      variant="outlined"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={handleCommentSubmit}
+                              color="primary"
+                            >
+                              <SendIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderRadius: "20px",
+                          },
+                        },
+                      }}
+                    />
+                  </Box>
+                </>
               )}
             </Card>
           </Grid>
         ))}
       </Grid>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000} // Adjust as per your requirement
