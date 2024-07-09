@@ -13,7 +13,7 @@ import { getAllArtists } from "@/app/services/ArtistServices";
 import { getUpcomingEventsByInterest } from "@/app/services/EventServices";
 
 import { Maindiv, SearchPaper } from "../../../styles/eventsMW.styles";
-import { Pagination } from "@mui/material";
+import { Pagination, Typography } from "@mui/material";
 
 const trendingEvents = [
   {
@@ -112,52 +112,53 @@ export default function MoreAlbums() {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(12);
   const [pageCount, setPageCount] = React.useState(0);
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   React.useEffect(() => {
     getUpcomingEventsByInterest(1, 5).then((events) => {
-      console.log("Events Trending......",events);
+      console.log("Events Trending......", events);
       setTrendingEvents(events);
       setPageCount(Math.ceil(events.total / limit));
     });
-  }
-  , [page, trendingEvents.length]);
+  }, [page, trendingEvents.length]);
 
   React.useEffect(() => {
     getAllArtists().then((artists) => {
-      console.log("Artists......",artists);
+      console.log("Artists......", artists);
       setArtists(artists.data);
     });
-  }
-  , []);
+  }, []);
 
   const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
   };
 
   const handlePageChange = (event, value) => {
     setPage(value);
   };
 
+  const filteredEvents = trendingEvents.filter((event) => {
+    const artistName = getArtistName(event.event_created_by).toLowerCase();
+    const eventName = event.event_name.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return eventName.includes(query) || artistName.includes(query);
+  });
+
   return (
     <Maindiv>
-      <Box
-        style={{
-          display: "flex",
-          padding: "15px",
-        }}
-      >
-        <SearchPaper>
-          <InputBase
-            sx={{ ml: 5, flex: 1 }}
-            placeholder="Search events"
-            inputProps={{ "aria-label": "search" }}
-          />
-          <IconButton type="button" sx={{ p: "10px" }} aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-            
-        </SearchPaper>
+      <Box sx={{ width: "100%", p: 5 }}>
+        <InputBase
+          placeholder="Search Events"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            width: "80%",
+            padding: "5px 10px",
+            borderRadius: "4px",
+          }}
+          startAdornment={<SearchIcon sx={{ marginRight: "8px" }} />}
+        />
       </Box>
       <Box
         style={{
@@ -171,17 +172,45 @@ export default function MoreAlbums() {
         Trending Events
       </Box>
       <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-        {trendingEvents.map(({ event_id, event_name, event_img, sessions, event_created_by }) => (
-          <Grid item xs={6} md={3}>
-            <SingleEvent
-              eventID={event_id}
-              eventName={event_name}
-              eventImg={event_img}
-              artistName={getArtistName(event_created_by)}
-              noOfSessions={sessions?.length}
-            ></SingleEvent>
-          </Grid>
-        ))}
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map(
+            ({
+              event_id,
+              event_name,
+              event_img,
+              sessions,
+              event_created_by,
+            }) => (
+              <Grid item xs={6} md={3}>
+                <SingleEvent
+                  eventID={event_id}
+                  eventName={event_name}
+                  eventImg={event_img}
+                  artistName={getArtistName(event_created_by)}
+                  noOfSessions={sessions?.length}
+                ></SingleEvent>
+              </Grid>
+            )
+          )
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "75vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              color="secondary"
+              variant="subtitle1"
+              sx={{ fontStyle: "italic" }}
+            >
+              No Events Found
+            </Typography>
+          </Box>
+        )}
       </Grid>
 
       <Box

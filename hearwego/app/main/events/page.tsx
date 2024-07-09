@@ -17,6 +17,7 @@ import { Artist } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 import { getUpcomingEventsByInterest } from "@/app/services/EventServices";
 import { getUpcomingEventsSortByDate } from "@/app/services/EventServices";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import {
   Maindiv,
@@ -29,7 +30,7 @@ import {
 } from "@/app/styles/eventsMW.styles";
 import { CustomSelect } from "@/app/components/eventsDropDown";
 import { get } from "http";
-
+import { set } from "date-fns";
 
 export const TypeOptions = [
   { value: "concerts", label: "Concerts" },
@@ -63,42 +64,49 @@ export default function EventsPage() {
   const [trendingEvents, setTrendingEvents] = React.useState<Event[]>([]);
   const [allEvents, setAllEvents] = React.useState<Event[]>([]);
   const [artists, setArtists] = React.useState<Artist[]>([]);
+  const [loadingInterestEvents, setLoadingInterestEvents] =
+    React.useState(true);
+  const [loadingTrendingEvents, setLoadingTrendingEvents] =
+    React.useState(true);
+  const [loadingAllEvents, setLoadingAllEvents] = React.useState(true);
 
   React.useEffect(() => {
-    getInterestedEventsByUser(1, 5, user?.user_id).then((events) => {
-      console.log("Events......",events);
+    setLoadingInterestEvents(true);
+    getInterestedEventsByUser(1, 4, user?.user_id).then((events) => {
+      console.log("Events......", events);
       setInterestEvents(events);
+      setLoadingInterestEvents(false);
     });
-  }
-  , [user]);
+  }, [user]);
 
   React.useEffect(() => {
-    getUpcomingEventsByInterest(1, 5).then((events) => {
-      console.log("Events Trending......",events);
+    setLoadingTrendingEvents(true);
+    getUpcomingEventsByInterest(1, 4).then((events) => {
+      console.log("Events Trending......", events);
       setTrendingEvents(events);
+      setLoadingTrendingEvents(false);
     });
-  }
-  , [user]);
+  }, [user]);
 
   React.useEffect(() => {
     getAllArtists().then((artists) => {
-      console.log("Artists......",artists);
+      console.log("Artists......", artists);
       setArtists(artists.data);
     });
-  }
-  , []);
+  }, []);
 
   React.useEffect(() => {
+    setLoadingAllEvents(true);
     getUpcomingEventsSortByDate(1, 8).then((events) => {
-      console.log("Events......",events);
+      console.log("Events......", events);
       setAllEvents(events.data);
+      setLoadingAllEvents(false);
     });
-  }
-  , [user]);
+  }, [user]);
 
   const getArtistName = (artistId) => {
-    const artist = artists.find(artist => artist.artist_id === artistId);
-    return artist ? artist.artistName : 'Unknown';
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
   };
 
   const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -143,204 +151,159 @@ export default function EventsPage() {
         </CaptionBox>
       </CoverCardMedia>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "95%",
-          height: "100%",
-          alignItems: "center",
-          margin: "auto",
-          //backgroundColor: "blue",
-          //padding: "20px",
-          justifyContent: "space-between",
-        }}
-      >
-        <Box
-          style={{
-            // width: "50%",
-            display: "flex",
-            padding: "15px",
-            //backgroundColor: "red",
-            // justifyContent: "left",
-          }}
-        >
-          <SearchPaper>
-            <InputBase
-              sx={{ flex: 1, p: "10px" }}
-              placeholder="Search for Events"
-              inputProps={{ "aria-label": "search" }}
-            />
-            <IconButton type="button" sx={{ p: "10" }} aria-label="Search">
-              <SearchIcon />
-            </IconButton>
-              
-          </SearchPaper>
-        </Box>
-
-        <Box
-          sx={{
-            // width: "50%",
-            //backgroundColor: "red",
-            //position: "relative",
-            display: "flex",
-            padding: "15px",
-            marginLeft: "40px",
-            //justifyContent: "right",
-            //alignItems:'right',
-            //padding: "15px",
-            //margin:'15px 40px 15px 0px',
-          }}
-        >
-          <Stack direction="row" spacing={1}>
-            <CustomSelect
-              labelId="genre-select-label"
-              id="genre-select"
-              value={Type}
-              onChange={handleTypeChange}
-              label="Type"
-              options={TypeOptions}
-              placeholder="Type"
-            />
-            <CustomSelect
-              labelId="profession-select-label"
-              id="profession-select"
-              value={Location}
-              onChange={handleLocationChange}
-              label="Location"
-              options={LocationOptions}
-              placeholder="Location"
-            />
-            <CustomSelect
-              labelId="gender-select-label"
-              id="gender-select"
-              value={Artist}
-              onChange={handleArtistChange}
-              label="Artist"
-              options={ArtistOptions}
-              placeholder="Artist"
-            />
-          </Stack>
-        </Box>
-      </Box>
-      <Divider
-        sx={{
-          width: "90%",
-          height: "2px",
-          // size: "50px",
-          margin: "auto",
-          backgroundColor: "primary.default",
-        }}
-      ></Divider>
-
-      {(user ? 
+      {user ? (
         <>
           <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "95%",
-          height: "100%",
-          margin: "auto",
-          justifyContent: "space-between",
-          //alignItems: "right",
-          //backgroundColor: "blue",
-          //padding: "20px",
-        }}
-      >
-        <Box
-          style={{
-            padding: "10px 0px 0px 0px",
-            color: "primary.default",
-            fontSize: "32px",
-            fontWeight: "bold",
-            //backgroundColor: "yellow",
-          }}
-        >
-          My Interest
-        </Box>
-        <CardActions style={{ padding: "20px", paddingRight: 0 }}>
-          <Button
-            href="/main/events/MoreInterestEvents"
-            //variant="contained"
-            size="small"
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "95%",
+              height: "100%",
+              margin: "auto",
+              justifyContent: "space-between",
+              //alignItems: "right",
+              //backgroundColor: "blue",
+              //padding: "20px",
+            }}
           >
-            Show All
-          </Button>
-        </CardActions>
-      </Box>
+            <Box
+              style={{
+                padding: "10px 0px 0px 0px",
+                color: "primary.default",
+                fontSize: "32px",
+                fontWeight: "bold",
+                //backgroundColor: "yellow",
+              }}
+            >
+              My Interest
+            </Box>
+            <CardActions style={{ padding: "20px", paddingRight: 0 }}>
+              <Button
+                href="/main/events/MoreInterestEvents"
+                //variant="contained"
+                size="small"
+              >
+                Show All
+              </Button>
+            </CardActions>
+          </Box>
 
-      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-        {interestEvents.map(
-          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
-            <Grid item xs={6} md={3}>
-              <SingleEvent
-                eventID={event_id}
-                eventName={event_name}
-                eventImg={event_img}
-                artistName={getArtistName(event_created_by)}
-                noOfSessions={sessions?.length}
-              ></SingleEvent>
+          {loadingInterestEvents ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                margin: "1em auto",
+                height: "40vh"
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Grid
+              container
+              spacing={2}
+              sx={{ margin: "1em auto", width: "95%" }}
+            >
+              {interestEvents.map(
+                ({
+                  event_id,
+                  event_name,
+                  event_img,
+                  sessions,
+                  event_created_by,
+                }) => (
+                  <Grid item xs={6} md={3}>
+                    <SingleEvent
+                      eventID={event_id}
+                      eventName={event_name}
+                      eventImg={event_img}
+                      artistName={getArtistName(event_created_by)}
+                      noOfSessions={sessions?.length}
+                    ></SingleEvent>
+                  </Grid>
+                )
+              )}
             </Grid>
-          )
-        )}
-      </Grid>
+          )}
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "95%",
-          height: "100%",
-          margin: "auto",
-          justifyContent: "space-between",
-          //alignItems: "right",
-          //backgroundColor: "blue",
-          //padding: "20px",
-        }}
-      >
-        <Box
-          style={{
-            padding: "10px 0px 0px 0px",
-            color: "primary.default",
-            fontSize: "32px",
-            fontWeight: "bold",
-            //backgroundColor: "yellow",
-          }}
-        >
-          Trending Events
-        </Box>
-        <CardActions style={{ padding: "20px", paddingRight: "0" }}>
-          <Button
-            href="/main/events/MoreTrendingEvents"
-            //variant="contained"
-            size="small"
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              width: "95%",
+              height: "100%",
+              margin: "auto",
+              justifyContent: "space-between",
+              //alignItems: "right",
+              //backgroundColor: "blue",
+              //padding: "20px",
+            }}
           >
-            Show All
-          </Button>
-        </CardActions>
-      </Box>
+            <Box
+              style={{
+                padding: "10px 0px 0px 0px",
+                color: "primary.default",
+                fontSize: "32px",
+                fontWeight: "bold",
+                //backgroundColor: "yellow",
+              }}
+            >
+              Trending Events
+            </Box>
+            <CardActions style={{ padding: "20px", paddingRight: "0" }}>
+              <Button
+                href="/main/events/MoreTrendingEvents"
+                //variant="contained"
+                size="small"
+              >
+                Show All
+              </Button>
+            </CardActions>
+          </Box>
 
-      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-      {trendingEvents.map(
-          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
-            <Grid item xs={6} md={3}>
-              <SingleEvent
-                eventID={event_id}
-                eventName={event_name}
-                eventImg={event_img}
-                artistName={getArtistName(event_created_by)}
-                noOfSessions={sessions?.length}
-              ></SingleEvent>
+          {loadingTrendingEvents ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                margin: "1em auto",
+                height: "40vh"
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Grid
+              container
+              spacing={2}
+              sx={{ margin: "1em auto", width: "95%" }}
+            >
+              {trendingEvents.map(
+                ({
+                  event_id,
+                  event_name,
+                  event_img,
+                  sessions,
+                  event_created_by,
+                }) => (
+                  <Grid item xs={6} md={3}>
+                    <SingleEvent
+                      eventID={event_id}
+                      eventName={event_name}
+                      eventImg={event_img}
+                      artistName={getArtistName(event_created_by)}
+                      noOfSessions={sessions?.length}
+                    ></SingleEvent>
+                  </Grid>
+                )
+              )}
             </Grid>
-          )
-        )}
-      </Grid>
-        </> 
-        : <></>) 
-    }
-
-      
+          )}
+        </>
+      ) : (
+        <></>
+      )}
 
       <Box
         sx={{
@@ -377,21 +340,35 @@ export default function EventsPage() {
         </CardActions>
       </Box>
 
-      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
-      {allEvents.map(
-          ({ event_id, event_name, event_img, sessions, event_created_by }) => (
-            <Grid item xs={6} md={3}>
-              <SingleEvent
-                eventID={event_id}
-                eventName={event_name}
-                eventImg={event_img}
-                artistName={getArtistName(event_created_by)}
-                noOfSessions={sessions?.length}
-              ></SingleEvent>
-            </Grid>
-          )
-        )}
-      </Grid>
+      {loadingAllEvents ? (
+        <Box
+          sx={{ display: "flex", justifyContent: "center", margin: "1em auto", height: "40vh" }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
+          {allEvents.map(
+            ({
+              event_id,
+              event_name,
+              event_img,
+              sessions,
+              event_created_by,
+            }) => (
+              <Grid item xs={6} md={3}>
+                <SingleEvent
+                  eventID={event_id}
+                  eventName={event_name}
+                  eventImg={event_img}
+                  artistName={getArtistName(event_created_by)}
+                  noOfSessions={sessions?.length}
+                ></SingleEvent>
+              </Grid>
+            )
+          )}
+        </Grid>
+      )}
     </Maindiv>
   );
 }
