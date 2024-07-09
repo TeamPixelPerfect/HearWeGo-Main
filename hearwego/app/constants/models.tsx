@@ -343,10 +343,9 @@ export interface MerchStore {
 }
 
 export interface Artistcover {
- 
   store_banner?: string;
   promo_banner?: string[];
-  
+
   artist_id?: string;
 }
 
@@ -412,7 +411,7 @@ export interface Cart {
 export interface CartItem {
   cart_item_id?: string;
   product_id?: string;
-  variation?:  ProductVariant[];
+  variation?: ProductVariant[];
   product_quantity?: number;
   product_price?: number;
   product_name?: string;
@@ -426,6 +425,22 @@ export interface ProductVariant {
   variation_value?: string;
   variation_price?: Number;
   variation_quantity?: Number;
+}
+
+export interface Order {
+  user_id?: string;
+  order_total?: number;
+  order_status?: string;
+  order_date?: string;
+  order_time?: string;
+  delivery_date?: string;
+  order_address?: string;
+  order_contact?: string;
+  order_email?: string;
+  is_returned?: boolean;
+  cart_items?: CartItem[];
+  cart_id?: string;
+  order_id?: string;
 }
 
 export interface replies {

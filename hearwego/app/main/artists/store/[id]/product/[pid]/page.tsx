@@ -126,6 +126,7 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
   ];
 
   const handleAddToCart = () => {
+    console.log("User: ", user?.user_id);
     if (user?.user_id) {
       getCartByUser(user?.user_id).then((res) => {
         const cart_id = res?.cart_id;
@@ -137,7 +138,7 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
           product_price: product?.product_price,
           cart_id: cart_id,
           cart_item_image: product?.product_Main_image,
-          cart_Item_name: product?.product_name,
+          cart_item_name: product?.product_name,
         };
 
         addItemToCart(user?.token as string, data).then((res) => {

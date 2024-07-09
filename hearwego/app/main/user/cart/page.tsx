@@ -209,7 +209,7 @@ const Cart = () => {
                       boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                     }}
                   />
-                  {item?.product_name}
+                  {item?.cart_item_name}
                 </TableCell>
                 <TableCell sx={{ justifyContent: "center" }}>
                   <IconButton
@@ -221,7 +221,6 @@ const Cart = () => {
                     }
                     disabled={Number(item?.product_quantity) <= 1}
                     color="primary"
-                   
                   >
                     <RemoveIcon />
                   </IconButton>
@@ -287,7 +286,7 @@ const Cart = () => {
             color: "primary.main",
           }}
         >
-          Rs {total}
+          Rs {total?.toFixed(2)}
         </Box>
         <Button
           variant="contained"
@@ -301,7 +300,6 @@ const Cart = () => {
             padding: "10px 20px",
             fontSize: "20px",
             textTransform: "none",
-
           }}
         >
           CheckOut
