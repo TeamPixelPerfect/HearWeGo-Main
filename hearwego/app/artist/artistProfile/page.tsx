@@ -67,7 +67,7 @@ import HelpIcon from "@mui/icons-material/Help";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { logOutArtist } from "@/lib/features/artist.slice";
+import { logInArtist, logOutArtist } from "@/lib/features/artist.slice";
 import { Formik, Form, Field } from "formik";
 
 import { Artistcover } from "@/app/constants/models";
@@ -194,7 +194,7 @@ const ADHomePage = () => {
   );
   // New state for cover photo editing
   const [coverPhoto, setCoverPhoto] = useState<any>(
-    artist?.user?.artistCovers[0] || ""
+    artist?.artistCovers && artist?.artistCovers.length > 0 && artist?.artistCovers[0] || ""
   );
 
   const handleCoverPhotoChange = (
@@ -455,6 +455,8 @@ const ADHomePage = () => {
     ).then((response) => {
       console.log(response);
       setLoading(false);
+      dispatch(logInArtist({ ...artist, ...response }));
+      localStorage.setItem("hwg-artist", JSON.stringify({ ...artist, ...response}));
       window.location.reload();
     });
   };
@@ -473,7 +475,7 @@ const ADHomePage = () => {
             sx={{ position: "relative" }} // Ensure the cover box is positioned relative
           >
             {/* New buttons for editing cover photo */}
-            <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+            {/* <Box sx={{ position: "absolute", top: 16, right: 16 }}>
               <input
                 accept="image/*"
                 style={{ display: "none" }}
@@ -538,7 +540,8 @@ const ADHomePage = () => {
                   <ListItemText primary="Log out" />
                 </MenuItem>
               </Menu>
-            </Box>
+            </Box> */}
+            
             <ADHomeNameArea>
               <Box
                 sx={{
