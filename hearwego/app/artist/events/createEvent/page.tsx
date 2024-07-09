@@ -103,6 +103,39 @@ import DropFile from "../../../components/DropFile";
 import { useAppSelector } from "@/lib/hooks";
 import { GiConsoleController } from "react-icons/gi";
 
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  "& .MuiDataGrid-columnsContainer": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.primary.main, // Change to darker shade if needed
+    color: theme.palette.common.white,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.dark,
+    },
+  },
+  "& .MuiDataGrid-cell": {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiDataGrid-row": {
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+  "& .MuiDataGrid-footerContainer": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "& .MuiCheckbox-root": {
+    color: `${theme.palette.primary.main} !important`,
+  },
+  "& .MuiDataGrid-toolbarContainer": {
+    "& .MuiButton-text": {
+      color: theme.palette.primary.main,
+    },
+  },
+}));
+
 const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
   ({ theme, ownerState }) => ({
     color: theme.palette.mode === "dark" ? theme.palette.grey[700] : "#eaeaf0",
@@ -1353,13 +1386,13 @@ type SessionRow = {
 };
 
 const sessionColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "sessionDate", headerName: "Date", width: 100 },
-  { field: "sessionTime", headerName: "Time", width: 100 },
-  { field: "duration", headerName: "Duration", width: 100 },
-  { field: "venue", headerName: "Venue", width: 100 },
-  { field: "artists", headerName: "Artists", width: 200 },
-  { field: "description", headerName: "Description", width: 200 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "sessionDate", headerName: "Date", flex: 1 },
+  { field: "sessionTime", headerName: "Time", flex: 1 },
+  { field: "duration", headerName: "Duration", flex: 1 },
+  { field: "venue", headerName: "Venue", flex: 1 },
+  { field: "artists", headerName: "Artists", flex: 1 },
+  { field: "description", headerName: "Description", flex: 1 },
 ];
 
 function SessionTable({ sessionRows, setSessionRows }) {
@@ -1603,7 +1636,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={sessionRows}
         columns={sessionColumns}
@@ -1804,11 +1837,11 @@ type TeamRow = {
 };
 
 const teamColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "teamType", headerName: "Team Type", width: 150 },
-  { field: "teamName", headerName: "Team Name", width: 150 },
-  { field: "teamContact", headerName: "Contact", width: 250 },
-  { field: "teamEmail", headerName: "E-mail", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "teamType", headerName: "Team Type", flex: 1 },
+  { field: "teamName", headerName: "Team Name", flex: 1 },
+  { field: "teamContact", headerName: "Contact", flex: 1 },
+  { field: "teamEmail", headerName: "E-mail", flex: 1 },
 ];
 
 function TeamTable({ teamRows, setTeamRows }) {
@@ -1991,7 +2024,7 @@ function TeamTable({ teamRows, setTeamRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={teamRows}
         columns={teamColumns}
@@ -2142,11 +2175,11 @@ type SponsorRow = {
 };
 
 const sponsorColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "sponsorType", headerName: "Sponsor Type", width: 150 },
-  { field: "sponsorName", headerName: "Sponsor Name", width: 150 },
-  { field: "sponsorContact", headerName: "Contact", width: 250 },
-  { field: "sponsorEmail", headerName: "E-mail", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "sponsorType", headerName: "Sponsor Type", flex: 1 },
+  { field: "sponsorName", headerName: "Sponsor Name", flex: 1 },
+  { field: "sponsorContact", headerName: "Contact", flex: 1 },
+  { field: "sponsorEmail", headerName: "E-mail", flex: 1 },
 ];
 
 function SponsorTable({ sponsorRows, setSponsorRows }) {
@@ -2336,7 +2369,7 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={sponsorRows}
         columns={sponsorColumns}
@@ -2527,11 +2560,11 @@ function BudgetDetails({ budgetRows, setBudgetRows }) {
 }
 
 const budgetColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "budgetTitle", headerName: "Title", width: 150 },
-  { field: "budgetSession", headerName: "Session", width: 150 },
-  { field: "budgetType", headerName: "Type", width: 250 },
-  { field: "budgetAmount", headerName: "Amount", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "budgetTitle", headerName: "Title", flex: 1 },
+  { field: "budgetSession", headerName: "Session", flex: 1 },
+  { field: "budgetType", headerName: "Type", flex: 1 },
+  { field: "budgetAmount", headerName: "Amount", flex: 1 },
 ];
 
 let budgetRows = [];
@@ -2736,7 +2769,7 @@ function BudgetTable({ budgetRows, setBudgetRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={budgetRows}
         columns={budgetColumns}
@@ -2885,9 +2918,9 @@ function BudgetTable({ budgetRows, setBudgetRows }) {
 }
 
 const manulTicketColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "ticketSession", headerName: "Session", width: 150 },
-  { field: "ticketLocation", headerName: "Where to Buy Tickets", width: 150 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "ticketSession", headerName: "Session", flex: 1 },
+  { field: "ticketLocation", headerName: "Where to Buy Tickets", flex: 1 },
 ];
 
 type ManualTicketRow = {
@@ -3049,7 +3082,7 @@ function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={manualTicketRows}
         columns={manulTicketColumns}
@@ -3183,11 +3216,11 @@ const autoTicketModalStyle = {
 };
 
 const autoTicketColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 50 },
-  { field: "ticketType", headerName: "Ticket Type", width: 150 },
-  { field: "ticketPrice", headerName: "Price", width: 80 },
-  { field: "ticketCount", headerName: "Count", width: 70 },
-  { field: "ticketSession", headerName: "Session", width: 150 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "ticketType", headerName: "Ticket Type", flex: 1 },
+  { field: "ticketPrice", headerName: "Price", flex: 1 },
+  { field: "ticketCount", headerName: "Count", flex: 1 },
+  { field: "ticketSession", headerName: "Session", flex: 1 },
 ];
 
 let autoTicketRows = [];
@@ -3390,7 +3423,7 @@ function AutoTicketTable({ autoTicketRows, setAutoTicketRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={autoTicketRows}
         columns={autoTicketColumns}

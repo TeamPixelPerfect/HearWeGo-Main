@@ -25,7 +25,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import { getEvent, updateBudget } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
 import { getBudgetByEventId } from "@/app/services/EventServices";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Budget } from "@/app/constants/models";
+import { useRouter } from "next/navigation";
 
 const types = ["Income", "Expense"];
 const sessions = ["Session 01", "Session 02"];
@@ -50,32 +52,32 @@ interface Props {
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
-  '& .MuiDataGrid-columnsContainer': {
+  "& .MuiDataGrid-columnsContainer": {
     backgroundColor: theme.palette.background.default,
   },
-  '& .MuiDataGrid-columnHeader': {
-    backgroundColor: theme.palette.primary.light,
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.primary.main, // Change to darker shade if needed
     color: theme.palette.common.white,
-    '&:hover': {
+    "&:hover": {
       backgroundColor: theme.palette.primary.dark,
     },
   },
-  '& .MuiDataGrid-cell': {
+  "& .MuiDataGrid-cell": {
     borderBottom: `1px solid ${theme.palette.divider}`,
   },
-  '& .MuiDataGrid-row': {
-    '&:nth-of-type(even)': {
+  "& .MuiDataGrid-row": {
+    "&:nth-of-type(even)": {
       backgroundColor: theme.palette.action.hover,
     },
   },
-  '& .MuiDataGrid-footerContainer': {
+  "& .MuiDataGrid-footerContainer": {
     backgroundColor: theme.palette.background.default,
   },
-  '& .MuiCheckbox-root': {
+  "& .MuiCheckbox-root": {
     color: `${theme.palette.primary.main} !important`,
   },
-  '& .MuiDataGrid-toolbarContainer': {
-    '& .MuiButton-text': {
+  "& .MuiDataGrid-toolbarContainer": {
+    "& .MuiButton-text": {
       color: theme.palette.primary.main,
     },
   },
@@ -85,7 +87,7 @@ let sessionCount : number = 0;
 
 const BudgetManager = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
-
+  const router = useRouter();
   const artist = useAppSelector((state) => state.artist.user);
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -191,14 +193,19 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
           event={event}
         />
 
-        <Stack direction="row" spacing={2} sx={{ marginTop: 4, display: "flex", justifyContent: "end" }}>
+        <Box sx={{ marginTop: 4, display: "flex", justifyContent: "space-between" }}>
+          <Button startIcon={<ArrowBackIcon />} color="secondary" variant="contained" onClick={()=>{router.back()}}>
+            Back
+          </Button>
+          <Stack direction="row" spacing={2}>
           <Button startIcon={<RestartAltIcon />} variant="outlined" color="error">
             Reset
           </Button>
           <Button endIcon={<SaveIcon />} variant="contained" onClick={handleBudgetUpdate}>
             Save Changes
           </Button>
-        </Stack>
+          </Stack>
+        </Box>
       </Card>
 
       <Snackbar
