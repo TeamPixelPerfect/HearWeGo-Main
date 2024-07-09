@@ -515,3 +515,30 @@ export interface ClubVideos {
   artistId?: string;
   timestamps?: string;
 }
+
+export interface HelpComplaints {
+  ComplaintFormId?: string;
+  ComplaintTitle?: string;
+  userName?: string;
+  userEmail?: string;
+  userId?: string;
+  ProblemInBrief?: string;
+  isHandled?: boolean;
+  status: "to_solve" | "solved";
+  solution?: string;
+}
+
+
+interface articalQandA {
+  question?: string;
+  answer?: string;
+}
+
+
+export interface HelpArticle {
+  articalId?: string;
+  articalTitle?: string;
+  articalImage_URL?: string;
+  QandA?: articalQandA[];
+}
+
