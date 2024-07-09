@@ -40,6 +40,9 @@ import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import EventCheckout from "@/app/components/EventCheckout";
 import { id } from "date-fns/locale";
+import htmlToImage from 'html-to-image';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 const ticketModalStyle = {
   position: "absolute" as "absolute",
@@ -91,7 +94,8 @@ function SingleTicket(
   session_venue: string,
   ticket_price: number,
   ticket_img: string,
-  ticket_count: number
+  ticket_count: number,
+  ref
 ) {
   const currentUrl = window.location.href; // Get current window URL
   const textDetails = `Ticket ID: ${ticket_id}, Ticket Type: ${ticket_type}, Event: ${event_name}, Session: ${session_name}, Date: ${session_date}, Time: ${session_time}, Venue: ${session_venue}, Price: LKR ${ticket_price}, Count: ${ticket_count}`;
@@ -111,6 +115,7 @@ function SingleTicket(
   };
   return (
     <Paper
+    ref={ref}
       sx={{
         width: "100%",
         display: "flex",
@@ -202,7 +207,7 @@ function SingleTicket(
 
 export default function Page() {
   const { event_id, session_name } = useParams();
-  const boxRef = useRef();
+  const boxRefs = useRef([]);
   const [id_list, setIdList] = useState<string[]>([]);
   const [openTicketModal, setOpenTicketModal] = React.useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -411,40 +416,20 @@ export default function Page() {
     );
   };
 
-  const downloadPDF = () => {
-    const input = boxRef.current;
-    console.log("Input: ", input);
-    const img = input.children[0].children[0].children[0].src;
-    console.log("Image: ", img);
-    html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      // Specify dimensions for the PDF
-      const pdf = new jsPDF({
-        orientation: "landscape", // 'portrait' or 'landscape'
-        unit: "mm", // 'mm', 'pt', 'cm', 'in'
-        format: "a3", // 'a3', 'a4', 'a5', 'letter', 'legal', or custom [width, height]
-      });
-
-      // Calculate width and height to fit the page
-      const imgWidth = 500; // A4 width in mm
-      const pageHeight = 500; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+  const handleDownloadImages = async () => {
+    const zip = new JSZip();
+    const promises = boxRefs.current.map(async (ref, index) => {
+      if (ref.current) {
+        const canvas = await htmlToImage.toCanvas(ref.current);
+        const dataUrl = canvas.toDataURL('image/png');
+        const imgData = dataUrl.split(',')[1];
+        zip.file(`ticket_${index + 1}.png`, imgData, { base64: true });
       }
-
-      pdf.save("download.pdf");
     });
+
+    await Promise.all(promises);
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    saveAs(zipBlob, 'tickets.zip');
   };
 
   return (
@@ -586,7 +571,7 @@ export default function Page() {
                   "-ms-overflow-style": "none", // IE and Edge
                   "scrollbar-width": "none", }}>
               <Box
-                ref={boxRef}
+                // ref={boxRef}
                 id="cart-tickets"
                 sx={{
                   width: "100%",
@@ -621,7 +606,7 @@ export default function Page() {
                         ticket.ticket_price,
                         (ticketType?.ticket_img as string) ||
                           "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg ",
-                        ticket.ticket_count
+                        ticket.ticket_count,
                       )
                     : null;
                 })}
@@ -630,8 +615,8 @@ export default function Page() {
             <Box
               sx={{ display: "flex", justifyContent: "center", width: "100%" }}
             >
-              <Button variant="contained" color="primary" onClick={downloadPDF}>
-                Download PDF
+              <Button variant="contained" color="primary" onClick={handleDownloadImages}>
+                Download Zip
               </Button>
             </Box>
           </Box>
