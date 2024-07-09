@@ -43,22 +43,22 @@ interface Comment {
   date: string;
 }
 
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  rating: number;
-  ratingCount?: number;
-  category: string;
-  subcategory: string;
-  comments: Comment[];
-  productCount: number;
-  sold: number;
-  sizes: string[];
-  colors: string[];
-}
+// interface Product {
+//   id: number;
+//   name: string;
+//   description: string;
+//   price: number;
+//   image: string;
+//   rating: number;
+//   ratingCount?: number;
+//   category: string;
+//   subcategory: string;
+//   comments: Comment[];
+//   productCount: number;
+//   sold: number;
+//   sizes: string[];
+//   colors: string[];
+// }
 
 export const products: Product[] = [
   {
@@ -115,6 +115,9 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
   const [selectedSize, setSelectedSize] = useState(products[0].sizes[0]);
   const [selectedColor, setSelectedColor] = useState(products[0].colors[0]);
   const [selectedVariation, setSelectedVariation] = useState<string>();
+  const [selectedVariations, setSelectedVariations] = useState<{
+    [key: string]: string;
+  }>({});
 
   const [product, setProduct] = useState<MerchProduct>();
   const productImages = [
@@ -123,6 +126,7 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
   ];
 
   const handleAddToCart = () => {
+    console.log("User: ", user?.user_id);
     if (user?.user_id) {
       getCartByUser(user?.user_id).then((res) => {
         const cart_id = res?.cart_id;
@@ -134,7 +138,7 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
           product_price: product?.product_price,
           cart_id: cart_id,
           cart_item_image: product?.product_Main_image,
-          cart_Item_name: product?.product_name,
+          cart_item_name: product?.product_name,
         };
 
         addItemToCart(user?.token as string, data).then((res) => {
@@ -198,6 +202,10 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
 
   const handleSelectVariation = (variation: ProductVariant) => {
     setSelectedVariation(variation?.variation_name);
+  };
+
+  const handleVariationChange = (name: string, value: string) => {
+    setSelectedVariations((prev) => ({ ...prev, [name]: value }));
   };
 
   const fetchProduct = async () => {
@@ -466,23 +474,77 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
             >
               Rs.{product?.product_price}
             </Typography>
-            <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+            {/* <Typography variant="body1" sx={{ marginBottom: "10px" }}>
               Variations
-            </Typography>
-            <Box sx={{ display: "flex", marginBottom: "20px" }}>
-              {product?.product_variations?.map((v) => (
-                <Chip
-                  key={v?.variation_name}
-                  label={v?.variation_name}
-                  onClick={() => handleSelectVariation(v)}
-                  sx={{
-                    margin: "0 5px",
-                    backgroundColor: "gray",
-                    color: "white",
-                  }}
-                />
-              ))}
+            </Typography> */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
+              <Typography variant="body1" sx={{ marginRight: 1 }}>
+                Size :
+              </Typography>
+              {product?.variations
+                ?.find((variation) => variation.variation_name === "Size")
+                ?.variation_value.split(",")
+                .map((size) => (
+                  <Chip
+                    key={size}
+                    label={size.trim()}
+                    onClick={() => handleVariationChange("Size", size.trim())}
+                    variant={
+                      selectedVariations["Size"] === size.trim()
+                        ? "filled"
+                        : "outlined"
+                    }
+                    color={
+                      selectedVariations["Size"] === size.trim()
+                        ? "primary"
+                        : "default"
+                    }
+                    sx={{ marginRight: 1, marginBottom: 1 }}
+                  />
+                ))}
             </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
+              <Typography variant="body1" sx={{ marginRight: 1 }}>
+                Color :
+              </Typography>
+              {product?.variations
+                ?.find((variation) => variation.variation_name === "Color")
+                ?.variation_value.split(",")
+                .map((color) => (
+                  <Chip
+                    key={color}
+                    label={color.trim()}
+                    onClick={() => handleVariationChange("Color", color.trim())}
+                    variant={
+                      selectedVariations["Color"] === color.trim()
+                        ? "filled"
+                        : "outlined"
+                    }
+                    color={
+                      selectedVariations["Color"] === color.trim()
+                        ? "primary"
+                        : "default"
+                    }
+                    sx={{ marginRight: 1, marginBottom: 1 }}
+                  />
+                ))}
+            </Box>
+
             <Typography variant="body1">Quantity</Typography>
             <Box
               sx={{
@@ -508,7 +570,7 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
             >
               Add to Cart
             </Button>
-            <Box sx={{ width: "20%", marginTop: "20px", position: "relative" }}>
+            {/* <Box sx={{ width: "20%", marginTop: "20px", position: "relative" }}>
               <Box sx={{ position: "relative" }}>
                 <LinearProgress
                   variant="determinate"
@@ -530,14 +592,14 @@ const ProductDetail = ({ params: { id, pid } }: Props) => {
                         Number(product?.product_quantity)) *
                       100
                     }%`,
-                    transform: "translate(-70%, -90%)",
+                    transform: "translate(30%, -90%)",
                     color: "white",
                   }}
                 >
                   {product?.product_sold} sold
                 </Typography>
               </Box>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </Box>

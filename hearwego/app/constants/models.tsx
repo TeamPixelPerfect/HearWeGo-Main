@@ -192,18 +192,6 @@ export interface Event {
   event_created_by?: string;
 }
 
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias?: string[];
-}
-
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
@@ -354,6 +342,13 @@ export interface MerchStore {
   artist_id?: string;
 }
 
+export interface Artistcover {
+  store_banner?: string;
+  promo_banner?: string[];
+
+  artist_id?: string;
+}
+
 export interface MerchCategory {
   store_id?: string;
   category_id?: string;
@@ -375,7 +370,7 @@ export interface MerchProduct {
   product_rating?: string;
   store_id?: string;
   rating_count?: number;
-  product_variations?: ProductVariant[];
+  variations?: ProductVariant[];
   review_count?: number;
   product_sold?: number;
 }
@@ -402,6 +397,9 @@ export interface Product {
   product_quantity?: string;
   product_rating?: string;
   store_id?: string;
+  variations?: ProductVariant[];
+  review_count?: number;
+  product_sold?: number;
 }
 
 export interface Cart {
@@ -413,9 +411,10 @@ export interface Cart {
 export interface CartItem {
   cart_item_id?: string;
   product_id?: string;
-  product_variation?: string;
+  variation?: ProductVariant[];
   product_quantity?: number;
   product_price?: number;
+  product_name?: string;
   cart_id?: string;
   cart_item_image?: string;
   cart_item_name?: string;
@@ -426,6 +425,22 @@ export interface ProductVariant {
   variation_value?: string;
   variation_price?: Number;
   variation_quantity?: Number;
+}
+
+export interface Order {
+  user_id?: string;
+  order_total?: number;
+  order_status?: string;
+  order_date?: string;
+  order_time?: string;
+  delivery_date?: string;
+  order_address?: string;
+  order_contact?: string;
+  order_email?: string;
+  is_returned?: boolean;
+  cart_items?: CartItem[];
+  cart_id?: string;
+  order_id?: string;
 }
 
 export interface replies {
@@ -454,7 +469,7 @@ export interface PRPosts {
   artist_id?: string;
   PrPostID?: string;
   ArtistName?: string;
-  Campaign?: string;
+  Campaigns?: string;
   Description?: string;
   Scheduled_Date?: Date;
   Scheduled_Time?: string;

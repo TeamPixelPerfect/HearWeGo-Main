@@ -3,12 +3,14 @@ import React, { use, useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 
 import {
+  Alert,
   IconButton,
   Button,
   Stack,
   PaletteMode,
   Dialog,
   styled,
+  Snackbar,
 } from "@mui/material";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -36,6 +38,14 @@ import ReactCountryFlag from "react-country-flag";
 
 import "react-phone-input-2/lib/bootstrap.css";
 import { logOutUser } from "@/lib/features/user.slice";
+
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import {
+  handleUserMobileChange,
+  handleUserPasswordChange,
+} from "../services/AuthServices";
+import PhoneInput from "react-phone-input-2";
 
 // Styled dialog component
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -70,6 +80,22 @@ const UserProfilePopup = ({
   const [selectedCountry, setSelectedCountry] = useState("LK");
   const [countryError, setCountryError] = React.useState(false);
   const [mobileNumberError, setMobileNumberError] = React.useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   // Accessing user from the redux store
   const user = useAppSelector((state) => state.user.user);
@@ -106,6 +132,16 @@ const UserProfilePopup = ({
     dispatch(logOutUser());
   };
 
+  const [name, setName] = useState(user?.name);
+  const [email, setEmail] = useState(user?.email);
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [oldNumber, setOldNumber] = useState(user?.mobileNumber);
+  const [newNumber, setNewNumber] = useState("");
+
   // State for user details
   const [userDetails, setUserDetails] = React.useState({
     country: "",
@@ -114,6 +150,87 @@ const UserProfilePopup = ({
 
   // State for password visibility
   const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
+
+  const handleChangePassword = () => {
+    if (!email) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Failed to fetchh Email");
+      return;
+    }
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("All fields are required");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Passwords do not match");
+      return;
+    }
+    // Call the handleUserPasswordChange function from AuthServices.ts
+    handleUserPasswordChange(email, oldPassword, newPassword)
+      .then(() => {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Password changed successfully");
+        handleClose1();
+        handleLogOut();
+      })
+      .catch((error) => {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(error.message);
+      });
+  };
+
+  const handleChangeMobileNumber = () => {
+    console.log(oldNumber, newNumber);
+    if (!email) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Failed to fetch Email");
+      return;
+    }
+    if (!oldNumber || !newNumber) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("All fields are required");
+      return;
+    }
+    if (oldNumber !== user?.mobileNumber) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Old number is incorrect");
+      return;
+    }
+    if (newNumber === user?.mobileNumber) {
+      setSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setSnackbarMessage("New number cannot be the same as the old number");
+      return;
+    }
+
+    // Call the handleUserMobileChange function from AuthServices.ts
+    handleUserMobileChange(email, newNumber)
+      .then(() => {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Mobile number changed successfully");
+        handleClose2();
+      })
+      .catch((error) => {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(error.message);
+      });
+  };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -183,7 +300,8 @@ const UserProfilePopup = ({
             <TextField
               id="user-name"
               label="User Name"
-              defaultValue={user?.name}
+              defaultValue={name}
+              onChange={handleChangeName}
               variant="filled"
             />
           </div>
@@ -202,6 +320,7 @@ const UserProfilePopup = ({
               label="E-mail"
               defaultValue={user?.email}
               variant="filled"
+              disabled
             />
           </div>
         </Box>
@@ -256,8 +375,21 @@ const UserProfilePopup = ({
                     <FilledInput
                       id="filled-adornment-password"
                       type={showPassword ? "text" : "password"}
+                      onChange={(e) => setOldPassword(e.target.value)}
                       endAdornment={
-                        <InputAdornment position="end"></InputAdornment>
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {showPassword ? (
+                              <VisibilityOffIcon />
+                            ) : (
+                              <VisibilityIcon />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
                       }
                     />
                   </FormControl>
@@ -269,6 +401,22 @@ const UserProfilePopup = ({
                     <FilledInput
                       id="filled-adornment-password"
                       type={showPassword ? "text" : "password"}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {showPassword ? (
+                              <VisibilityOffIcon />
+                            ) : (
+                              <VisibilityIcon />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      }
                     />
                   </FormControl>
 
@@ -279,15 +427,28 @@ const UserProfilePopup = ({
                     <FilledInput
                       id="filled-adornment-password"
                       type={showPassword ? "text" : "password"}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       endAdornment={
-                        <InputAdornment position="end"></InputAdornment>
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {showPassword ? (
+                              <VisibilityOffIcon />
+                            ) : (
+                              <VisibilityIcon />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
                       }
                     />
                   </FormControl>
                 </Box>
 
                 <DialogActions>
-                  <Button autoFocus onClick={handleClose1}>
+                  <Button autoFocus onClick={handleChangePassword}>
                     Save changes
                   </Button>
                 </DialogActions>
@@ -331,16 +492,23 @@ const UserProfilePopup = ({
                     noValidate
                     autoComplete="off"
                   >
-                    <div>
-                      <TextField
-                        id="old-mobile-number"
-                        label="Old Mobile Number"
-                        defaultValue={
+                    <Box sx={{ p: "1em" }}>
+                      <label style={{ marginBottom: "4px" }}>
+                        Old Number{" "}
+                        {"*** ** ***" + user?.mobileNumber?.substring(9, 12)}
+                      </label>
+                      <PhoneInput
+                        enableSearch={true}
+                        country={"lk"}
+                        onChange={(phone: any) => {
+                          setOldNumber(phone);
+                        }}
+                        placeholder={
                           "*** ** ***" + user?.mobileNumber?.substring(9, 12)
                         }
-                        variant="filled"
+                        specialLabel="Old Number"
                       />
-                    </div>
+                    </Box>
                   </Box>
 
                   <Stack
@@ -351,65 +519,17 @@ const UserProfilePopup = ({
                       justifyContent: "center",
                     }}
                   >
-                    <FormControl sx={{ m: 1, minWidth: 100 }}>
-                      <InputLabel id="demo-simple-select-autowidth-label">
-                        Country
-                      </InputLabel>
-                      <Select
-                        variant="filled"
-                        labelId="demo-simple-select-autowidth-label"
-                        id="country"
-                        value={userDetails?.country}
-                        onChange={handleCountryChange}
-                        // autoWidth
-                        label="Country"
-                        color={countryError ? "error" : "primary"}
-                        defaultValue={selectedCountry}
-                        inputRef={(input) =>
-                          input && countryError && input.focus()
-                        }
-                      >
-                        <MenuItem value="">
-                          <em>None</em>
-                        </MenuItem>
-                        {countries.map((country) => {
-                          return (
-                            <MenuItem value={country}>
-                              <ReactCountryFlag
-                                key={country}
-                                countryCode={country}
-                                svg
-                                style={{
-                                  width: "1.5em",
-                                  height: "1.5em",
-                                  marginRight: "8px",
-                                }}
-                                title={country}
-                              />
-                              {country}
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    </FormControl>
-                    <TextField
-                      id="phone"
-                      label="Mobile Number*"
-                      variant="filled"
-                      type="text"
-                      color={mobileNumberError ? "error" : "primary"}
-                      style={{ boxSizing: "initial", width: "73%" }}
-                      defaultValue={userDetails.mobileNumber}
-                      onChange={(e) => {
-                        setUserDetails({
-                          ...userDetails,
-                          mobileNumber: e.target.value,
-                        });
-                      }}
-                      inputRef={(input) =>
-                        input && mobileNumberError && input.focus()
-                      }
-                    />
+                    <Box sx={{ p: "1em" }}>
+                      <label style={{ marginBottom: "4px" }}>New Number</label>
+                      <PhoneInput
+                        enableSearch={true}
+                        country={"lk"}
+                        onChange={(phone: any) => {
+                          setNewNumber(phone);
+                        }}
+                        specialLabel="New Number"
+                      />
+                    </Box>
                   </Stack>
 
                   <IconButton
@@ -425,7 +545,7 @@ const UserProfilePopup = ({
                     <CloseIcon />
                   </IconButton>
                   <DialogActions>
-                    <Button autoFocus onClick={handleClose2}>
+                    <Button autoFocus onClick={handleChangeMobileNumber}>
                       Save Changes
                     </Button>
                   </DialogActions>
@@ -444,6 +564,15 @@ const UserProfilePopup = ({
           </Button>
         </DialogActions>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </BootstrapDialog>
   );
 };
