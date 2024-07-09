@@ -5,7 +5,7 @@ export const getSongs = async (
   token: string,
   page?: number,
   limit?: number,
-  sort?: string,
+  sort?: string
 ) => {
   const res = await fetch(
     `${base_url}/DiscographyManager/songs?page=${page}&limit=${limit}&`,
@@ -39,6 +39,25 @@ export const getSongsForArtist = async (
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const songs = await res.json();
+    return songs;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getSongsForAlbum = async (albumId: string) => {
+  const res = await fetch(
+    `${base_url}/DiscographyManager/songs/album/${albumId}`,
+    {
+      method: "GET",
+      headers: {
         "Content-Type": "application/json",
       },
     }
@@ -109,7 +128,7 @@ export const updateSong = async (token: string, songId: string, data: any) => {
 };
 
 // delete a song
-export const deletSong = async (token: string, songId: string) => {
+export const deleteSong = async (token: string, songId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/songs/${songId}`, {
     method: "DELETE",
     headers: {
@@ -230,7 +249,7 @@ export const updateAlbum = async (
 };
 
 // delete an album
-export const deletAlbum = async (token: string, albumId: string) => {
+export const deleteAlbum = async (token: string, albumId: string) => {
   const res = await fetch(`${base_url}/DiscographyManager/albums/${albumId}`, {
     method: "DELETE",
     headers: {
@@ -246,3 +265,21 @@ export const deletAlbum = async (token: string, albumId: string) => {
     throw new Error(error.message);
   }
 };
+
+export const getSongDuration = async (url: string) => {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(url);
+    audio.preload = 'metadata';
+
+    const handleLoadedMetadata = () => {
+      resolve(audio.duration);
+    };
+
+    const handleError = (error: any) => {
+      reject(error);
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('error', handleError);
+  });
+}

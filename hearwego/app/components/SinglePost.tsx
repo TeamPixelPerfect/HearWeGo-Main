@@ -45,7 +45,7 @@ type Post = {
 };
 
 type Props = {
-  post: Post;
+  posts={posts}
   onDeletePost: (postId: number) => void;
   onEditPost: (postId: number, updatedPost: Post) => void;
   onAddComment: (postId: number, comment: Comment) => void;

@@ -108,7 +108,7 @@ const Language = [
 ];
 
 const AddSongData = () => {
-  //reads the global song file 
+  //reads the global song file
   const songTrack = useAppSelector((state) => state.song.song_track);
   //reads the artist details from global
   const artist = useAppSelector((state) => state.artist.user);
@@ -119,7 +119,7 @@ const AddSongData = () => {
     if (songTrack === "") {
       Router.push("add");
     }
-  }, [])
+  }, []);
 
   const theme = useTheme();
 
@@ -168,7 +168,7 @@ const AddSongData = () => {
   const dispatch = useAppDispatch();
 
   //switch between tags
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (event: any, newValue: number) => {
     setValue(newValue);
   };
 
@@ -276,8 +276,17 @@ const AddSongData = () => {
     addSong(artist ? artist.token : "", songData).then((res) => {
       console.log("Response:::", res);
       setUploading(false);
-      dispatch(setSong({ song_track: "" }));
-      Router.push("/artist/songs/addSongPreview/"+res.song_id);
+      dispatch(
+        setSong({
+          song_track: "",
+          current_song: "",
+          playing: false,
+          song_name: "",
+          cover_art: "",
+          artist: "",
+        })
+      );
+      Router.push("/artist/songs/addSongPreview/" + res.song_id);
     });
   };
 
@@ -419,7 +428,7 @@ const AddSongData = () => {
                           filterOptions={handleTagFilter}
                           style={{ boxSizing: "initial", maxWidth: "82%" }}
                           onChange={(e, value) => {
-                            setSongData((data) => {
+                            setSongData((data: any) => {
                               return { ...data, additional_tags: value };
                             });
                           }}
@@ -594,11 +603,7 @@ function SongMetaData({
         }}
         elevation={3}
       >
-        <Grid
-          container
-          rowSpacing={1}
-          columnSpacing={{ xs: 1, sm: 2, md: 3 }} 
-        >
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid xs={6}>
             <FormGroup>
               <FormControlLabel
@@ -708,7 +713,7 @@ function SongMetaData({
           <Grid xs={6}></Grid>
           <Grid xs={6}></Grid>
         </Grid>
-
+{/* 
         <Typography component="div" sx={{ fontSize: 14, marginTop: "1em" }}>
           Setting your release date to at least 1-week in the future increases
           your chances of getting added to playlists.
@@ -716,7 +721,7 @@ function SongMetaData({
         <Typography component="div" sx={{ fontSize: 14 }}>
           If it's important that your album goes live in all stores on the same
           day, click here for info.
-        </Typography>
+        </Typography> */}
       </Paper>
 
       <Paper
@@ -742,6 +747,11 @@ function SongMetaData({
               label="Album Title (Optional)"
               variant="filled"
               sx={{ width: "90%" }}
+              onChange={(e) => {
+                setSongData((data) => {
+                  return { ...data, album_title: e.target.value };
+                });
+              }}
             />
           </Grid>
           <Grid xs={6}>
@@ -814,12 +824,17 @@ function SongMetaData({
           <Grid xs={12}>
             <TextField
               id="filled-multiline-flexible"
-              label="Type your lyrics here"
+              placeholder="Type your lyrics here"
               multiline
               rows={10}
               // maxRows={20}
               variant="filled"
               sx={{ width: "95%" }}
+              onChange={(e) => {
+                setSongData((data) => {
+                  return { ...data, lyrics: e.target.value };
+                });
+              }}
             />
           </Grid>
         </Grid>
@@ -928,7 +943,7 @@ function GenreSelect({ songData, setSongData, error }: InputProps) {
 function ElectrinocGenreSelect({ songData, setSongData }: InputProps) {
   const handleChange = (event: SelectChangeEvent) => {
     console.log(event.target.value);
-    setSongData((data) => {
+    setSongData((data: any) => {
       return { ...data, electronic_sub_genre: event.target.value };
     });
   };
@@ -943,7 +958,7 @@ function ElectrinocGenreSelect({ songData, setSongData }: InputProps) {
           multiple
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={songData.electronic_sub_genre}
+          value={songData.electronic_sub_genre as any}
           label="Primary Genre"
           onChange={handleChange}
           variant="filled"
@@ -1066,11 +1081,8 @@ function ArtistTags({ songData, setSongData, error }: InputProps) {
     { label: "Shawn Mendes", _id: "ar4" },
   ]);
 
-  const handleChange = (
-    event: React.SyntheticEvent<Element>,
-    value: { label: string; _id: string }[]
-  ) => {
-    const artists = value.map((artist) => ({
+  const handleChange = (event: any, value: any) => {
+    const artists = value.map((artist: any) => ({
       artist_name: artist.label,
       artist_id: artist._id,
     }));
@@ -1129,14 +1141,11 @@ function ComposerTags({ songData, setSongData, error }: InputProps) {
     });
   };
 
-  const handleChange = (
-    event: React.SyntheticEvent<Element>,
-    value: { label: string; _id?: string }[]
-  ) => {
-    const composers = value.map((artist) => ({
+  const handleChange = (event: any, value: any) => {
+    const composers = value.map((artist: any) => ({
       artist_name: artist.label,
     }));
-    setSongData((data) => {
+    setSongData((data: any) => {
       return { ...data, composer: composers };
     });
   };
@@ -1183,26 +1192,26 @@ function SongWriterTags({ songData, setSongData, error }: InputProps) {
 
   const getArtists = () => {
     getAllArtists().then((res) => {
-      const data = res?.data.map((opt: any) => ({label: opt.artistName, _id: opt.artist_id}))
+      const data = res?.data.map((opt: any) => ({
+        label: opt.artistName,
+        _id: opt.artist_id,
+      }));
       setWriters(data);
-    })
-  }
+    });
+  };
 
-  const handleChange = (
-    event: React.SyntheticEvent<Element>,
-    value: { label: string; _id?: string }[]
-  ) => {
-    const writers = value.map((artist) => ({
+  const handleChange = (event: any, value: any) => {
+    const writers = value.map((artist: any) => ({
       artist_name: artist.label,
     }));
-    setSongData((data) => {
+    setSongData((data: any) => {
       return { ...data, song_writers: writers };
     });
   };
 
   useEffect(() => {
     getArtists();
-  } ,[])
+  }, []);
 
   return (
     <>
@@ -1261,13 +1270,13 @@ function a11yProps(index: number) {
 
 const filter = createFilterOptions();
 
-const handleFilter = (options, params) => {
+const handleFilter = (options: any, params: any) => {
   const filtered = filter(options, params);
   const { inputValue } = params;
 
   if (
     inputValue !== "" &&
-    !options.some((option) => option.label === inputValue)
+    !options.some((option: any) => option.label === inputValue)
   ) {
     filtered.push({ label: inputValue, _id: "" });
   }
@@ -1275,11 +1284,14 @@ const handleFilter = (options, params) => {
   return filtered;
 };
 
-const handleTagFilter = (options, params) => {
+const handleTagFilter = (options: any, params: any) => {
   const filtered = filter(options, params);
   const { inputValue } = params;
 
-  if (inputValue !== "" && !options.some((option) => option === inputValue)) {
+  if (
+    inputValue !== "" &&
+    !options.some((option: any) => option === inputValue)
+  ) {
     filtered.push(inputValue);
   }
 

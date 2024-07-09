@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export interface menuItem {
   _id: string;
   name: string;
@@ -36,6 +38,7 @@ export interface Address {
 }
 
 export interface User {
+  user_id?: string;
   email: string;
   password: string;
   name: string;
@@ -50,6 +53,7 @@ export interface User {
   isMobileVerified: boolean;
   role: string;
   joinedDate: string;
+  token?: string;
 }
 
 export interface SocialMediaLink {
@@ -97,11 +101,12 @@ export interface Artist {
 }
 
 export interface Song {
+  _id?: string;
   song_id?: string;
   song_title?: string;
   album_title?: string;
   song_length?: number;
-  song_track: string;
+  song_track?: string;
   song_img?: string;
   no_of_impressions?: number;
   no_of_plays?: number;
@@ -128,6 +133,8 @@ export interface Song {
 }
 
 export interface Album {
+  _id?: string;
+  album_id?: string;
   album_title?: string;
   artist?: { artist_id: string; artist_name: string }[];
   album_img?: string;
@@ -185,18 +192,6 @@ export interface Event {
   event_created_by?: string;
 }
 
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias ?: string[];
-}
-
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
@@ -244,8 +239,51 @@ export interface PRPost {
   Description: string;
   Scheduled_Date: string;
   Scheduled_Time: string;
-  SocialMedias ?: string[];
-  
+  SocialMedias?: string[];
+}
+
+export interface AutoTicket {
+  auto_ticket_id?: string;
+  ticket_type?: string;
+  ticket_price?: number;
+  ticket_count?: number;
+  ticket_session?: string;
+  event_id?: string;
+}
+
+export interface ManualTicket {
+  manual_ticket_id?: string;
+  ticket_location?: string;
+  ticket_session?: string;
+  event_id?: string;
+}
+
+export interface TicketType {
+  ticket_type_id?: string;
+  ticket_type?: string;
+  ticket_description?: string;
+  ticket_img?: string;
+  event_id?: string;
+}
+
+export interface SoldTickets {
+  sold_ticket_id?: string;
+  ticket_id?: string;
+  user_id?: string;
+  bought_quantity?: number;
+  total_price?: number;
+  user_name?: string;
+  user_email?: string;
+  user_contact?: string;
+  user_nic?: string;
+  order_ticket_id?: string;
+}
+
+export interface RemainingTickets {
+  remaining_ticket_id?: string;
+  ticket_id?: string;
+  remaining_quantity?: number;
+  SocialMedias?: string[];
 }
 
 export interface FanClub {
@@ -254,7 +292,6 @@ export interface FanClub {
   coverImage_URL?: string;
   visibility?: boolean;
 }
-
 
 export interface ClubMember {
   memberId?: string;
@@ -270,11 +307,279 @@ export interface ClubPost {
   postpublisher?: string;
   postImage_URL?: string;
   clubId?: string;
+  artistId?: string;
+  reacts?: string;
+  comments?: string;
+  timestamps?: string;
+  createdAt?: string;
 }
 
-export interface Comment {
+export interface ClubNews {
+  newsId?: string;
+  newsTitle?: string;
+  newsBody?: string;
+  newsImage_URL?: string;
+  newsPublisher?: string;
+  clubId?: string;
+  artistId?: string;
+  timestamps?: string;
+}
+export interface comments {
   commentId?: string;
   commenter?: string;
   commentBody?: string;
+  commenter_ProfilePic?: string;
   postId?: string;
+  timestamps?: string;
+  parentCommentId?: string;
+}
+
+export interface MerchStore {
+  store_id?: string;
+  store_banner?: string;
+  promo_banner?: string[];
+  store_description?: string;
+  shipping_fees?: string;
+  delivery_services?: string;
+  artist_id?: string;
+}
+
+export interface Artistcover {
+  store_banner?: string;
+  promo_banner?: string[];
+
+  artist_id?: string;
+}
+
+export interface MerchCategory {
+  store_id?: string;
+  category_id?: string;
+  category_name?: string;
+  category_description?: string;
+  subCategories?: string[];
+  image?: string;
+}
+
+export interface MerchProduct {
+  product_id?: string;
+  product_name?: string;
+  product_description?: string;
+  product_Main_image?: string;
+  product_Additional_image?: string;
+  catagory_name?: string;
+  product_price?: string;
+  product_quantity?: string;
+  product_rating?: string;
+  store_id?: string;
+  rating_count?: number;
+  variations?: ProductVariant[];
+  review_count?: number;
+  product_sold?: number;
+}
+
+export interface MerchPromo {
+  promo_id?: string;
+  promo_code?: string;
+  promo_description?: string;
+  promo_image?: string;
+  promo_start?: string;
+  promo_end?: string;
+  promo_status?: string;
+  store_id?: string;
+}
+
+export interface Product {
+  product_id?: string;
+  product_name?: string;
+  product_description?: string;
+  product_Main_image?: string;
+  product_Additional_image?: string;
+  category_name?: string;
+  product_price?: string;
+  product_quantity?: string;
+  product_rating?: string;
+  store_id?: string;
+  variations?: ProductVariant[];
+  review_count?: number;
+  product_sold?: number;
+}
+
+export interface Cart {
+  cart_id?: string;
+  user_id?: string;
+  cart_total?: number;
+}
+
+export interface CartItem {
+  cart_item_id?: string;
+  product_id?: string;
+  variation?: ProductVariant[];
+  product_quantity?: number;
+  product_price?: number;
+  product_name?: string;
+  cart_id?: string;
+  cart_item_image?: string;
+  cart_item_name?: string;
+}
+
+export interface ProductVariant {
+  variation_name?: string;
+  variation_value?: string;
+  variation_price?: Number;
+  variation_quantity?: Number;
+}
+
+export interface EventInterest  {
+  interest_id?: string;
+  event_id?: string;
+  user_id?: string;
+}
+  
+export interface Order {
+  user_id?: string;
+  order_total?: number;
+  order_status?: string;
+  order_date?: string;
+  order_time?: string;
+  delivery_date?: string;
+  order_address?: string;
+  order_contact?: string;
+  order_email?: string;
+  is_returned?: boolean;
+  cart_items?: CartItem[];
+  cart_id?: string;
+  order_id?: string;
+}
+
+export interface replies {
+  replyId?: string;
+  replier?: string;
+  replyBody?: string;
+  postId?: string;
+  replier_ProfilePic?: string;
+  commenter_ProfilePic?: string;
+  commentId?: string;
+}
+
+export interface PRCampaigns {
+  ArtistID: string;
+  CampaignID?: string;
+  Campaign_Name?: string;
+  Campaign_Description?: string;
+  CampaignImage_URL?: string;
+  CampaignStatus?: string;
+  completedProgress?: number;
+  PRPosts?: PRPosts[];
+  PRtask?: PRtask[];
+}
+
+export interface PRPosts {
+  artist_id?: string;
+  PrPostID?: string;
+  ArtistName?: string;
+  Campaigns?: string;
+  Description?: string;
+  Scheduled_Date?: Date;
+  Scheduled_Time?: string;
+  SocialMedias?: string[];
+  PostImage_URL?: string;
+  CampaignID?: string;
+}
+
+export interface PRtask {
+  TaskID?: string;
+  TaskName?: string;
+  TaskDescription?: string;
+  TaskStatus?: string;
+  CampaignID?: string;
+  isEdit?: boolean;
+  timestamps?: string;
+}
+
+export interface reacts {
+  reactId?: string;
+  reacter?: string;
+  postId?: string;
+  timestamps?: string;
+}
+
+export interface newsreacts {
+  newsreactId?: string;
+  newsreacter?: string;
+  newsId?: string;
+  timestamps?: string;
+}
+
+
+export interface Newscomments {
+  newscommentId?: string;
+  newscommenter?: string;
+  newscommentBody?: string;
+  newscommenter_ProfilePic?: string;
+  newsId?: string;
+  timestamps?: string;
+  parentCommentId?: string;
+}
+
+export interface ClubVideos {
+  videoId?: string;
+  videoTitle?: string;
+  videoDescription?: string;
+  videoURL?: string;
+  videoThumbnail?: string;
+  clubId?: string;
+  artistId?: string;
+  timestamps?: string;
+}
+
+
+export interface newsreplies {
+  newsreplyId?: string;
+  newsreplier?: string;
+  newsreplyBody?: string;
+  newsId?: string;
+  newsreplier_ProfilePic?: string;
+  newscommenter_ProfilePic?: string;
+  newscommentId?: string;
+}
+
+export interface HelpComplaints {
+  ComplaintFormId?: string;
+  ComplaintTitle?: string;
+  userName?: string;
+  userEmail?: string;
+  userId?: string;
+  ProblemInBrief?: string;
+  isHandled?: boolean;
+  status: "to_solve" | "solved";
+  solution?: string;
+}
+
+
+interface articalQandA {
+  question?: string;
+  answer?: string;
+}
+
+
+export interface HelpArticle {
+  articalId?: string;
+  articalTitle?: string;
+  articalImage_URL?: string;
+  QandA?: articalQandA[];
+}
+
+export interface PressReleaseData{
+  PressReleaseID?: string;
+  ArtistLogo_URL?: string;
+  Headline?: string;
+  SubHeadline?: string;
+  EventDate?: Date;
+  Venue?: string;
+  Description?: string;
+  Signature?: string;
+  ReleaseDate?: Date;
+  ArtistID?: string;
+  Status?: string;
+  emails?: string[];
 }

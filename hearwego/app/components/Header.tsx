@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import { AppItem } from "../constants/models";
 import Logo from "../components/Logo";
 import Navigation from "../components/Navigation";
-import { IconButton, Button } from "@mui/material";
+import { IconButton, Button, Avatar } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -40,7 +40,6 @@ const Header = ({ app }: Props) => {
   const user = useAppSelector((state) => state.user.user);
 
   useEffect(() => {
-    console.log(localStorage.getItem("hwg-theme"));
     dispatch(setApp(app));
   }, []);
 
@@ -88,7 +87,15 @@ const Header = ({ app }: Props) => {
                   size="large"
                   style={{ marginRight: "16px" }}
                 >
-                  <AccountCircleIcon sx={{ color: "#fff" }} fontSize="large" />
+                  <Avatar
+                    alt={user?.name}
+                    src={
+                      user?.profilePicture ||
+                      "https://avatar.iran.liara.run/public/49"
+                    }
+                    sx={{ width: "40px", height: "40px" }}
+                  />
+                  {/* <AccountCircleIcon sx={{ color: "#fff" }} fontSize="large" /> */}
                 </IconButton>
                 <UserProfilePopup
                   open={open}
@@ -106,7 +113,9 @@ const Header = ({ app }: Props) => {
               variant="contained"
               startIcon={<CellTowerIcon />}
               style={{ textTransform: "capitalize" }}
-              onClick={() => {router.push("/main/predictor")}}
+              onClick={() => {
+                router.push("/main/predictor");
+              }}
             >
               Hit Predictor
             </Button>

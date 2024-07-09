@@ -16,7 +16,18 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import { CardActionArea, CardActions, Grid, Paper } from "@mui/material";
+import {
+  CardActionArea,
+  CardActions,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Paper,
+} from "@mui/material";
 import CardMedia from "@mui/material/CardMedia";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -35,7 +46,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Avatar from "@mui/material/Avatar";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
+import { useRouter } from "next/navigation";
 import { Event } from "@/app/constants/models";
+import { deleteEvent } from "@/app/services/EventServices";
+import { getPastEventsForGivenArtist } from "@/app/services/EventServices";
+import VpnLockIcon from '@mui/icons-material/VpnLock';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
@@ -50,26 +67,14 @@ import {
   EventDetailRow,
 } from "../../styles/artistDashboardEventsPage.styles";
 import { getEvents } from "@/app/services/EventServices";
+import { getUpcomingEventsForGivenArtist } from "@/app/services/EventServices";
+import { getInterestedEventsForGivenArtist } from "@/app/services/EventServices";
+import { getPrivateEventsForGivenArtist } from "@/app/services/EventServices";
 import { RoundaboutLeft } from "@mui/icons-material";
+import { set } from "date-fns";
 
 //event cards display
 export default function ArtistEvents() {
-  const [eventDetails, setEventDetails] = useState([]);
-
-  useEffect(() => {
-    // Fetch event data from the API route
-    fetch("http://localhost:5000/api/EventsManager/events")
-      .then((response) => response.json())
-      .then((data) => setEventDetails(data))
-      .catch((error) => console.error("Error fetching event data:", error));
-  }, []);
-
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-
   return (
     <>
       <Box sx={{ width: "100%" }}>
@@ -124,6 +129,17 @@ function a11yProps(index: number) {
   };
 }
 
+function switchStatus (status: string) {
+  switch(status) {
+    case "public":
+      return <Chip color="success" icon={<PublicIcon />} label="Public" />;
+    case "private":
+      return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
+    default:
+      return <Chip icon={<LockIcon />} label="Private" />;
+  }
+}
+
 //event tab bar
 function EventTabs() {
   const [value, setValue] = React.useState(0);
@@ -148,21 +164,21 @@ function EventTabs() {
           />
           <Tab icon={<TrendingUpIcon />} label="Popular" {...a11yProps(1)} />
           <Tab icon={<CallMissedIcon />} label="Past" {...a11yProps(2)} />
-          <Tab icon={<DraftsIcon />} label="Drafts" {...a11yProps(3)} />
+          <Tab icon={<VpnLockIcon />} label="Private" {...a11yProps(3)} />
           <Tab icon={<PeopleIcon />} label="Other" {...a11yProps(4)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <EventArea />
+        {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+      {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        Item Three
+      {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        Item Four
+      {EventArea(value)}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={4}>
         Item Five
@@ -171,9 +187,22 @@ function EventTabs() {
   );
 }
 
+function HeaderChange(tab: number) {
+  if (tab === 0) {
+    return "My Upcoming Events";
+  } else if (tab === 1) {
+    return "My Popular Events";
+  } else if (tab === 2) {
+    return "My Past Events";
+  } else if (tab === 3) {
+    return "My Private Events";
+  }
+}
+
 //event details
-function EventArea() {
-  const artist = useAppSelector((state) => state.artist.user);
+function EventArea(tab: number) {
+  const artist = useAppSelector((state) => state?.artist?.user);
+  const router = useRouter();
 
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
@@ -182,22 +211,82 @@ function EventArea() {
   const [createdArtist, setCreatedArtist] = useState("");
   const [filter, setFilter] = useState("event_created_by");
   const [pageCount, setPageCount] = useState(0);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState("");
+
 
   useEffect(() => {
-    if(artist){
+    if (artist) {
       setCreatedArtist(artist.artist_id);
     }
     if (artist?.token) {
-      getEvents( page, limit, filter, artist.artist_id ).then((events) => {
-        console.log("Events:::", events);
-        setUpcomingEvents(events.data);
-      }); 
+      if (tab === 0) {
+        getUpcomingEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
+          (events) => {
+            setUpcomingEvents(events.data);
+            setPageCount(Math.ceil(events.total / limit));
+          }
+        );
+      }
+      else if (tab === 1) {
+        getInterestedEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
+          (events) => {
+            setUpcomingEvents(events);
+            setPageCount(Math.ceil(events.total / limit));
+          }
+        );
+      }
+      else if (tab === 2) {
+        getPastEventsForGivenArtist(page, limit, artist?.user?.artist_id).then(
+          (events) => {
+            setUpcomingEvents(events.data);
+            setPageCount(Math.ceil(events.total / limit));
+          }
+        );
+      }
+      else if (tab === 3) {
+        getPrivateEventsForGivenArtist(page, limit, artist?.user?.artist_id).then((events) => {
+          setUpcomingEvents(events.data);
+          setPageCount(Math.ceil(events.total / limit));
+        }
+        );
+      }
     }
-  }, [artist, page]);
+  }, [artist?.user?.artist_id, artist?.token, page, upcomingEvents.length, tab]);
+
+  const handleDeleteEvent = async (event_id: string) => {
+    try {
+      await deleteEvent(artist?.token, event_id);
+      setUpcomingEvents((prevEvents) =>
+        prevEvents.filter((event) => event.event_id !== event_id)
+      );
+    } catch (error) {
+      console.log("Error Deleting Event:::", error);
+    }
+  };
+
+  const handleDeleteModal = (event_id: string) => {
+    setSelectedEventId(event_id);
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+    setSelectedEventId("");
+  };
+
+  const handleConfirmDelete = () => {
+    handleDeleteEvent(selectedEventId);
+    handleCloseDeleteModal();
+  };
 
   const handlePageChange = (event, value) => {
     setPage(value);
-  }
+  };
+
+  const handleCreateEvent = () => {
+    router.push("/artist/events/createEvent");
+  };
 
   return (
     <>
@@ -215,9 +304,13 @@ function EventArea() {
           component="div"
           sx={{ fontWeight: 500 }}
         >
-          My Upcoming Events
+          {HeaderChange(tab)}
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />}>
+        <Button
+          variant="contained"
+          onClick={handleCreateEvent}
+          startIcon={<AddIcon />}
+        >
           Add New Event
         </Button>
       </Box>
@@ -230,7 +323,7 @@ function EventArea() {
                 aria-controls="panel2-content"
                 id="panel2-header"
               >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Avatar
                       alt="event_img"
@@ -240,13 +333,20 @@ function EventArea() {
                     />
                     <Typography>{events.event_name}</Typography>
                   </Box>
+
+                  <Box sx={{marginRight: 2}}>
+                    {switchStatus(events.event_status as string)}
+                  </Box>
                 </Box>
               </AccordionSummary>
               <AccordionDetails>
                 <Divider sx={{ marginBottom: 2 }} />
-                <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap" }}>
+                <Box sx={{ width: "100%", display: "flex", justifyContent:"center", flexWrap: "wrap" }}>
                   {events.sessions?.map((session, index) => (
-                    <Paper elevation={2} sx={{ width: "25%", padding: 2, marginRight: 1 }}>
+                    <Paper
+                      elevation={2}
+                      sx={{ width: "25%", padding: 2, marginRight: 1, marginBottom: 1}}
+                    >
                       <Typography variant="h6" color="secondary">
                         {session.session_name.charAt(0).toUpperCase() +
                           session.session_name.slice(1)}
@@ -288,21 +388,29 @@ function EventArea() {
                     marginTop: "1em",
                   }}
                 >
-                  <Box sx={{marginLeft: 1}}>
-                    <Link href="#" color="secondary" style={{fontStyle: "italic"}}>more details...</Link>
+                  <Box sx={{ marginLeft: 1 }}>
+                    <Button onClick={()=> {router.push(`/artist/events/${events.event_id}`)}}>
+                      See more
+                    </Button>
+                  
                   </Box>
                   <Box>
                     <Stack direction="row" spacing={1}>
                       <IconButton aria-label="share">
                         <ShareIcon />
                       </IconButton>
-                      <IconButton aria-label="ticket">
+                      <IconButton aria-label="ticket" onClick={()=>{router.push(`/artist/events/tickets/${events.event_id}`)}}>
                         <LocalActivityIcon />
                       </IconButton>
-                      <IconButton aria-label="budget">
+                      <IconButton aria-label="budget" onClick={()=>{router.push(`/artist/events/budget/${events.event_id}`)}}>
                         <PaidIcon />
                       </IconButton>
-                      <IconButton aria-label="add to shopping cart">
+                      <IconButton
+                        onClick={() => {
+                          handleDeleteModal(events.event_id);
+                        }}
+                        aria-label="delete"
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </Stack>
@@ -322,8 +430,36 @@ function EventArea() {
           marginTop: "1em",
         }}
       >
-        <Pagination count={5} color="primary" page={page} onChange={handlePageChange} />
+        <Pagination
+          count={pageCount}
+          color="primary"
+          page={page}
+          onChange={handlePageChange}
+        />
       </Box>
+
+      <Dialog
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        sx={{ borderRadius: 20 }}
+      >
+        <DialogTitle id="alert-dialog-title" color="error">{"Delete Event"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this event?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal} color="secondary">
+            No
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

@@ -3,7 +3,7 @@
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { Stack } from "@mui/material";
+import { Stack, useMediaQuery } from "@mui/material";
 import Button from "@mui/material/Button";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -27,44 +27,108 @@ import {
   TableRow,
   TableCell,
   RightBox,
-} from "../../../../styles/SingleArtistPage.styles";
+} from "@/app/styles/SingleArtistPage.styles";
+import { getSong, getSongDuration } from "@/app/services/SongServices";
+import { Song } from "@/app/constants/models";
+import dayjs from "dayjs";
+import AudioDuration from "@/app/components/AudioDuration";
+import { addSongImpression } from "@/app/services/AnalyticServices";
 
-export default function SingleSongPage() {
+interface Props {
+  params: { id: string };
+}
+
+export default function SingleSongPage({ params: { id } }: Props) {
+  const matches = useMediaQuery("(max-width:960px)"); //This is used to check the screen size
+
+  const [songData, setSongData] = React.useState<Song>({});
+
+  const getSongData = () => {
+    getSong("", id).then((res) => {
+      setSongData(res);
+    });
+  };
+
+  const incrementSongImpressions = () => {
+    addSongImpression(id).then((res) => {
+      // console.log(res);
+    });
+  };
+
+  React.useEffect(() => {
+    getSongData();
+    incrementSongImpressions();
+  }, []);
+
+  React.useEffect(() => {
+    if (songData?.song_track) {
+      getSongDuration(songData?.song_track).then((res: any) => {
+        setSongData((prev) => ({ ...prev, song_length: res }));
+      });
+    }
+  }, [songData?.song_track]);
+
   const tableData = [
-    { key: 1, attribute: "Released", value: "January 2, 1983" },
-    { key: 2, attribute: "Recorded", value: "1982" },
-    { key: 3, attribute: "Length", value: "04:57" },
-    { key: 4, attribute: "Label", value: "Epic" },
-    { key: 5, attribute: "Songwriter(s)", value: "Michael Jackson" },
-    {key: 6,attribute: "Producer(s)",value: "Quincy Jones, Michael Jackson",
+    {
+      key: 1,
+      attribute: "Released",
+      value: dayjs(songData?.release_date).format("YYYY MMMM DD"),
+    },
+    {
+      key: 2,
+      attribute: "Recorded",
+      value: dayjs(songData?.release_date).format("YYYY"),
+    },
+    {
+      key: 3,
+      attribute: "Length",
+      value:
+        songData?.song_length &&
+        Math.floor(songData?.song_length / 60) +
+          ":" +
+          Math.floor(songData?.song_length % 60)
+            .toString()
+            .padStart(2, "0"),
+    },
+    { key: 4, attribute: "Label", value: songData?.record_label },
+    {
+      key: 5,
+      attribute: "Songwriter(s)",
+      value: songData?.song_writers?.map((w) => w?.artist_name).join(", "),
+    },
+    {
+      key: 6,
+      attribute: "Producer(s)",
+      value: songData?.composer?.map((p) => p?.artist_name).join(", "),
     },
   ];
+
   return (
     <Maindiv>
       {/* This is CardMedia component for backcover img */}
-      <CoverCardMedia image="https://www.billboard.com/wp-content/uploads/media/Michael-Jackson-1986-concert-billboard-1548.jpg">
+      <CoverCardMedia image={songData?.song_img}>
         <div
           style={{
             background: "black",
-            height: "500px",
+            height: matches ? "1000px" : "500px",
             width: "100%",
             opacity: "0.7",
           }}
         ></div>
 
         <AllMiddleBox>
-          <Stack direction="row" width="100%" spacing={"1px"}>
+          <Stack
+            direction={matches ? "column" : "row"}
+            width="100%"
+            spacing={"1px"}
+          >
             {/* This is the profilepictureavtar for artist profile pic*/}
-            <ProfilePicAvatar
-              src={
-                "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg"
-              }
-            ></ProfilePicAvatar>
+            <ProfilePicAvatar src={songData?.song_img}></ProfilePicAvatar>
 
             {/* This is the artistdetailbox for artist details*/}
             <ArtistDetailBox>
-              <ArtistNameBox>Billie Jean</ArtistNameBox>
-              <GenreBox>Michael Jackson</GenreBox>
+              <ArtistNameBox>{songData?.song_title}</ArtistNameBox>
+              <GenreBox>{songData?.song_genre?.join(", ")}</GenreBox>
               <SocialMediaBox>
                 <Button>
                   <FacebookRoundedIcon
@@ -92,7 +156,7 @@ export default function SingleSongPage() {
                     //backgroundColor: "white",
                   }}
                 >
-                  Album : Thriller
+                  Album : {songData?.album_title}
                 </Box>
                 <Box
                   sx={{
@@ -103,8 +167,7 @@ export default function SingleSongPage() {
                     //backgroundColor: "white",
                   }}
                 >
-                  Genre(s) : Rhythm and blues, Dance-pop, Pop, Disco, Classic,
-                  Rock
+                  Genre(s) : {songData?.song_genre?.join(", ")}
                 </Box>
               </Box>
             </ArtistDetailBox>
@@ -127,13 +190,20 @@ export default function SingleSongPage() {
         </AllMiddleBox>
       </CoverCardMedia>
 
-      <Box sx={{ display: "flex", padding: "40px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: matches ? "column" : "row",
+          alignItems: "flex-start",
+          padding: "1em",
+        }}
+      >
         <TableContainer>
           <table
             style={{
               width: "100%",
               //borderCollapse: "collapse",
-              border: "1.5px solid black",
+              // border: "1.5px solid black",
               //borderRadius: "20px",
             }}
           >
@@ -149,7 +219,7 @@ export default function SingleSongPage() {
           <Box
             sx={{
               fontSize: "20px",
-              color: "white",
+              fontWeight: 600,
             }}
           >
             {" "}
@@ -157,36 +227,12 @@ export default function SingleSongPage() {
           </Box>
           <Box
             sx={{
-              fontSize: "10px",
-              color: "white",
+              fontSize: "14px",
               padding: "20px",
               display: "flex",
             }}
           >
-            She was more like a beauty queen from a movie scene<br></br>I said
-            don't mind, but what do you mean I am the one Who will dance on the
-            floor in the round She said I am the one<br></br>
-            Who will dance on the floor in the round She told me her name was
-            Billie Jean as she caused a scene Then every head turned with eyes
-            that dreamed of being the one Who will dance on the floor in the
-            round People always told me be careful of what you do Don't go
-            around breaking young <br></br>
-            She was more like a beauty queen from a movie scene<br></br>I said
-            don't mind, but what do you mean I am the one Who will dance on the
-            floor in the round She said I am the one<br></br>
-            Who will dance on the floor in the round She told me her name was
-            Billie Jean as she caused a scene Then every head turned with eyes
-            that dreamed of being the one Who will dance on the floor in the
-            round People always told me be careful of what you do Don't go
-            around breaking young<br></br>
-            She was more like a beauty queen from a movie scene<br></br>I said
-            don't mind, but what do you mean I am the one Who will dance on the
-            floor in the round She said I am the one<br></br>
-            Who will dance on the floor in the round She told me her name was
-            Billie Jean as she caused a scene Then every head turned with eyes
-            that dreamed of being the one Who will dance on the floor in the
-            round People always told me be careful of what you do Don't go
-            around breaking young
+            {songData?.lyrics ? songData?.lyrics : "No Lyrics Found"}
           </Box>
         </RightBox>
       </Box>

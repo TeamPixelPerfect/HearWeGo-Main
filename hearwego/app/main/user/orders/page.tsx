@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import {
   AppBar,
   Tabs,
@@ -14,22 +14,20 @@ import {
   Pagination,
   TextField,
 } from "@mui/material";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import Link from "@mui/material/Link";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/hooks";
+import { CartItem, Order } from "@/app/constants/models";
+import { getOrdersForUser } from "@/app/services/StoreServices";
+import dayjs from "dayjs";
 
 interface OrderItemProps {
   orderId: string;
   orderDate: string;
   status: string;
-  items: {
-    imageSrc: string;
-    title: string;
-    price: number;
-    itemCount: number;
-  }[];
+  items: CartItem[];
   total: number;
-  buttonLabel: string;
-  
 }
 
 const OrderItem: React.FC<OrderItemProps> = ({
@@ -38,45 +36,80 @@ const OrderItem: React.FC<OrderItemProps> = ({
   status,
   items,
   total,
-  buttonLabel,
 }) => {
+  const router = useRouter();
+
   return (
     <Card
       style={{
         marginBottom: "20px",
-        width: "98%",
+        width: "100%",
         padding: "10px",
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Typography variant="subtitle2">{orderId}</Typography>
+        <Typography variant="subtitle2" sx={{ textTransform: "uppercase" }}>
+          {orderId}
+        </Typography>
         <Typography variant="body2">{orderDate}</Typography>
       </Box>
-      <Box style={{ display: "flex", flexDirection: "row" }}>
-        {items.map((item, index) => (
-          <Box key={index} style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
-            <Box style={{ width: "100px", height: "100px", marginRight: "10px" }}>
-              <img
-                src={item.imageSrc}
-                alt={item.title}
-                style={{ width: "100px", height: "100px", objectFit: "cover" }}
-              />
+      <Box>
+        <Box style={{ display: "flex", flexDirection: "row" }}>
+          {items.map((item, index) => (
+            <Box
+              key={index}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "20px",
+              }}
+            >
+              <Box
+                style={{ width: "100px", height: "100px", marginRight: "10px" }}
+              >
+                <img
+                  src={item?.cart_item_image}
+                  alt={item?.cart_item_name}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+
+              <CardContent>
+                <Typography variant="h6">{item?.cart_item_name}</Typography>
+                <Typography variant="body2">
+                  Rs. {item?.product_price?.toFixed(2)}
+                </Typography>
+                <Typography variant="body2">
+                  {item?.product_quantity} item(s)
+                </Typography>
+              </CardContent>
             </Box>
-            <CardContent>
-              <Typography variant="h6">{item.title}</Typography>
-              <Typography variant="body2">Rs. {item.price}</Typography>
-              <Typography variant="body2">{item.itemCount} item(s)</Typography>
-            </CardContent>
-          </Box>
-        ))}
+          ))}
+        </Box>
       </Box>
-      <Box style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="body2" color="textSecondary">
           {status}
         </Typography>
-        <Typography variant="body2">Total: Rs. {total}</Typography>
-        <Button variant="contained" color="primary">
-          {buttonLabel}
+        <Typography variant="body2">Total: Rs. {total.toFixed(2)}</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            router.push("/main/user/orders/" + orderId);
+          }}
+        >
+          Go To Order
         </Button>
       </Box>
     </Card>
@@ -84,6 +117,10 @@ const OrderItem: React.FC<OrderItemProps> = ({
 };
 
 const OrderPage: React.FC = () => {
+  const user = useAppSelector((state) => state.user.user);
+
+  const [orderData, setOrderData] = useState<Order[]>([]);
+
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -92,88 +129,34 @@ const OrderPage: React.FC = () => {
     setSelectedTab(newValue);
   };
 
-  const images: string[] = [
-    "https://m.media-amazon.com/images/I/91IM87eeuCL._CLa%7C2140%2C2000%7C81am2B0c2BL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png",
-    "https://m.media-amazon.com/images/I/A13usaonutL._CLa%7C2140%2C2000%7C71INiT3PTcL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png",
-    "https://ae01.alicdn.com/kf/Hc2ed792f16564287a61257e59e2ed3d52.jpg_640x640q90.jpg",
-    "https://m.media-amazon.com/images/I/A13usaonutL._CLa%7C2140%2C2000%7C81gpJeXaukL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_UY1000_.png",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNt7xPi3jFBGDi_uVqCJ9ng5ljzmELKwhdKjiNStughHsidapgj3TdIJU885XSu7q2rNw&usqp=CAU",
-    "https://cdn.vectorstock.com/i/1000v/06/31/special-summer-sale-banner-for-advertisement-vector-19600631.jpg",
-  ];
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+  const getOrders = () => {
+    getOrdersForUser(user?.token as string, user?.user_id as string).then(
+      (response) => {
+        if (response) {
+          setOrderData(response.data);
+        }
+      }
+    );
   };
 
-  const orders: OrderItemProps[] = [
-    {
-      orderId: "21479376954477",
-      orderDate: "10 May 2024 19:08:22",
-      status: "Cancelled",
-      items: [
-        {
-          imageSrc: images[0],
-          title: "Innvex 32inch HD Ready",
-          price: 5449,
-          itemCount: 1,
-        },
-        {
-          imageSrc: images[1],
-          title: "Smart Watch HK9 Pro",
-          price: 7380,
-          itemCount: 1,
-        },
-      ],
-      total: 12829,
-      buttonLabel: "Buy again",
-    },
-    {
-      orderId: "213856134354477",
-      orderDate: "15 Feb 2024 22:23:23",
-      status: "Delivered",
-      items: [
-        {
-          imageSrc: images[2],
-          title: "Sunco Zigma 4 outlets",
-          price: 1110,
-          itemCount: 1,
-        },
-      ],
-      total: 1110,
-      buttonLabel: "Buy again",
-    },
-    {
-      orderId: "21479376954477",
-      orderDate: "10 May 2024 19:08:22",
-      status: "Cancelled",
-      items: [
-        {
-          imageSrc: images[3],
-          title: "Innvex 32inch HD Ready",
-          price: 5449,
-          itemCount: 1,
-        },
-        {
-          imageSrc: images[4],
-          title: "Smart Watch HK9 Pro",
-          price: 7380,
-          itemCount: 1,
-        },
-      ],
-      total: 12829,
-      buttonLabel: "Buy again",
-    },
-  ];
+  // const filteredOrders = orders.filter(
+  //   (order) =>
+  //     order.orderId.includes(searchQuery) ||
+  //     order.items.some((item) =>
+  //       item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  //     )
+  // );
 
-  const filteredOrders = orders.filter((order) =>
-    order.orderId.includes(searchQuery) ||
-    order.items.some(item =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
+  useEffect(() => {
+    if (user?.token && user?.user_id) {
+      getOrders();
+    }
+  }, [user?.token, user?.user_id]);
 
   return (
-    <Box style={{ padding: "20px", fontFamily: "Arial, Helvetica, sans-serif" }}>
+    <Box
+      style={{ padding: "20px", fontFamily: "Arial, Helvetica, sans-serif" }}
+    >
       <AppBar position="static">
         <Tabs
           value={selectedTab}
@@ -206,51 +189,85 @@ const OrderPage: React.FC = () => {
           />
         </Tabs>
       </AppBar>
-      <Box style={{ display: "flex", justifyContent: "center", marginTop: "20px", marginBottom: "20px" }}>
-        <TextField
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          // marginTop: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        {/* <TextField
           label="Search Orders"
           variant="outlined"
           value={searchQuery}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setSearchQuery(e.target.value)
+          }
           style={{ width: "50%" }}
-        />
+        /> */}
       </Box>
       <TabPanel value={selectedTab} index={0}>
         <Box style={{ display: "flex" }}>
-          <Box style={{ width: "70%" }}>
-            {filteredOrders.map((order) => (
-              <OrderItem key={order.orderId} {...order} />
-            ))}
+          <Box style={{ width: "100%" }}>
+            {orderData &&
+              orderData.map((order) => (
+                <OrderItem
+                  key={order?.order_id}
+                  orderId={order?.order_id as string}
+                  orderDate={dayjs(order?.order_date).format("DD MMM YYYY")}
+                  status={order?.order_status as string}
+                  items={order?.cart_items as CartItem[]}
+                  total={order?.order_total as number}
+                />
+              ))}
           </Box>
-          <Card style={{ width: "30%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "10px" }}>
+          {/* <Card
+            style={{
+              width: "30%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "10px",
+            }}
+          >
             <CardContent>
               <Typography variant="h6">50% Discount!</Typography>
-              <Typography variant="body2">This is a card on the right side, spanning the height between the header and the footer.</Typography>
-              <Box style={{ position: "relative"}}>
+              <Typography variant="body2">
+                This is a card on the right side, spanning the height between
+                the header and the footer.
+              </Typography>
+              <Box style={{ position: "relative" }}>
                 <img
                   src={images[currentImageIndex]}
                   alt="Uploaded Image"
                   style={{ width: "410px", height: "410px" }}
                 />
                 <IconButton
-                  style={{ position: "absolute", top: "50%", right: "-20px", transform: "translateY(-50%)" }}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    right: "-20px",
+                    transform: "translateY(-50%)",
+                  }}
                   onClick={handleNextImage}
                 >
                   <ArrowForwardIosIcon />
                 </IconButton>
               </Box>
             </CardContent>
-          </Card>
+          </Card> */}
         </Box>
       </TabPanel>
       <TabPanel value={selectedTab} index={1}></TabPanel>
       <TabPanel value={selectedTab} index={2}></TabPanel>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Stack spacing={2} >
+      {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Stack spacing={2}>
           <Pagination count={10} color="secondary" />
         </Stack>
-      </Box>
+      </Box> */}
     </Box>
   );
 };
@@ -286,7 +303,9 @@ const TabPanel: React.FC<TabPanelProps> = ({
 
 const App: React.FC = () => {
   return (
-    <div style={{ fontFamily: "Arial, Helvetica, sans-serif", padding: "20px" }}>
+    <div
+      style={{ fontFamily: "Arial, Helvetica, sans-serif", padding: "20px" }}
+    >
       <OrderPage />
     </div>
   );

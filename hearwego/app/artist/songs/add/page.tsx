@@ -24,14 +24,13 @@ const AddSong = () => {
   const theme = useTheme();
 
   //useSatate for the song file
-  const [songFile, setSongFile] = useState<File|null>();
+  const [songFile, setSongFile] = useState<File | null>();
   const [uploading, setUploading] = useState(false);
   //useState for errors in song upload
   const [error, setError] = useState(false);
 
   //redux for saving the song file globally
   const dispatch = useAppDispatch();
-
 
   const onDrop = useCallback((acceptedFiles: any) => {
     console.log(acceptedFiles);
@@ -47,7 +46,16 @@ const AddSong = () => {
     setUploading(true);
     uploadSong(songFile).then((res) => {
       console.log(res);
-      dispatch(setSong({song_track: res}));
+      dispatch(
+        setSong({
+          song_track: res,
+          current_song: "",
+          playing: false,
+          song_name: "",
+          cover_art: "",
+          artist: "",
+        })
+      );
       setUploading(false);
       Router.push("add2");
     });
@@ -98,7 +106,7 @@ const AddSong = () => {
               <Typography
                 variant="subtitle1"
                 color="error"
-                sx={{ width:"100%", textAlign: "center", padding: "1em" }}
+                sx={{ width: "100%", textAlign: "center", padding: "1em" }}
               >
                 {error ? "Please upload a song file to continue!" : ""}
               </Typography>
@@ -114,7 +122,7 @@ const AddSong = () => {
                   <Button
                     variant="outlined"
                     onClick={() => {
-                      Router.replace("add");
+                      Router.push("/artist/songs");
                     }}
                   >
                     Cancel

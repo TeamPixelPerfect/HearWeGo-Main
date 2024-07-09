@@ -5,19 +5,13 @@ import { Card, CardContent, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import Button from '@mui/material/Button';  
 import Link from 'next/link';
-
-
-interface Category {
-  id: number;
-  name: string;
-  image: string;
-}
+import { MerchCategory } from '../constants/models';
 
 interface CategoryProps {
-  category: Category;
+  category: MerchCategory;
 }
 
-
+ 
 const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
   const router = useRouter();
   return (
@@ -35,8 +29,8 @@ const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
         }}
       >
         <img
-          src={category.image}
-          alt={category.name}
+          src={category?.image}
+          alt={category?.category_name}
           style={{
             width: '100%',
             height: 300,
@@ -56,12 +50,12 @@ const CategoryComponent: React.FC<CategoryProps> = ({ category }) => {
           {/* <Link href="/main/artists/store/1/category/1"> */}
             <Button 
                onClick={() => {
-                router.push("/main/artists/store/1/category/1");
+                router.push(`/main/artists/store/1/category/${category?.category_name}`);
               }}
               >
            
-          <Typography variant="h4" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
-            {category.name}
+          <Typography variant="h3" component="div" style={{ color: 'white', fontWeight: 'bold',textTransform:"none", textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+            {category?.category_name}
           </Typography>
           </Button>
           {/* </Link> */}

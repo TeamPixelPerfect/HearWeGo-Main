@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -21,187 +21,22 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InputAdornment from "@mui/material/InputAdornment";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { HelpComplaints, HelpArticle } from "../../constants/models";
+import {
+  createComplaintForm,
+  getHelpArticles,
+} from "../../services/HelpServices";
+import { useAppSelector } from "@/lib/hooks";
+import { get } from "http";
 
-const helpImages = {
-  payment:
-    "https://media.istockphoto.com/id/531236924/photo/group-of-credit-cards-on-computer-keyboard.jpg?s=612x612&w=0&k=20&c=5iAuEH7ipVgVDI9TkgzTC8Xx0roMhvDlT79UzRiSzcE=",
-  account:
-    "https://img.freepik.com/free-photo/young-woman-using-her-smartphone-city_23-2149375672.jpg",
-  store:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuI7N2ljGnhukDu0xusc95j4nslYA3huWmag&s",
-  club: "https://cdn.create.vista.com/api/media/small/443584156/stock-photo-silhouette-girl-raised-hands-enjoys-concert-music-show",
-  safetyAndPrivacy:
-    "https://thumbs.dreamstime.com/b/data-protection-privacy-concept-gdpr-eu-cyber-security-network-business-man-protecting-his-personal-information-padlock-icon-117352204.jpg",
-  others:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScyOttwB3rOLrr6go7UFpPQidRL1vDvA_IZg&s",
-};
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
-  email: Yup.string()
+  userName: Yup.string().required("Name is required"),
+  userEmail: Yup.string()
     .email("Invalid email format")
     .required("Email is required"),
-  issue: Yup.string().required("Issue description is required"),
+  ComplaintTitle: Yup.string().required("Complaint title is required"),
+  ProblemInBrief: Yup.string().required("Issue description is required"),
 });
-
-const helpSections = {
-  payment: [
-    {
-      question: "How to handle a failed payment?",
-      answer:
-        "If your payment fails, please check your payment details and try again or contact your bank.",
-    },
-    {
-      question: "Can I get a refund?",
-      answer:
-        "Refunds can be requested by contacting our support team within 30 days of purchase.",
-    },
-    {
-      question: "How do I update my payment method?",
-      answer:
-        "You can update your payment method in the Account Settings section.",
-    },
-    {
-      question: "Why was my payment declined?",
-      answer:
-        "Payments can be declined due to insufficient funds or security checks by your bank.",
-    },
-    {
-      question: "How to cancel a subscription?",
-      answer:
-        "You can cancel your subscription in the Subscription section of your account settings.",
-    },
-  ],
-  account: [
-    {
-      question: "How to reset my password?",
-      answer:
-        'Go to the login page and click on "Forgot Password" to reset your password.',
-    },
-    {
-      question: "How to update my profile?",
-      answer: "Navigate to your profile settings and update your information.",
-    },
-    {
-      question: "How to delete my account?",
-      answer: "To delete your account, contact support for assistance.",
-    },
-    {
-      question: "How do I change my email address?",
-      answer:
-        "You can change your email address in the Account Settings section.",
-    },
-    {
-      question: "How to enable two-factor authentication?",
-      answer:
-        "Enable two-factor authentication for added security in your Account Settings.",
-    },
-  ],
-  store: [
-    {
-      question: "How to track my order?",
-      answer:
-        "You can track your order in the Order History section of your account.",
-    },
-    {
-      question: "What is the shipping policy?",
-      answer:
-        "Shipping policies are detailed in the Shipping section of our website.",
-    },
-    {
-      question: "How to return an item?",
-      answer:
-        "Follow the return instructions in the Returns section of our website.",
-    },
-    {
-      question: "How to contact customer support?",
-      answer:
-        'Contact customer support through the "Contact Us" form on our website.',
-    },
-    {
-      question: "How to use discount codes?",
-      answer:
-        "Apply discount codes during checkout in the Discount Code section.",
-    },
-  ],
-  club: [
-    {
-      question: "How to join a fan club?",
-      answer:
-        'To join a fan club, go to the Fan Club section and click on the "Join" button next to the club you want to join.',
-    },
-    {
-      question: "How to participate in club events?",
-      answer:
-        "Check the Events section in your club for upcoming events and how to participate.",
-    },
-    {
-      question: "How to cancel club membership?",
-      answer: "Contact support to cancel your club membership.",
-    },
-    {
-      question: "How to create a new club?",
-      answer: "New clubs can be created by contacting our support team.",
-    },
-    {
-      question: "How to change club settings?",
-      answer:
-        "Club settings can be managed in the Club Settings section of your account.",
-    },
-  ],
-  safetyAndPrivacy: [
-    {
-      question: "How to protect my personal information?",
-      answer:
-        "Ensure your account password is strong and enable two-factor authentication for added security.",
-    },
-    {
-      question: "What should I do if I suspect a data breach?",
-      answer:
-        "Immediately change your password and contact our support team for further assistance.",
-    },
-    {
-      question: "How is my data used?",
-      answer:
-        "Your data is used in accordance with our Privacy Policy, which you can review on our website.",
-    },
-    {
-      question: "How to update my privacy settings?",
-      answer:
-        "You can update your privacy settings in the Account Settings section.",
-    },
-    {
-      question: "How to report a privacy concern?",
-      answer:
-        "Report any privacy concerns to our support team through the Contact Us form.",
-    },
-  ],
-  others: [
-    {
-      question: "How to contact support?",
-      answer:
-        'You can contact support through the "Contact Us" form on our website.',
-    },
-    {
-      question: "Where to find user guides?",
-      answer:
-        "User guides are available in the Help Center under the Resources section.",
-    },
-    {
-      question: "How to provide feedback?",
-      answer:
-        'We welcome your feedback through the "Feedback" section of our website.',
-    },
-    {
-      question: "How to report a bug?",
-      answer: "Report bugs through the Bug Report form in our Help Center.",
-    },
-    {
-      question: "How to request a feature?",
-      answer:
-        "Use the Feature Request form to submit your ideas for new features.",
-    },
-  ],
-};
 
 const quickHelp = [
   {
@@ -221,28 +56,31 @@ const quickHelp = [
   },
 ];
 
-const Help: React.FC = () => {
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [formData, setFormData] = useState<{
-    name: string;
-    email: string;
-    issue: string;
-  }>({
-    name: "",
-    email: "",
-    issue: "",
-  });
+const Help = () => {
+  const [selectedArticle, setSelectedArticle] = useState<HelpArticle | null>(
+    null
+  );
+  const [ComplaintData, setComplaintData] = useState<HelpComplaints>();
   const [formModalOpen, setFormModalOpen] = useState<boolean>(false);
   const [submissionModalOpen, setSubmissionModalOpen] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false); // Added for form submission loading indicator
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const user = useAppSelector((state) => state.user.user);
+  const [helpArticles, setHelpArticles] = useState<HelpArticle[]>([]);
 
-  const handleSectionClick = (section: string) => {
-    setSelectedSection(section);
-    setFormModalOpen(false); // Close form modal if open
-    setSubmissionModalOpen(false); // Close submission modal if open
+  useEffect(() => {
+    getHelpArticles().then((res) => {
+      console.log(res.data);
+      setHelpArticles(res.data);
+    });
+  }, []);
+
+  const handleSectionClick = (section: HelpArticle) => {
+    setSelectedArticle(section);
+    setFormModalOpen(false);
+    setSubmissionModalOpen(false);
   };
 
   const handleOpenFormModal = () => {
@@ -257,47 +95,56 @@ const Help: React.FC = () => {
     setIsSubmitted(false); // Reset submission confirmation state
   };
 
-  const handleSubmit = (values: {
-    name: string;
-    email: string;
-    issue: string;
+  const handleSubmit = async (values: {
+    userName: string;
+    userEmail: string;
+    ComplaintTitle: string;
+    ProblemInBrief: string;
   }) => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const complaintData: HelpComplaints = {
+        userName: values.userName,
+        userEmail: values.userEmail,
+        ComplaintTitle: values.ComplaintTitle,
+        ProblemInBrief: values.ProblemInBrief,
+        isHandled: false,
+        userId: user?.user_id ? user.user_id : "",
+        status: "to_solve",
+      };
+      await createComplaintForm(user?.token ? user.token : "", complaintData);
+      formik.resetForm(); // Reset formik form state
       setLoading(false);
       setFormModalOpen(false);
       setIsSubmitted(true); // Set submission confirmation state to true
       setTimeout(() => {
         setIsSubmitted(false); // Hide submission confirmation after some time (optional)
       }, 3000); // Example: Hide after 3 seconds
-    }, 1000);
+    } catch (error) {
+      setLoading(false);
+      // handle error
+    }
   };
+
+  const filteredHelpArticles = helpArticles.filter((article) =>
+    article.articalTitle?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleCloseSubmissionModal = () => {
     setSubmissionModalOpen(false);
-    setSelectedSection(null); // Reset selected section
-  };
-
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    setSelectedArticle(null); // Reset selected section
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredSections = Object.keys(helpSections).filter((section) =>
-    section.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const formik = useFormik({
     initialValues: {
-      name: "",
-      email: "",
-      issue: "",
+      userName: "",
+      userEmail: "",
+      ComplaintTitle: "",
+      ProblemInBrief: "",
     },
     validationSchema: validationSchema,
     onSubmit: handleSubmit,
@@ -325,7 +172,7 @@ const Help: React.FC = () => {
                 fontWeight="bold"
                 style={{ flexGrow: 1 }}
               >
-                How can we help you?
+                How Can We Help You?
               </Typography>
             </Box>
           </Box>
@@ -367,22 +214,22 @@ const Help: React.FC = () => {
           </Box>
 
           <Grid container spacing={3}>
-            {filteredSections.map((section) => (
-              <Grid item xs={12} sm={6} md={4} key={section}>
+            {filteredHelpArticles.map((section) => (
+              <Grid item xs={12} sm={6} md={4} key={section.articalId}>
                 <Card
                   onClick={() => handleSectionClick(section)}
                   style={{
                     cursor: "pointer",
                     minHeight: "150px",
                     position: "relative",
-                    borderRadius: "10px", // Ensure relative positioning for overlay
+                    borderRadius: "10px",
                   }}
                 >
                   <CardMedia
                     component="img"
                     height="140"
-                    image={helpImages[section]}
-                    alt={section}
+                    image={section.articalImage_URL}
+                    alt={section.articalTitle}
                     style={{
                       position: "absolute",
                       top: 0,
@@ -399,8 +246,7 @@ const Help: React.FC = () => {
                       bottom: 50,
                       left: 0,
                       width: "100%",
-                      background: "rgba(0, 0, 0, 0.2)", // Semi-transparent background for readability
-                      // color: "#fff",
+                      background: "rgba(0, 0, 0, 0.2)",
                       padding: "8px",
                     }}
                   >
@@ -408,7 +254,7 @@ const Help: React.FC = () => {
                       variant="h5"
                       style={{ textAlign: "center", color: "white" }}
                     >
-                      {section.charAt(0).toUpperCase() + section.slice(1)} Help
+                      {section.articalTitle}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -446,8 +292,8 @@ const Help: React.FC = () => {
           </Box>
 
           <Modal
-            open={selectedSection !== null}
-            onClose={() => setSelectedSection(null)}
+            open={selectedArticle !== null}
+            onClose={() => setSelectedArticle(null)}
             aria-labelledby="help-modal-title"
             aria-describedby="help-modal-description"
           >
@@ -465,7 +311,7 @@ const Help: React.FC = () => {
                 borderRadius: 4,
               }}
             >
-              {selectedSection && (
+              {selectedArticle && (
                 <>
                   <Typography
                     id="help-modal-title"
@@ -473,13 +319,9 @@ const Help: React.FC = () => {
                     gutterBottom
                     sx={{ marginTop: "10px" }}
                   >
-                    {selectedSection.charAt(0).toUpperCase() +
-                      selectedSection.slice(1)}{" "}
-                    Help
+                    {selectedArticle.articalTitle}
                   </Typography>
-                  {helpSections[
-                    selectedSection as keyof typeof helpSections
-                  ].map((faq, index) => (
+                  {selectedArticle.QandA?.map((item, index) => (
                     <Accordion
                       key={index}
                       elevation={0}
@@ -488,13 +330,13 @@ const Help: React.FC = () => {
                     >
                       <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
+                        aria-controls={`panel${index}-content`}
+                        id={`panel${index}-header`}
                       >
-                        <Typography>{faq.question}</Typography>
+                        <Typography>{item.question}</Typography>
                       </AccordionSummary>
                       <AccordionDetails sx={{ marginLeft: "10px" }}>
-                        <Typography>{faq.answer}</Typography>
+                        <Typography>{item.answer}</Typography>
                       </AccordionDetails>
                     </Accordion>
                   ))}
@@ -547,42 +389,75 @@ const Help: React.FC = () => {
                   variant="outlined"
                   margin="normal"
                   fullWidth
-                  id="name"
-                  name="name"
+                  id="userName"
+                  name="userName"
                   label="Name"
-                  value={formik.values.name}
+                  value={formik.values.userName}
                   onChange={formik.handleChange}
-                  error={formik.touched.name && Boolean(formik.errors.name)}
-                  helperText={formik.touched.name && formik.errors.name}
+                  error={
+                    formik.touched.userName && Boolean(formik.errors.userName)
+                  }
+                  helperText={formik.touched.userName && formik.errors.userName}
                 />
+
                 <TextField
                   variant="outlined"
                   margin="normal"
                   fullWidth
-                  id="email"
-                  name="email"
-                  label="Email"
-                  type="email"
-                  value={formik.values.email}
+                  id="ComplaintTitle"
+                  name="ComplaintTitle"
+                  label="Complaint Title"
+                  value={formik.values.ComplaintTitle}
                   onChange={formik.handleChange}
-                  error={formik.touched.email && Boolean(formik.errors.email)}
-                  helperText={formik.touched.email && formik.errors.email}
+                  error={
+                    formik.touched.ComplaintTitle &&
+                    Boolean(formik.errors.ComplaintTitle)
+                  }
+                  helperText={
+                    formik.touched.ComplaintTitle &&
+                    formik.errors.ComplaintTitle
+                  }
                 />
+
                 <TextField
                   variant="outlined"
                   margin="normal"
-                  // fullWidth
-                  id="issue"
-                  name="issue"
+                  fullWidth
+                  id="userEmail"
+                  name="userEmail"
+                  label="Email"
+                  type="email"
+                  value={formik.values.userEmail}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.userEmail && Boolean(formik.errors.userEmail)
+                  }
+                  helperText={
+                    formik.touched.userEmail && formik.errors.userEmail
+                  }
+                />
+
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="ProblemInBrief"
+                  name="ProblemInBrief"
                   label="Describe your issue"
                   multiline
                   rows={4}
-                  value={formik.values.issue}
+                  value={formik.values.ProblemInBrief}
                   onChange={formik.handleChange}
-                  error={formik.touched.issue && Boolean(formik.errors.issue)}
-                  helperText={formik.touched.issue && formik.errors.issue}
-                  sx={{width:"100%"}}
+                  error={
+                    formik.touched.ProblemInBrief &&
+                    Boolean(formik.errors.ProblemInBrief)
+                  }
+                  helperText={
+                    formik.touched.ProblemInBrief &&
+                    formik.errors.ProblemInBrief
+                  }
+                  sx={{ width: "100%" }}
                 />
+
                 <Box
                   sx={{
                     display: "flex",
@@ -594,21 +469,21 @@ const Help: React.FC = () => {
                     type="submit"
                     variant="contained"
                     color="primary"
-                    disabled={loading} // Disable button when submitting
+                    disabled={loading}
                   >
                     {loading && (
                       <CircularProgress size={24} style={{ marginRight: 8 }} />
-                    )}{" "}
-                    {/* Show loading indicator */}
+                    )}
                     Submit
                   </Button>
                   <Button
                     type="button"
                     onClick={handleCloseFormModal}
-                    variant="outlined"
-                    color="secondary"
-                    style={{ marginLeft: 10 }}
-                    disabled={loading} // Disable button when submitting
+                    style={{
+                      color: "#E74C3C",
+                      marginLeft: 10,
+                      textTransform: "none",
+                    }}
                   >
                     Cancel
                   </Button>
@@ -618,10 +493,10 @@ const Help: React.FC = () => {
           </Modal>
 
           <Modal
-            open={isSubmitted}
-            onClose={() => setIsSubmitted(false)}
-            aria-labelledby="submission-confirmation-modal-title"
-            aria-describedby="submission-confirmation-modal-description"
+            open={submissionModalOpen}
+            onClose={handleCloseSubmissionModal}
+            aria-labelledby="submission-modal-title"
+            aria-describedby="submission-modal-description"
           >
             <Box
               sx={{
@@ -636,26 +511,22 @@ const Help: React.FC = () => {
                 borderRadius: 4,
               }}
             >
-              <Typography variant="h5" id="submission-modal-title" gutterBottom>
-                Submission Confirmation
-              </Typography>
               <Typography
-                id="submission-modal-description"
-                variant="body1"
-                sx={{ marginTop: "5px", color: "grey" }}
+                id="submission-modal-title"
+                variant="h5"
+                gutterBottom
+                align="center"
               >
-                Your issue has been submitted. We will respond as soon as
-                possible.
+                Thank you for submitting your issue!
               </Typography>
               <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  marginTop: 2,
-                }}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                mt={3}
               >
                 <Button
-                  onClick={() => setIsSubmitted(false)}
+                  onClick={handleCloseSubmissionModal}
                   variant="contained"
                   color="primary"
                 >

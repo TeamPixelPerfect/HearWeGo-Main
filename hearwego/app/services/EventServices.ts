@@ -26,10 +26,25 @@ export const getEvents = async (
   }
 };
 
-
-
 export const getAllEvents = async (): Promise<Event[]> => {
   const res = await fetch(`${base_url}/EventsManager/events`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    const events = await res.json();
+    return events;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getUpcomingEventsSortByDate = async (page?: number, limit?: number) => {
+  const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&sort=-updatedAt&limit=${limit}&event_status=public`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -80,15 +95,163 @@ export const getEvent = async (id: string) => {
     }
 
     const data = await res.json();
+    console.log("Event data in service...:", data);
     return data;
   } catch (error) {
     console.error("Failed to fetch event:", error);
-    throw error; // Rethrow the error to handle it in the calling function
+    throw error; 
   }
 };
 
+export const getUpcomingEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&limit=${limit}&event_created_by=${artist_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getUpcomingEventsForGivenArtistByFan = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events?page=${page}&limit=${limit}&event_created_by=${artist_id}&event_status=public`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getPastEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/past-events?page=${page}&limit=${limit}&event_created_by=${artist_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getInterestedEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events-sorted-by-interests?page=${page}&limit=${limit}&event_created_by=${artist_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getPrivateEventsForGivenArtist = async (page?: number, limit?: number, artist_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/events?page=${page}&limit=${limit}&event_created_by=${artist_id}&event_status=private`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getInterestedEventsByUser = async (page?: number, limit?: number, user_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/interested-events/${user_id}?page=${page}&limit=${limit}&event_status=public`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
+export const getUpcomingEventsByInterest = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events-sorted-by-interests`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+}
+
 export const addEvent = async (token: string, data: any) => {
-  console.log("Sending event data:", data); 
+  console.log("Sending event data:", data);
   const res = await fetch(`${base_url}/EventsManager/events`, {
     method: "POST",
     headers: {
@@ -107,9 +270,192 @@ export const addEvent = async (token: string, data: any) => {
   }
 };
 
+export const updateBudget = async (token: string, id: string, data: any) => {
+  console.log("Sending updated budget data:", data);
+  const res = await fetch(`${base_url}/EventsManager/budget/${id}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const budget = await res.json();
+    return budget;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const addAutoTicket = async (token: string, data: any) => {
+  console.log("Sending auto ticket data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/autoTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const getTicketTypeByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/ticketTypes/events/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+}
+
+export const getAutoTicketByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/autoTickets?event_id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; 
+  }
+}
+
+export const getManualTicketByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/manualTickets?event_id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error; 
+  }
+}
+
+export const addManualTicket = async (token: string, data: any) => {
+  console.log("Sending manual ticket data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/manualTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const addTicketType = async (token: string, data: any) => {
+  console.log("Sending ticket type data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/ticketTypes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const addSoldTicket = async (token: string, data: any) => {
+  console.log("Sending ticket sold data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/soldTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+
+export const addRemainTicket = async (token: string, data: any) => {
+  console.log("Sending ticket remain data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/remainTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
 
 export const addTicket = async (token: string, data: any) => {
-  console.log("Sending ticket data:", data); 
+  console.log("Sending ticket data:", data);
   const res = await fetch(`${base_url}/EventsManager/ticket`, {
     method: "POST",
     headers: {
@@ -123,13 +469,132 @@ export const addTicket = async (token: string, data: any) => {
     return ticket;
   } else {
     const error = await res.json();
-    console.error("Error response:", error); 
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const updateEvent = async (token: string, id: string, data: any) => {
+  console.log("Sending updated event data:", data);
+  const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const event = await res.json();
+    return event;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const getAllTicketTypes = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/ticketTypes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch ticket types:", error);
+    throw error;
+  }
+}
+
+export const getAllAutoTickets = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/autoTickets`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto tickets:", error);
+    throw error;
+  }
+}
+
+export const updateEventByAdmin = async ( id: string, data: any) => {
+  console.log("Sending updated event data:", data);
+  const res = await fetch(`${base_url}/EventsManager/events/admin/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const event = await res.json();
+    return event;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const getSoldTickets = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/soldTickets`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch sold tickets:", error);
+    throw error;
+  }
+}
+
+export const deleteEvent = async (token: string, id: string) => {
+  const res = await fetch(`${base_url}/EventsManager/events/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    return true;
+  } else {
+    const error = await res.json();
     throw new Error(error.message);
   }
 };
 
 export const addBudget = async (token: string, data: any) => {
-  console.log("Sending budget data:", data); 
+  console.log("Sending budget data:", data);
   const res = await fetch(`${base_url}/EventsManager/budget`, {
     method: "POST",
     headers: {
@@ -143,7 +608,7 @@ export const addBudget = async (token: string, data: any) => {
     return budget;
   } else {
     const error = await res.json();
-    console.error("Error response:", error); 
+    console.error("Error response:", error);
     throw new Error(error.message);
   }
 };
@@ -161,6 +626,257 @@ export const getAllBudgets = async (): Promise<Budget[]> => {
     return budgets;
   } else {
     const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getBudgetByEventId = async (id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/budget/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch budget:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+}
+
+export const createInterest = async (token?: string, data?: any) => {
+  console.log("Sending interest data:", data); 
+  const res = await fetch(`${base_url}/EventsManager/interest`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const interest = await res.json();
+    return interest;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error); 
+    throw new Error(error.message);
+  }
+};
+
+export const deleteInterest = async (token?: string, user_id?: string, event_id?: string) => {
+  const res = await fetch(`${base_url}/EventsManager/delete-interest/user/${user_id}/event/${event_id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    return true;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getUserInterestForEvent = async (token?: string, user_id?: string, event_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/interest/user/${user_id}/event/${event_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return null; // No interest found
+      }
+    }
+
+    const data = await res.json();
+    return data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error("Failed to fetch interest:", error);
+    throw error;
+  }
+}
+
+export const checkUserInterestForEvent = async (token?: string, user_id?: string, event_id?: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/is-interest/user/${user_id}/event/${event_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data.status;
+  } catch (error) {
+    console.error("Failed to fetch interest:", error);
+    throw error;
+  }
+}
+
+export const getAutoTicketsByEventAndSession = async (event_id: string, session_name: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/autoTickets/event/${event_id}/session/${session_name}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto tickets:", error);
+    throw error;
+  }
+}
+
+export const getManualTicketsByEventAndSession = async (event_id: string, session_name: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/manualTickets/event/${event_id}/session/${session_name}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto tickets:", error);
+    throw error;
+  }
+}
+
+export const getRemainingTicketByTicketId = async (ticket_id: string) => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/remainTickets/ticket/${ticket_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch remaining tickets:", error);
+    throw error;
+  }
+}
+
+export const getAllRemainingTickets = async () => {
+  try {
+    const res = await fetch(`${base_url}/EventsManager/remainTickets`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch remaining tickets:", error);
+    throw error;
+  }
+}
+
+export const updateRemainingTicketByTicketId = async (token: string, ticket_id: string, data: any) => {
+  console.log("Sending updated remaining ticket data:", data);
+  const res = await fetch(`${base_url}/EventsManager/remainTickets/ticket/${ticket_id}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const createSoldTicket = async (token: string, data: any) => {
+  console.log("Sending sold ticket data:", data);
+  const res = await fetch(`${base_url}/EventsManager/soldTickets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const ticket = await res.json();
+    return ticket;
+  } else {
+    const error = await res.json();
+    console.error("Error response:", error);
+    throw new Error(error.message);
+  }
+}
+
+export const getEventsByArtist = async (token: string, artistId: string) => {
+  const res = await fetch(
+    `${base_url}/EventsManager/events/Artist/${artistId}`,
+  {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const events = await res.json();
+    console.log("Events Services: ", events);
+    return events;
+  } else {
+    const error = await res.json();
+    console.log("Events Services Error: ", error);
     throw new Error(error.message);
   }
 };

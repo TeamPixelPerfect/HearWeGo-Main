@@ -70,7 +70,7 @@ export const Caption03Box = styled(Box)(({ theme }) => ({
 
 export const SearchPaper = styled(Paper)(({ theme }) => ({
   component: "form",
-  p: "2px 4px",
+  p: "4px 8px",
   display: "flex",
   alignItems: "center",
   width: "100%",
@@ -78,6 +78,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   borderRadius: "90px",
   height: "40px",
   position: "relative",
+  minWidth: "300px",
 }));
 
 
@@ -98,7 +99,7 @@ export const CoverEventCardMedia = styled(CardMedia)(({ theme }) => ({
 export const EventBox = styled(Box)(({ theme }) => ({
   position: "absolute",
   display: "flex",
-  width: "40%",
+  width: "60%",
   height: "35%",
   padding: "1em",
   margin: "0px 0px 0px 2%",
