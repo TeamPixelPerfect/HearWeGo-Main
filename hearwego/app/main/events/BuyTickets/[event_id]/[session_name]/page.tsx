@@ -34,15 +34,15 @@ import { Snackbar } from "@mui/material";
 import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import QRCode from "qrcode.react";
-import {QRCodeSVG} from 'qrcode.react';
+import { QRCodeSVG } from "qrcode.react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import EventCheckout from "@/app/components/EventCheckout";
 import { id } from "date-fns/locale";
-import htmlToImage from 'html-to-image';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+import * as htmlToImage from 'html-to-image';
+import JSZip from "jszip";
+// import { saveAs } from "file-saver";
 
 const ticketModalStyle = {
   position: "absolute" as "absolute",
@@ -103,7 +103,6 @@ function SingleTicket(
   // Create a URL with text details as query parameters
   const qrUrl = `${currentUrl}?details=${encodeURIComponent(textDetails)}`;
   const generateQRCode = () => {
-    
     return `
     URL: ${currentUrl}\n
     Ticket ID: ${ticket_id}\n
@@ -115,7 +114,7 @@ function SingleTicket(
   };
   return (
     <Paper
-    ref={ref}
+      ref={ref}
       sx={{
         width: "100%",
         display: "flex",
@@ -199,7 +198,6 @@ function SingleTicket(
       >
         {/* <QRCodeComponent value={qrValue} url={currentUrl} /> */}
         <QRCodeComponent value={generateQRCode()} />
-        
       </Box>
     </Paper>
   );
@@ -416,20 +414,19 @@ export default function Page() {
     );
   };
 
-  const handleDownloadImages = async () => {
-    const zip = new JSZip();
-    const promises = boxRefs.current.map(async (ref, index) => {
-      if (ref.current) {
-        const canvas = await htmlToImage.toCanvas(ref.current);
-        const dataUrl = canvas.toDataURL('image/png');
-        const imgData = dataUrl.split(',')[1];
-        zip.file(`ticket_${index + 1}.png`, imgData, { base64: true });
-      }
+  const handleDownloadImages = () => {
+    boxRefs.current.forEach((boxRef, index) => {
+      htmlToImage.toJpeg(boxRef, { quality: 0.95 })
+        .then(function (dataUrl) {
+          const link = document.createElement('a');
+          link.download = `box_${index}.png`;
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+        });
     });
-
-    await Promise.all(promises);
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'tickets.zip');
   };
 
   return (
@@ -564,12 +561,18 @@ export default function Page() {
             <Typography id="transition-modal-title" variant="h6" component="h2">
               Your Tickets
             </Typography>
-            <Box sx={{ width: "100%", height: "75vh", overflow: "scroll",
-                  "&::-webkit-scrollbar": {
-                    display: "none",
-                  },
-                  "-ms-overflow-style": "none", // IE and Edge
-                  "scrollbar-width": "none", }}>
+            <Box
+              sx={{
+                width: "100%",
+                height: "75vh",
+                overflow: "scroll",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                "-ms-overflow-style": "none", // IE and Edge
+                "scrollbar-width": "none",
+              }}
+            >
               <Box
                 // ref={boxRef}
                 id="cart-tickets"
@@ -581,41 +584,163 @@ export default function Page() {
                   flexDirection: "column",
                   justifyContent: "center",
                   // alignItems: "center",
-                  
                 }}
               >
                 {cartTickets.map((ticket, index) => {
                   const autoTicket = autoTickets.find(
                     (autoTicket) => autoTicket._id === ticket.ticket_id
                   );
-                  return autoTicket
-                    ? SingleTicket(
-                        id_list[index] as string,
-                        autoTicket?.ticket_type,
-                        event?.event_name as string,
-                        session_name as string,
-                        event?.sessions[
-                          (session_name.match(/\d+/)[0] - 1) as number
-                        ].session_date.slice(0, 10) as string,
-                        event?.sessions[
-                          (session_name.match(/\d+/)[0] - 1) as number
-                        ].session_time as string,
-                        event?.sessions[
-                          (session_name.match(/\d+/)[0] - 1) as number
-                        ].venue as string,
-                        ticket.ticket_price,
-                        (ticketType?.ticket_img as string) ||
-                          "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg ",
-                        ticket.ticket_count,
-                      )
-                    : null;
+                  return autoTicket ? (
+                    <Paper
+                      key={index}
+                      ref={(ref) => (boxRefs.current[index] = ref)}
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        border: "1px #000 solid",
+                        marginBottom: 2,
+                      }}
+                    >
+                      <Box sx={{ width: "25%" }}>
+                        <CardMedia
+                          component="img"
+                          sx={{ width: "200px", height: "200px" }}
+                          image={
+                            (ticketType?.ticket_img as string) ||
+                            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg "
+                          }
+                        />
+                      </Box>
+                      <Box sx={{ width: "35%" }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            fontSize: "12px",
+                            marginBottom: 2,
+                            marginTop: 2,
+                          }}
+                        >
+                          Ticket ID: {id_list[index] as string}
+                        </Typography>
+                        <Box sx={{ width: "100%", display: "flex" }}>
+                          <Box
+                            sx={{
+                              width: "50%",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Ticket Count: {ticket.ticket_count}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Ticket Type: {autoTicket?.ticket_type}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Event: {event?.event_name as string}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Session: {session_name as string}
+                            </Typography>
+                          </Box>
+
+                          <Box
+                            sx={{
+                              width: "50%",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Date:{" "}
+                              {
+                                event?.sessions[
+                                  (session_name.match(/\d+/)[0] - 1) as number
+                                ].session_date.slice(0, 10) as string
+                              }
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Time:{" "}
+                              {
+                                event?.sessions[
+                                  (session_name.match(/\d+/)[0] - 1) as number
+                                ].session_time as string
+                              }
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              Venue:{" "}
+                              {
+                                event?.sessions[
+                                  (session_name.match(/\d+/)[0] - 1) as number
+                                ].venue as string
+                              }
+                            </Typography>
+
+                            <Typography
+                              variant="subtitle2"
+                              color="primary"
+                              sx={{ fontSize: "24px" }}
+                            >
+                              LKR {ticket.ticket_price}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          width: "30%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {/* <QRCodeComponent value={qrValue} url={currentUrl} /> */}
+                        <QRCodeComponent
+                          value={`URL: ${window.location.href}\n
+                                  Ticket ID: ${id_list[index] as string}\n
+                                  Ticket Type: ${autoTicket?.ticket_type}\n
+                                  Event: ${event?.event_name as string}\n
+                                  Session: ${session_name as string}\n
+                                  No of Tickets: ${ticket.ticket_count}\n `}
+                        />
+                      </Box>
+                    </Paper>
+                  ) : null;
                 })}
               </Box>
             </Box>
             <Box
               sx={{ display: "flex", justifyContent: "center", width: "100%" }}
             >
-              <Button variant="contained" color="primary" onClick={handleDownloadImages}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDownloadImages}
+              >
                 Download Zip
               </Button>
             </Box>

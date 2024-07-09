@@ -81,7 +81,7 @@ export default function EventsPage() {
 
   React.useEffect(() => {
     setLoadingTrendingEvents(true);
-    getUpcomingEventsByInterest(1, 4).then((events) => {
+    getUpcomingEventsByInterest().then((events) => {
       console.log("Events Trending......", events);
       setTrendingEvents(events);
       setLoadingTrendingEvents(false);

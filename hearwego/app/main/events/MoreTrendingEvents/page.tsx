@@ -115,10 +115,10 @@ export default function MoreAlbums() {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   React.useEffect(() => {
-    getUpcomingEventsByInterest(1, 5).then((events) => {
+    getUpcomingEventsByInterest().then((events) => {
       console.log("Events Trending......", events);
       setTrendingEvents(events);
-      setPageCount(Math.ceil(events.total / limit));
+      // setPageCount(Math.ceil(events.total / limit));
     });
   }, [page, trendingEvents.length]);
 

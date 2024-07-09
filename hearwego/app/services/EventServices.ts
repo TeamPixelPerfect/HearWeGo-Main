@@ -231,9 +231,9 @@ export const getInterestedEventsByUser = async (page?: number, limit?: number, u
   }
 }
 
-export const getUpcomingEventsByInterest = async (page?: number, limit?: number) => {
+export const getUpcomingEventsByInterest = async () => {
   try {
-    const res = await fetch(`${base_url}/EventsManager/upcoming-events-sorted-by-interests?page=${page}&limit=${limit}&event_status=public`, {
+    const res = await fetch(`${base_url}/EventsManager/upcoming-events-sorted-by-interests`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
