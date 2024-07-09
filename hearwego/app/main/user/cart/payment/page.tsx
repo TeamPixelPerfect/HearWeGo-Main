@@ -30,13 +30,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "@/lib/hooks";
 import { getCartByUser, getCartItems } from "@/app/services/StoreServices";
-import { CartItem } from "@/app/constants/models";
+import { CartItem, Order } from "@/app/constants/models";
 import Checkout from "@/app/components/Checkout";
+import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
 const Payment = () => {
+  const router = useRouter();
   const user = useAppSelector((state) => state?.user?.user);
 
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartId, setCartId] = useState<string>("");
   const [total, setTotal] = useState<number>(0);
 
   const [shippingAddress, setShippingAddress] = useState<string | null>(null);
@@ -51,6 +55,21 @@ const Payment = () => {
   const [postalCode, setPostalCode] = useState<string>("");
   const [shippingMethod, setShippingMethod] = useState<string | null>(null);
 
+  const [orderDetails, setOrderdetails] = useState<Order>({
+    user_id: user?.user_id,
+    order_total: total,
+    order_status: "to prepare",
+    order_date: dayjs().format("YYYY-MM-DD"),
+    order_time: dayjs().format("HH:mm:ss"),
+    delivery_date: dayjs().add(7, "day").format("YYYY-MM-DD"),
+    order_address: shippingAddress as string,
+    order_contact: user?.mobileNumber,
+    order_email: user?.email,
+    is_returned: false,
+    cart_items: cart,
+    cart_id: cartId,
+  });
+
   const [stripOpen, setStripeOpen] = useState(false);
 
   const handleAddShippingAddress = () => {
@@ -64,6 +83,7 @@ const Payment = () => {
   const handleSaveAddress = () => {
     const fullAddress = `${addressLine1}, ${addressLine2}, ${city}, ${country}, ${postalCode}`;
     setShippingAddress(fullAddress);
+    setOrderdetails({ ...orderDetails, order_address: fullAddress });
     setAddressDialogOpen(false);
   };
 
@@ -99,6 +119,7 @@ const Payment = () => {
   const fetchCart = () => {
     getCartByUser(user?.user_id as string).then((res) => {
       if (res) {
+        setCartId(res.cart_id);
         getCartItems(res.cart_id).then((items) => {
           if (items) {
             setCart(items.data);
@@ -110,6 +131,21 @@ const Payment = () => {
             );
 
             setTotal(total);
+
+            setOrderdetails({
+              user_id: user?.user_id,
+              order_total: total,
+              order_status: "to prepare",
+              order_date: dayjs().format("YYYY-MM-DD"),
+              order_time: dayjs().format("HH:mm:ss"),
+              delivery_date: dayjs().add(7, "day").format("YYYY-MM-DD"),
+              order_address: shippingAddress as string,
+              order_contact: user?.mobileNumber,
+              order_email: user?.email,
+              is_returned: false,
+              cart_items: items?.data,
+              cart_id: res?.cart_id,
+            });
           }
         });
       }
@@ -132,17 +168,24 @@ const Payment = () => {
       >
         <DialogTitle>Checkout</DialogTitle>
         <DialogContent>
-          <Checkout />
+          <Checkout amount={total} orderDetails={orderDetails} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleStripeClose}>Cancel</Button>
           <Button onClick={handleStripeClose}>Submit</Button>
         </DialogActions>
       </Dialog>
-      <h1 style={{ marginLeft: "40px" }}>
-        <ArrowBackIosNewIcon sx={{ marginRight: "10px" }} />
-        Payment Information
-      </h1>
+      <Box sx={{ display: "flex", alignItems: "center", margin: "20px" }}>
+        <IconButton onClick={() => router.back()} color="primary">
+          <ArrowBackIosNewIcon />
+        </IconButton>
+        <Typography
+          variant="h4"
+          sx={{ ml: 2, fontWeight: "bold", margin: "10px" }}
+        >
+          Payment Information
+        </Typography>
+      </Box>
       <Box
         sx={{
           display: "flex",
@@ -153,19 +196,27 @@ const Payment = () => {
         <Box sx={{ width: "40%" }}>
           <Card sx={{ marginBottom: "30px" }}>
             <CardContent>
-              <Typography variant="h6">Shipping Address</Typography>
+              <Typography variant="h5" sx={{ marginBottom: "20px" }}>
+                Shipping Address
+              </Typography>
               {shippingAddress ? (
                 <Typography>{shippingAddress}</Typography>
               ) : (
-                <Button variant="contained" onClick={handleAddShippingAddress}>
+                <Button
+                  variant="contained"
+                  onClick={handleAddShippingAddress}
+                  sx={{ ppadding: "10px 20px", fontSize: "16px" }}
+                >
                   Add Shipping Address +
                 </Button>
               )}
             </CardContent>
           </Card>
-          <Card sx={{ marginBottom: "20px" }}>
+          <Card sx={{ marginBottom: "30px" }}>
             <CardContent>
-              <Typography variant="h6">Shipping Method</Typography>
+              <Typography variant="h5" sx={{ marginBottom: "20px" }}>
+                Shipping Method
+              </Typography>
               <FormControl component="fieldset">
                 <RadioGroup
                   name="shipping-method"
@@ -190,7 +241,9 @@ const Payment = () => {
           </Card>
           <Card>
             <CardContent>
-              <Typography variant="h6">Payment Method</Typography>
+              <Typography variant="h5" sx={{ marginBottom: "20px" }}>
+                Payment Method
+              </Typography>
               <FormControl component="fieldset">
                 <RadioGroup
                   name="payment-method"
@@ -200,7 +253,7 @@ const Payment = () => {
                   }
                 >
                   <FormControlLabel
-                    value="Payhere"
+                    value="Stripe"
                     control={<Radio />}
                     label={
                       <Box
@@ -211,78 +264,15 @@ const Payment = () => {
                           width: "100%",
                         }}
                       >
-                        <span>Payhere</span>
+                        <span>Stripe</span>
                         <img
-                          src="https://payherestorage.blob.core.windows.net/payhere-resources/www/images/PayHere-Logo.png"
-                          alt="Payhere"
+                          src="https://i0.wp.com/www.frenchweb.fr/wp-content/uploads/2023/02/LOGO-850-stripe.png?fit=850%2C478&ssl=1"
+                          alt="Stripe"
                           style={{ width: "60px" }}
                         />
                       </Box>
                     }
                   />
-                  {/* <FormControlLabel
-                    value="visa"
-                    control={<Radio />}
-                    label={
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <span>Visa</span>
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUrSAW3P8DAScPXnS2Wc6d_IbbZSNd_GlFKQ&s"
-                          alt="Visa"
-                          style={{ width: "60px" }}
-                        />
-                      </Box>
-                    }
-                  />
-                  <FormControlLabel
-                    value="mastercard"
-                    control={<Radio />}
-                    label={
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <span>Mastercard</span>
-                        <img
-                          src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg"
-                          alt="Mastercard"
-                          style={{ width: "40px" }}
-                        />
-                      </Box>
-                    }
-                  />
-                  <FormControlLabel
-                    value="applepay"
-                    control={<Radio />}
-                    label={
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <span>Apple Pay</span>
-                        <img
-                          src="https://www.srcu4u.com/creditunion/wp-content/uploads/2019/07/Apple_Pay_Logo-01-01.png"
-                          alt="Apple Pay"
-                          style={{ width: "60px" }}
-                        />
-                      </Box>
-                    }
-                  /> */}
                 </RadioGroup>
               </FormControl>
             </CardContent>
@@ -291,24 +281,40 @@ const Payment = () => {
         <Box sx={{ width: "35%" }}>
           <Card>
             <CardContent>
-              <Typography variant="h6">Order Summary</Typography>
-              {cart?.map((item) => (
+              <Typography variant="h5" sx={{ marginBottom: "20px" }}>
+                Order Summary
+              </Typography>
+              {cart?.map((item, index) => (
                 <Box
+                  key={index}
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     marginBottom: "10px",
+                    borderBottom: "1px solid #e0e0e0",
+                    paddingBottom: "10px",
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <img
                       src={item?.cart_item_image}
                       alt={item?.cart_item_name}
-                      style={{ width: "50px", marginRight: "10px" }}
+                      style={{ width: "100px", marginRight: "10px" }}
                     />
-                    <Typography>{item?.cart_item_name}</Typography>
+                    <Typography sx={{ fontWeight: "bold" }}>
+                      {item?.cart_item_name}
+                    </Typography>
+                    <Typography style={{ marginLeft: "10px" }}>
+                      x{item?.product_quantity}
+                    </Typography>
                   </Box>
-                  <Typography>x{item?.product_quantity}</Typography>
+                  <Typography sx={{ fontWeight: "bold", fontSize: "16px" }}>
+                    Rs.{" "}
+                    {(
+                      Number(item?.product_price) *
+                      Number(item?.product_quantity)
+                    ).toFixed(2)}
+                  </Typography>
                 </Box>
               ))}
               <Box
@@ -318,8 +324,12 @@ const Payment = () => {
                   marginTop: "20px",
                 }}
               >
-                <Typography variant="h6">Total:</Typography>
-                <Typography variant="h6">LKR. {total.toFixed(2)}</Typography>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Total :
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Rs. {total.toFixed(2)}
+                </Typography>
               </Box>
 
               <Button
@@ -338,7 +348,7 @@ const Payment = () => {
         <Dialog open={addressDialogOpen} onClose={handleCloseAddressDialog}>
           <DialogTitle>Add Shipping Address</DialogTitle>
           <DialogContent>
-            <DialogContentText>
+            <DialogContentText sx={{ marginBottom: "10px" }}>
               Please enter your shipping address below.
             </DialogContentText>
             <TextField
@@ -348,7 +358,7 @@ const Payment = () => {
               label="Address Line 1"
               type="text"
               fullWidth
-              variant="standard"
+              variant="filled"
               value={addressLine1}
               onChange={(e) => setAddressLine1(e.target.value)}
             />
@@ -358,7 +368,7 @@ const Payment = () => {
               label="Address Line 2"
               type="text"
               fullWidth
-              variant="standard"
+              variant="filled"
               value={addressLine2}
               onChange={(e) => setAddressLine2(e.target.value)}
             />
@@ -368,7 +378,7 @@ const Payment = () => {
               label="City"
               type="text"
               fullWidth
-              variant="standard"
+              variant="filled"
               value={city}
               onChange={(e) => setCity(e.target.value)}
             />
@@ -378,7 +388,7 @@ const Payment = () => {
               label="Country"
               type="text"
               fullWidth
-              variant="standard"
+              variant="filled"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
             />
@@ -388,7 +398,7 @@ const Payment = () => {
               label="Postal Code"
               type="text"
               fullWidth
-              variant="standard"
+              variant="filled"
               value={postalCode}
               onChange={(e) => setPostalCode(e.target.value)}
             />
@@ -399,70 +409,182 @@ const Payment = () => {
           </DialogActions>
         </Dialog>
 
-        <Dialog open={orderDialogOpen} onClose={handleCloseOrderDialog}>
-          <DialogTitle>Order Summary</DialogTitle>
-          <DialogContent>
-            <Typography variant="h6">Shipping Address</Typography>
-            <Typography>{shippingAddress}</Typography>
-            <Typography variant="h6" sx={{ marginTop: "20px" }}>
-              Shipping Method
-            </Typography>
-            <Typography>
-              {shippingMethod === "standard"
-                ? "Standard Shipping"
-                : "Express Shipping"}
-            </Typography>
-            <Typography variant="h6" sx={{ marginTop: "20px" }}>
-              Payment Method
-            </Typography>
-            <Typography>{paymentMethod}</Typography>
-            <Typography variant="h6" sx={{ marginTop: "20px" }}>
-              Order Summary
-            </Typography>
-            <Box
+        <Dialog
+          open={orderDialogOpen}
+          onClose={handleCloseOrderDialog}
+          PaperProps={{ sx: { borderRadius: 4, boxShadow: 10 } }}
+        >
+          <DialogTitle
+            sx={{
+              fontWeight: "bold",
+              fontSize: "1.5rem",
+              // bgcolor: "primary.main",
+              // color: "white",
+              textAlign: "center",
+              py: 2,
+            }}
+          >
+            Order Summary
+          </DialogTitle>
+          <DialogContent dividers sx={{ px: 4, py: 3 }}>
+            <DialogContent
+              dividers
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "10px",
+                px: 4,
+                py: 3,
+
+                borderRadius: 2,
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {cart?.map((item) => (
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  mb: 2,
+                  color: "primary.main",
+                  borderBottom: "2px solid",
+                  borderColor: "primary.main",
+                  pb: 1,
+                }}
+              >
+                Shipping Address
+              </Typography>
+              <Typography sx={{ mb: 3, fontSize: "1rem", lineHeight: 1.5 }}>
+                {shippingAddress || "No address provided."}
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  mb: 2,
+                  color: "primary.main",
+                  borderBottom: "2px solid",
+                  borderColor: "primary.main",
+                  pb: 1,
+                }}
+              >
+                Shipping Method
+              </Typography>
+              <Typography sx={{ mb: 3, fontSize: "1rem", lineHeight: 1.5 }}>
+                {shippingMethod === "standard"
+                  ? "Standard Shipping"
+                  : "Express Shipping"}
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  mb: 2,
+                  color: "primary.main",
+                  borderBottom: "2px solid",
+                  borderColor: "primary.main",
+                  pb: 1,
+                }}
+              >
+                Payment Method
+              </Typography>
+              <Typography sx={{ mb: 3, fontSize: "1rem", lineHeight: 1.5 }}>
+                {paymentMethod || "No payment method selected."}
+              </Typography>
+            </DialogContent>
+
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: "bold", mb: 2, marginTop: "5px" }}
+            >
+              Order Summary
+            </Typography>
+            <Box sx={{ mb: 2 }}>
+              {cart?.map((item, index) => (
                 <Box
+                  key={index}
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
-                    marginBottom: "10px",
+                    alignItems: "center",
+                    py: 1,
+                    px: 2,
+
+                    borderRadius: 2,
+                    mb: 1,
+                    boxShadow: 1,
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <img
                       src={item?.cart_item_image}
                       alt={item?.cart_item_name}
-                      style={{ width: "50px", marginRight: "10px" }}
+                      style={{
+                        width: "50px",
+                        marginRight: "10px",
+                        borderRadius: 4,
+                      }}
                     />
-                    <Typography>{item?.cart_item_name}</Typography>
-                    <Typography style={{ marginLeft: "10px" }}>
+                    <Typography sx={{ fontWeight: "bold" }}>
+                      {item?.cart_item_name}
+                    </Typography>
+                    <Typography sx={{ marginLeft: "10px", color: "grey.600" }}>
                       x{item?.product_quantity}
                     </Typography>
                   </Box>
+                  <Typography sx={{ fontWeight: "bold" }}>
+                    LKR.{" "}
+                    {(
+                      Number(item?.product_price) *
+                      Number(item?.product_quantity)
+                    ).toFixed(2)}
+                  </Typography>
                 </Box>
               ))}
             </Box>
-
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                marginTop: "20px",
+                alignItems: "center",
+                py: 1,
+                px: 2,
+
+                borderRadius: 2,
+                boxShadow: 1,
               }}
             >
-              <Typography variant="h6">Total:</Typography>
-              <Typography variant="h6">LKR. {total.toFixed(2)}</Typography>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Total:
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                LKR. {total.toFixed(2)}
+              </Typography>
             </Box>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseOrderDialog}>Cancel</Button>
-            <Button onClick={handleConfirmOrder}>Confirm Order</Button>
+          <DialogActions sx={{ bgcolor: "#f9f9f9", py: 2 }}>
+            <Button
+              onClick={handleCloseOrderDialog}
+              sx={{
+                bgcolor: "grey.200",
+                color: "black",
+                fontWeight: "bold",
+                px: 3,
+                borderRadius: 3,
+                "&:hover": {},
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmOrder}
+              sx={{
+                bgcolor: "primary.main",
+                color: "white",
+                fontWeight: "bold",
+                px: 3,
+                borderRadius: 3,
+                "&:hover": { bgcolor: "primary.dark" },
+              }}
+            >
+              Confirm Order
+            </Button>
           </DialogActions>
         </Dialog>
 

@@ -146,7 +146,7 @@ export const getCategories = async () => {
     },
   });
   if (res.ok) {
-    const category = await res.json();
+    const category = await res.json();  
     return category;
   } else {
     const error = await res.json();
@@ -408,3 +408,69 @@ export const deleteCartItem = async (token: string, cartItemId: string) => {
     throw new Error(error.message);
   }
 };
+
+export const getProductsByCategory = async (category_name: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/products/category/${category_name}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const products = await res.json();
+    return products;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getProducts = async () => {
+  const res = await fetch(`${base_url}/MerchsManager/products`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    const products = await res.json();
+    return products;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const getOrder = async (token: string, orderId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/orders/${orderId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const order = await res.json();
+    return order;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
+
+export const getOrdersForUser = async (token: string, userId: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/orders/user/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const orders = await res.json();
+    return orders;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+}
