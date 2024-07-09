@@ -31,6 +31,7 @@ import {
 import CardMedia from "@mui/material/CardMedia";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
+import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from "@mui/icons-material/Delete";
 import Divider from "@mui/material/Divider";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
@@ -136,7 +137,7 @@ function switchStatus (status: string) {
     case "private":
       return <Chip color="secondary" icon={<LockIcon />} label="Private" />;
     default:
-      return <Chip icon={<LockIcon />} label="Private" />;
+      return <Chip color="error" icon={<BlockIcon />} label="Blocked" />;
   }
 }
 
