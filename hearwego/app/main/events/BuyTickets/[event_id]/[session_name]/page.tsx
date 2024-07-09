@@ -40,7 +40,7 @@ import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import EventCheckout from "@/app/components/EventCheckout";
 import { id } from "date-fns/locale";
-import * as htmlToImage from 'html-to-image';
+import * as htmlToImage from "html-to-image";
 import JSZip from "jszip";
 // import { saveAs } from "file-saver";
 
@@ -417,12 +417,14 @@ export default function Page() {
 
   const generateURL = (url) => {
     const currentUrl = url;
-    const urlParts = currentUrl.split('/').filter(part => part !== "BuyTickets");
+    const urlParts = currentUrl
+      .split("/")
+      .filter((part) => part !== "BuyTickets");
     urlParts.pop();
-    const newUrl = urlParts.join('/');
+    const newUrl = urlParts.join("/");
 
     return newUrl;
-  }
+  };
 
   const handleDownloadImages = () => {
     const zip = new JSZip();
@@ -624,8 +626,8 @@ export default function Page() {
                   );
                   return autoTicket ? (
                     <Paper
-                    ref={(el) => (boxRefs.current[index] = el)}
-                    key={ticket.ticket_id}
+                      ref={(el) => (boxRefs.current[index] = el)}
+                      key={ticket.ticket_id}
                       sx={{
                         width: "100%",
                         display: "flex",
@@ -752,12 +754,7 @@ export default function Page() {
                       >
                         {/* <QRCodeComponent value={qrValue} url={currentUrl} /> */}
                         <QRCodeComponent
-                          value={`URL: ${generateURL(window.location.href)}\n
-                                  Ticket ID: ${id_list[index] as string}\n
-                                  Ticket Type: ${autoTicket?.ticket_type}\n
-                                  Event: ${event?.event_name as string}\n
-                                  Session: ${session_name as string}\n
-                                  No of Tickets: ${ticket.ticket_count}\n `}
+                          value={`Ticket ID: ${id_list[index] as string}\nTicket Type: ${autoTicket?.ticket_type}\nEvent: ${event?.event_name as string}\nSession: ${session_name as string}\nNo of Tickets: ${ticket.ticket_count}\n URL: ${generateURL(window.location.href)}\n`}
                         />
                       </Box>
                     </Paper>
