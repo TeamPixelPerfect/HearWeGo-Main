@@ -122,7 +122,7 @@ const AddSong = () => {
                   <Button
                     variant="outlined"
                     onClick={() => {
-                      Router.replace("add");
+                      Router.push("/artist/songs");
                     }}
                   >
                     Cancel

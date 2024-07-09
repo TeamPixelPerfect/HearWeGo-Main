@@ -1173,7 +1173,14 @@ const ADHomePage = () => {
           <Button variant="outlined" color="error" onClick={handleLogOut}>
             Log Out
           </Button>
-          <Button variant="outlined">Close</Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              window.history.back();
+            }}
+          >
+            Close
+          </Button>
           <LoadingButton
             loading={loading}
             onClick={handleUpdate}
