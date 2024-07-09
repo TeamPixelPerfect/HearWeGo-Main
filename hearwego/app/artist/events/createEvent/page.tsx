@@ -322,6 +322,20 @@ function CreateEvent() {
   useEffect(() => {
     setEventData({
       ...eventData,
+      teams: teamRows.map(
+        ({ id, teamType, teamName, teamContact, teamEmail }) => ({
+          team_type: teamType,
+          team_name: teamName,
+          contact: teamContact,
+          email: teamEmail,
+        })
+      ),
+    });
+  }, [teamRows]);
+
+  useEffect(() => {
+    setEventData({
+      ...eventData,
       sessions: sessionRows.map(
         ({
           id,
@@ -342,6 +356,13 @@ function CreateEvent() {
           session_special_notice: description,
         })
       ),
+    })
+  }
+  , [sessionRows]);
+
+  useEffect(() => {
+    setEventData({
+      ...eventData,
       sponsor: sponsorRows.map(
         ({ id, sponsorType, sponsorName, sponsorContact, sponsorEmail }) => ({
           sponsor_type: sponsorType,
@@ -350,16 +371,9 @@ function CreateEvent() {
           sponsor_email: sponsorEmail,
         })
       ),
-      teams: teamRows.map(
-        ({ id, teamType, teamName, teamContact, teamEmail }) => ({
-          team_type: teamType,
-          team_name: teamName,
-          contact: teamContact,
-          email: teamEmail,
-        })
-      ),
-    });
-  }, [sessionRows, sponsorRows, teamRows]);
+    })
+  }
+  , [sponsorRows]);
 
   useEffect(() => {
     setTicketData({
@@ -800,7 +814,7 @@ function CreateEvent() {
                 <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                   <Button
                     color="inherit"
-                    disabled={activeStep === 0}
+                    disabled={true}
                     onClick={handleBack}
                     sx={{ mr: 1 }}
                   >
