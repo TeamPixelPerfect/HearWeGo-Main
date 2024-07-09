@@ -610,6 +610,11 @@ function CreateEvent() {
       Errors.push("There is no budget details provided. You can skip this step and add budget details later.");
     }
 
+    if (!isValid) {
+      setErrorMessages(Errors);
+      handleOpenErrorModal();
+    }
+
     return isValid;
   };
 
