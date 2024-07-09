@@ -190,7 +190,7 @@ const ADHomePage = () => {
     setTabValue(newValue);
   };
   const [profilePicture, setProfilePicture] = useState<any>(
-    artist?.user.profilePicture || ""
+    artist?.profilePicture || ""
   );
   // New state for cover photo editing
   const [coverPhoto, setCoverPhoto] = useState<any>(
@@ -210,9 +210,9 @@ const ADHomePage = () => {
   };
 
   const [isEditingName, setIsEditingName] = useState(false); // State to control edit mode
-  const [artistName, setArtistName] = useState(artist?.user.artistName || "");
+  const [artistName, setArtistName] = useState(artist?.artistName || "");
   const [isEditingBio, setIsEditingBio] = useState(false); // State to control bio edit mode
-  const [artistBio, setArtistBio] = useState(artist?.user.artistBio || "");
+  const [artistBio, setArtistBio] = useState(artist?.artistBio || "");
 
   // Placeholder function to simulate an API call to save the artist name
   const saveArtistName = (name: string) => {
@@ -303,13 +303,13 @@ const ADHomePage = () => {
     setProfiles(updatedProfiles);
   };
 
-  const [alias, setAlias] = useState(artist?.user?.alias || "");
-  const [email, setEmail] = useState(artist?.user?.email || "");
+  const [alias, setAlias] = useState(artist?.alias || "");
+  const [email, setEmail] = useState(artist?. email || "");
   // const [address, setAddress] = useState("America");
-  const [contribute, setContribute] = useState(artist?.user?.artistProfession);
-  const [birthDay, setBirthDay] = useState(artist?.user?.birthDate);
-  const [genre, setGenre] = useState(artist?.user?.musicGenres);
-  const [gender, setGender] = useState(artist?.user?.gender?.toLowerCase());
+  const [contribute, setContribute] = useState(artist?.artistProfession);
+  const [birthDay, setBirthDay] = useState(artist?.birthDate);
+  const [genre, setGenre] = useState(artist?.musicGenres);
+  const [gender, setGender] = useState(artist?.gender?.toLowerCase());
 
   const [selectedCountry, setSelectedCountry] = useState(artist?.user?.country);
   const [artistBankDetails, setArtistBankDetails] = useState({
@@ -371,9 +371,9 @@ const ADHomePage = () => {
   });
 
   const [promoBanners, setPromoBanners] = useState<any>([
-    artist?.artistCovers[0] || "",
-    artist?.artistCovers[1] || "",
-    artist?.artistCovers[2] || "",
+    artist?.artistCovers?.length > 0 ? artist?.artistCovers[0] : "",
+    artist?.artistCovers?.length > 0 ? artist?.artistCovers[1] : "",
+    artist?.artistCovers?.length > 0 ? artist?.artistCovers[2] : "",
   ]);
 
   const submitData = async (values: Artistcover) => {};
@@ -733,6 +733,7 @@ const ADHomePage = () => {
               variant="filled"
               fullWidth
               margin="normal"
+              disabled
             />
           </Box>
           <Box
@@ -801,7 +802,7 @@ const ADHomePage = () => {
               disableClearable
               options={genres.map((option) => option.label)}
               defaultValue={genre}
-              onChange={handleContributeChange}
+              onChange={handleGenreChange}
               renderInput={(params) => (
                 <TextField
                   {...params}

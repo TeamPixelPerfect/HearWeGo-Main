@@ -102,10 +102,10 @@ export const MainSongCard = ({ songData, setIsDeleted }: HomeSongCardProps) => {
         <SongCardCoverArt imgUrl={songData.song_img ? songData.song_img : ""} />
         <Typography variant="h6">{songData.song_title}</Typography>
       </Box>
-      <SongCardItem width="20%">
+      {/* <SongCardItem width="20%">
         <MdAlbum />
         <Typography variant="body1">{songData.album_title}</Typography>
-      </SongCardItem>
+      </SongCardItem> */}
       <SongCardItem width="15%">
         <FaEye />
         <Typography variant="body1">{songData.no_of_impressions}</Typography>
