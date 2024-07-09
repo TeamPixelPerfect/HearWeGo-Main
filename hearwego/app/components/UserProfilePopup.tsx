@@ -46,6 +46,8 @@ import {
   handleUserPasswordChange,
 } from "../services/AuthServices";
 import PhoneInput from "react-phone-input-2";
+import { updateUser } from "../services/UserServices";
+import { set } from "date-fns";
 
 // Styled dialog component
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -153,6 +155,24 @@ const UserProfilePopup = ({
 
   const handleChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
+  };
+
+  const handleUpdateUser = () => {
+    updateUser({ id: user?._id, name, profilePicture }).then((res) => {
+      if (res) {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("User details updated successfully");
+        sessionStorage.setItem("hwg-user", JSON.stringify({...user, name, profilePicture}));
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage("Failed to update user details");
+      }
+    });
   };
 
   const handleChangePassword = () => {
@@ -556,7 +576,7 @@ const UserProfilePopup = ({
         </Box>
 
         <DialogActions>
-          <Button variant="text" autoFocus onClick={handleClose}>
+          <Button variant="text" autoFocus onClick={handleUpdateUser}>
             Save Changes
           </Button>
           <Button variant="text" color="error" autoFocus onClick={handleLogOut}>

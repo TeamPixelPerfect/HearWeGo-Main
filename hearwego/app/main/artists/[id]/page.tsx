@@ -69,12 +69,17 @@ export default function SingleArtistPage({ params: { id } }: Props) {
   React.useEffect(() => {
     getAlbumForArtists(artist?.token as string, id).then((res) => {
       console.log("Albums:::", res);
-      setAlbumByArtist(res.data);
+      if (res?.data) {
+        const albums = res.data.filter((album: Album) => album.privacy === "Public");
+        setAlbumByArtist(albums);
+      }
     });
 
     getSongsForArtist(artist?.token as string, id).then((res) => {
-      console.log("Songs:::", res);
-      setSongByArtist(res.data);
+      if (res?.data) {
+        const songs = res.data.filter((song: Song) => song.privacy_status === "Public");
+        setSongByArtist(songs);
+      }
     });
 
     getStoreForArtist(id).then((res) => {

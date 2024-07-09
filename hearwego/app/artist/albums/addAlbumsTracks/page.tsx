@@ -208,6 +208,7 @@ export default function AddAlbumTracks() {
                       Reset
                     </Button>
                     {/* Button to save album tracks  */}
+
                     <LoadingButton
                       loading={uploading}
                       startIcon={<SaveIcon />}
@@ -323,7 +324,12 @@ function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
           sx={{ display: "flex", alignItems: "center" }}
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ClickPlay song_track={song ? song.song_track : ""} />
+            <ClickPlay
+              url={song?.song_track as string}
+              songName={song?.song_title as string}
+              artist={song?.artist?.map((a: any) => a.artist_name).join("," ) as string}
+              coverArt={song?.song_img as string}
+            />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -338,9 +344,19 @@ function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
 }
 
 // Component for handling play/pause button
-function ClickPlay({ song_track }: { song_track: string }) {
+function ClickPlay({
+  url,
+  songName,
+  artist,
+  coverArt,
+}: {
+  url: string;
+  songName: string;
+  artist: string;
+  coverArt: string;
+}) {
   // Custom hook to manage audio playback
-  const { playing, toggle } = useAudio({ url: song_track });
+  const { playing, toggle } = useAudio({ url, songName, artist, coverArt });
 
   return (
     <>

@@ -52,7 +52,11 @@ import {
   SongDetailTitleEven,
 } from "@/app/styles/artistSongDetails.styles";
 import Link from "next/link";
-import { deleteSong, getSong } from "@/app/services/SongServices";
+import {
+  deleteSong,
+  getSong,
+  getSongDuration,
+} from "@/app/services/SongServices";
 import { useRouter } from "next/navigation";
 import LoadingButton from "@mui/lab/LoadingButton";
 import dayjs from "dayjs";
@@ -230,17 +234,13 @@ function SongPreview({ songData }: SongPreviewProps) {
         <Alert
           variant="filled"
           severity={
-            songData?.song_status === "Released"
-              ? "success"
-              : songData?.song_status === "To Release"
-              ? "warning"
-              : songData?.song_status === "Draft"
-              ? "info"
-              : "info"
+            dayjs(songData?.release_date).isAfter(dayjs()) ? "info" : "success"
           }
           sx={{ width: "200px", marginBottom: "1em" }}
         >
-          {songData.song_status}
+          {dayjs(songData?.release_date).isAfter(dayjs())
+            ? "To Release"
+            : "Released"}
         </Alert>
       </SongPreviewDetails>
 
@@ -372,6 +372,14 @@ const SongDetails = ({ params: { id } }: Props) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (songDetails?.song_track) {
+      getSongDuration(songDetails?.song_track).then((res: any) => {
+        setSongDetails((prev) => ({ ...prev, song_length: res }));
+      });
+    }
+  }, [songDetails?.song_track]);
+
   if (!songDetails) return <div>Loading...</div>;
 
   return (
@@ -447,7 +455,12 @@ const SongDetails = ({ params: { id } }: Props) => {
             Length
           </SongDetailTitle>
           <SongDetailData item xs={8} md={10}>
-            {songDetails?.song_length}
+            {songDetails?.song_length &&
+              Math.floor(songDetails?.song_length / 60) +
+                ":" +
+                Math.floor(songDetails?.song_length % 60)
+                  .toString()
+                  .padStart(2, "0")}
           </SongDetailData>
 
           <SongDetailTitleEven item xs={4} md={2}>

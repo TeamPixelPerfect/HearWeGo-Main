@@ -18,7 +18,7 @@ import {
   Paper,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import FavoriteIcon from "@mui/icons-material/ThumbUp";
 import CommentIcon from "@mui/icons-material/Comment";
 import SendIcon from "@mui/icons-material/Send";
 import ReplyIcon from "@mui/icons-material/Reply";
@@ -38,6 +38,7 @@ import {
   addReacts,
   getReactsByPost,
 } from "@/app/services/FanClubServices";
+import set from "date-fns/fp/set/index";
 
 const FeedTab = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -52,9 +53,9 @@ const FeedTab = () => {
   );
   const user = useAppSelector((state) => state.user.user);
   const [commentFormData, setCommentFormData] = useState({
-    commenter: "",
+    commenter: artist?.user.artistName || "",
     commentBody: "",
-    commenter_ProfilePic: user?.profilePicture || "",
+    commenter_ProfilePic: artist?.user.profilePicture || "",
     postId: "",
     timestamps: new Date().toISOString(),
   });
@@ -62,7 +63,7 @@ const FeedTab = () => {
   const [replyFormData, setReplyFormData] = useState({
     replier: "",
     replyBody: "",
-    replier_ProfilePic: user?.profilePicture || "",
+    replier_ProfilePic:artist?.user.profilePicture || "",
     commentId: "",
     timestamps: new Date().toISOString(),
   });
@@ -76,6 +77,20 @@ const FeedTab = () => {
   const [selectedComment, setSelectedComment] = useState<comments | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState<string>("");
+  const [commentsCount, setCommentsCount] = useState<{ [key: string]: number }>(
+    {}
+  );
+
+  useEffect(() => {
+    setReplyFormData({
+      ...replyFormData,
+      replier: artist?.user.artistName || "",
+      replier_ProfilePic: artist?.user.profilePicture|| "",
+    });
+  }
+  , [user?.name, user?.profilePicture]);
+
+
 
   useEffect(() => {
     if (artist?.token) {
@@ -86,6 +101,29 @@ const FeedTab = () => {
         .then((post) => {
           console.log("Club Posts: ", post);
           setClubPost(post.data);
+
+          // Fetch comments count for each post
+          post.data.forEach((postItem: ClubPost) => {
+            getCommentsByPost(artist.token, postItem.postId || "")
+              .then((comments) => {
+                setCommentsCount((prevCount) => ({
+                  ...prevCount,
+                  [postItem.postId || ""]: comments.data.length,
+                }));
+              })
+              .catch((error) => console.log(error));
+          });
+
+          post.data.forEach((postItem: ClubPost) => {
+            getReactsByPost(artist.token, postItem.postId || "")
+              .then((reacts) => {
+                setReactsCount((prevCount) => ({
+                  ...prevCount,
+                  [postItem.postId || ""]: reacts.data.length,
+                }));
+              })
+              .catch((error) => console.log(error));
+          });
         })
         .catch((error) => console.log(error));
     }
@@ -93,7 +131,7 @@ const FeedTab = () => {
 
   useEffect(() => {
     if (selectedPost) {
-      getCommentsByPost(artist?.token, selectedPost.postId || "")
+      getCommentsByPost(artist?.token?artist.token:"", selectedPost.postId || "")
         .then((comments) => {
           console.log("Comments: ", comments);
           setCommentsData(comments.data);
@@ -120,7 +158,7 @@ const FeedTab = () => {
   };
 
   const handleDeleteClick = (commentId: string | undefined) => {
-    deleteComment(artist?.token, commentId || "")
+    deleteComment(artist?.token?artist.token:"", commentId || "")
       .then(() => {
         console.log("Comment deleted successfully");
         setDeleteSuccessMessage("Comment deleted successfully");
@@ -132,7 +170,7 @@ const FeedTab = () => {
       .catch((error) => console.log(error));
   };
   const handleDeletePostClick = () => {
-    deletePost(artist?.token, menuPostId || "")
+    deletePost(artist?.token?artist.token:"", menuPostId || "")
       .then(() => {
         console.log("Post deleted successfully");
         setDeleteSuccessMessage("Post deleted successfully");
@@ -158,7 +196,7 @@ const FeedTab = () => {
 
   const handleCommentSubmit = async () => {
     try {
-      await addComments(artist?.token, {
+      await addComments(artist?.token?artist.token:"", {
         ...commentFormData,
         postId: selectedPost?.postId || "",
       });
@@ -167,7 +205,7 @@ const FeedTab = () => {
         commentBody: "",
       });
       if (selectedPost) {
-        getCommentsByPost(artist?.token, selectedPost.postId || "")
+        getCommentsByPost(artist?.token?artist.token:"", selectedPost.postId || "")
           .then((comments) => {
             console.log("Updated Comments: ", comments);
             setCommentsData(comments.data);
@@ -186,7 +224,7 @@ const FeedTab = () => {
       setSelectedComment(comment);
       try {
         const replies = await getRepliesByComment(
-          artist?.token,
+          artist?.token?artist.token:"",
           comment.commentId || ""
         );
         setRepliesData((prevReplies) => ({
@@ -201,7 +239,7 @@ const FeedTab = () => {
 
   const handleReplySubmit = async () => {
     try {
-      await addReplies(artist?.token, {
+      await addReplies(artist?.token?artist.token:"", {
         ...replyFormData,
         commentId: selectedComment?.commentId || "",
       });
@@ -210,7 +248,7 @@ const FeedTab = () => {
         replyBody: "",
       });
       if (selectedComment) {
-        getRepliesByComment(artist?.token, selectedComment.commentId || "")
+        getRepliesByComment(artist?.token?artist.token:"", selectedComment.commentId || "")
           .then((replies) => {
             console.log("Updated Replies: ", replies);
             setRepliesData((prevReplies) => ({
@@ -227,7 +265,7 @@ const FeedTab = () => {
 
   const handleReactClick = async (post: ClubPost) => {
     try {
-      const reacts = await getReactsByPost(artist?.token, post.postId || "");
+      const reacts = await getReactsByPost(artist?.token?artist.token:"", post.postId || "");
       setReactsCount((prevCount) => ({
         ...prevCount,
         [post.postId || ""]: reacts.data.length,
@@ -237,16 +275,60 @@ const FeedTab = () => {
     }
   };
 
+  const handleAddComment = (postId: number, comment: Comment) => {
+    const updatedPosts = clubPost.map((post: any) => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          comments: [...post.comments, comment],
+        };
+      }
+      return post;
+    });
+    setClubPost(updatedPosts);
+  };
+
+  const handleReplyToComment = (
+    postId: string,
+    commentId: string,
+    replyContent: string
+  ) => {
+    const reply: Comment = {
+      id: Date.now(),
+      user: "User",
+      content: replyContent,
+      profilePicture: "path/to/artist/profile/picture.jpg", // Replace with actual path
+      timestamp: new Date().toISOString(),
+      isArtist: true,
+    };
+
+    const updatedPosts = clubPost.map((post: any) => {
+      if (post.id === postId) {
+        const updatedComments = post.comments.map((comment: any) =>
+          comment.id === commentId
+            ? { ...comment, replies: [...(comment.replies || []), reply] }
+            : comment
+        );
+        return { ...post, comments: updatedComments };
+      }
+      return post;
+    });
+
+    setClubPost(updatedPosts);
+  };
+
+
   return (
-    <Box sx={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "100%",
-      marginTop: "1rem",
-    
-    }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        marginTop: "1rem",
+      }}
+    >
       {clubPost.map((post) => (
         <Card
           key={post.createdAt}
@@ -282,7 +364,7 @@ const FeedTab = () => {
                   open={Boolean(anchorEl)}
                   onClose={handleMoreClose}
                 >
-                  <MenuItem onClick={handleEditClick}>Edit</MenuItem>
+                  {/* <MenuItem onClick={handleEditClick}>Edit</MenuItem> */}
                   <MenuItem onClick={handleDeletePostClick}>Delete</MenuItem>
                 </Menu>
               </>
@@ -291,55 +373,46 @@ const FeedTab = () => {
             subheader={new Date(post.createdAt).toLocaleString()}
           />
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p" sx={{marginLeft:"10px"}}>
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              component="p"
+              sx={{ marginLeft: "10px" }}
+            >
               {post.postDescription}
             </Typography>
 
-            <Box sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-            
-            }}>
-            {post.postImage_URL && (
-              <img
-                src={post.postImage_URL}
-                alt="Post image"
-                style={{
-                  width: "80%",
-                  marginTop: "1rem",
-                  maxHeight: "400px",
-                  objectFit: "cover",
-                }}
-              />
-            )}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
+              {post.postImage_URL && (
+                <img
+                  src={post.postImage_URL}
+                  alt="Post image"
+                  style={{
+                    width: "80%",
+                    marginTop: "1rem",
+                    maxHeight: "400px",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
             </Box>
             <Box
               sx={{ display: "flex", marginTop: "1rem", alignItems: "center" }}
             >
               <IconButton
                 onClick={() => handleReactClick(post)}
-                sx={{
-                  color: reactsCount[post.postId || ""] ? "blue" : "gray",
-                  transition: "color 0.3s, transform 0.3s",
-                  "&:hover": {
-                    color: "blue",
-                    transform: "scale(1.3)",
-                  },
-                  display: "flex",
-                  alignItems: "center",
-                }}
+                color="primary"
               >
-                <ThumbUpIcon />
-                <Typography
-                  sx={{
-                    marginLeft: "5px",
-                    fontWeight: "bold",
-                    color: reactsCount[post.postId || ""] ? "blue" : "gray",
-                  }}
-                >
-                  {reactsCount[post.postId || ""] || 0}
+                <FavoriteIcon />
+                <Typography variant="body2" style={{ marginLeft: 8 }}>
+                  {reactsCount[post.postId as string] || 0}
                 </Typography>
               </IconButton>
               <IconButton
@@ -347,6 +420,9 @@ const FeedTab = () => {
                 sx={{ marginLeft: "10px" }}
               >
                 <CommentIcon />
+                <Typography variant="body2" style={{ marginLeft: 8 }}>
+                  Comments  {commentsCount[post.postId as string] || 0}
+                </Typography>
               </IconButton>
             </Box>
 
@@ -374,12 +450,12 @@ const FeedTab = () => {
                     >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Avatar
-                          src={user?.profilePicture}
+                           src={comment.commenter_ProfilePic}
                           sx={{ marginRight: 2 }}
                         />
                         <Box>
                           <Typography variant="subtitle2">
-                            {user?.name ? user?.name : ""}
+                          {comment.commenter}
                           </Typography>
                           <Typography variant="caption" color="textSecondary">
                             {new Date(comment.createdAt).toLocaleString()}
@@ -412,7 +488,7 @@ const FeedTab = () => {
                             (reply, index) => (
                               <Box key={index} sx={{ display: "flex", mb: 1 }}>
                                 <Avatar
-                                  src={artist?.user.profilePicture}
+                                  src={reply.replier_ProfilePic}
                                   sx={{
                                     marginRight: 2,
                                     marginTop: "8px",
@@ -421,7 +497,7 @@ const FeedTab = () => {
                                 />
                                 <Box sx={{ marginTop: "5px" }}>
                                   <Typography variant="subtitle1">
-                                    {artist?.user.artistName}
+                                    {reply.replier}
                                   </Typography>
                                   <Typography
                                     variant="caption"

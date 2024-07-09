@@ -54,7 +54,12 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
     });
 
     getSongsForAlbum(album_id).then((songs) => {
-      setAlbumSongs(songs);
+      if (songs) {
+        const filtered = songs.filter(
+          (song: Song) => song.privacy_status === "Public"
+        );
+        setAlbumSongs(songs);
+      }
     });
 
     incrementAlbumImpression();

@@ -275,6 +275,8 @@ export interface SoldTickets {
   user_name?: string;
   user_email?: string;
   user_contact?: string;
+  user_nic?: string;
+  order_ticket_id?: string;
 }
 
 export interface RemainingTickets {
@@ -343,10 +345,9 @@ export interface MerchStore {
 }
 
 export interface Artistcover {
- 
   store_banner?: string;
   promo_banner?: string[];
-  
+
   artist_id?: string;
 }
 
@@ -412,7 +413,7 @@ export interface Cart {
 export interface CartItem {
   cart_item_id?: string;
   product_id?: string;
-  variation?:  ProductVariant[];
+  variation?: ProductVariant[];
   product_quantity?: number;
   product_price?: number;
   product_name?: string;
@@ -426,6 +427,28 @@ export interface ProductVariant {
   variation_value?: string;
   variation_price?: Number;
   variation_quantity?: Number;
+}
+
+export interface EventInterest  {
+  interest_id?: string;
+  event_id?: string;
+  user_id?: string;
+}
+  
+export interface Order {
+  user_id?: string;
+  order_total?: number;
+  order_status?: string;
+  order_date?: string;
+  order_time?: string;
+  delivery_date?: string;
+  order_address?: string;
+  order_contact?: string;
+  order_email?: string;
+  is_returned?: boolean;
+  cart_items?: CartItem[];
+  cart_id?: string;
+  order_id?: string;
 }
 
 export interface replies {
@@ -480,6 +503,14 @@ export interface reacts {
   timestamps?: string;
 }
 
+export interface newsreacts {
+  newsreactId?: string;
+  newsreacter?: string;
+  newsId?: string;
+  timestamps?: string;
+}
+
+
 export interface Newscomments {
   newscommentId?: string;
   newscommenter?: string;
@@ -499,4 +530,56 @@ export interface ClubVideos {
   clubId?: string;
   artistId?: string;
   timestamps?: string;
+}
+
+
+export interface newsreplies {
+  newsreplyId?: string;
+  newsreplier?: string;
+  newsreplyBody?: string;
+  newsId?: string;
+  newsreplier_ProfilePic?: string;
+  newscommenter_ProfilePic?: string;
+  newscommentId?: string;
+}
+
+export interface HelpComplaints {
+  ComplaintFormId?: string;
+  ComplaintTitle?: string;
+  userName?: string;
+  userEmail?: string;
+  userId?: string;
+  ProblemInBrief?: string;
+  isHandled?: boolean;
+  status: "to_solve" | "solved";
+  solution?: string;
+}
+
+
+interface articalQandA {
+  question?: string;
+  answer?: string;
+}
+
+
+export interface HelpArticle {
+  articalId?: string;
+  articalTitle?: string;
+  articalImage_URL?: string;
+  QandA?: articalQandA[];
+}
+
+export interface PressReleaseData{
+  PressReleaseID?: string;
+  ArtistLogo_URL?: string;
+  Headline?: string;
+  SubHeadline?: string;
+  EventDate?: Date;
+  Venue?: string;
+  Description?: string;
+  Signature?: string;
+  ReleaseDate?: Date;
+  ArtistID?: string;
+  Status?: string;
+  emails?: string[];
 }

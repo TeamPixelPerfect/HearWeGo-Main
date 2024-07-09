@@ -151,7 +151,7 @@ export const getClubPostsByArtist = async (token: string, artistId: string) => {
   }
 };
 
-export const getClubNewsByArtist = async (token: string, artistId: string) => {
+export const getClubNewsByArtist = async (token: string, artistId: string) => {''
   const res = await fetch(
     `${base_url}/FanClubManager/clubNews/Artist/${artistId}`,
     {
@@ -238,6 +238,25 @@ export const addReplies = async (token: string, data: any) => {
   }
 };
 
+export const addNewsReplies = async (token: string, data: any) => {
+  console.log("Sending newsreplies data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/newsreplies`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const newsreplies = await res.json();
+    return newsreplies;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
 export const getRepliesByComment = async (token: string,  commentId: string) => {
   const res = await fetch(
     `${base_url}/FanClubManager/replies/Comment/${commentId}`,
@@ -261,6 +280,28 @@ export const getRepliesByComment = async (token: string,  commentId: string) => 
   }
 };
 
+export const getRepliesByNewsComment = async (token: string,  newscommentId: string) => {
+  const res = await fetch(
+    `${base_url}/FanClubManager/newsreplies/NewsComment/${newscommentId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.ok) {
+    const newsreplies = await res.json();
+    console.log("Club newsreplies Services: ", newsreplies);
+    return newsreplies;
+  } else {
+    const error = await res.json();
+    console.log("Club newsreplies Services Error: ", error);
+    throw new Error(error.message);
+  }
+};
 export const deleteComment = async (token: string, commentId: string) => {
   const res = await fetch(
     `${base_url}/FanClubManager/comments/${commentId}`,
@@ -343,6 +384,28 @@ export const addReacts = async (token: string, data: any) => {
     throw new Error(error.message);
   }
 };
+
+export const addNewsReacts = async (token: string, data: any) => {
+  console.log("Sending newsreacts data:", data);
+  const res = await fetch(`${base_url}/FanClubManager/newsreacts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    const newsreacts = await res.json();
+    return newsreacts;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+
 
 export const getReactsByPost = async (token: string, postId: string) => {
   const res = await fetch(

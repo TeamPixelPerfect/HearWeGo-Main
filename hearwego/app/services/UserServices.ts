@@ -69,7 +69,7 @@ export const createUser = async (user: any) => {
 
 export const updateUser = async (user: any) => {
   const res = await fetch(`${base_url}/users/${user.id}`, {
-    method: "PUT",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },

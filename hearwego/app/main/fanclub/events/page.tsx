@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import {
   CssBaseline,
   ThemeProvider,
@@ -12,24 +12,18 @@ import {
   CardActions,
   Grid,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  IconButton,
   Slide,
 } from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
+import { getArtist, getArtistV2 } from "@/app/services/ArtistServices";
+import { useAppSelector } from "@/lib/hooks";
+import { getUpcomingEventsForGivenArtist } from "@/app/services/EventServices";
+import { Event } from "@/app/constants/models";
+import {useRouter} from "next/navigation";
 
-// Define the event data
 const events = [
   {
     title: "Event One",
@@ -105,9 +99,31 @@ const theme = createTheme({
   },
 });
 
-const App: React.FC = () => {
+interface Props {
+  artist_id: string;
+}
+const App = ({ artist_id }: Props) => {
+  const user = useAppSelector((state) => state.user.user);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [artist, setArtist] = useState<any>();
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.token) {
+      getUpcomingEventsForGivenArtist( 1,10,artist_id as string)
+        .then((events) => {
+          console.log("Club events: ", events);
+          setEvents(events.data);
+        })
+        .catch((error) => console.log(error));
+    }
+
+    getArtistV2(artist_id).then((res) => {
+      setArtist(res.user);
+    });
+  }, [artist_id, user?.token]);
 
   const handleLearnMoreClick = (event: any) => {
     setSelectedEvent(event);
@@ -123,11 +139,15 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold"}}>
-        Events
-        </Typography>
-        <Grid container spacing={3}>
-          {events.map((event, index) => (
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+          Upcoming Events
+          </Typography>
+        </Grid>
+        {artist &&
+          events.map((Event, index) => {
+            return (
             <Grid item key={index} xs={12} sm={6} md={4}>
               <Slide direction="up" in={true} timeout={index * 250}>
                 <Card
@@ -141,36 +161,38 @@ const App: React.FC = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={event.image}
-                    alt={event.title}
+                    image={Event.event_img}
+                    alt={Event.event_name}
                     sx={{ objectFit: "cover" }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" component="div" gutterBottom>
-                      {event.title}
+                    {Event.event_name}
                     </Typography>
                     <Typography
                       variant="body2"
                       color="text.secondary"
                       gutterBottom
                     >
-                      <EventIcon fontSize="small" /> {event.date}
+                      <EventIcon fontSize="small" /> {new Date(Event.sessions?.[0]?.session_date ?? "").toLocaleDateString()}
                     </Typography>
                     <Typography
                       variant="body2"
                       color="text.secondary"
                       gutterBottom
                     >
-                      <LocationOnIcon fontSize="small" /> {event.location}
+                      <LocationOnIcon fontSize="small" /> {Event.sessions?.[0]?.venue ?? ""}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {event.description}
+                    {Event.description}
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button
                       size="small"
-                      onClick={() => handleLearnMoreClick(event)}
+                      onClick={() => {
+                        router.push(`/main/events/ ${Event.event_id}`);
+                      }}
                       startIcon={<InfoIcon />}
                       variant="contained"
                       color="primary"
@@ -181,92 +203,11 @@ const App: React.FC = () => {
                 </Card>
               </Slide>
             </Grid>
-          ))}
+          );
+        })}
         </Grid>
 
-        <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth>
-          <DialogTitle>
-            {selectedEvent?.title}
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDialog}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers>
-            <DialogContentText>{selectedEvent?.description}</DialogContentText>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 2 }}
-            >
-              <EventIcon fontSize="small" /> {selectedEvent?.date}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 1 }}
-            >
-              <LocationOnIcon fontSize="small" /> {" "}
-              {selectedEvent?.location}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 1 }}
-            >
-              {selectedEvent?.tickets}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mt: 1 }}
-            >
-              Ticket Link:{" "}
-              <a
-                href={selectedEvent?.ticketLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: theme.palette.primary.main }}
-              >
-                {selectedEvent?.ticketLink}
-              </a>
-            </Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h6" gutterBottom>
-              Sponsors:
-            </Typography>
-            <List>
-              {selectedEvent?.sponsors.map((sponsor: string, index: number) => (
-                <ListItem key={index} disableGutters>
-                  <ListItemText primary={sponsor} />
-                </ListItem>
-              ))}
-            </List>
-          </DialogContent>
-          <DialogActions sx={{paddingBottom: 3 }}>
-            <Button
-              onClick={handleCloseDialog}
-              color="primary"
-              variant="contained"
-            >
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+        
       </Container>
     </ThemeProvider>
   );

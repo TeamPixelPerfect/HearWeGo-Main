@@ -32,6 +32,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ClubPost, ClubNews, Event } from "../../constants/models";
 import { addNews, addPost } from "../../services/FanClubServices";
 import { useAppSelector } from "@/lib/hooks";
+import { Artist} from "@/app/constants/models";
 
 const validationSchema = Yup.object().shape({
   postDescription: Yup.string().required("Description is required"),

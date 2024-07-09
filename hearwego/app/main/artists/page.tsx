@@ -152,11 +152,11 @@ export default function ArtistsPage({ params: { id } }: props) {
 
   //Get all the artists
   useEffect(() => {
-    getAllArtists({ page: 1, per_page: 10 }).then((res) => {
+    getAllArtists({ page: 1, per_page: 10, isApproved: true }).then((res) => {
       setFeaturedArtists(res.data);
     });
 
-    getAllArtists({ page: 1, per_page: 10, sort: "newest" }).then((res) => {
+    getAllArtists({ page: 1, per_page: 10, sort: "newest", isApproved: true }).then((res) => {
       setRecentArtists(res.data);
     });
   }, []);
@@ -184,6 +184,7 @@ export default function ArtistsPage({ params: { id } }: props) {
         gender: gender,
         artistType: type,
         country: country,
+        isApproved: true,
       }).then((res) => {
         setSearchedArtists(res.data);
       });

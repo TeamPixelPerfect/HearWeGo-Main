@@ -43,7 +43,7 @@ const ADAdvancedAnalytics = () => {
   const [shares, setShares] = useState<string>("4K");
 
   const [rangeValue, setrangeValue] = useState(0);
-  const [songValue, setSongValue] = useState<string>();
+  const [songValue, setSongValue] = useState<string>("");
   const [dataKey, setDataKey] = useState("Impressions");
   const [dataset, setDataset] = useState<any[]>([
     { hour: "00:00", impressions: 182, plays: 102, shares: 29 },
@@ -236,225 +236,227 @@ const ADAdvancedAnalytics = () => {
           </Select>
         </FormControl>
       </Stack>
-      <Grid container>
-        <Grid xs={3} md={2} item>
-          <ADGraphTab
-            active={false}
-            onClick={() => {
-              handleKeyChange("Impressions");
-            }}
-            sx={{
-              background:
-                dataKey === "Impressions"
-                  ? theme.palette.primary.dark
-                  : theme.palette.primary.light,
-            }}
-          >
-            <Typography variant="body1" fontSize={13}>
-              Impressions
-            </Typography>
-            <Typography variant="h5" fontWeight={700}>
-              {impressions}
-            </Typography>
-          </ADGraphTab>
-        </Grid>
-        <Grid xs={3} md={2} item>
-          <ADGraphTab
-            active={false}
-            onClick={() => {
-              handleKeyChange("Plays");
-            }}
-            sx={{
-              background:
-                dataKey === "Plays"
-                  ? theme.palette.primary.dark
-                  : theme.palette.primary.light,
-            }}
-          >
-            <Typography variant="body1" fontSize={13}>
-              Plays
-            </Typography>
-            <Typography variant="h5" fontWeight={700}>
-              {plays}
-            </Typography>
-          </ADGraphTab>
-        </Grid>
-        <Grid xs={3} md={2} item>
-          <ADGraphTab
-            active={false}
-            onClick={() => {
-              handleKeyChange("Shares");
-            }}
-            sx={{
-              background:
-                dataKey === "Shares"
-                  ? theme.palette.primary.dark
-                  : theme.palette.primary.light,
-            }}
-          >
-            <Typography variant="body1" fontSize={13}>
-              Shares
-            </Typography>
-            <Typography variant="h5" fontWeight={700}>
-              {shares}
-            </Typography>
-          </ADGraphTab>
-        </Grid>
-        <Grid
-          xs={3}
-          md={6}
-          item
-          sx={{ display: "flex", justifyContent: "flex-end" }}
-        >
-          <FormControl
-            sx={{
-              width: "40%",
-              minWidth: "100px",
-            }}
-          >
-            <InputLabel id="date-range">Show results for</InputLabel>
-            <Select
-              labelId="song-select-label"
-              id="song-select"
-              value={rangeValue}
-              label="Select a song"
-              onChange={handleRangeChange}
+      {songValue !== "" && (
+        <Grid container>
+          <Grid xs={3} md={2} item>
+            <ADGraphTab
+              active={false}
+              onClick={() => {
+                handleKeyChange("Impressions");
+              }}
               sx={{
-                borderColor: theme.palette.secondary.main,
-                // background: "#C4B5FD",
+                background:
+                  dataKey === "Impressions"
+                    ? theme.palette.primary.dark
+                    : theme.palette.primary.light,
               }}
             >
-              <MenuItem value={0}>Last Day</MenuItem>
-              <MenuItem value={1}>Last Week</MenuItem>
-              <MenuItem value={2}>Last Month</MenuItem>
-              <MenuItem value={3}>All Time</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid xs={12} md={12} item>
-          <Card
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-            }}
+              <Typography variant="body1" fontSize={13}>
+                Impressions
+              </Typography>
+              <Typography variant="h5" fontWeight={700}>
+                {impressions}
+              </Typography>
+            </ADGraphTab>
+          </Grid>
+          <Grid xs={3} md={2} item>
+            <ADGraphTab
+              active={false}
+              onClick={() => {
+                handleKeyChange("Plays");
+              }}
+              sx={{
+                background:
+                  dataKey === "Plays"
+                    ? theme.palette.primary.dark
+                    : theme.palette.primary.light,
+              }}
+            >
+              <Typography variant="body1" fontSize={13}>
+                Plays
+              </Typography>
+              <Typography variant="h5" fontWeight={700}>
+                {plays}
+              </Typography>
+            </ADGraphTab>
+          </Grid>
+          <Grid xs={3} md={2} item>
+            <ADGraphTab
+              active={false}
+              onClick={() => {
+                handleKeyChange("Shares");
+              }}
+              sx={{
+                background:
+                  dataKey === "Shares"
+                    ? theme.palette.primary.dark
+                    : theme.palette.primary.light,
+              }}
+            >
+              <Typography variant="body1" fontSize={13}>
+                Shares
+              </Typography>
+              <Typography variant="h5" fontWeight={700}>
+                {shares}
+              </Typography>
+            </ADGraphTab>
+          </Grid>
+          <Grid
+            xs={3}
+            md={6}
+            item
+            sx={{ display: "flex", justifyContent: "flex-end" }}
           >
-            <LineChart
-              dataset={dataset}
-              xAxis={[
-                {
-                  scaleType: "band",
-                  dataKey:
-                    rangeValue === 0 ? "hour" : 1 || 2 ? "date" : "month",
-                  valueFormatter: (value, context) =>
-                    context.location === "tick" ? value : "",
-                },
-              ]}
-              series={[
-                {
-                  dataKey: dataKey.toLowerCase(),
-                  color: "#4338ca",
-                  type: "line",
-                  curve: "linear",
-                  label: dataKey,
-                },
-              ]}
-              width={1000}
-              height={400}
-              leftAxis={null}
-            />
-          </Card>
-        </Grid>
-        <Grid xs={12} md={6} item>
-          <Card
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              padding: "1em",
-              boxShadow: shadows[3],
-              margin: "1em",
-              ml: 0,
-            }}
-          >
-            <Typography variant="h6" fontWeight={700} color="secondary">
-              Gender
-            </Typography>
-            <PieChart
-              series={[
-                {
-                  data: genderDataset,
-                },
-              ]}
-              width={400}
-              height={200}
-              colors={[
-                theme.palette.primary.main,
-                theme.palette.secondary.main,
-                theme.palette.secondary.light,
-              ]}
-            />
-          </Card>
-        </Grid>
-        <Grid xs={12} md={6} item>
-          <Card
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              padding: "1em",
-              boxShadow: shadows[3],
-              margin: "1em",
-              mr: 0,
-            }}
-          >
-            <Typography variant="h6" fontWeight={700} color="secondary">
-              Age Group
-            </Typography>
-            <PieChart
-              series={[
-                {
-                  data: ageDataset,
-                },
-              ]}
-              width={400}
-              height={200}
-              colors={[
-                theme.palette.primary.main,
-                theme.palette.primary.dark,
-                theme.palette.secondary.main,
-                theme.palette.secondary.light,
-              ]}
-            />
-          </Card>
-        </Grid>
-        <Grid xs={12} md={12} item>
-          <Card
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              padding: "1em",
-              boxShadow: shadows[3],
-              margin: "1em 0",
-            }}
-          >
-            <Typography variant="h6" fontWeight={700} color="secondary">
-              Top Countries
-            </Typography>
-            <Box sx={{ m: "auto" }}>
-              <WorldMap
-                color={theme.palette.secondary.main}
-                backgroundColor="transparent"
-                value-suffix="people"
-                size={1000}
-                data={countryData}
+            <FormControl
+              sx={{
+                width: "40%",
+                minWidth: "100px",
+              }}
+            >
+              <InputLabel id="date-range">Show results for</InputLabel>
+              <Select
+                labelId="song-select-label"
+                id="song-select"
+                value={rangeValue}
+                label="Select a song"
+                onChange={handleRangeChange}
+                sx={{
+                  borderColor: theme.palette.secondary.main,
+                  // background: "#C4B5FD",
+                }}
+              >
+                <MenuItem value={0}>Last Day</MenuItem>
+                <MenuItem value={1}>Last Week</MenuItem>
+                <MenuItem value={2}>Last Month</MenuItem>
+                <MenuItem value={3}>All Time</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid xs={12} md={12} item>
+            <Card
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <LineChart
+                dataset={dataset}
+                xAxis={[
+                  {
+                    scaleType: "band",
+                    dataKey:
+                      rangeValue === 0 ? "hour" : 1 || 2 ? "date" : "month",
+                    valueFormatter: (value, context) =>
+                      context.location === "tick" ? value : "",
+                  },
+                ]}
+                series={[
+                  {
+                    dataKey: dataKey.toLowerCase(),
+                    color: "#4338ca",
+                    type: "line",
+                    curve: "linear",
+                    label: dataKey,
+                  },
+                ]}
+                width={1000}
+                height={400}
+                leftAxis={null}
               />
-            </Box>
-          </Card>
+            </Card>
+          </Grid>
+          <Grid xs={12} md={6} item>
+            <Card
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                padding: "1em",
+                boxShadow: shadows[3],
+                margin: "1em",
+                ml: 0,
+              }}
+            >
+              <Typography variant="h6" fontWeight={700} color="secondary">
+                Gender
+              </Typography>
+              <PieChart
+                series={[
+                  {
+                    data: genderDataset,
+                  },
+                ]}
+                width={400}
+                height={200}
+                colors={[
+                  theme.palette.primary.main,
+                  theme.palette.secondary.main,
+                  theme.palette.secondary.light,
+                ]}
+              />
+            </Card>
+          </Grid>
+          <Grid xs={12} md={6} item>
+            <Card
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                padding: "1em",
+                boxShadow: shadows[3],
+                margin: "1em",
+                mr: 0,
+              }}
+            >
+              <Typography variant="h6" fontWeight={700} color="secondary">
+                Age Group
+              </Typography>
+              <PieChart
+                series={[
+                  {
+                    data: ageDataset,
+                  },
+                ]}
+                width={400}
+                height={200}
+                colors={[
+                  theme.palette.primary.main,
+                  theme.palette.primary.dark,
+                  theme.palette.secondary.main,
+                  theme.palette.secondary.light,
+                ]}
+              />
+            </Card>
+          </Grid>
+          <Grid xs={12} md={12} item>
+            <Card
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                padding: "1em",
+                boxShadow: shadows[3],
+                margin: "1em 0",
+              }}
+            >
+              <Typography variant="h6" fontWeight={700} color="secondary">
+                Top Countries
+              </Typography>
+              <Box sx={{ m: "auto" }}>
+                <WorldMap
+                  color={theme.palette.secondary.main}
+                  backgroundColor="transparent"
+                  value-suffix="people"
+                  size={1000}
+                  data={countryData}
+                />
+              </Box>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Box>
   );
 };
