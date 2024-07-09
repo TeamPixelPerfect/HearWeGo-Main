@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   Checkbox,
+  Container,
   Divider,
   FormControl,
   FormControlLabel,
@@ -15,6 +16,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
+  ListItemSecondaryAction,
   ListItemText,
   Menu,
   MenuItem,
@@ -27,7 +29,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { FaCopy, FaFacebook } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
@@ -49,12 +51,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DropArtistPP from "@/app/components/DropArtistPP";
-import {
-  Facebook as FacebookIcon,
-  Twitter as TwitterIcon,
-  Instagram as InstagramIcon,
-  LinkedIn as LinkedInIcon,
-} from "@mui/icons-material";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TikTokIcon from "@mui/icons-material/MusicNote";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+
 import ReactCountryFlag from "react-country-flag";
 import { countries } from "country-flag-icons";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -63,6 +68,20 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { logOutArtist } from "@/lib/features/artist.slice";
+import { Formik, Form, Field } from "formik";
+
+import { Artistcover } from "@/app/constants/models";
+import DropFile from "@/app/components/DropFile";
+import { color } from "framer-motion";
+import { ar } from "date-fns/locale";
+import dayjs from "dayjs";
+import { updateArtist } from "@/app/services/ArtistServices";
+import LoadingButton from "@mui/lab/LoadingButton";
+
+interface Platform {
+  name: string;
+  link: string;
+}
 
 interface SocialMediaType {
   label: string;
@@ -91,11 +110,23 @@ const initialSocialMediaOptions = [
   },
 ];
 
-const socialMediaOptions = [
-  { label: "Facebook", icon: <FacebookIcon /> },
-  { label: "Twitter", icon: <TwitterIcon /> },
-  { label: "Instagram", icon: <InstagramIcon /> },
-  { label: "LinkedIn", icon: <LinkedInIcon /> },
+const contributes = [
+  {
+    value: "Performer",
+    label: "Performer",
+  },
+  {
+    value: "Producer",
+    label: "Producer",
+  },
+  {
+    value: "Songwriter",
+    label: "Songwriter",
+  },
+  {
+    value: "Instrumentalist",
+    label: "Instrumentalist",
+  },
 ];
 
 const genres = [
@@ -150,24 +181,20 @@ const ADHomePage = () => {
 
   const matches = useMediaQuery("(max-width:960px)");
 
-  const [profilePic, setProfilePic] = useState<string>(
-    // "https://placehold.co/600x600/png"
-    "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-  );
-  const [coverPic, setCoverPic] = useState<string>(
-    // "https://placehold.co/1280x720/png"
-    "https://.com/wp-content/uploads/2019/07/The-Rembrandts-Via-Satellite-2.jpg"
-  );
-
   const [tabValue, setTabValue] = React.useState(0);
+
+  const [loading, setLoading] = useState(false);
+
   const artist = useAppSelector((state) => state.artist.user);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-  const [profilePicture, setProfilePicture] = useState<any>(null);
+  const [profilePicture, setProfilePicture] = useState<any>(
+    artist?.profilePicture || ""
+  );
   // New state for cover photo editing
-  const [coverPhoto, setCoverPhoto] = useState<string>(
-    "https://www.profilerehab.com/facebook_covers/hearts/tree_heart_cover_1.jpg"
+  const [coverPhoto, setCoverPhoto] = useState<any>(
+    artist?.user?.artistCovers[0] || ""
   );
 
   const handleCoverPhotoChange = (
@@ -183,9 +210,9 @@ const ADHomePage = () => {
   };
 
   const [isEditingName, setIsEditingName] = useState(false); // State to control edit mode
-  const [artistName, setArtistName] = useState(artist?.user.artistName || "");
+  const [artistName, setArtistName] = useState(artist?.artistName || "");
   const [isEditingBio, setIsEditingBio] = useState(false); // State to control bio edit mode
-  const [artistBio, setArtistBio] = useState(artist?.user.artistBio || "");
+  const [artistBio, setArtistBio] = useState(artist?.artistBio || "");
 
   // Placeholder function to simulate an API call to save the artist name
   const saveArtistName = (name: string) => {
@@ -225,6 +252,20 @@ const ADHomePage = () => {
     setArtistBio(event.target.value);
   };
 
+  const handleContributeChange = (
+    event: SyntheticEvent<Element, Event>,
+    value: any
+  ) => {
+    setContribute(value);
+  };
+
+  const handleGenreChange = (
+    event: SyntheticEvent<Element, Event>,
+    value: any
+  ) => {
+    setGenre(value);
+  };
+
   const handleLogOut = () => {
     // Implement your log out logic here
     sessionStorage.removeItem("hwg-artist");
@@ -262,20 +303,21 @@ const ADHomePage = () => {
     setProfiles(updatedProfiles);
   };
 
-  const [alias, setAlias] = useState("Jone");
-  const [email, setEmail] = useState("maroon5@gmail.com");
-  const [address, setAddress] = useState("America");
-  const [contribute, setContribute] = useState("Writer");
-  const [birthDay, setBirthDay] = useState("1999-03-12");
-  const [genre, setGenre] = useState("Hip Pop");
+  const [alias, setAlias] = useState(artist?.alias || "");
+  const [email, setEmail] = useState(artist?. email || "");
+  // const [address, setAddress] = useState("America");
+  const [contribute, setContribute] = useState(artist?.artistProfession);
+  const [birthDay, setBirthDay] = useState(artist?.birthDate);
+  const [genre, setGenre] = useState(artist?.musicGenres);
+  const [gender, setGender] = useState(artist?.gender?.toLowerCase());
 
-  const [selectedCountry, setSelectedCountry] = useState<string>("LK");
+  const [selectedCountry, setSelectedCountry] = useState(artist?.user?.country);
   const [artistBankDetails, setArtistBankDetails] = useState({
     bankDetails: {
-      accountName: "John Doe",
-      accountNumber: "123456789",
-      bankName: "Bank of Example",
-      bankBranch: "Main Branch",
+      accountName: artist?.bankDetails?.accountName,
+      accountNumber: artist?.bankDetails?.accountNumber,
+      bankName: artist?.bankDetails?.bankName,
+      bankBranch: artist?.bankDetails?.bankBranch,
     },
   });
 
@@ -321,6 +363,100 @@ const ADHomePage = () => {
     setSocialMediaOptions((prevOptions) =>
       prevOptions.filter((option) => option.label !== label)
     );
+  };
+
+  //cover photos
+  const [coverphoto, setcoverphoto] = useState<Artistcover>({
+    promo_banner: ["", "", ""],
+  });
+
+  const [promoBanners, setPromoBanners] = useState<any>([
+    artist?.artistCovers?.length > 0 ? artist?.artistCovers[0] : "",
+    artist?.artistCovers?.length > 0 ? artist?.artistCovers[1] : "",
+    artist?.artistCovers?.length > 0 ? artist?.artistCovers[2] : "",
+  ]);
+
+  const submitData = async (values: Artistcover) => {};
+  const handleDeletee = (index: number) => {
+    const updatedPromoBanners = [...promoBanners];
+    updatedPromoBanners[index] = null;
+    setPromoBanners(updatedPromoBanners);
+  };
+  //end
+
+  //social media platform
+  const [platform, setPlatform] = useState("YouTube");
+  const [link, setLink] = useState<string>();
+  const [facebookLink, setFacebookLink] = useState<string>(
+    artist?.socialMediaLinks?.facebook
+  );
+  const [twitterLink, setTwitterLink] = useState<string>(
+    artist?.socialMediaLinks?.twitter
+  );
+  const [instagramLink, setInstagramLink] = useState<string>(
+    artist?.socialMediaLinks?.instagram
+  );
+
+  const [platforms, setPlatforms] = useState(artist?.user?.socialMediaLinks);
+
+  const handlePlatformChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPlatform(event.target.value);
+  };
+
+  const handleLinkChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLink(event.target.value);
+  };
+
+  const renderIcon = (platform: string) => {
+    switch (platform) {
+      case "YouTube":
+        return <YouTubeIcon />;
+      case "Facebook":
+        return <FacebookIcon />;
+      case "Twitter":
+        return <TwitterIcon />;
+      case "Instagram":
+        return <InstagramIcon />;
+      case "LinkedIn":
+        return <LinkedInIcon />;
+      case "TikTok":
+        return <TikTokIcon />;
+      default:
+        return null;
+    }
+  };
+
+  const handleUpdate = () => {
+    const data = {
+      artistName,
+      artistBio,
+      alias,
+      email,
+      artistProfession: contribute,
+      birthDate: birthDay,
+      musicGenres: genre,
+      gender,
+      country: selectedCountry,
+      bankDetails: artistBankDetails.bankDetails,
+      artistCovers: promoBanners,
+      profilePicture,
+      socialMediaLinks: {
+        facebook: facebookLink,
+        twitter: twitterLink,
+        instagram: instagramLink,
+      },
+    };
+
+    setLoading(true);
+    updateArtist(
+      artist?.token as string,
+      artist?.user?._id as string,
+      data
+    ).then((response) => {
+      console.log(response);
+      setLoading(false);
+      window.location.reload();
+    });
   };
 
   return (
@@ -520,24 +656,6 @@ const ADHomePage = () => {
                       </ADArtistInfo>
                     </>
                   )}
-                  <ADArtistPageUrl>
-                    <Link href="">http://www.hearwego.com/wq23s</Link>
-                    <FaCopy />
-                  </ADArtistPageUrl>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      color: "#fff",
-                      fontWeight: "600",
-                      mb: 0,
-                      fontSize: "20px",
-                    }}
-                  >
-                    22,522,155
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: "#fff" }}>
-                    Followers
-                  </Typography>
                 </Box>
               </Box>
               <Box
@@ -563,7 +681,14 @@ const ADHomePage = () => {
         </Grid>
       </Grid>
 
-      <Card sx={{ border: "black", borderRadius: "5px", marginTop: "10px" }}>
+      <Card
+        sx={{
+          border: "black",
+          borderRadius: "5px",
+          marginTop: "10px",
+          padding: "10px",
+        }}
+      >
         <Box
           component="form"
           sx={{
@@ -576,6 +701,13 @@ const ADHomePage = () => {
           noValidate
           autoComplete="off"
         >
+          <Typography
+            sx={{ marginTop: "10px", marginLeft: "30px" }}
+            variant="h5"
+            gutterBottom
+          >
+            Basic Info
+          </Typography>
           <Box
             sx={{
               display: "flex",
@@ -601,6 +733,7 @@ const ADHomePage = () => {
               variant="filled"
               fullWidth
               margin="normal"
+              disabled
             />
           </Box>
           <Box
@@ -611,23 +744,33 @@ const ADHomePage = () => {
             }}
           >
             <TextField
-              id="artist-address"
+              id="artist-alias"
               label="Alias(other)"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              value={alias}
+              onChange={(e) => setAlias(e.target.value)}
               variant="filled"
               fullWidth
               margin="normal"
             />
 
-            <TextField
-              id="artist-contribution"
-              label="Contribution"
-              value={contribute}
-              onChange={(e) => setContribute(e.target.value)}
-              variant="filled"
-              fullWidth
-              margin="normal"
+            <Autocomplete
+              freeSolo
+              id="contribute"
+              multiple
+              disableClearable
+              options={contributes.map((option) => option.label)}
+              defaultValue={contribute}
+              onChange={handleContributeChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Profession"
+                  InputProps={{
+                    ...params.InputProps,
+                    type: "search",
+                  }}
+                />
+              )}
             />
           </Box>
 
@@ -641,7 +784,7 @@ const ADHomePage = () => {
             <TextField
               id="artist-birthday"
               label="Birthday"
-              value={birthDay}
+              value={dayjs(birthDay as string).format("YYYY-MM-DD") || ""}
               onChange={(e) => setBirthDay(e.target.value)}
               variant="filled"
               fullWidth
@@ -652,23 +795,25 @@ const ADHomePage = () => {
               }}
             />
 
-            <TextField
-              id="genre"
-              select
-              label="Genre"
-              value={genre}
-              onChange={(event) => setGenre(event.target.value)}
-              variant="filled"
-              fullWidth
-              margin="normal"
-              sx={{ width: "60ch" }}
-            >
-              {genres.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Autocomplete
+              freeSolo
+              id="contribute"
+              multiple
+              disableClearable
+              options={genres.map((option) => option.label)}
+              defaultValue={genre}
+              onChange={handleGenreChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Genres"
+                  InputProps={{
+                    ...params.InputProps,
+                    type: "search",
+                  }}
+                />
+              )}
+            />
           </Box>
           <Box
             sx={{
@@ -683,7 +828,10 @@ const ADHomePage = () => {
               <FormLabel id="gender-label">Gender</FormLabel>
               <RadioGroup
                 aria-labelledby="gender-label"
-                defaultValue="female"
+                defaultValue={gender}
+                onChange={(e) => {
+                  setGender(e.target.value);
+                }}
                 name="radio-buttons-group"
                 sx={{ display: "flex", flexDirection: "row" }}
               >
@@ -717,7 +865,7 @@ const ADHomePage = () => {
                 labelId="country-label"
                 id="country"
                 variant="outlined"
-                value={selectedCountry}
+                value={selectedCountry === "USA" ? "US" : selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
                 sx={{
                   background: "rgba(255,255,255,0.1)",
@@ -745,22 +893,56 @@ const ADHomePage = () => {
               </Select>
             </FormControl>
           </Box>
-          <Box sx={{ display: "flex" }}>
-            <form
-              style={{
+        </Box>
+      </Card>
+
+      <Card
+        sx={{
+          border: "black",
+          borderRadius: "5px",
+          marginTop: "20px",
+          padding: "10px",
+        }}
+      >
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "60ch" },
+            display: "flex",
+            flexDirection: "column",
+
+            justifyContent: "space-evenly",
+          }}
+          noValidate
+          autoComplete="off"
+        >
+          <Typography
+            sx={{ marginTop: "10px", marginLeft: "30px" }}
+            variant="h5"
+            gutterBottom
+          >
+            Bank Details
+          </Typography>
+
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "60ch" },
+              display: "flex",
+              flexDirection: "column",
+
+              justifyContent: "space-evenly",
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <Box
+              sx={{
                 display: "flex",
-                flexDirection: "column",
-                width: "60ch",
-                marginLeft: "30px",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
               }}
             >
-              <Typography
-                sx={{ marginTop: "10px", marginLeft: "10px" }}
-                variant="h5"
-                gutterBottom
-              >
-                Bank Details
-              </Typography>
               <TextField
                 id="bank-account-name"
                 label="Bank Account Name"
@@ -794,7 +976,15 @@ const ADHomePage = () => {
                   });
                 }}
               />
+            </Box>
 
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+              }}
+            >
               <TextField
                 id="bank"
                 label="Bank"
@@ -828,239 +1018,147 @@ const ADHomePage = () => {
                   });
                 }}
               />
-            </form>
+            </Box>
           </Box>
         </Box>
       </Card>
-      <Card sx={{ border: "black", borderRadius: "5px", marginTop: "10px" }}>
+
+      <Card
+        sx={{
+          border: "black",
+          borderRadius: "5px",
+          marginTop: "20px",
+          padding: "20px",
+        }}
+      >
         <Typography
-          sx={{ marginTop: "10px", marginLeft: "10px" }}
+          sx={{ marginTop: "10px", marginLeft: "27px" }}
           variant="h5"
           gutterBottom
         >
           Cover Photos
         </Typography>
+        <Formik initialValues={coverphoto} onSubmit={submitData}>
+          <Form>
+            <Grid container spacing={3}>
+              {promoBanners.map((promoBanner: string, index: number) => (
+                <Grid item xs={4} key={index} sx={{ position: "relative" }}>
+                  <Field name={`promo_banner.${index}`}>
+                    {({ field }: any) => (
+                      <>
+                        <DropFile
+                          fileTypes="image"
+                          fileExtensions="jpg, jpeg, png"
+                          isCircular={false}
+                          width="100%"
+                          height="200px"
+                          file={promoBanner}
+                          setFile={(file) => {
+                            const updatedPromoBanners = [...promoBanners];
+                            updatedPromoBanners[index] = file;
+                            setPromoBanners(updatedPromoBanners);
+                          }}
+                          aspectX={16}
+                          aspectY={9}
+                          shape="rect"
+                          // style={{
+                          //   borderRadius: 10,
+                          //   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          // }}
+                        />
+                        <IconButton
+                          aria-label="delete"
+                          sx={{
+                            position: "absolute",
+                            bottom: 10,
+                            right: -7,
+                          }}
+                          onClick={() => handleDeletee(index)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    )}
+                  </Field>
+                </Grid>
+              ))}
+            </Grid>
+          </Form>
+        </Formik>
+      </Card>
+
+      <Card
+        sx={{
+          border: "black",
+          borderRadius: "5px",
+          marginTop: "10px",
+          padding: "20px",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-evenly",
-            margin: "20px",
+            flexDirection: "column",
+            padding: 2,
+            borderRadius: 2,
+            width: "100%",
           }}
         >
-          <Box sx={{ display: "flex" }}>
-            <img
-              src="https://www.profilerehab.com/facebook_covers/hearts/tree_heart_cover_1.jpg"
-              alt="Example"
-              style={{ width: "300px" }}
-            />
-            <Stack
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-              }}
-            >
-              <IconButton>
-                <AddCircleOutlineIcon />
-              </IconButton>
-              <IconButton aria-label="delete">
-                <DeleteIcon />
-              </IconButton>
-            </Stack>
-          </Box>
-          <Box sx={{ display: "flex" }}>
-            <img
-              src="https://www.shutterstock.com/blog/wp-content/uploads/sites/5/2022/08/making_album_create_cover.jpg"
-              alt="Example"
-              style={{ width: "300px" }}
-            />
-            <Stack
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-              }}
-            >
-              <IconButton>
-                <AddCircleOutlineIcon />
-              </IconButton>
-              <IconButton aria-label="delete">
-                <DeleteIcon />
-              </IconButton>
-            </Stack>
-          </Box>
-          <Box sx={{ display: "flex" }}>
-            <img
-              src="https://fiverr-res.cloudinary.com/videos/so_0.116681,t_main1,q_auto,f_auto/y5hg5qbfdyd8oquq7nom/create-unique-cover-art-for-your-music-album-ep-or-single.png"
-              alt="Example"
-              style={{ width: "300px" }}
-            />
-            <Stack
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-              }}
-            >
-              <IconButton>
-                <AddCircleOutlineIcon />
-              </IconButton>
-              <IconButton aria-label="delete">
-                <DeleteIcon />
-              </IconButton>
-            </Stack>
-          </Box>
-        </Box>
-      </Card>
-      <Card sx={{ border: "black", borderRadius: "5px", marginTop: "10px" }}>
-        <Typography
-          sx={{ marginTop: "10px", marginLeft: "10px" }}
-          variant="h5"
-          gutterBottom
-        >
-          Social media
-          <IconButton onClick={toggleEditMode} aria-label="edit">
-            <EditIcon />
-          </IconButton>
-        </Typography>
-        <div>
-          <div>
-            <List>
-              {socialMediaOptions.map((option) => (
-                <div key={option.label}>
-                  <Grid container alignItems="center" spacing={1}>
-                    <Grid item>
-                      <ListItemIcon sx={{ marginLeft: "20px" }}>
-                        {option.icon}
-                      </ListItemIcon>
-                    </Grid>
-                    <Grid item xs>
-                      <ListItemText
-                        sx={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                        primary={
-                          <Typography variant="body1" component="span">
-                            {option.label}
-                          </Typography>
-                        }
-                        secondary={
-                          <Link
-                            style={{ marginLeft: "10px" }}
-                            href={option.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {option.url}
-                          </Link>
-                        }
-                      />
-                    </Grid>
-                    {isEditMode && (
-                      <Grid item>
-                        <Checkbox
-                          checked={selectedOptions.includes(option.label)}
-                          onChange={() => handleSelect(option.label)}
-                          inputProps={{ "aria-label": option.label }}
-                        />
-                      </Grid>
-                    )}
-                  </Grid>
-                </div>
-              ))}
-            </List>
-            {isEditMode && selectedOptions.length > 0 && (
-              <Button
-                sx={{ marginLeft: "10px" }}
-                variant="contained"
-                startIcon={<DeleteIcon />}
-                onClick={handleDeleteSelected}
-              >
-                Delete Selected
-              </Button>
-            )}
-          </div>
-          {profiles.map((profile) => (
-            <div key={profile.id}>
-              <Grid container alignItems="center" spacing={1}>
-                <Grid item>
-                  <ListItemIcon sx={{ marginLeft: "20px" }}>
-                    {profile.icon}
-                  </ListItemIcon>
-                </Grid>
-                <Grid item xs>
-                  <ListItemText
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                    primary={profile.label}
-                    secondary={
-                      <a
-                        style={{ marginLeft: "10px" }}
-                        href={profile.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {profile.url}
-                      </a>
-                    }
-                  />
-                </Grid>
-                <Grid item>
-                  <IconButton
-                    sx={{ marginRight: "9px" }}
-                    onClick={() => handleDeleteProfile(profile.id)}
-                    aria-label="delete"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </div>
-          ))}
           <Typography
-            sx={{ marginTop: "10px", marginLeft: "10px" }}
+            sx={{ marginTop: "10px", marginLeft: "18px" }}
             variant="h5"
+            mb={2}
             gutterBottom
           >
-            Add New Social media
+            Social media Platforms
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row" }}>
-            <Autocomplete
-              options={socialMediaOptions.map((option) => option.label)}
-              value={selectedProfile}
-              onChange={(event, newValue) => setSelectedProfile(newValue)}
-              sx={{ width: 100, marginLeft: "20px" }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Social Media"
-                  variant="outlined"
-                />
-              )}
-            />
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MenuItem value="Facebook" sx={{ width: "180px" }}>
+              <FacebookIcon sx={{ marginRight: 1 }} /> Facebook
+            </MenuItem>
+
             <TextField
-              label="Web Address"
+              value={facebookLink}
+              onChange={(e) => {
+                setFacebookLink(e.target.value);
+              }}
               variant="outlined"
-              value={webAddress}
-              onChange={(e) => setWebAddress(e.target.value)}
-              sx={{ marginLeft: "80px", width: "800px" }}
+              fullWidth
+              sx={{ flex: 4, color: "white" }}
             />
           </Box>
-          <Box></Box>
-          <Button
-            sx={{ marginTop: "20px", marginLeft: "20px" }}
-            variant="contained"
-            color="primary"
-            onClick={handleAddProfile}
-          >
-            Add Social Profile
-          </Button>
-        </div>
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MenuItem value="Twitter" sx={{ width: "180px" }}>
+              <TwitterIcon sx={{ marginRight: 1 }} /> Twitter
+            </MenuItem>
+
+            <TextField
+              value={twitterLink}
+              onChange={(e) => {
+                setTwitterLink(e.target.value);
+              }}
+              variant="outlined"
+              fullWidth
+              sx={{ flex: 4, color: "white" }}
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MenuItem value="Instagram" sx={{ width: "180px" }}>
+              <InstagramIcon sx={{ marginRight: 1 }} /> Instagram
+            </MenuItem>
+            {/* Add more platforms here if needed */}
+
+            <TextField
+              value={instagramLink}
+              onChange={(e) => {
+                setInstagramLink(e.target.value);
+              }}
+              variant="outlined"
+              fullWidth
+              sx={{ flex: 4, color: "white" }}
+            />
+          </Box>
+        </Box>
 
         <Stack
           direction="row"
@@ -1077,7 +1175,13 @@ const ADHomePage = () => {
             Log Out
           </Button>
           <Button variant="outlined">Close</Button>
-          <Button variant="contained">Save</Button>
+          <LoadingButton
+            loading={loading}
+            onClick={handleUpdate}
+            variant="contained"
+          >
+            Save
+          </LoadingButton>
         </Stack>
       </Card>
     </>

@@ -301,7 +301,7 @@ const BudgetDetails = ({ params: { event_id } }: Props) => {
               variant="outlined"
               color="secondary"
               sx={{ textTransform: "capitalize" }}
-              onClick={() => {}}
+              onClick={() => {Router.push("/artist/events")}}
             >
               Close
             </Button>

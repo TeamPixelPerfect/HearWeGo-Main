@@ -51,6 +51,7 @@ import {
 } from "../services/SongServices";
 import { Home } from "@mui/icons-material";
 import { site_url } from "../constants/keys";
+import dayjs from "dayjs";
 
 interface HomeSongCardProps {
   songName: string;
@@ -79,7 +80,7 @@ const HomeSongCard = ({
   const { playing, toggle } = useAudio({
     url: songUrl,
     songName,
-    artist: artist?.user?.artistName as string,
+    artist: artist?.artistName as string,
     coverArt,
   });
   const matches = useMediaQuery("(max-width:960px)");
@@ -171,25 +172,33 @@ const ADHomePage = () => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(
-      site_url + "main/artists/" + artist?.user?.artist_id
+      site_url + "main/artists/" + artist?.artist_id
     );
     setSnackbarOpen(true);
     setSnackbarMessage("Link copied to clipboard!");
     setSnackbarSeverity("success");
   };
 
+  const getUpcomingSongs = (songs: Song[]) => {
+    const upcoming = songs.filter((song) =>
+      dayjs(song.release_date).isAfter(dayjs())
+    );
+    return upcoming;
+  };
+
   useEffect(() => {
     getSongsForArtist(
       artist?.token as string,
-      artist?.user.artist_id as string
+      artist?.artist_id as string
     ).then((songs) => {
       console.log(songs);
       setPopularSongs(songs.data);
+      setUpcomingSongs(getUpcomingSongs(songs.data));
     });
 
     getAlbumForArtists(
       artist?.token as string,
-      artist?.user.artist_id as string
+      artist?.artist_id as string
     ).then((albums) => {
       console.log(albums);
       setAlbums(albums.data);
@@ -204,7 +213,7 @@ const ADHomePage = () => {
         md={12}
         sx={{ height: matches ? "600px" : "400px", margin: "0" }}
       >
-        <ADHomeCoverBox imgUrl={artist?.user.artistCovers[0] as string}>
+        <ADHomeCoverBox imgUrl={artist?.artistCovers[0] as string}>
           <ADHomeNameArea>
             <Box
               sx={{
@@ -215,7 +224,7 @@ const ADHomePage = () => {
                 mb: matches ? "2em" : 0,
               }}
             >
-              <ADHomeProfilePicture imgUrl={artist?.user.profilePicture} />
+              <ADHomeProfilePicture imgUrl={artist?.profilePicture} />
               <Box
                 sx={
                   !matches
@@ -228,16 +237,14 @@ const ADHomePage = () => {
                       }
                 }
               >
-                <ADHomeName>{artist?.user.artistName}</ADHomeName>
-                {artist?.user.artistBio && (
-                  <ADArtistInfo>
-                    {artist?.user.artistBio.split(".")[0]}
-                  </ADArtistInfo>
+                <ADHomeName>{artist?.artistName}</ADHomeName>
+                {artist?.artistBio && (
+                  <ADArtistInfo>{artist?.artistBio.split(".")[0]}</ADArtistInfo>
                 )}
 
                 <ADArtistPageUrl>
                   <Link href="">
-                    {site_url + "main/artists/" + artist?.user?.artist_id}
+                    {site_url + "main/artists/" + artist?.artist_id}
                   </Link>
                   <IconButton onClick={handleCopyLink}>
                     <FaCopy style={{ fontSize: "12px" }} />
@@ -322,8 +329,8 @@ const ADHomePage = () => {
             )}
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1} fullWidth={false}>
-            {recentSongs && recentSongs?.length > 0 ? (
-              recentSongs.map((song) => (
+            {popularSongs && popularSongs?.length > 0 ? (
+              popularSongs.map((song) => (
                 <HomeSongCard
                   songName={song.song_title as string}
                   albumName={song.album_title as string}

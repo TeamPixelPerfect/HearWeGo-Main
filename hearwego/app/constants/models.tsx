@@ -192,18 +192,6 @@ export interface Event {
   event_created_by?: string;
 }
 
-export interface PRPost {
-  PrPostID: string;
-  ArtistName: string;
-  post_img: string;
-  post_social_media?: string;
-  schedule_date: string;
-  Description: string;
-  Scheduled_Date: string;
-  Scheduled_Time: string;
-  SocialMedias?: string[];
-}
-
 export interface Ticket {
   ticket_id?: string;
   ticket_catagory?: string;
@@ -287,6 +275,8 @@ export interface SoldTickets {
   user_name?: string;
   user_email?: string;
   user_contact?: string;
+  user_nic?: string;
+  order_ticket_id?: string;
 }
 
 export interface RemainingTickets {
@@ -354,6 +344,13 @@ export interface MerchStore {
   artist_id?: string;
 }
 
+export interface Artistcover {
+  store_banner?: string;
+  promo_banner?: string[];
+
+  artist_id?: string;
+}
+
 export interface MerchCategory {
   store_id?: string;
   category_id?: string;
@@ -375,7 +372,7 @@ export interface MerchProduct {
   product_rating?: string;
   store_id?: string;
   rating_count?: number;
-  product_variations?: ProductVariant[];
+  variations?: ProductVariant[];
   review_count?: number;
   product_sold?: number;
 }
@@ -402,6 +399,9 @@ export interface Product {
   product_quantity?: string;
   product_rating?: string;
   store_id?: string;
+  variations?: ProductVariant[];
+  review_count?: number;
+  product_sold?: number;
 }
 
 export interface Cart {
@@ -413,9 +413,10 @@ export interface Cart {
 export interface CartItem {
   cart_item_id?: string;
   product_id?: string;
-  product_variation?: string;
+  variation?: ProductVariant[];
   product_quantity?: number;
   product_price?: number;
+  product_name?: string;
   cart_id?: string;
   cart_item_image?: string;
   cart_item_name?: string;
@@ -426,6 +427,28 @@ export interface ProductVariant {
   variation_value?: string;
   variation_price?: Number;
   variation_quantity?: Number;
+}
+
+export interface EventInterest  {
+  interest_id?: string;
+  event_id?: string;
+  user_id?: string;
+}
+  
+export interface Order {
+  user_id?: string;
+  order_total?: number;
+  order_status?: string;
+  order_date?: string;
+  order_time?: string;
+  delivery_date?: string;
+  order_address?: string;
+  order_contact?: string;
+  order_email?: string;
+  is_returned?: boolean;
+  cart_items?: CartItem[];
+  cart_id?: string;
+  order_id?: string;
 }
 
 export interface replies {
@@ -454,7 +477,7 @@ export interface PRPosts {
   artist_id?: string;
   PrPostID?: string;
   ArtistName?: string;
-  Campaign?: string;
+  Campaigns?: string;
   Description?: string;
   Scheduled_Date?: Date;
   Scheduled_Time?: string;
@@ -463,14 +486,13 @@ export interface PRPosts {
   CampaignID?: string;
 }
 
-
 export interface PRtask {
   TaskID?: string;
   TaskName?: string;
   TaskDescription?: string;
   TaskStatus?: string;
   CampaignID?: string;
-  isEdit?: boolean; 
+  isEdit?: boolean;
   timestamps?: string;
 }
 
@@ -510,6 +532,7 @@ export interface ClubVideos {
   timestamps?: string;
 }
 
+
 export interface newsreplies {
   newsreplyId?: string;
   newsreplier?: string;
@@ -520,3 +543,43 @@ export interface newsreplies {
   newscommentId?: string;
 }
 
+export interface HelpComplaints {
+  ComplaintFormId?: string;
+  ComplaintTitle?: string;
+  userName?: string;
+  userEmail?: string;
+  userId?: string;
+  ProblemInBrief?: string;
+  isHandled?: boolean;
+  status: "to_solve" | "solved";
+  solution?: string;
+}
+
+
+interface articalQandA {
+  question?: string;
+  answer?: string;
+}
+
+
+export interface HelpArticle {
+  articalId?: string;
+  articalTitle?: string;
+  articalImage_URL?: string;
+  QandA?: articalQandA[];
+}
+
+export interface PressReleaseData{
+  PressReleaseID?: string;
+  ArtistLogo_URL?: string;
+  Headline?: string;
+  SubHeadline?: string;
+  EventDate?: Date;
+  Venue?: string;
+  Description?: string;
+  Signature?: string;
+  ReleaseDate?: Date;
+  ArtistID?: string;
+  Status?: string;
+  emails?: string[];
+}

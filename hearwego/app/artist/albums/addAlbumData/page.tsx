@@ -435,7 +435,7 @@ const AddAlbumData = () => {
                       Router.push("add");
                     }}
                   >
-                    Cansel
+                    Cancel
                   </Button>
                   <LoadingButton
                     loading={uploading}

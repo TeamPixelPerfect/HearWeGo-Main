@@ -4,12 +4,12 @@ import { Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
 
 export const EventMainBox = styled(Box)(({ theme }) => ({
-  width: "100%",
+  maxWidth: "100%",
   backgroundColor: "transparent",
   height: "auto",
   borderRadius: 30,
-  // padding: '1em',
-  margin: "1em",
+  padding: '10px',
+  // margin: "1em",
   paddingBottom: "5em",
   "@media (max-width:960px)": {
     width: "100%",

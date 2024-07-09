@@ -63,7 +63,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
   },
   "& .MuiDataGrid-columnHeader": {
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: theme.palette.primary.main, // Change to darker shade if needed
     color: theme.palette.common.white,
     "&:hover": {
       backgroundColor: theme.palette.primary.dark,
@@ -295,13 +295,13 @@ function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
           },
         }}
         pageSizeOptions={[5, 10]}
-        checkboxSelection
+        // checkboxSelection
         onRowSelectionModelChange={handleSelectionModelChange}
         rowSelectionModel={selectedRows}
       />
 
       <div>
-        <IconButton
+        {/* <IconButton
           onClick={handleOpenForAdd}
           aria-label="add"
           color="secondary"
@@ -321,7 +321,7 @@ function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
           disabled={selectedRows.length != 1}
         >
           <EditIcon />
-        </IconButton>
+        </IconButton> */}
         <Modal
           open={open}
           onClose={handleClose}
@@ -633,13 +633,13 @@ function AutoTicketTable({ autoTicketRows, setAutoTicketRows }) {
           },
         }}
         pageSizeOptions={[5, 10]}
-        checkboxSelection
+        // checkboxSelection
         onRowSelectionModelChange={handleSelectionModelChange}
         rowSelectionModel={selectedRows}
       />
 
       <div>
-        <IconButton
+        {/* <IconButton
           onClick={handleOpenForAdd}
           aria-label="add"
           color="secondary"
@@ -659,7 +659,7 @@ function AutoTicketTable({ autoTicketRows, setAutoTicketRows }) {
           disabled={selectedRows.length != 1}
         >
           <EditIcon />
-        </IconButton>
+        </IconButton> */}
         <Modal
           open={open}
           onClose={handleClose}
@@ -987,32 +987,16 @@ const TicketDetails = ({ params: { event_id } }: Props) => {
         </Box>
         <div
           style={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "flex-end",
             margin: "3em",
           }}
         >
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              sx={{ textTransform: "capitalize" }}
-              onClick={() => {}}
-            >
-              Close
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={{ textTransform: "capitalize" }}
-              onClick={() => {
-                Router.push(`manage/${event_id}`);
-              }}
-            >
-              Open Budget Manager
-            </Button>
-          </Stack>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => Router.back()}
+          >
+            Back
+          </Button>
         </div>
       </Card>
     </Grid>

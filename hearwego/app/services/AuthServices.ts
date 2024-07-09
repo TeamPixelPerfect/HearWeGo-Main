@@ -138,3 +138,39 @@ export const handleArtistForgotPassword = async (email: string) => {
     throw new Error(error.message);
   }
 };
+
+export const handleUserPasswordChange = async (
+  email: string,
+  password: string,
+  newPassword: string
+) => {
+  const res = await fetch(`${base_url}/auth/change-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password, newPassword }),
+  });
+  if (res.ok) {
+    return true;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
+export const handleUserMobileChange = async (email: string, mobile: string) => {
+  const res = await fetch(`${base_url}/auth/change-mobile-number`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, mobileNumber: mobile }),
+  });
+  if (res.ok) {
+    return true;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};

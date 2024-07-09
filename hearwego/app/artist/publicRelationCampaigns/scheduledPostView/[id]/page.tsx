@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import {
   Card,
@@ -17,6 +17,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DateRangeIcon from "@mui/icons-material/DateRange";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { deletePRPost } from "@/app/services/PrServices";
 
 interface ScheduledPostProps {
   description: string;
@@ -25,6 +27,9 @@ interface ScheduledPostProps {
   socialMedias: string[];
   date: string;
   time: string;
+  id: string;
+  token: string;
+  setIsChanged: (value: boolean) => void;
 }
 
 const ScheduledPostCard: React.FC<ScheduledPostProps> = ({
@@ -34,12 +39,25 @@ const ScheduledPostCard: React.FC<ScheduledPostProps> = ({
   socialMedias,
   date,
   time,
+  token,
+  id,
+  setIsChanged,
 }) => {
   const [expanded, setExpanded] = useState(false);
-
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const onDelete = async () => {
+    try {
+      await deletePRPost(token, id).then(() => setIsChanged(true));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const formattedDate = new Date(date).toLocaleDateString("en-CA"); // Format date as YYYY-MM-DD
+  const formattedTime = time; // Directly use the time string for display
 
   return (
     <Card sx={{ maxWidth: 345, m: 2, boxShadow: 3 }}>
@@ -50,19 +68,30 @@ const ScheduledPostCard: React.FC<ScheduledPostProps> = ({
         alt="Scheduled post image"
       />
       <CardContent>
-        <Typography variant="h6" component="div">
-          Scheduled Post
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6" component="div">
+            Scheduled Post
+          </Typography>
+          <IconButton color="error" onClick={onDelete}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
         <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
           <DateRangeIcon sx={{ mr: 1, color: "text.secondary" }} />
           <Typography variant="body2" color="text.secondary">
-            {date}
+            {formattedDate}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
           <AccessTimeIcon sx={{ mr: 1, color: "text.secondary" }} />
           <Typography variant="body2" color="text.secondary">
-            {time}
+            {formattedTime}
           </Typography>
         </Box>
         <Divider sx={{ my: 2 }} />
@@ -85,8 +114,8 @@ const ScheduledPostCard: React.FC<ScheduledPostProps> = ({
               Campaign: {assignedCampaign}
             </Typography>
             <Stack direction="row" spacing={1} mt={1}>
-              {socialMedias.map((media, index) => (
-                <Chip key={index} label={media} color="primary" />
+              {socialMedias.map((media) => (
+                <Chip key={media} label={media} color="primary" />
               ))}
             </Stack>
           </Box>
