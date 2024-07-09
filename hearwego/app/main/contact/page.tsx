@@ -12,10 +12,16 @@ import {
   Avatar,
   Icon,
   styled,
+  InputAdornment,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import BusinessIcon from "@mui/icons-material/Business";
+import BadgeIcon from '@mui/icons-material/Badge';
+import EmailIcon from '@mui/icons-material/Email';
+import SubjectIcon from '@mui/icons-material/Subject';
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 const CustomBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -24,80 +30,156 @@ const CustomBox = styled(Box)(({ theme }) => ({
   boxShadow: theme.shadows[3],
 }));
 
+const BackgroundBox = styled(Box)(({ theme }) => ({
+  backgroundImage:
+    'url("https://img.freepik.com/free-vector/music-vinyl-record-label-with-sound-notes_1017-33905.jpg")',
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  minHeight: "100vh",
+  display: "flex",
+
+  padding: theme.spacing(4),
+}));
+
 const Contact = () => {
   return (
-    <Container maxWidth="md" sx={{ m: "2em auto" }}>
-      <CustomBox>
+    <BackgroundBox>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Typography
           variant="h2"
           component="h1"
-          sx={{ fontWeight: 700 }}
+          sx={{ fontWeight: 700,color:'white' }}
           gutterBottom
         >
           Contact Us
         </Typography>
         <Typography
-          variant="h6"
+        
+         variant="body1"
           component="p"
           paragraph
-          sx={{ fontWeight: 400 }}
+          sx={{ fontWeight: 400,color:'white' }}
         >
           We'd love to hear from you! Whether you have a question about
           features, trials, pricing, need a demo, or anything else, our team is
           ready to answer all your questions.
         </Typography>
-      </CustomBox>
-      <Box sx={{ mt: 4 }}>
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={6}>
-            <Card>
-              <CardContent>
-                <Avatar
-                  sx={{ width: 56, height: 56, mb: 2, bgcolor: "primary.main" }}
-                >
-                  <SupportAgentIcon />
-                </Avatar>
-                <Typography variant="h5" component="div">
-                  General Support
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Email: support@hearwego.com
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Phone: (123) 456-7890
-                </Typography>
-              </CardContent>
-            </Card>
+        <Box>
+        <Box sx={{ mt: 4 }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={6}>
+              <Card sx={{backgroundColor:'rgba(0,0,0, 0.9)'}}>
+                <CardContent>
+                  <Avatar
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      mb: 2,
+                      bgcolor: "primary.main",
+                    }}
+                  >
+                    <SupportAgentIcon />
+                  </Avatar>
+                  <Typography variant="h5" component="div" sx={{color:'white'}}>
+                    General Support
+                  </Typography>
+                  <Typography variant="body1" sx={{color:'white'}}>
+                    Email: support@hearwego.com
+                  </Typography>
+                  <Typography variant="body1" sx={{color:'white'}}>
+                    Phone: (123) 456-7890
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <Card sx={{backgroundColor:'rgba(0,0,0, 0.9)'}}>
+                <CardContent>
+                  <Avatar
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      mb: 2,
+                      bgcolor: "secondary.main",
+                    }}
+                  >
+                    <BusinessIcon />
+                  </Avatar>
+                  <Typography variant="h5" component="div" sx={{color:'white'}}>
+                    Sales Inquiries
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{color:'white'}}>
+                    Email: sales@hearwego.com
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary"sx={{color:'white'}}>
+                    Phone: (987) 654-3210
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Card>
-              <CardContent>
-                <Avatar
-                  sx={{
-                    width: 56,
-                    height: 56,
-                    mb: 2,
-                    bgcolor: "secondary.main",
-                  }}
-                >
-                  <BusinessIcon />
-                </Avatar>
-                <Typography variant="h5" component="div">
-                  Sales Inquiries
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Email: sales@hearwego.com
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Phone: (987) 654-3210
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        </Box>
       </Box>
-      <CustomBox sx={{ mt: 4 }}>
-        <Typography variant="h4" component="h2" gutterBottom>
+      <Box>
+      <Box sx={{ mt: 4 }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={6}>
+            <Card sx={{backgroundColor:'rgba(0,0,0, 0.9)'}}>
+                <CardContent>
+                  <Avatar
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      mb: 2,
+                      bgcolor:"teal",
+                    }}
+                  >
+              < HelpCenterIcon/>
+                  </Avatar>
+                  <Typography variant="h5" component="div" sx={{color:'white'}}>
+                    Help Center
+                  </Typography>
+                  <Typography variant="body1" sx={{color:'white'}}>
+                    Email: support@hearwego.com
+                  </Typography>
+                  <Typography variant="body1" sx={{color:'white'}}>
+                    Phone: (123) 456-7890
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <Card sx={{backgroundColor:'rgba(0,0,0, 0.9)'}}>
+                <CardContent>
+                  <Avatar
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      mb: 2,
+                      bgcolor: "cornflowerblue",
+                    }}
+                  >
+                    <LocationCityIcon/>
+                  </Avatar>
+                  <Typography variant="h5" component="div" sx={{color:'white'}}>
+                  Address
+                  </Typography>
+                  <Typography variant="body1" sx={{color:'white'}}>
+                   Bandaranayaka road,
+                   Katubedda,Moratuwa
+                  </Typography>
+                 
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+      </Box>
+     
+      <CustomBox sx={{ mt: 4, marginLeft:'30px',backgroundColor:'rgba(0,0,0, 0.6)' }}>
+        <Typography variant="h4" component="h2" gutterBottom sx={{color:'white'}}>
           Send Us a Message
         </Typography>
         <Box
@@ -109,16 +191,40 @@ const Contact = () => {
           noValidate
           autoComplete="off"
         >
-          <TextField required fullWidth label="Name" variant="outlined" />
-          <TextField required fullWidth label="Email" variant="outlined" />
-          <TextField required fullWidth label="Subject" variant="outlined" />
+         <TextField
+              required
+              fullWidth
+              label="Name"
+              variant="outlined"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <BadgeIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          <TextField required fullWidth label="Email" variant="outlined" InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <EmailIcon />
+                  </InputAdornment>
+                ),
+              }} />
+          <TextField required fullWidth label="Subject" variant="outlined"  InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    < SubjectIcon />
+                  </InputAdornment>
+                ),
+              }} />
           <TextField
             required
             fullWidth
             label="Message"
             variant="outlined"
             multiline
-            rows={4}
+            rows={8}
           />
           <Button
             variant="contained"
@@ -130,7 +236,7 @@ const Contact = () => {
           </Button>
         </Box>
       </CustomBox>
-    </Container>
+    </BackgroundBox>
   );
 };
 
