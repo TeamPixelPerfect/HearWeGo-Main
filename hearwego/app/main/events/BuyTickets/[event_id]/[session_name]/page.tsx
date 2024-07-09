@@ -40,7 +40,7 @@ import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import EventCheckout from "@/app/components/EventCheckout";
 import { id } from "date-fns/locale";
-import * as htmlToImage from 'html-to-image';
+import * as htmlToImage from "html-to-image";
 import JSZip from "jszip";
 // import { saveAs } from "file-saver";
 
@@ -214,6 +214,7 @@ export default function Page() {
   const handleCloseTicketModal = () => setOpenTicketModal(false);
   const user = useAppSelector((state) => state.user.user);
   const [event, setEvent] = useState<Event | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [ticketType, setTicketType] = useState<TicketType | null>(null);
   const [soldTicket, setSoldTicket] = useState<SoldTickets | null>({
     ticket_id: "",
@@ -414,19 +415,52 @@ export default function Page() {
     );
   };
 
+  const generateURL = (url) => {
+    const currentUrl = url;
+    const urlParts = currentUrl
+      .split("/")
+      .filter((part) => part !== "BuyTickets");
+    urlParts.pop();
+    const newUrl = urlParts.join("/");
+
+    return newUrl;
+  };
+
   const handleDownloadImages = () => {
-    boxRefs.current.forEach((boxRef, index) => {
-      htmlToImage.toJpeg(boxRef, { quality: 0.95 })
-        .then(function (dataUrl) {
-          const link = document.createElement('a');
-          link.download = `box_${index}.png`;
-          link.href = dataUrl;
-          link.click();
+    const zip = new JSZip();
+    const folder = zip.folder("ticket_images");
+
+    if (folder) {
+      setIsGeneratingImage(true); // Set the state to true before generating images
+      const imagePromises = boxRefs.current.map((ref, index) =>
+        html2canvas(ref).then((canvas) => {
+          return new Promise<void>((resolve) => {
+            canvas.toBlob((blob) => {
+              if (blob) {
+                folder.file(`ticket_${index + 1}.png`, blob);
+                resolve();
+              }
+            });
+          });
         })
-        .catch(function (error) {
-          console.error('Error:', error);
+      );
+
+      Promise.all(imagePromises)
+        .then(() => {
+          return zip.generateAsync({ type: "blob" });
+        })
+        .then((content) => {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(content);
+          link.download = "ticket_images.zip";
+          link.click();
+          setIsGeneratingImage(false); // Set the state back to false after generating images
+        })
+        .catch((error) => {
+          console.error("Error generating images:", error);
+          setIsGeneratingImage(false); // Set the state back to false even if there's an error
         });
-    });
+    }
   };
 
   return (
@@ -592,8 +626,8 @@ export default function Page() {
                   );
                   return autoTicket ? (
                     <Paper
-                      key={index}
-                      ref={(ref) => (boxRefs.current[index] = ref)}
+                      ref={(el) => (boxRefs.current[index] = el)}
+                      key={ticket.ticket_id}
                       sx={{
                         width: "100%",
                         display: "flex",
@@ -601,7 +635,7 @@ export default function Page() {
                         marginBottom: 2,
                       }}
                     >
-                      <Box sx={{ width: "25%" }}>
+                      <Box sx={{ width: "25%" }} className="ticket-image">
                         <CardMedia
                           component="img"
                           sx={{ width: "200px", height: "200px" }}
@@ -720,12 +754,7 @@ export default function Page() {
                       >
                         {/* <QRCodeComponent value={qrValue} url={currentUrl} /> */}
                         <QRCodeComponent
-                          value={`URL: ${window.location.href}\n
-                                  Ticket ID: ${id_list[index] as string}\n
-                                  Ticket Type: ${autoTicket?.ticket_type}\n
-                                  Event: ${event?.event_name as string}\n
-                                  Session: ${session_name as string}\n
-                                  No of Tickets: ${ticket.ticket_count}\n `}
+                          value={`Ticket ID: ${id_list[index] as string}\nTicket Type: ${autoTicket?.ticket_type}\nEvent: ${event?.event_name as string}\nSession: ${session_name as string}\nNo of Tickets: ${ticket.ticket_count}\n URL: ${generateURL(window.location.href)}\n`}
                         />
                       </Box>
                     </Paper>

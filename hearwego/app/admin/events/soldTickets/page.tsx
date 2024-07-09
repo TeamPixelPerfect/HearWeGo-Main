@@ -60,8 +60,11 @@ import { getAllArtists } from "@/app/services/ArtistServices";
 import { getEvent } from "@/app/services/EventServices";
 import { Artist } from "@/app/constants/models";
 import { updateEventByAdmin } from "@/app/services/EventServices";
+import { getSoldTickets } from "@/app/services/EventServices";
+import { SoldTickets } from "@/app/constants/models";
+import { AutoTicket } from "@/app/constants/models";
+import { getAllAutoTickets } from "@/app/services/EventServices";
 import Link from "next/link";
-import { ro } from "date-fns/locale";
 // import router, { Router } from "next/router";
 
 const style = {
@@ -80,6 +83,8 @@ function EventDataGrid() {
   const artist = useAppSelector((state) => state.artist.user);
 
   const [events, setEvents] = useState<Event[]>([]);
+  const [soldTickets, setSoldTickets] = useState<SoldTickets[]>([]);
+  const [autoTickets, setAutoTickets] = useState<AutoTicket[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [isChanged, setIsChanged] = useState(false);
   const [eventId, setEventId] = useState("");
@@ -87,73 +92,114 @@ function EventDataGrid() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    getSoldTickets().then((soldTickets) => {
+      console.log("Sold Tickets......", soldTickets);
+      setSoldTickets(soldTickets.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    getAllAutoTickets().then((autoTickets) => {
+      console.log("Auto Tickets......", autoTickets);
+      setAutoTickets(autoTickets.data);
+    });
+  }, []);
+
+  useEffect(() => {
     getAllEvents().then((events) => {
       console.log("Events......", events);
       setEvents(events.data);
     });
+  }, []);
 
-    getAllArtists().then((artists) => {
-      console.log("Artists......", artists);
-      setArtists(artists.data);
-    });
-  }, [isChanged]);
-
-  const handleStatusUpdate = (event_id: string, eventStatus: string) => {
-    let status = eventStatus;
-    if (eventStatus !== "blocked") {
-      status = "blocked";
-    } else {
-      status = "private";
-    }
-
-    updateEventByAdmin(event_id, { event_status: status }).then((response) => {
-      console.log("Event Status Updated......", response);
-      setIsChanged(!isChanged);
-
-      // setEvents(events.data);
-    });
+  const getEventName = (ticket_id) => {
+    const event = events.find(
+      (event) => event.event_id === getGetEventId(ticket_id)
+    );
+    return event ? event.event_name : "Unknown";
   };
 
-  function createEventData(
-    event_id: string,
-    event_img: string,
-    event_name: string,
-    event_type: string,
-    age_from: number,
-    age_to: number,
-    sessions: any,
-    event_status: string,
-    event_created_by: string,
+  const getGetEventId = (ticket_id) => {
+    const autoTicket = autoTickets.find(
+      (autoTicket) => autoTicket._id === ticket_id
+    );
+    return autoTicket ? autoTicket.event_id : "Unknown";
+  };
+
+  //   useEffect(() => {
+  //     getAllEvents().then((events) => {
+  //       console.log("Events......",events);
+  //       setEvents(events.data);
+  //     });
+
+  //     getAllArtists().then((artists) => {
+  //       console.log("Artists......",artists);
+  //       setArtists(artists.data);
+  //     });
+  //   }
+  //   , [isChanged]);
+
+  //   const handleStatusUpdate = (event_id: string, eventStatus: string) => {
+
+  //     let status = eventStatus;
+  //     if (eventStatus !== "blocked"){
+  //       status = "blocked";
+  //     }
+  //     else{
+  //       status = "private";
+  //     }
+
+  //     updateEventByAdmin(event_id, {event_status: status}).then((response) => {
+  //       console.log("Event Status Updated......",response);
+  //       setIsChanged(!isChanged);
+
+  //       // setEvents(events.data);
+  //     }
+  //     );
+  //   };
+
+  function createTicketData(
+    _id: string,
+    sold_ticket_id: string,
+    ticket_id: string,
+    user_id: string,
+    bought_quantity: number,
+    total_price: number,
+    user_name: string,
+    user_email: string,
+    user_contact: string,
+    order_ticket_id: string,
     createdAt: string,
     updatedAt: string
   ) {
     return {
-      event_id,
-      event_img,
-      event_name,
-      event_type,
-      age_from,
-      age_to,
-      no_of_sessions: sessions.length,
-      sessions,
-      event_status,
-      event_created_by,
+      _id,
+      sold_ticket_id,
+      ticket_id,
+      user_id,
+      bought_quantity,
+      total_price,
+      user_name,
+      user_email,
+      user_contact,
+      order_ticket_id,
       createdAt,
       updatedAt,
     };
   }
 
-  const eventRows = events.map((event) =>
-    createEventData(
-      event.event_id,
-      event.event_img,
-      event.event_name,
-      event.event_type,
-      event.age_from,
-      event.age_to,
-      event.sessions,
-      event.event_status,
-      event.event_created_by,
+  const ticketRows = soldTickets.map((event) =>
+    createTicketData(
+      event._id,
+      event.sold_ticket_id,
+      event.ticket_id,
+      event.user_id,
+      event.bought_quantity,
+      event.total_price,
+      event.user_name,
+      event.user_email,
+      event.user_contact,
+      event.order_ticket_id,
       event.createdAt,
       event.updatedAt
     )
@@ -165,100 +211,30 @@ function EventDataGrid() {
   };
 
   const columns = [
-    { field: "event_id", headerName: "Event ID", flex: 1 },
+    { field: "_id", headerName: "ID", flex: 0.5 },
+    { field: "sold_ticket_id", headerName: "Sold ID", flex: 1 },
+    { field: "ticket_id", headerName: "Ticket ID", flex: 2 },
     {
-      field: "event_img",
-      headerName: "Event Image",
+      field: "event_id",
+      headerName: "Event ID",
       flex: 1,
-      renderCell: (params) => (
-        <img src={params.row.event_img} style={{ width: 50, height: 50 }} />
-      ),
+      valueGetter: (params) => getGetEventId(params.row.ticket_id),
     },
-    { field: "event_name", headerName: "Event Name", flex: 2 },
-    { field: "event_type", headerName: "Event Type", flex: 1 },
-    { field: "age_from", headerName: "Age From", flex: 1 },
-    { field: "age_to", headerName: "Age To", flex: 1 },
-    { field: "no_of_sessions", headerName: "No of Sessions", flex: 1 },
     {
-      field: "event_status",
-      headerName: "Event Status",
+      field: "event_name",
+      headerName: "Event",
       flex: 1,
-      renderCell: (params) => {
-        const status = params.row.event_status;
-        let chipColor;
-        switch (status) {
-          case "private":
-            chipColor = "primary";
-            break;
-          case "public":
-            chipColor = "success";
-            break;
-          case "blocked":
-            chipColor = "error";
-            break;
-          default:
-            chipColor = "default";
-        }
-        return (
-          <Chip
-            label={status.charAt(0).toUpperCase() + status.slice(1)}
-            color={chipColor}
-          />
-        );
-      },
+      valueGetter: (params) => getEventName(params.row.ticket_id),
     },
-    { field: "event_created_by", headerName: "Artist ID", flex: 1 },
-    {
-      field: "ArtistName",
-      headerName: "Artist Name",
-      flex: 2,
-      valueGetter: (params) => getArtistName(params.row.event_created_by),
-    },
+    { field: "user_id", headerName: "User ID", flex: 1 },
+    { field: "bought_quantity", headerName: "Count", flex: 1 },
+    { field: "total_price", headerName: "Total", flex: 1 },
+    { field: "user_name", headerName: "User Name", flex: 1 },
+    { field: "user_email", headerName: "E-mail", flex: 1 },
+    { field: "user_contact", headerName: "Contact", flex: 1 },
+    { field: "order_ticket_id", headerName: "Order ID", flex: 1 },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     { field: "updatedAt", headerName: "Updated At", flex: 1 },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 2,
-      renderCell: (params) => (
-        <ButtonGroup>
-          {/* <Link href={`/app/admin/events/${params.row.event_id}`}> */}
-          <IconButton
-            color="secondary"
-            sx={{ fontSize: "16px" }}
-            onClick={() => {
-              router.push(`/admin/events/${params.row.event_id}`);
-            }}
-          >
-            <FaEye />
-          </IconButton>
-          {/* </Link> */}
-          <IconButton
-            disabled={
-              params.row.event_status == "public" ||
-              params.row.event_status == "private"
-            }
-            color="success"
-            sx={{ fontSize: "16px" }}
-            onClick={() =>
-              handleStatusUpdate(params.row.event_id, params.row.event_status)
-            }
-          >
-            <KeyIcon />
-          </IconButton>
-          <IconButton
-            disabled={params.row.event_status == "blocked"}
-            color="error"
-            sx={{ fontSize: "16px" }}
-            onClick={() =>
-              handleStatusUpdate(params.row.event_id, params.row.event_status)
-            }
-          >
-            <BlockIcon />
-          </IconButton>
-        </ButtonGroup>
-      ),
-    },
   ];
 
   const handleView = (id) => {
@@ -284,12 +260,12 @@ function EventDataGrid() {
   return (
     <div style={{ height: 600, width: "100%" }}>
       <DataGrid
-        rows={eventRows}
+        rows={ticketRows}
         columns={columns}
         pageSize={10}
         rowsPerPageOptions={[10]}
         components={{ Toolbar: GridToolbar }}
-        getRowId={(row) => row.event_id} // Specify the custom id field
+        getRowId={(row) => row.order_ticket_id} // Specify the custom id field
       />
     </div>
   );
@@ -340,51 +316,21 @@ const AdminUserPage = () => {
               color: theme.palette.mode === "dark" ? "#fff" : "#000",
             }}
           >
-            Events
+            Tickets Sold
           </Typography>
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="contained"
-              startIcon={<IoAddOutline />}
-              sx={{
-                textTransform: "capitalize",
-                background: "#000",
-                color: "#fff",
-              }}
-              onClick={() => {}}
-              disabled
-            >
-              Add New Event
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                textTransform: "capitalize",
-                background: "#000",
-                color: "#fff",
-              }}
-              onClick={() => {
-                router.push(`/admin/events/soldTickets`);
-              }}
-              // disabled
-            >
-              Tickets Sold
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                textTransform: "capitalize",
-                background: "#000",
-                color: "#fff",
-              }}
-              onClick={() => {
-                router.push(`/admin/events/autoTickets`);
-              }}
-              // disabled
-            >
-              Generated Tickets
-            </Button>
-          </Stack>
+          <Button
+            variant="contained"
+            startIcon={<IoAddOutline />}
+            sx={{
+              textTransform: "capitalize",
+              background: "#000",
+              color: "#fff",
+            }}
+            onClick={() => {}}
+            disabled
+          >
+            Add New Event
+          </Button>
         </Box>
         <ADTabBox>
           <EventDataGrid />
