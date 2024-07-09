@@ -323,7 +323,7 @@ const AdminSingleEventPage = () => {
             justifyContent: "end"
           }}
         >
-          <div style={{ width: "100%", padding: 2, display: "flex", justifyContent: "end" }}>
+          {/* <div style={{ width: "100%", padding: 2, display: "flex", justifyContent: "end" }}>
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" color="error" startIcon={<BlockIcon />}>
                 Block
@@ -335,7 +335,7 @@ const AdminSingleEventPage = () => {
                 Budget
               </Button>
             </Stack>
-          </div>
+          </div> */}
         </Box>
       </Card>
     </Grid>
