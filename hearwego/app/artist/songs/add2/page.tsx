@@ -713,7 +713,7 @@ function SongMetaData({
           <Grid xs={6}></Grid>
           <Grid xs={6}></Grid>
         </Grid>
-
+{/* 
         <Typography component="div" sx={{ fontSize: 14, marginTop: "1em" }}>
           Setting your release date to at least 1-week in the future increases
           your chances of getting added to playlists.
@@ -721,7 +721,7 @@ function SongMetaData({
         <Typography component="div" sx={{ fontSize: 14 }}>
           If it's important that your album goes live in all stores on the same
           day, click here for info.
-        </Typography>
+        </Typography> */}
       </Paper>
 
       <Paper
@@ -747,6 +747,11 @@ function SongMetaData({
               label="Album Title (Optional)"
               variant="filled"
               sx={{ width: "90%" }}
+              onChange={(e) => {
+                setSongData((data) => {
+                  return { ...data, album_title: e.target.value };
+                });
+              }}
             />
           </Grid>
           <Grid xs={6}>
@@ -819,12 +824,17 @@ function SongMetaData({
           <Grid xs={12}>
             <TextField
               id="filled-multiline-flexible"
-              label="Type your lyrics here"
+              placeholder="Type your lyrics here"
               multiline
               rows={10}
               // maxRows={20}
               variant="filled"
               sx={{ width: "95%" }}
+              onChange={(e) => {
+                setSongData((data) => {
+                  return { ...data, lyrics: e.target.value };
+                });
+              }}
             />
           </Grid>
         </Grid>

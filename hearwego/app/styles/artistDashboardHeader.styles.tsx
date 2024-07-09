@@ -4,12 +4,13 @@ import Fab from "@mui/material/Fab";
 import Card from "@mui/material/Card";
 
 export const HeaderBox = styled("div")(({ theme }) => ({
-  width: "100%",
+  maxWidth: "100%",
   bgColor: "#000",
   height: "fit-content",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  margin: "0 10px"
 }));
 
 export const SearchArea = styled("div")(({ theme }) => ({

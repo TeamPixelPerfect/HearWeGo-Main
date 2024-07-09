@@ -15,7 +15,7 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
     width: "calc(100% - 215px)",
     maxWidth: "100%",
     minWidth: "350px",
-    padding: "1em 1em 1em 0",
+    padding: "1em 0",
     marginLeft: "0em",
   },
   "@media (max-width:960px)": {
