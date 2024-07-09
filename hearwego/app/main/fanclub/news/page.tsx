@@ -25,10 +25,9 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import InputAdornment from "@mui/material/InputAdornment";
 import {
-  ClubNews,
+  ClubNews, 
   Newscomments,
   newsreplies,
-  newsreacts,
   Artist,
 } from "@/app/constants/models";
 import { useAppSelector } from "@/lib/hooks";

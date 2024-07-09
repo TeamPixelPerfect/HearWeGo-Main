@@ -19,7 +19,7 @@ import {
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { HelpComplaints } from "../../constants/models";
 import { getComplaints, updateComplaint } from "../../services/HelpServices";
-import { HelpDialog, AddCategoryDialog } from "./HelpForm/page";
+import { HelpDialog, AddCategoryDialog } from "./HelpForm/HelpForm";
 
 const CardContainer = styled(Card)(({ theme }) => ({
   width: "100%",
