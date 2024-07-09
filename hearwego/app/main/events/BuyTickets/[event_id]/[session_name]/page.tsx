@@ -416,9 +416,11 @@ export default function Page() {
   };
 
   const generateURL = (url) => {
-    const urlParts = url.split('/');
-    urlParts.splice(-2, 2);
+    const currentUrl = url;
+    const urlParts = currentUrl.split('/').filter(part => part !== "BuyTickets");
+    urlParts.pop();
     const newUrl = urlParts.join('/');
+
     return newUrl;
   }
 
