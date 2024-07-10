@@ -50,7 +50,7 @@ export const handleArtistRegister = async (data: any) => {
     return user;
   } else {
     const error = await res.json();
-    throw new Error(error.message);
+    return error?.message;
   }
 };
 
@@ -189,5 +189,21 @@ export const handleAdminSignIn = async (data: any) => {
   } else {
     const error = await res.json();
     return error?.message;
+  }
+};
+
+export const handleArtistAproved = async (data: any) => {
+  const res = await fetch(`${base_url}/AdminControls/approve-artist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    return await res.json();
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
   }
 };

@@ -23,6 +23,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -70,6 +72,22 @@ const ArtistSignUp = () => {
 
   const matches = useMediaQuery("(max-width:960px)");
   const artist = useAppSelector((state) => state.artist.user);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   // Sign up stage
   const [step, setStep] = useState<number>(0);
@@ -400,10 +418,19 @@ const ArtistSignUp = () => {
 
     console.log("Artist Details:::", artistDetails);
 
-    handleArtistRegister(artistDetails).then((res) => {
-      if (res) {
-        console.log("Artist Registered Successfully! " + res);
+    handleArtistRegister({
+      ...artistDetails,
+      verificationDocuments: verDoc,
+    }).then((res) => {
+      if (res?.user) {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Documents submitted successfully!");
         incrementStep(1);
+      } else {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(res || "Error submitting documents!");
       }
     });
   };
@@ -2337,6 +2364,15 @@ const ArtistSignUp = () => {
           </Box>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </AuthContainer>
   );
 };

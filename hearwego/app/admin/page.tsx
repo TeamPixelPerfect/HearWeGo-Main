@@ -84,38 +84,40 @@ const AdminPage = () => {
   };
 
   useEffect(() => {
-    getAllArtists().then((res) => {
-      setArtists(res.length);
-    });
+    if (admin?.token) {
+      getAllArtists().then((res) => {
+        setArtists(res.length);
+      });
 
-    getAllUsers().then((res) => {
-      setUsers(res.length);
-    });
+      getAllUsers().then((res) => {
+        setUsers(res.length);
+      });
 
-    getSongs("test").then((res) => {
-      setSharedSongs(res.length);
-    });
+      getSongs("test").then((res) => {
+        setSharedSongs(res.length);
+      });
 
-    getAlbums("test").then((res) => {
-      setCreatedAlbums(res.length);
-    });
+      getAlbums("test").then((res) => {
+        setCreatedAlbums(res.length);
+      });
 
-    getAllEvents().then((res) => {
-      setHostedEvents(res.length);
-    });
+      getAllEvents().then((res) => {
+        setHostedEvents(res.length);
+      });
 
-    getPressReleases(admin?.token).then((res) => {
-      setPressReleases(res.length);
-    });
+      getPressReleases(admin?.token).then((res) => {
+        setPressReleases(res.length);
+      });
 
-    getAllOrders(admin?.token).then((res) => {
-      setMerchandiseSold(res.length);
-    });
+      getAllOrders(admin?.token).then((res) => {
+        setMerchandiseSold(res.length);
+      });
 
-    getAllPRCampaigns(admin?.token).then((res) => {
-      setCampaignsCreated(res.length);
-    });
-  });
+      getAllPRCampaigns(admin?.token).then((res) => {
+        setCampaignsCreated(res.length);
+      });
+    }
+  }, [admin?.token]);
 
   return (
     <Grid container sx={{ width: "100%", margin: 0 }}>

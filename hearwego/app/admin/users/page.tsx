@@ -8,7 +8,6 @@ import {
   Card,
   Grid,
   IconButton,
-  Stack,
   TextField,
   Typography,
   useTheme,
@@ -21,12 +20,18 @@ import {
   SelectChangeEvent,
   FormControl,
   InputLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Switch,
+  Divider,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { FaEdit, FaEye } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { IoAddOutline } from "react-icons/io5";
 import { getAllUsers } from "@/app/services/UserServices";
+import { handleArtistAproved } from "@/app/services/AuthServices";
 import { User } from "@/app/constants/models";
 import { getAllArtists } from "@/app/services/ArtistServices";
 
@@ -39,14 +44,21 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
   const router = useRouter();
 
   const [userData, setUserData] = React.useState<User[]>([]);
+  const [artistData, setArtistData] = React.useState<User[]>([]);
   const [rows, setRows] = React.useState<User[]>([]);
-
-  const [category, setCategory] = React.useState<string>("Fans");
+  const [category, setCategory] = React.useState<string>("All");
+  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
+  const [isAdminApproved, setIsAdminApproved] = React.useState<boolean>(false);
 
   const columns: GridColDef[] = [
     { field: "user_id", headerName: "User ID", flex: 1 },
     { field: "email", headerName: "Email", flex: 2 },
-    { field: category === "Fanns" ? "name" : "artistName", headerName: "Name", flex: 2 },
+    {
+      field: category === "Fans" ? "name" : "artistName",
+      headerName: "Name",
+      flex: 2,
+    },
     { field: "mobileNumber", headerName: "Mobile Number", flex: 2 },
     { field: "country", headerName: "Country", flex: 1 },
     { field: "gender", headerName: "Gender", flex: 1 },
@@ -77,6 +89,12 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
       flex: 1,
       type: "boolean",
     },
+    {
+      field: "isAdminApproved",
+      headerName: "Admin Approved",
+      flex: 1,
+      type: "boolean",
+    },
     { field: "role", headerName: "Role", flex: 1 },
     { field: "joinedDate", headerName: "Joined Date", flex: 1 },
     {
@@ -85,15 +103,10 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
       width: 150,
       renderCell: (params) => (
         <ButtonGroup>
-          <IconButton color="primary" sx={{ fontSize: "16px" }}>
-            <FaEdit />
-          </IconButton>
           <IconButton
             color="secondary"
             sx={{ fontSize: "16px" }}
-            onClick={() => {
-              router.push(`/admin/users/${params.row.user_id}`);
-            }}
+            onClick={() => handleOpenDialog(params.row)}
           >
             <FaEye />
           </IconButton>
@@ -113,7 +126,7 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
       const filteredData = rows.filter((user) => !user.isEmailVerified);
       setRows(filteredData);
     } else {
-      setRows(userData);
+      setRows(category === "Fans" ? userData : artistData);
     }
   };
 
@@ -121,41 +134,87 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
-    if (value === "All") return setRows(userData);
-    const filteredUsers = userData.filter((user) =>
-      user.name.toLowerCase().includes(value.toLowerCase())
+    if (value === "All")
+      return setRows(category === "Fans" ? userData : artistData);
+    const filteredUsers = (category === "Fans" ? userData : artistData).filter(
+      (user) => user.name.toLowerCase().includes(value.toLowerCase())
     );
     setRows(filteredUsers);
   };
 
-  const handleCategoryChange = (
-    event: SelectChangeEvent<string>,
-    value: any
-  ) => {
+  const handleCategoryChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value as string;
     setCategory(value);
-    if (value === "Fans") {
-      getUsers();
+    if (value === "All") {
+      setRows([...userData, ...artistData]);
+    } else if (value === "Fans") {
+      setRows(userData);
     } else {
-      getArtists();
+      setRows(artistData);
     }
   };
 
   const getUsers = () => {
-    const users = getAllUsers().then((data) => {
+    getAllUsers().then((data) => {
       setUserData(data.data);
-      setRows(data.data);
+      if (category === "All" || category === "Fans") {
+        setRows(data.data);
+      }
     });
   };
 
   const getArtists = () => {
-    const artists = getAllArtists().then((data) => {
-      setUserData(data.data);
-      setRows(data.data);
+    getAllArtists().then((data) => {
+      setArtistData(data.data);
+      if (category === "All" || category === "Artists") {
+        setRows(data.data);
+      }
     });
+  };
+
+  const handleOpenDialog = (user: User) => {
+    setSelectedUser(user);
+    setIsAdminApproved(user.isAdminApproved);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedUser(null);
+  };
+
+  const handleAdminApprovedChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsAdminApproved(event.target.checked);
+  };
+
+  const handleSave = () => {
+    if (selectedUser && selectedUser.role === "artist") {
+      handleArtistAproved({
+        artist_id: selectedUser.artist_id,
+        email: selectedUser.email,
+      })
+        .then(() => {
+          getArtists(); // Refresh artist data
+          handleCloseDialog();
+        })
+        .catch((error) => {
+          console.error("Error updating admin approved status:", error);
+        });
+    } else {
+      handleCloseDialog();
+    }
   };
 
   React.useEffect(() => {
     getUsers();
+    getArtists();
+  }, []);
+
+  // Set default category to "All" on component mount
+  React.useEffect(() => {
+    setCategory("All");
   }, []);
 
   return (
@@ -180,25 +239,9 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
           >
             Users
           </Typography>
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="contained"
-              startIcon={<IoAddOutline />}
-              sx={{
-                textTransform: "capitalize",
-                background: "#000",
-                color: "#fff",
-              }}
-              onClick={() => {
-                router.push("/admin/users/add");
-              }}
-            >
-              Add New User
-            </Button>
-          </Stack>
         </Box>
         <Box sx={{ padding: "2em" }}>
-          <Grid container>
+          <Grid container spacing={2}>
             <Grid item xs={4}>
               <Autocomplete
                 freeSolo
@@ -220,13 +263,12 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
               />
             </Grid>
             <Grid item xs={4}>
-              <FormControl sx={{width: "300px"}}>
-                <Select
-                  value={category}
-                  onChange={handleCategoryChange}
-                >
-                  <MenuItem value="fans" selected>Fans</MenuItem>
-                  <MenuItem value="artists">Artists</MenuItem>
+              <FormControl sx={{ width: "300px" }}>
+                <InputLabel>Category</InputLabel>
+                <Select value={category} onChange={handleCategoryChange}>
+                  <MenuItem value="All">All</MenuItem>
+                  <MenuItem value="Fans">Fans</MenuItem>
+                  <MenuItem value="Artists">Artists</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -249,18 +291,97 @@ export default function UsersDataGrid({ params: { id } }: UsersDataGridProps) {
                 rows={rows ? rows : []}
                 columns={columns}
                 getRowId={(row) => row._id}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 25 },
-                  },
-                }}
-                pageSizeOptions={[25, 50]}
                 checkboxSelection
               />
             </Grid>
           </Grid>
         </Box>
       </Card>
+      {selectedUser && (
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>User Details</DialogTitle>
+          <DialogContent dividers>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                padding: 2,
+              }}
+            >
+              <Typography variant="body1">
+                <strong>User ID:</strong> {selectedUser.user_id}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Email:</strong> {selectedUser.email}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Name:</strong> {selectedUser.name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Mobile Number:</strong> {selectedUser.mobileNumber}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Country:</strong> {selectedUser.country}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Gender:</strong> {selectedUser.gender}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Birth Date:</strong> {selectedUser.birthDate}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Email Verified:</strong>{" "}
+                {selectedUser.isEmailVerified ? "Yes" : "No"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Mobile Verified:</strong>{" "}
+                {selectedUser.isMobileVerified ? "Yes" : "No"}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Role:</strong> {selectedUser.role}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Joined Date:</strong> {selectedUser.joinedDate}
+              </Typography>
+              {selectedUser.verificationDocuments &&
+                selectedUser.verificationDocuments.length > 0 && (
+                  <img
+                    src={selectedUser.verificationDocuments[0]}
+                    alt="Verification Document"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "400px",
+                      marginTop: "16px",
+                    }}
+                  />
+                )}
+              {selectedUser.role === "artist" && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isAdminApproved}
+                      onChange={handleAdminApprovedChange}
+                    />
+                  }
+                  label="Admin Approved"
+                />
+              )}
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button variant="contained" onClick={handleSave}>
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Grid>
   );
 }
