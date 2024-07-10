@@ -467,7 +467,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
   };
 
   const handleUpdateArtist = () => {
-    updateArtist(artist?.token, artist?.user._id, artistBankDetails).then(
+    updateArtist(artist?.token, artist?.user._id, {isMobileVerified: true, ...artistBankDetails}).then(
       (res) => {
         if (res) {
           const newData = { user: res, token: artist?.token, ...res };
