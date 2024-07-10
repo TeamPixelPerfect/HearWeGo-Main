@@ -463,6 +463,10 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     setBankBranchError(false);
     setBankCountryError(false);
 
+    handleUpdateArtist();
+  };
+
+  const handleUpdateArtist = () => {
     updateArtist(artist?.token, artist?.user._id, artistBankDetails).then(
       (res) => {
         if (res) {
@@ -2275,7 +2279,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleUpdateArtist}
             >
               Skip
             </Button>
