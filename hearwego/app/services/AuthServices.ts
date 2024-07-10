@@ -174,3 +174,19 @@ export const handleUserMobileChange = async (email: string, mobile: string) => {
     throw new Error(error.message);
   }
 };
+
+export const handleArtistAproved = async (data: any) => {
+  const res = await fetch(`${base_url}/AdminControls/approve-artist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    return await res.json();
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};

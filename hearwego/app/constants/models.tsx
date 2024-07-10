@@ -70,6 +70,7 @@ export interface BankDetails {
   country: String;
 }
 
+
 export interface Artist {
   user: {
     _id?: string;
