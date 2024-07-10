@@ -128,7 +128,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     email: "",
     password: "",
     confirmPassword: "",
-    mobileVerified: false,
+    isMobileVerified: false,
   });
 
   // Artist Profile Customization Details
@@ -356,7 +356,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
       setOtpError(true);
       return;
     }
-    setArtistDetails({ ...artistDetails, mobileVerified: true });
+    setArtistDetails({ ...artistDetails, isMobileVerified: true });
     setOtpError(false);
 
     incrementStep(1);
