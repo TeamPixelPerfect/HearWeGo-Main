@@ -14,12 +14,16 @@ import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
-import { handleArtistLogin } from "@/app/services/AuthServices";
+import {
+  handleAdminSignIn,
+  handleArtistLogin,
+} from "@/app/services/AuthServices";
 import { useAppDispatch } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
 import { logInArtist } from "@/lib/features/artist.slice";
 import Logo from "@/app/components/Logo";
 import { error } from "console";
+import { logInAdmin } from "@/lib/features/admin.slice";
 
 const ArtistSignIn = () => {
   const dispatch = useAppDispatch();
@@ -69,18 +73,18 @@ const ArtistSignIn = () => {
 
     if (errors.includes(true)) return;
 
-    handleArtistLogin(artistDetails).then((res) => {
+    handleAdminSignIn(artistDetails).then((res) => {
       if (res?.user) {
         setSnackbarOpen(true);
         setSnackbarSeverity("success");
         setSnackbarMessage("Login successful");
 
-        dispatch(logInArtist({ ...res, ...res?.user }));
+        dispatch(logInAdmin({ ...res, ...res?.user }));
         sessionStorage.setItem(
-          "hwg-artist",
+          "hwg-admin",
           JSON.stringify({ ...res, ...res?.user })
         );
-        router.replace("/artist");
+        router.replace("/admin");
       } else {
         setSnackbarOpen(true);
         setSnackbarSeverity("error");
@@ -105,7 +109,7 @@ const ArtistSignIn = () => {
             width: matches ? "100%" : "50%",
             minHeight: matches ? "20%" : "100%",
             backgroundColor: "#000",
-            backgroundImage: `url("https://images.pexels.com/photos/3806767/pexels-photo-3806767.jpeg")`,
+            backgroundImage: `url("https://images.pexels.com/photos/860707/pexels-photo-860707.jpeg")`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -113,7 +117,7 @@ const ArtistSignIn = () => {
         ></Box>
 
         <Box
-          id="artist-sign-in"
+          id="admin-sign-in"
           sx={{
             flex: "0 0 auto",
             width: matches ? "100%" : "50%",
@@ -144,7 +148,7 @@ const ArtistSignIn = () => {
               marginBottom: "20px",
             }}
           >
-            Sign into HearWeGo as an Artist
+            Sign into HearWeGo as an Admin
           </Typography>
 
           {/* Email */}
@@ -198,11 +202,11 @@ const ArtistSignIn = () => {
           </Stack>
 
           {/* Sign up link */}
-          <Typography variant="body1" sx={{ marginTop: "40px" }}>
+          {/* <Typography variant="body1" sx={{ marginTop: "40px" }}>
             <Link href="/auth/forgotArtist" style={{ color: "#C084FC" }}>
               Forgot Password?
             </Link>
-          </Typography>
+          </Typography> */}
           <Typography variant="body1" sx={{ marginTop: "20px" }}>
             Don't have an account?{" "}
             <Link href="/auth/artistSignUp" style={{ color: "#C084FC" }}>

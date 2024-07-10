@@ -32,7 +32,7 @@ export const handleLogin = async (data: any) => {
     return user;
   } else {
     const error = await res.json();
-    throw new Error(error.message);
+    return error?.message;
   }
 };
 
@@ -68,7 +68,7 @@ export const handleArtistLogin = async (data: any) => {
     return user;
   } else {
     const error = await res.json();
-    throw new Error(error.message);
+    return error?.message;
   }
 };
 
@@ -172,5 +172,22 @@ export const handleUserMobileChange = async (email: string, mobile: string) => {
   } else {
     const error = await res.json();
     throw new Error(error.message);
+  }
+};
+
+export const handleAdminSignIn = async (data: any) => {
+  const res = await fetch(`${base_url}/auth/admin/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (res.ok) {
+    const user = await res.json();
+    return user;
+  } else {
+    const error = await res.json();
+    return error?.message;
   }
 };

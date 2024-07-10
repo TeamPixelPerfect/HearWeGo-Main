@@ -28,6 +28,25 @@ export const getPRCampaignsByArtist = async (
   }
 };
 
+
+export const getAllPRCampaigns = async (token: string) => {
+  const res = await fetch(`${base_url}/PRManager/PRCampaign`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const campaigns = await res.json();
+    return campaigns;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+
+}
+
 //add PR Campaign
 export const addPRCampaign = async (token: string, data: any) => {
   console.log(" sending data", data);

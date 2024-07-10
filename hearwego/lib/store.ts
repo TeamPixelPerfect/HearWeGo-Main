@@ -4,6 +4,7 @@ import userReducer from "./features/user.slice";
 import artistReducer from "./features/artist.slice";
 import songReducer from "./features/song.slice";
 import albumReducer from "./features/album.slice";
+import adminReducer from "./features/admin.slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -13,6 +14,7 @@ export const makeStore = () => {
       artist: artistReducer,
       song: songReducer,
       album: albumReducer,
+      admin: adminReducer,
     },
   });
 };

@@ -44,6 +44,23 @@ export const getPressReleasesByArtist = async (
   }
 };
 
+export const getPressReleases = async (token: string) => {
+  const res = await fetch(`${base_url}/PressRelease/PressRelease`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const press = await res.json();
+    return press;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
+
 export const deletePressRelease = async (
   token: string,
   PressReleaseID: string

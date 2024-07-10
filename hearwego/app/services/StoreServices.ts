@@ -474,3 +474,20 @@ export const getOrdersForUser = async (token: string, userId: string) => {
     throw new Error(error.message);
   }
 }
+
+export const getAllOrders = async (token: string) => {
+  const res = await fetch(`${base_url}/MerchsManager/orders`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const orders = await res.json();
+    return orders;
+  } else {
+    const error = await res.json();
+    throw new Error(error.message);
+  }
+};
