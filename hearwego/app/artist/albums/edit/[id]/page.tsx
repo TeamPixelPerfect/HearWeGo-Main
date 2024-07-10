@@ -158,6 +158,7 @@ const AddAlbumData = ({ params: { id } }: Props) => {
   // Effect to set initial album data
   useEffect(() => {
     getAlbum(artist?.token as string, id).then((res) => {
+      console.log(res);
       setAlbumData(res);
       setImageFile(res?.album_img);
     });
@@ -387,41 +388,43 @@ const AddAlbumData = ({ params: { id } }: Props) => {
 
                       {/* Form section for selecting privacy settings */}
                       <div style={{ marginTop: "30px", marginLeft: "20px" }}>
-                        <FormControl>
-                          <FormLabel id="demo-radio-buttons-group-label">
-                            Privacy
-                          </FormLabel>
-                          <RadioGroup
-                            aria-labelledby="demo-radio-buttons-group-label"
-                            defaultValue="Public"
-                            value={albumData?.privacy}
-                            name="radio-buttons-group"
-                            row
-                            // Handler for updating privacy settings in state
-                            onChange={(e) => {
-                              setAlbumData({
-                                ...albumData,
-                                privacy: e.target.value,
-                              });
-                            }}
-                          >
-                            <FormControlLabel
-                              value="Public"
-                              control={<Radio />}
-                              label="Public"
-                            />
-                            <FormControlLabel
-                              value="Private"
-                              control={<Radio />}
-                              label="Private"
-                            />
-                            <FormControlLabel
-                              value="Scheduled"
-                              control={<Radio />}
-                              label="Scheduled"
-                            />
-                          </RadioGroup>
-                        </FormControl>
+                        {albumData && (
+                          <FormControl>
+                            <FormLabel id="demo-radio-buttons-group-label">
+                              Privacy
+                            </FormLabel>
+                            <RadioGroup
+                              aria-labelledby="demo-radio-buttons-group-label"
+                              defaultValue={albumData?.privacy}
+                              value={albumData?.privacy}
+                              name="radio-buttons-group"
+                              row
+                              // Handler for updating privacy settings in state
+                              onChange={(e) => {
+                                setAlbumData({
+                                  ...albumData,
+                                  privacy: e.target.value,
+                                });
+                              }}
+                            >
+                              <FormControlLabel
+                                value="Public"
+                                control={<Radio />}
+                                label="Public"
+                              />
+                              <FormControlLabel
+                                value="Private"
+                                control={<Radio />}
+                                label="Private"
+                              />
+                              <FormControlLabel
+                                value="Scheduled"
+                                control={<Radio />}
+                                label="Scheduled"
+                              />
+                            </RadioGroup>
+                          </FormControl>
+                        )}
                       </div>
                     </Box>
                   </Box>

@@ -19,13 +19,13 @@ import { styled } from "@mui/material/styles";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppSelector } from "@/lib/hooks";
-import SaveIcon from '@mui/icons-material/Save';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import SaveIcon from "@mui/icons-material/Save";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import EditIcon from "@mui/icons-material/Edit";
 import { getEvent, updateBudget } from "@/app/services/EventServices";
 import { Event } from "@/app/constants/models";
 import { getBudgetByEventId } from "@/app/services/EventServices";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Budget } from "@/app/constants/models";
 import { useRouter } from "next/navigation";
 
@@ -44,7 +44,12 @@ import {
 } from "@mui/material";
 
 import TextField from "@mui/material/TextField";
-import { DataGrid, GridColDef, GridRowSelectionModel, GridToolbar } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRowSelectionModel,
+  GridToolbar,
+} from "@mui/x-data-grid";
 
 interface Props {
   params: { event_id: string };
@@ -83,7 +88,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }));
 
-let sessionCount : number = 0;
+let sessionCount: number = 0;
 
 const BudgetManager = ({ params: { event_id } }: Props) => {
   const theme = useTheme();
@@ -100,7 +105,9 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -142,17 +149,12 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
           budget_amount: budgetAmount,
         })
       ),
-    })
-  }
-  , [budgetRows]);
+    });
+  }, [budgetRows]);
 
   const handleBudgetUpdate = async () => {
     try {
-      await updateBudget(
-        artist.token,
-        event_id,
-        budgets
-      );
+      await updateBudget(artist.token, event_id, budgets);
       setSnackbarSeverity("success");
       setSnackbarMessage("Budget updated successfully!");
       setSnackbarOpen(true);
@@ -161,7 +163,7 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
       setSnackbarMessage("Failed to update budget.");
       setSnackbarOpen(true);
     }
-  }
+  };
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -177,12 +179,16 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
         sx={{
           width: "100%",
           minHeight: "100vh",
-          padding: 3
+          padding: 3,
           // background: theme.palette.background.default,
         }}
       >
         <Typography variant="h4" sx={{ marginBottom: 1 }}>
-          Budget Manager for <Typography  color="secondary" fontWeight={700}> {event?.event_name} </Typography> 
+          Budget Manager for{" "}
+          <Typography color="secondary" fontWeight={700}>
+            {" "}
+            {event?.event_name}{" "}
+          </Typography>
         </Typography>
 
         <Divider sx={{ marginBottom: 2 }} />
@@ -193,17 +199,38 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
           event={event}
         />
 
-        <Box sx={{ marginTop: 4, display: "flex", justifyContent: "space-between" }}>
-          <Button startIcon={<ArrowBackIcon />} color="secondary" variant="contained" onClick={()=>{router.back()}}>
+        <Box
+          sx={{
+            marginTop: 4,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button
+            startIcon={<ArrowBackIcon />}
+            color="secondary"
+            variant="contained"
+            onClick={() => {
+              router.back();
+            }}
+          >
             Back
           </Button>
           <Stack direction="row" spacing={2}>
-          <Button startIcon={<RestartAltIcon />} variant="outlined" color="error">
-            Reset
-          </Button>
-          <Button endIcon={<SaveIcon />} variant="contained" onClick={handleBudgetUpdate}>
-            Save Changes
-          </Button>
+            <Button
+              startIcon={<RestartAltIcon />}
+              variant="outlined"
+              color="error"
+            >
+              Reset
+            </Button>
+            <Button
+              endIcon={<SaveIcon />}
+              variant="contained"
+              onClick={handleBudgetUpdate}
+            >
+              Save Changes
+            </Button>
           </Stack>
         </Box>
       </Card>
@@ -213,7 +240,12 @@ const BudgetManager = ({ params: { event_id } }: Props) => {
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
       >
-        <Alert onClose={handleSnackbarClose} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleSnackbarClose}
+          variant="filled"
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -254,7 +286,6 @@ const budgetColumns: GridColDef[] = [
     editable: true,
   },
 ];
-
 
 let budgetRows = [];
 
@@ -320,11 +351,13 @@ function BudgetTable({ budgetRows, setBudgetRows, event }) {
   };
 
   const validateFields = () => {
+    console.log(budgetTitle, budgetSession, budgetType, budgetAmount)
+ 
     return (
-      budgetTitle.trim() !== "" &&
-      budgetSession.trim() !== "" &&
-      budgetType.trim() !== "" &&
-      budgetAmount.trim() !== ""
+      budgetTitle?.trim() !== "" &&
+      budgetSession?.trim() !== "" &&
+      budgetType?.trim() !== "" &&
+      Number(budgetAmount) >= 0
     );
   };
 
@@ -467,7 +500,7 @@ function BudgetTable({ budgetRows, setBudgetRows, event }) {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
-        sx={{marginBottom: "1em"}}
+        sx={{ marginBottom: "1em" }}
         pageSizeOptions={[5, 10, 20, 30]}
         components={{ Toolbar: GridToolbar }}
         checkboxSelection
@@ -607,6 +640,5 @@ function BudgetTable({ budgetRows, setBudgetRows, event }) {
     </div>
   );
 }
-
 
 export default BudgetManager;

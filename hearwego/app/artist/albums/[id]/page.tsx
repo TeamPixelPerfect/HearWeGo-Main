@@ -222,13 +222,13 @@ function AlbumPreview({ albumData }: AlbumPreviewProps) {
               padding: "5px",
               maxWidth: "100%",
               overflow: "hidden",
+              fontSize: "12px",
             }}
           >
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                fontSize: "14px",
               }}
             >
               {site_url + "main/albums/" + albumData?.album_id}

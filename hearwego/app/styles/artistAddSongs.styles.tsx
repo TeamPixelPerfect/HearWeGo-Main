@@ -12,13 +12,13 @@ export const SongPreviewSong = styled(Box)(({ theme }) => ({
   }));
 
 export const SongPreviewDetails = styled(Box)(({ theme }) => ({
-    width: '55%',
+    width: '45%',
     paddingLeft: '1em',
     paddingTop: '10px',
   }));
 
   export const SongPreviewShare = styled(Box)(({ theme }) => ({
-    width: '25%',
+    width: '35%',
     display: 'flex',
     // backgroundColor: 'yellow',
     flexDirection: 'column',

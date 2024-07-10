@@ -397,9 +397,9 @@ function EventArea(tab: number) {
                   </Box>
                   <Box>
                     <Stack direction="row" spacing={1}>
-                      <IconButton aria-label="share">
+                      {/* <IconButton aria-label="share">
                         <ShareIcon />
-                      </IconButton>
+                      </IconButton> */}
                       <IconButton aria-label="ticket" onClick={()=>{router.push(`/artist/events/tickets/${events.event_id}`)}}>
                         <LocalActivityIcon />
                       </IconButton>
