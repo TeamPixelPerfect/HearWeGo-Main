@@ -102,6 +102,12 @@ export interface Artist {
 
 export interface Song {
   _id?: string;
+  image: string | undefined;
+  title: ReactNode;
+  created: ReactNode;
+  status: any;
+  listenedBy: ReactNode;
+  album: ReactNode;
   song_id?: string;
   song_title?: string;
   album_title?: string;
