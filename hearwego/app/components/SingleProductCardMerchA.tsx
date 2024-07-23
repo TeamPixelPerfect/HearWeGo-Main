@@ -8,16 +8,36 @@ import {
   TextField,
   Box,
   CircularProgress,
+  Stack,
+  Snackbar,
+  IconButton,
 } from "@mui/material";
+import { Product } from "../constants/models";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useAppSelector } from "@/lib/hooks";
+import { deleteProduct, editProduct } from "../services/StoreServices";
 
-const SingleProductCard = ({ product }) => {
+const SingleProductCard = ({
+  product,
+  setEditComplete,
+  handleSnackbarOpen,
+}: any) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editedProduct, setEditedProduct] = useState(product);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
+  const artist = useAppSelector((state) => state.artist.user);
+
   const handleEditClick = () => {
     setIsEditing(true);
+  };
+
+  const handleDeleteClick = () => {
+    setIsDeleting(true);
+    handleDelete();
   };
 
   const handleSaveClick = async () => {
@@ -54,13 +74,25 @@ const SingleProductCard = ({ product }) => {
   };
 
   const saveEditedProduct = async (editedProduct: any) => {
-    // Simulate API call
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log("Saving edited product:", editedProduct);
-        resolve();
-      }, 1000);
-    });
+    await editProduct(
+      artist?.token ? artist.token : "",
+      product?.product_id,
+      editedProduct
+    );
+    setEditComplete(true);
+    console.log("Saved edited product:", editedProduct);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      await deleteProduct(
+        artist?.token ? artist.token : "",
+        product?.product_id
+      );
+      setEditComplete(true);
+      handleSnackbarOpen("Product deleted successfully");
+    }
+    setIsDeleting(false);
   };
 
   return (
@@ -68,56 +100,60 @@ const SingleProductCard = ({ product }) => {
       <CardMedia
         component="img"
         height="200"
-        image={product.image}
-        alt={product.title}
+        image={product.product_Main_image}
+        alt={product.product_name}
       />
       <CardContent>
         {!isEditing ? (
           <>
             <Typography gutterBottom variant="h5" component="div">
-              {product.title}
+              {product.product_name}
             </Typography>
             <Typography variant="body1" color="textSecondary">
-              {product.description}
+              {product.product_description}
             </Typography>
             <Typography variant="body1" color="textPrimary" sx={{ mt: 1 }}>
-              ${product.price}
+              LKR {Number(product?.product_price).toFixed(2)}
             </Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-              Quantity: {product.quantity}
+              Quantity: {product.product_quantity}
             </Typography>
           </>
         ) : (
           <Box>
             <TextField
-              name="title"
+              name="product_name"
               label="Title"
               fullWidth
-              value={editedProduct.title}
+              defaultValue={editedProduct.product_name}
+              placeholder={product.product_name}
               onChange={handleInputChange}
               sx={{ marginBottom: 1 }}
             />
             <TextField
-              name="description"
+              name="product_description"
               label="Description"
               fullWidth
-              value={editedProduct.description}
+              defaultValue={editedProduct.product_description}
+              placeholder={product.product_description}
               onChange={handleInputChange}
               sx={{ marginBottom: 1 }}
             />
             <TextField
-              name="price"
+              name="product_price"
               label="Price"
               fullWidth
-              value={editedProduct.price}
+              defaultValue={editedProduct.product_price}
+              placeholder={product.product_price}
               onChange={handleInputChange}
               sx={{ marginBottom: 1 }}
             />
             <TextField
-              name="quantity"
+              name="product_quantity"
               label="Quantity"
               fullWidth
-              value={editedProduct.quantity}
+              defaultValue={editedProduct.product_quantity}
+              placeholder={product.product_quantity}
               onChange={handleInputChange}
               sx={{ marginBottom: 1 }}
             />
@@ -126,9 +162,14 @@ const SingleProductCard = ({ product }) => {
       </CardContent>
       <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
         {!isEditing ? (
-          <Button variant="outlined" onClick={handleEditClick}>
-            Edit
-          </Button>
+          <Stack direction="row">
+            <IconButton color="primary" onClick={handleEditClick}>
+              <EditIcon />
+            </IconButton>
+            <IconButton color="error" onClick={handleDeleteClick}>
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
         ) : (
           <>
             <Button

@@ -1,398 +1,406 @@
 "use client";
-import React from "react";
-import { Divider, Stack, useTheme } from "@mui/material";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import SingleFan from "@/app/components/Single Fan";
-import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditNoteIcon from "@mui/icons-material/EditNote";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import SinglePost from "@/app/components/SinglePost";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
-import Avatar from "@mui/material/Avatar";
-import TextField from "@mui/material/TextField";
-import DropFile from "../../components/DropFile";
-import ImageCropper from "@/app/components/ImageCropper";
-
-// Stack from "@mui/material";
-
-// import { BorderBox } from "../../styles/fanclub.styles";
+import React, { useState, useEffect } from "react";
 import {
-  BorderBox,
-  CoverBackgroundCard,
-  CoverCardMedia,
-  ProfilePicDiv,
-  ProfilePicAvatar,
-  ArtistNameBox,
-  NoOfFollowersBox,
-  ArtistDetailBox,
-  ChatButton,
-  FindMorebutton,
-  CreatePostPopup,
-  CreateContestPopup,
-  ArtistDetail,
-  PostTextField,
-  SubmitButton,
-  CancleButton,
-} from "../../styles/fanclub.styles";
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Container,
+  Paper,
+  Button,
+  Tab,
+  Tabs,
+  Box,
+  Card,
+  CardHeader,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import FeedTab from "./FeedTab";
+import PhotosTab from "./PhotosTab";
+import DropFile from "../../components/DropFile";
+import NewsPage from "./NewsTab";
+import EventsTab from "./EventsTab";
+import VideosTab from "./VideosTab";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import { ClubPost, ClubNews, Event } from "../../constants/models";
+import { addNews, addPost } from "../../services/FanClubServices";
+import { useAppSelector } from "@/lib/hooks";
+import { Artist} from "@/app/constants/models";
 
+const validationSchema = Yup.object().shape({
+  postDescription: Yup.string().required("Description is required"),
+});
+const newsValidationSchema = Yup.object().shape({
+  newsTitle: Yup.string().required("Title is required"),
+  newsBody: Yup.string().required("Description is required"),
+});
+const ArtistPage = () => {
+  const router = useRouter();
+  const artist = useAppSelector((state) => state.artist.user);
+  const artistId = artist?.user.artist_id ?? "";
+  const [selectedPost, setSelectedPost] = useState<ClubPost | null>(null);
+  const [posts, setPosts] = useState<ClubPost[]>([]);
+  const [news, setNews] = useState<ClubNews[]>([]);
+  const [artistData, setArtistData] = useState<string | null>(null);
+  const [tabValue, setTabValue] = useState(0);
+  const [openPostDialog, setOpenPostDialog] = useState(false);
+  const [openNewsDialog, setOpenNewsDialog] = useState(false);
 
+  const [postImage, setPostImage] = useState<File | null>(null);
+  const [newsImage, setNewsImage] = useState<File | null>(null);
 
-const userNames = [
-  {
-    name: "Chandler Bing",
-    img: "https://pyxis.nymag.com/v1/imgs/079/792/3ed0d94be0a9bd3d023f00532889bab152-30-chandler-bing.rsquare.w330.jpg",
-  },
-  {
-    name: "Ross Geller",
-    img: "https://upload.wikimedia.org/wikipedia/en/6/6f/David_Schwimmer_as_Ross_Geller.jpg",
-  },
-  {
-    name: "Joey Tribbiani",
-    img: "https://upload.wikimedia.org/wikipedia/en/d/da/Matt_LeBlanc_as_Joey_Tribbiani.jpg",
-  },
-  {
-    name: "Monica Geller",
-    img: "https://home.adelphi.edu/~ni21572/Monica.jpg",
-  },
-  {
-    name: "Rachel Green",
-    img: "https://pyxis.nymag.com/v1/imgs/47c/71a/130bf1e557e534b3f2be3351afc2ecf952-17-rachel-green-jewish.rsquare.w400.jpg",
-  },
-  {
-    name: "Phoebe Buffay",
-    img: "https://upload.wikimedia.org/wikipedia/en/f/f6/Friendsphoebe.jpg",
-  },
-];
-
-const options = ["Edit Profile", "Manage Posts"];
-const ITEM_HEIGHT = 24;
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
-export default function ArtistFanClub() {
-  const theme = useTheme();
-
-  const [openCreatePost, setOpenCreatePost] = React.useState(false);
-  const handleCreatePostOpen = () => setOpenCreatePost(true);
-  const handleCreatePostClose = () => setOpenCreatePost(false);
-
-  const [openCreateContest, setOpenCreateContest] = React.useState(false);
-  const handleCreateContestOpen = () => setOpenCreateContest(true);
-  const handleCreateContestClose = () => setOpenCreateContest(false);
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
+  const initialValues: ClubPost = {
+    postType: "",
+    postDescription: "",
+    postpublisher: artist ? artist.user.artist_id : "",
+    postImage_URL: "",
+    reacts: "",
+    comments: "",
+    clubId: "fc0",
+    artistId: artist ? artist.user.artist_id : "",
+    timestamps: "",
   };
 
-  const [songFile, setSongFile] = React.useState("");
+  const initialValuesNews: ClubNews = {
+    newsTitle: "",
+    newsBody: "",
+    newsPublisher: artist ? artist.user.artist_id : "",
+    newsImage_URL: "",
+    clubId: "fc0",
+    artistId: artist ? artist.user.artist_id : "",
+    timestamps: "",
+  };
+
+  useEffect(() => {
+    if (newsImage) {
+      setNewsImage(newsImage);
+    }
+  }, [newsImage]);
+
+  useEffect(() => {
+    if (postImage) {
+      setPostImage(postImage);
+    }
+  }, [postImage]);
+
+  const submitData = async (values: ClubPost) => {
+    try {
+      const updatedPost = {
+        ...values,
+        postImage_URL: postImage ? postImage : "",
+      };
+      const newPost = await addPost(artist.token, updatedPost);
+      setPosts([...posts, newPost]); // Update the state with the new post
+      setOpenPostDialog(false);
+      setPostImage(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const submitNewsData = async (values: ClubNews) => {
+    try {
+      const updatedNews = {
+        ...values,
+        newsImage_URL: newsImage ? newsImage : "",
+      };
+      const newNews = await addNews(artist.token, updatedNews);
+      setNews([...news, newNews]); // Update the state with the new news
+      setOpenNewsDialog(false);
+      setNewsImage(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const handleClickOpenPostDialog = () => {
+    setSelectedPost(null);
+    setOpenPostDialog(true);
+  };
+
+  const handleClosePostDialog = () => {
+    setOpenPostDialog(false);
+  };
+  const handleClickOpenNewsDialog = () => {
+    setOpenNewsDialog(true);
+  };
+
+  const handleCloseNewsDialog = () => {
+    setOpenNewsDialog(false);
+  };
+  const handleCardClick = (post: ClubPost) => {
+    setSelectedPost(post);
+  };
+
+  const handleGoToProfile = () => {
+    router.push("/artist/fanClub/Profile");
+  };
 
   return (
-    <>
-      <CoverBackgroundCard>
-        <CoverCardMedia
-          image={
-            "https://londonmumsmagazine.com/wp-content/uploads/2019/07/The-Rembrandts-Via-Satellite-2.jpg"
-          }
-        ></CoverCardMedia>
+    <Container maxWidth="lg">
+      <Paper sx={{ p: 5, marginBottom: 2 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="h5" component="div">
+              Artist Page
+            </Typography>
+            <Typography variant="body1" component="p" sx={{ mb: 2 }}>
+              This is a place where you can share your latest posts, updates,
+              and news with your audience.
+            </Typography>
+          </Box>
+          {/* <Button variant="contained" color="primary" onClick={handleGoToProfile}>
+          Go to Profile
+        </Button> */}
+        </Box>
+        <Tabs value={tabValue} onChange={handleTabChange} centered>
+          <Tab label="Feed" />
+          <Tab label="Events" />
+          <Tab label="News" />
+        </Tabs>
+      </Paper>
 
-        <ProfilePicDiv>
-          <ProfilePicAvatar
-            src={
-              "https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-            }
-          ></ProfilePicAvatar>
-        </ProfilePicDiv>
-
-        <ArtistDetailBox>
-          <Stack width="60%">
-            <ArtistNameBox>The Rembrandts</ArtistNameBox>
-            <NoOfFollowersBox>
-              <i>2.5K Followers</i>
-            </NoOfFollowersBox>
-          </Stack>
-
-          <Stack direction="row" spacing={1}>
-            <ChatButton variant="contained" disableElevation>
-              Chat
-            </ChatButton>
-          </Stack>
-        </ArtistDetailBox>
-      </CoverBackgroundCard>
-
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "100%",
-          margin: "15px 0",
-        }}
-      />
-
-      <Box
-        sx={{
-          fontSize: 16,
-          fontWeight: "bold",
-          marginLeft: 3,
-          color: "#464141",
-        }}
-      >
-        Fans<br></br>
-        1,900 Fans
-      </Box>
-
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {userNames.map(({ name, img }) => (
-          <Grid item xs={4} md={3} style={{ paddingLeft: 0 }}>
-            <SingleFan userName={name} userImg={img}></SingleFan>
-          </Grid>
-        ))}
-      </Grid>
-
-      <FindMorebutton color={"secondary"} fullWidth>
-        See all Fans <ChevronRightRounded />
-      </FindMorebutton>
-
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "100%",
-          margin: "15px 0",
-        }}
-      />
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "right",
-          width: "100%",
-       
-        }}
-      >
-        <Stack direction="row" spacing={1}>
-          <Button
-            onClick={handleCreatePostOpen}
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{
-              fontSize: 14,
-              textTransform: "capitalize",
-            }}
+      {tabValue === 0 && (
+        <Box>
+          <Card
+            sx={{ marginBottom: 2, cursor: "pointer" }}
+            onClick={handleClickOpenPostDialog}
           >
-            Add Post
-          </Button>
-
-          <Modal open={openCreatePost} onClose={handleCreatePostClose}>
-            <CreatePostPopup style={{width:"40%"}}>
-              <Typography
-                variant="h5"
-                component="h5"
-                sx={{
-                  textAlign: "center",
-                  padding: "8px",
-                  borderColor: "divider",
-                  borderBottom: "1px solid",
-                  color: theme.palette.text.primary,
-                  fontWeight: 600,
-                  textTransform: "uppercase"
-                }}
-              >
-                Create Post
-              </Typography>
-              <ArtistDetail sx={{  marginLeft: "30px" }}>
-                <Avatar
-                  sx={{
-                    width: "60px",
-                    height: "60px",
-                    position: "relative",
-                    margin: "10px",
-                    //marginTop: "10px",
-                  }}
-                  alt="Remy Sharp"
-                  src="https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-                />
-                <Typography
-                  sx={{
-                    //paddingLeft: "5px",
-                    color: theme.palette.text.primary,
-                    fontSize: "20px",
-                    fontWeight: "600",
-                  }}
-                >
-                  The Rembrandts<br></br>
-                 <Box sx={{fontSize: "14px", fontWeight: "400"}}>Musician</Box>
+            <CardHeader
+              title={
+                <Typography variant="body1" color="textSecondary">
+                  What's on your mind?
                 </Typography>
-              </ArtistDetail>
+              }
+              action={
+                <Tooltip title="Create Post">
+                  <IconButton onClick={handleClickOpenPostDialog}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              }
+            />
+          </Card>
 
-              <Box
-                component="form"
-                sx={{
-                  "& > :not(style)": { m: 1, width: "5ch" },
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: "10px",
-                 
-                }}
-                noValidate
-                autoComplete="off"
-              >
-                <PostTextField
-                  multiline
-                  minRows={4}
-                  placeholder="What's On Your Mind?"
-                  variant="filled"
-                  inputProps={{
-                    style: {
-                      color: theme.palette.text.primary,
-                      width: "80%",
-                      height:'50px',
-                      fontSize: "12px",
-                      display: "flex",
-                      justifyContent: "center",
-                    },
-                  }}
-                />
-              </Box>
-  
-            <Box sx={{padding:'10px', width: "100%", display:"flex", justifyContent:"center"}}>
-              <Box
-                sx={{
-                  width: "300px",
-                  height: "300px",
-                  display: "flex",
-                  justifyContent: "center",
-                 backgroundColor:theme.palette.background.default ,
-                 borderRadius:'10px'
-                 
-                }}
-              >
-                <DropFile
-                  fileTypes="Music Track"
-                  fileExtensions="MP3,AAC,M4A"
-                  isCircular={false}
-                  width="100%"
-                  height="100%"
-                  file={songFile}
-                  setFile={setSongFile}
-                  aspectX={1}
-                  aspectY={1}
-                  shape="rect"
-                />
-              </Box>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "right",
-                  padding: "10px",
-                  marginTop: "25px",
-                }}
-              >
-                <Stack direction="row" spacing={1}>
-                  <CancleButton variant="contained" disableElevation onClick={handleCreatePostClose}>
-                    Cancle
-                  </CancleButton>
-                  <SubmitButton variant="contained" disableElevation>
-                    Post
-                  </SubmitButton>
-                </Stack>
-              </Box>
-            </CreatePostPopup>
-          </Modal>
-
-          <Button
-            onClick={handleCreateContestOpen}
-            variant="contained"
-            startIcon={<EditNoteIcon />}
-            sx={{
-              fontSize: 14,
-              textTransform: "capitalize",
-            }}
-          >
-            Create Contest
-          </Button>
-          
-        </Stack>
-
-        <div>
-          <IconButton
-            aria-label="more"
-            id="long-button"
-            aria-controls={open ? "long-menu" : undefined}
-            aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="long-menu"
-            MenuListProps={{
-              "aria-labelledby": "long-button",
-            }}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            PaperProps={{
-              style: {
-                maxHeight: ITEM_HEIGHT * 4.5,
-                width: "20ch",
-                color: "black",
-                backgroundColor: "primary",
-              },
-            }}
-          >
-            {options.map((option) => (
-              <MenuItem
-                key={option}
-                selected={option === "Pyxis"}
-                onClick={handleClose}
-              >
-                {option}
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-      </Box>
-
-      <Box
-        sx={{
-          width: "100%",
-          flexDirection: "column",
-          display: "flex",
-          alignItems: "center",
-          marginTop: "20px",
+          <FeedTab
+            posts={posts}
+            onAddPost={(newPost) => {}}
+            onDeletePost={(postId) => {}}
+            onEditPost={(postId, updatedPost) => {}}
+            onAddComment={(postId, comment) => {}}
+            onEditComment={(postId, commentId, updatedContent) => {}}
+            onDeleteComment={(postId, commentId) => {}}
+          />
+        </Box>
+      )}
+      <Dialog
+        open={openPostDialog}
+        onClose={handleClosePostDialog}
+        maxWidth="lg"
+        // fullWidth
+        PaperProps={{
+          style: {
+            height: "60vh",
+            width: "30vw",
+          },
         }}
       >
-        <SinglePost></SinglePost>
-        <SinglePost></SinglePost>
-      </Box>
+        <DialogTitle>
+          Create Post
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleClosePostDialog}
+            aria-label="close"
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
 
-      <FindMorebutton color={"primary"} fullWidth>
-        Find Out More <ChevronRightRounded />
-      </FindMorebutton>
-    </>
+        <DialogContent dividers>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={(values, { resetForm }) => {
+              submitData(values);
+              resetForm();
+            }}
+          >
+            {({ handleSubmit, setFieldValue, errors, touched }) => (
+              <Form onSubmit={handleSubmit}>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Description"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    name="postDescription"
+                    error={
+                      touched.postDescription && Boolean(errors.postDescription)
+                    }
+                    helperText={
+                      touched.postDescription && errors.postDescription
+                    }
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box mb={2}>
+                  <DropFile
+                    fileTypes="image"
+                    fileExtensions=".jpg,.png,.jpeg"
+                    isCircular={false}
+                    width="100%"
+                    height="200px"
+                    file={postImage}
+                    setFile={setPostImage}
+                    aspectX={4}
+                    aspectY={3}
+                    shape="rect"
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={handleClosePostDialog} variant="outlined">
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="contained" color="primary">
+                    Add Post
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+
+      {tabValue === 1 && (
+        <Box>
+          <EventsTab />
+        </Box>
+      )}
+
+      {tabValue === 2 && (
+        <Box sx={{ position: "relative" }}>
+          <NewsPage
+            news={news}
+            onAddNews={(newNews) => {}}
+            onDeleteNews={(newsId) => {}}
+            onEditNews={(newsId, updatedNews) => {}}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            sx={{ position: "absolute", top: 5, right: 16 }}
+            onClick={handleClickOpenNewsDialog} // Replace with the actual handler for adding news
+          >
+            Add News
+          </Button>
+        </Box>
+      )}
+
+      {/* News Dialog */}
+      <Dialog
+        open={openNewsDialog}
+        onClose={handleCloseNewsDialog}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          style: {
+            height: "60vh",
+            width: "30vw",
+          },
+        }}
+      >
+        <DialogTitle>
+          Create News
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleCloseNewsDialog}
+            aria-label="close"
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent dividers>
+          <Formik
+            initialValues={initialValuesNews}
+            validationSchema={newsValidationSchema}
+            onSubmit={(values, { resetForm }) => {
+              submitNewsData(values);
+              resetForm();
+            }}
+          >
+            {({ handleSubmit, setFieldValue, errors, touched }) => (
+              <Form onSubmit={handleSubmit}>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Title"
+                    variant="outlined"
+                    name="newsTitle"
+                    error={touched.newsTitle && Boolean(errors.newsTitle)}
+                    helperText={touched.newsTitle && errors.newsTitle}
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box mb={2}>
+                  <Field
+                    as={TextField}
+                    label="Description"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    name="newsBody"
+                    error={touched.newsBody && Boolean(errors.newsBody)}
+                    helperText={touched.newsBody && errors.newsBody}
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box mb={2}>
+                  <DropFile
+                    fileTypes="image"
+                    fileExtensions=".jpg,.png,.jpeg"
+                    isCircular={false}
+                    width="100%"
+                    height="200px"
+                    file={newsImage}
+                    setFile={setNewsImage}
+                    aspectX={4}
+                    aspectY={3}
+                    shape="rect"
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={handleCloseNewsDialog} variant="outlined">
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="contained" color="primary">
+                    Add News
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+    </Container>
   );
-}
+};
+
+export default ArtistPage;

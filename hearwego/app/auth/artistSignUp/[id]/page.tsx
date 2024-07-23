@@ -128,7 +128,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     email: "",
     password: "",
     confirmPassword: "",
-    mobileVerified: false,
+    isMobileVerified: false,
   });
 
   // Artist Profile Customization Details
@@ -356,7 +356,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
       setOtpError(true);
       return;
     }
-    setArtistDetails({ ...artistDetails, mobileVerified: true });
+    setArtistDetails({ ...artistDetails, isMobileVerified: true });
     setOtpError(false);
 
     incrementStep(1);
@@ -463,10 +463,14 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
     setBankBranchError(false);
     setBankCountryError(false);
 
-    updateArtist(artist?.token, artist?.user._id, artistBankDetails).then(
+    handleUpdateArtist();
+  };
+
+  const handleUpdateArtist = () => {
+    updateArtist(artist?.token, artist?.user._id, {isMobileVerified: true, ...artistBankDetails}).then(
       (res) => {
         if (res) {
-          const newData = { user: res, token: artist?.token };
+          const newData = { user: res, token: artist?.token, ...res };
           dispatch(logInArtist(newData));
           sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
           incrementStep(1);
@@ -2275,7 +2279,7 @@ const ArtistSignUp = ({ params: { id } }: Props) => {
                 textTransform: "capitalize",
                 padding: "8px 32px",
               }}
-              onClick={() => incrementStep(1)}
+              onClick={handleUpdateArtist}
             >
               Skip
             </Button>

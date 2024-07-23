@@ -134,8 +134,8 @@ const SignUp = () => {
     console.log(userDetails);
     handleRegister(userDetails).then((res) => {
       if (res) {
-        dispatch(logInUser(res?.user));
-        sessionStorage.setItem("hwg-user", JSON.stringify(res));
+        dispatch(logInUser({...res?.user, token: res?.token}));
+        sessionStorage.setItem("hwg-user", JSON.stringify({...res?.user, token: res?.token}));
         router.replace("/");
       }
     });

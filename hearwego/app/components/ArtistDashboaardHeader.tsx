@@ -113,40 +113,47 @@ const ArtistDashboardHeader = () => {
         </Paper>
       </SearchArea>
 
-      <HitPredictorIco>
-        <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <HitPredictorBtn
-            color="secondary"
-            aria-label="add"
-            onClick={() => {
-              router.push("/main/predictor");
-            }}
-          >
-            <CellTowerIcon />
-          </HitPredictorBtn>
-        </Box>
-      </HitPredictorIco>
+      <Stack direction={"row"} spacing={2} sx={{ alignItems: "center" }}>
+        <HitPredictorIco>
+          <Box sx={{ "& > :not(style)": { m: 1 } }}>
+            <HitPredictorBtn
+              color="secondary"
+              aria-label="add"
+              onClick={() => {
+                router.push("/main/predictor");
+              }}
+            >
+              <CellTowerIcon />
+            </HitPredictorBtn>
+          </Box>
+        </HitPredictorIco>
 
-      <ProfileArea>
-        {!matches && (
+        <ProfileArea>
+          {/* {!matches && (
           <ProfileDetailArea elevation={0}>
-            <IconButton>
+            {/* <IconButton>
               <ArrowDropDownIcon sx={{ fontSize: "32px" }} />
-            </IconButton>
-            <Stack direction="row" sx={{ alignItems: "center" }}>
+            </IconButton> */}
+          {/* <Stack direction="row" sx={{ alignItems: "center" }}>
               <ArtistName>{artist?.user.artistName}</ArtistName>
               <Avatar src={artist?.user.profilePicture} />
-            </Stack>
-            {/* <ArtistDetail> */}
+            </Stack> */}
+          {/* <ArtistDetail> */}
 
-            {/* <ArtistGenre>
+          {/* <ArtistGenre>
               {artist?.user.musicGenres[0]} | {artist?.user.artistType}
             </ArtistGenre> */}
-            {/* </ArtistDetail> */}
-          </ProfileDetailArea>
-        )}
-        {matches && <Avatar src={artist?.user.profilePicture} />}
-      </ProfileArea>
+          {/* </ArtistDetail> */}
+          {/* </ProfileDetailArea> */}
+          {/* )} */}
+          <Link href="/artist/artistProfile">
+            <Avatar
+              src={artist?.profilePicture as string}
+              style={{ height: "50px", width: "50px" }}
+            />
+          </Link>
+        </ProfileArea>
+      </Stack>
     </HeaderBox>
   );
 };

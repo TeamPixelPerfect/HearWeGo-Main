@@ -3,7 +3,7 @@
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { Stack } from "@mui/material";
+import { Stack, useMediaQuery } from "@mui/material";
 import Button from "@mui/material/Button";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -27,47 +27,8 @@ import {
   AllMiddleBox,
 } from "../../../../styles/SingleArtistPage.styles";
 import { Album, Song } from "@/app/constants/models";
-import { getAlbum } from "@/app/services/SongServices";
-
-const songNames = [
-  {
-    index: 1,
-    songImg:
-      "https://i.discogs.com/RTFGo4KUqbx8PhupphvPjzv5hdijnj5ks_gaEzyEexY/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQzMTc3/Ni0xNjY5OTcyOTcx/LTI3NjIuanBlZw.jpeg",
-    songName: "Wanna Be Startin’ Somethin’",
-    noOfFollowers: "2,234,450,000",
-  },
-  {
-    index: 2,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
-  },
-  {
-    index: 3,
-    songImg: "https://i.scdn.co/image/ab67616d0000b273de437d960dda1ac0a3586d97",
-    songName: "Baby Be Mine",
-    noOfFollowers: "1,284,453,300",
-  },
-  {
-    index: 4,
-    songImg: "https://f4.bcbits.com/img/a2068708402_10.jpg",
-    songName: "The Lady in My Life",
-    noOfFollowers: "1,234,450,000",
-  },
-  {
-    index: 5,
-    songImg: "https://miro.medium.com/v2/resize:fit:500/0*U2KdecQg1CLUbMZc.jpg",
-    songName: "Beat It",
-    noOfFollowers: "1,034,450,900",
-  },
-  {
-    index: 6,
-    songImg: "https://i1.sndcdn.com/artworks-000003321270-60t2ec-t500x500.jpg",
-    songName: "Billy Jean",
-    noOfFollowers: "1,234,450,000",
-  },
-];
+import { getAlbum, getSongsForAlbum } from "@/app/services/SongServices";
+import { addAlbumImpression } from "@/app/services/AnalyticServices";
 
 interface Props {
   params: { album_id: string };
@@ -77,13 +38,31 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
   const [albumData, setAlbumData] = React.useState<Album>(); // This is the state for album data
   const [albumSongs, setAlbumSongs] = React.useState<Song[]>(); // This is the state for album songs
 
+  const matches = useMediaQuery("(max-width:960px)");
+
+  const incrementAlbumImpression = () => {
+    addAlbumImpression(album_id).then((res) => {
+      // console.log(res);
+    });
+  };
+
   // This is the useEffect for get album
   React.useEffect(() => {
     console.log(album_id);
     getAlbum("test", album_id).then((album) => {
-      console.log("Album:::", album[0]);
-      setAlbumData(album[0]);
+      setAlbumData(album);
     });
+
+    getSongsForAlbum(album_id).then((songs) => {
+      if (songs) {
+        const filtered = songs.filter(
+          (song: Song) => song.privacy_status === "Public"
+        );
+        setAlbumSongs(songs);
+      }
+    });
+
+    incrementAlbumImpression();
   }, []);
 
   return (
@@ -95,14 +74,18 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
             <div
               style={{
                 background: "black",
-                height: "500px",
+                height: matches ? "1000px" : "500px",
                 width: "100%",
                 opacity: "0.7",
               }}
             ></div>
 
             <AllMiddleBox>
-              <Stack direction="row" width="100%" spacing={"1px"}>
+              <Stack
+                direction={matches ? "column" : "row"}
+                width="100%"
+                spacing={"1px"}
+              >
                 {/* This is the profilepictureavtar for artist profile pic*/}
                 <ProfilePicAvatar src={albumData?.album_img}></ProfilePicAvatar>
 
@@ -176,9 +159,9 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
           </CoverCardMedia>
           <Box
             style={{
-              padding: "40px 0px 0px 20px",
+              padding: "1em",
               color: "primary.default",
-              fontSize: "20px",
+              fontSize: "24px",
               fontWeight: "bold",
             }}
           >
@@ -186,24 +169,32 @@ export default function SingleAlbumPage({ params: { album_id } }: Props) {
           </Box>
 
           {/* This is the stack for songs */}
-          {songNames.map(({ index, songImg, songName, noOfFollowers }) => (
-            // This is the single song row component
-            <SingleSongRow
-              index={index}
-              songImg={songImg}
-              songName={songName}
-              noOfFollowers={noOfFollowers}
-            ></SingleSongRow>
-          ))}
+          {albumSongs &&
+            albumSongs.map((song, index) => (
+              // This is the single song row component
+              <SingleSongRow
+                key={index}
+                song_id={song?.song_id as string}
+                songImg={song?.song_img as string}
+                songName={song?.song_title as string}
+                noOfFollowers={song?.no_of_plays as number}
+                songUrl={song?.song_track as string}
+                artist={
+                  song?.artist
+                    ?.map((artist) => artist?.artist_name)
+                    .join(", ") as string
+                }
+              ></SingleSongRow>
+            ))}
 
           <CardActions style={{ justifyContent: "right", padding: "10px" }}>
-            <Button
+            {/* <Button
               href="/main/artists/SingleArtistPage/MoreSongs"
               //variant="contained"
               size="small"
             >
               Discover More
-            </Button>
+            </Button> */}
           </CardActions>
         </>
       ) : (

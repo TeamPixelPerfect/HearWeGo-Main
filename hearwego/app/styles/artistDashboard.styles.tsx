@@ -15,8 +15,8 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
     width: "calc(100% - 215px)",
     maxWidth: "100%",
     minWidth: "350px",
-    padding: "1em 1em 1em 0",
-    marginLeft: "1em",
+    padding: "1em 0",
+    marginLeft: "0em",
   },
   "@media (max-width:960px)": {
     ".ad-left": {
@@ -25,7 +25,7 @@ export const ArtistDashboardLayout = styled("div")(({ theme }) => ({
     },
     ".ad-right": {
       width: "100%",
-      padding: "1em",
+      padding: "0",
       margin: "0",
     },
   },
@@ -128,7 +128,7 @@ export const ADHomeCoverBox = styled(Box, {
 
 export const ADHomeNameArea = styled(Box)(({ theme }) => ({
   width: "100%",
-  maxHeight: "150px",
+  maxHeight: "200px",
   padding: "1em",
   // paddingBottom: "0",
   background: "rgba(0,0,0,0.5)",
@@ -204,9 +204,9 @@ export const ADHomeSocialIcons = styled(Box)(({ theme }) => ({
   marginBottom: "0.5em",
   fontSize: "32px",
 
-  "& svg": {
-    marginRight: "8px",
-  },
+  // "& svg": {
+  //   marginRight: "8px",
+  // },
 }));
 
 export const FeaturedSongCard = styled(Card)(({ theme }) => ({

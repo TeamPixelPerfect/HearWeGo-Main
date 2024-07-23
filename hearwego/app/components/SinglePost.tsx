@@ -1,113 +1,274 @@
-import Box from "@mui/material/Box";
-
-import FavoriteBorderRounded from "@mui/icons-material/FavoriteBorderRounded";
-import Divider from "@mui/material/Divider";
-import Share from "@mui/icons-material/Share";
-import CommentIcon from "@mui/icons-material/Comment";
-import IconButton from "@mui/material/IconButton";
-import { Stack } from "@mui/material";
-
+"use client";
+import React, { useState } from "react";
 import {
-  PostCard,
-  PostPublishAvatar,
-  PublisherNameBox,
-  PublishedDateBox,
-  DescriptionBox,
-  PostImageCard,
-  NoOfLikesBox,
-  NoOfCommentsBox,
-} from "../styles/fanclub.styles";
+  Typography,
+  Paper,
+  IconButton,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
+  Button,
+  Avatar,
+  Box,
+} from "@mui/material";
+import {
+  Delete as DeleteIcon,
+  Send as SendIcon,
+  Reply as ReplyIcon,
+  ThumbUp as ThumbUpIcon,
+  Comment as CommentIcon,
+} from "@mui/icons-material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
-export default function SinglePost() {
+type Comment = {
+  id: number;
+  user: string;
+  content: string;
+  profilePicture: string;
+  timestamp: string;
+  isArtist?: boolean;
+  replies?: Comment[];
+};
+
+type Post = {
+  id: number;
+  title: string;
+  content: string;
+  image?: string;
+  profilePicture: string;
+  user: string;
+  timestamp: string;
+  comments: Comment[];
+};
+
+type Props = {
+  posts={posts}
+  onDeletePost: (postId: number) => void;
+  onEditPost: (postId: number, updatedPost: Post) => void;
+  onAddComment: (postId: number, comment: Comment) => void;
+  onEditComment: (
+    postId: number,
+    commentId: number,
+    updatedContent: string
+  ) => void;
+  onDeleteComment: (
+    postId: number,
+    commentId: number,
+    replyId?: number
+  ) => void;
+};
+
+const SinglePost: React.FC<Props> = ({
+  post,
+  onDeletePost,
+  onEditPost,
+  onAddComment,
+
+}) => {
+  const [newComment, setNewComment] = useState("");
+  const [replyingCommentId, setReplyingCommentId] = useState<number | null>(
+    null
+  );
+  const [replyContent, setReplyContent] = useState("");
+  const [showComments, setShowComments] = useState(false);
+  const [likes, setLikes] = useState<number>(10); // Dummy data for likes count
+  const [liked, setLiked] = useState<boolean>(false); // Track if post is liked
+
+  
+  const handleReplyToComment = (commentId: number) => {
+    setReplyingCommentId(commentId);
+    setReplyContent("");
+  };
+
+  const handleSendReply = () => {
+    if (replyingCommentId !== null && replyContent.trim()) {
+      const reply: Comment = {
+        id: Date.now(),
+        user: "Artist",
+        content: replyContent,
+        profilePicture: "path/to/artist/profile/picture.jpg", // Replace with actual path
+        timestamp: new Date().toISOString(),
+        isArtist: true,
+      };
+
+      const updatedComments = post.comments.map((comment) =>
+        comment.id === replyingCommentId
+          ? { ...comment, replies: [...(comment.replies || []), reply] }
+          : comment
+      );
+
+      onEditPost(post.id, { ...post, comments: updatedComments });
+      setReplyingCommentId(null);
+      setReplyContent("");
+    }
+  };
+
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      const comment: Comment = {
+        id: Date.now(),
+        user: "Maroon5", // Replace with actual user info
+        content: newComment,
+        profilePicture: "path/to/user/profile/picture.jpg", // Replace with actual path
+        timestamp: new Date().toISOString(),
+        isArtist: true,
+        replies: [],
+      };
+      onAddComment(post.id, comment);
+      setNewComment("");
+    }
+  };
+
+  const handleShowComments = () => {
+    setShowComments(!showComments);
+  };
+
+  const handleLikePost = () => {
+    if (!liked) {
+      // Placeholder for future backend integration
+      setLikes((prevLikes) => prevLikes + 1); // Example incrementing likes
+      setLiked(true);
+    }
+    // Optionally, handle already liked state (if needed)
+  };
+
   return (
-    <PostCard sx={{ marginBottom: "8px" }}>
-      <Stack
-        direction="row"
-        sx={{
-          width: "100%",
-          padding: "1em",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <PostPublishAvatar
-          src={"https://www.rollingstone.com/wp-content/uploads/2021/05/rembrandts-flashback.jpg"
-          }
+    <Paper sx={{ p: 2, marginBottom: 2,borderRadius:"10px" }}>
+      <Box display="flex" alignItems="center" mb={2}>
+        <Avatar
+          alt="Poster Profile Picture"
+          src={post.profilePicture}
+          sx={{ marginRight: 2 }}
         />
-        <Stack>
-          <PublisherNameBox component="h3">The Rembrandts</PublisherNameBox>
-          <PublishedDateBox component="h3">2024-01-25</PublishedDateBox>
-        </Stack>
-      </Stack>
-
-      <DescriptionBox>
-        <p>
-          Snow storm coming in Sommaroy island, Arctic Norway. This is something
-          that you definitely wanna see in your life.
-        </p>
-      </DescriptionBox>
-
-      <PostImageCard
-        image={
-          "https://nsidc.org/sites/default/files/images/After%20a%20snow%20storm%2C%20the%20sun%20emerged%20revealing%20this%20beautiful%20scene%20on%20Cedar%20River%20Road%20west%20of%20Mount%20Vernon%2C%20IA..jpg"
-        }
-      />
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-          padding: "0 2em",
-          mb: "1em",
-        }}
-      >
-        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-          <IconButton
-            sx={
-              {
-                //color: "#3B0764",
-              }
-            }
-          >
-            <FavoriteBorderRounded />
-          </IconButton>
-          <NoOfLikesBox component="h3">Damidu and 12k others</NoOfLikesBox>
-        </Stack>
-
-        <NoOfCommentsBox component="h3">250 comments</NoOfCommentsBox>
+        <Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            {post.user}
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
+            {new Date(post.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </Typography>
+        </Box>
       </Box>
 
-      <Divider
-        sx={{
-          backgroundColor: "#9A9A9A",
-          height: "2px",
-          width: "90%",
-          margin: "8px 0",
-        }}
-      />
-      <Stack
-        direction="row"
-        sx={{
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          padding: "0 2em",
-          pb: "1em",
-        }}
+      <Typography variant="body1" gutterBottom>
+        {post.content}
+      </Typography>
+
+      {post.image && (
+        <div style={{ textAlign: "center", marginTop: 16, marginBottom: 16 }}>
+          <img
+            src={post.image}
+            alt={post.title}
+            style={{ maxWidth: "70%", minWidth: "70%" }}
+          />
+        </div>
+      )}
+
+      <Divider sx={{ my: 2 }} />
+
+      <Button
+        startIcon={<FavoriteIcon />}
+        onClick={handleLikePost}
+        disabled={liked}
+      
       >
-        <IconButton>
-          <FavoriteBorderRounded />
-        </IconButton>
+      
+        Like ({likes})
+      </Button>
+      <Button startIcon={<CommentIcon />} onClick={handleShowComments}>
+        Comment ({post.comments.length})
+      </Button>
 
-        <IconButton>
-          <CommentIcon />
-        </IconButton>
+      {showComments && (
+        <>
+          <Divider sx={{ my: 2 }} />
 
-        <IconButton>
-          <Share />
-        </IconButton>
-      </Stack>
-    </PostCard>
+          <Typography variant="h6" component="div" gutterBottom>
+            Comments
+          </Typography>
+          <List sx={{ maxHeight: 200, overflow: "auto" }}>
+            {post.comments.map((comment) => (
+              <div key={comment.id}>
+                <ListItem>
+                  <Avatar
+                    alt={comment.user}
+                    src={comment.profilePicture}
+                    sx={{ marginRight: 2 }}
+                  />
+                  <ListItemText
+                    primary={`${comment.user} - ${new Date(
+                      comment.timestamp
+                    ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ago`}
+                    secondary={comment.content}
+                  />
+                  <ListItemSecondaryAction>
+                    {!comment.isArtist && (
+                      <IconButton
+                        onClick={() => handleReplyToComment(comment.id)}
+                      >
+                        <ReplyIcon />
+                      </IconButton>
+                    )}
+                   
+                  </ListItemSecondaryAction>
+                </ListItem>
+                {comment.replies &&
+                  comment.replies.map((reply) => (
+                    <ListItem key={reply.id} sx={{ pl: 4 }}>
+                      <Avatar
+                        alt={reply.user}
+                        src={reply.profilePicture}
+                        sx={{ marginRight: 2 }}
+                      />
+                      <ListItemText
+                        primary={`${reply.user} - ${new Date(
+                          reply.timestamp
+                        ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ago`}
+                        secondary={reply.content}
+                      />
+                      <ListItemSecondaryAction>
+                     
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                {replyingCommentId === comment.id && (
+                  <ListItem sx={{ pl: 4 }}>
+                    <TextField
+                      fullWidth
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      variant="standard"
+                      margin="dense"
+                      label="Reply to comment"
+                    />
+                    <IconButton onClick={handleSendReply}>
+                      <SendIcon />
+                    </IconButton>
+                  </ListItem>
+                )}
+              </div>
+            ))}
+            <ListItem>
+              <TextField
+                fullWidth
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                variant="standard"
+                margin="dense"
+                label="Add a comment"
+              />
+              <IconButton onClick={handleAddComment}>
+                <SendIcon />
+              </IconButton>
+            </ListItem>
+          </List>
+        </>
+      )}
+    </Paper>
   );
-}
+};
+
+export default SinglePost;

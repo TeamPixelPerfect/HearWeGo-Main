@@ -430,12 +430,13 @@ const AddAlbumData = () => {
               >
                 <Stack direction="row" spacing={2}>
                   <Button
-                    variant="outlined"
-                    onClick={() => {
-                      Router.push("add");
-                    }}
+                     variant="contained"
+                    
+                     onClick={() => {
+                      window.history.back();
+                     }}
                   >
-                    Cansel
+                    Cancel
                   </Button>
                   <LoadingButton
                     loading={uploading}

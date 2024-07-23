@@ -16,6 +16,8 @@ const Wrapper = ({ app, children }: Props) => {
 
   const user = useAppSelector((state) => state.user?.user);
 
+  console.log(user);
+
   useEffect(() => {
     console.log(app);
     dispatch(setApp(app));
@@ -26,7 +28,8 @@ const Wrapper = ({ app, children }: Props) => {
       const _user = sessionStorage.getItem("hwg-user");
       if (_user) {
         const currentUser = JSON.parse(_user);
-        getUser(currentUser.user._id).then((res) => {
+        console.log(currentUser);
+        getUser(currentUser._id).then((res) => {
           if (res) {
             const newData = { ...currentUser, ...res.user };
             dispatch(logInUser(newData));

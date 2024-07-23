@@ -14,6 +14,10 @@ import { Stack } from "@mui/material";
 import { InputLabel, Select, MenuItem } from "@mui/material";
 import Card from "@mui/material/Card";
 import { TableCell, TableRow } from "@mui/material";
+import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import ReactCountryFlag from "react-country-flag";
 
 //created the interface for the options in the select component
 interface Option {
@@ -45,7 +49,7 @@ interface tableRow {
   LinkPage: string;
   Rank: {
     rank: number;
-    rank_img: string;
+    previous_rank: number;
   };
   Artist: {
     name: String;
@@ -61,7 +65,7 @@ interface tableRow {
   };
   Fans: number;
   popularity: string;
-  country_img: string;
+  country_code: string;
 }
 
 //created the custom select component
@@ -75,15 +79,13 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 }) => {
   return (
     <div>
-      <FormControl sx={{ m: 1, color: "white" }} size="small">
+      <FormControl sx={{ color: "white" }} size="small">
         <InputLabel id={labelId}>{label}</InputLabel>
         <Select
           labelId={labelId}
           id={id}
           value={value}
-          onChange={(event: React.ChangeEvent<{ value: string }>) =>
-            onChange(event)
-          }
+          onChange={(event: any) => onChange(event)}
           label={label}
           sx={{
             width: "150px",
@@ -110,6 +112,7 @@ export const Maindiv = styled("div")(({ theme }) => ({
   height: "100%",
   paddingLeft: "30px",
   paddingRight: "10px",
+  paddingBottom: "50px",
 }));
 
 //created the styled component for the search paper
@@ -118,9 +121,9 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
   p: "2px 4px",
   display: "flex",
   alignItems: "center",
-  width: "40%",
+  width: "300px",
   backgroundColor: theme.palette.primary.light,
-  borderRadius: "30px",
+  borderRadius: "20px",
   height: "100%",
 }));
 
@@ -138,13 +141,12 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
       sx={{
         position: "relative",
         width: "190px",
-        height: "230px",
+        height: "220px",
         marginBottom: 0,
-        borderRadius: "30px",
+        borderRadius: "10px",
         transition: "transform 0.2s ease-in-out",
-        transform: isHovered ? "scale(1.10)" : "scale(1)",
-        marginRight: "20px",
-        marginTop: "20px",
+        // transform: isHovered ? "scale(1.10)" : "scale(1)",
+        flexShrink: 0,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -160,6 +162,9 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({
             height: "100%",
             width: "100%",
             textTransform: "capitalize",
+            maxHeight: "100%",
+            maxWidth: "100%",
+            overflow: "hidden",
           }}
         >
           {/*created the card actions for the artist card*/}
@@ -194,7 +199,7 @@ export const TrendingRow: React.FC<tableRow> = ({
   Latest_album,
   Fans,
   popularity,
-  country_img,
+  country_code,
 }) => {
   return (
     <TableRow>
@@ -205,15 +210,13 @@ export const TrendingRow: React.FC<tableRow> = ({
           spacing={4}
           sx={{ justifyContent: "center", alignItems: "center" }}
         >
-          <div
-            style={{
-              backgroundImage: `url(${Rank.rank_img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              width: "15px",
-              height: "15px",
-            }}
-          ></div>
+          {Rank.rank > Rank.previous_rank ? (
+            <KeyboardDoubleArrowUpIcon color="success" />
+          ) : Rank.rank < Rank.previous_rank ? (
+            <KeyboardDoubleArrowDownIcon color="error" />
+          ) : (
+            <HorizontalRuleIcon />
+          )}
           <div>{Rank.rank.toString()}</div>
         </Stack>
       </TableCell>
@@ -222,7 +225,7 @@ export const TrendingRow: React.FC<tableRow> = ({
           <Stack
             direction={"row"}
             spacing={2}
-            sx={{ justifyContent: "center", alignItems: "left " }}
+            sx={{ justifyContent: "left", alignItems: "center " }}
           >
             <div
               style={{
@@ -277,13 +280,14 @@ export const TrendingRow: React.FC<tableRow> = ({
       <TableCell align="center">{Fans.toString()}</TableCell>
       <TableCell align="center">{popularity}</TableCell>
       <TableCell align="center">
-        <div
+        <ReactCountryFlag
+          countryCode={country_code === "USA" ? "US" : country_code}
+          svg
           style={{
-            backgroundImage: `url(${country_img})`,
-            width: "15px",
-            height: "15px",
+            width: "2em",
+            height: "2em",
           }}
-        ></div>
+        />
       </TableCell>
     </TableRow>
   );

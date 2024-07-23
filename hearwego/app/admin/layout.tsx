@@ -9,57 +9,45 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { logInArtist } from "@/lib/features/artist.slice";
 import { getArtist } from "../services/ArtistServices";
+import { getAdmin } from "../services/UserServices";
+import { logInAdmin } from "@/lib/features/admin.slice";
 
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-//   const router = useRouter();
-//   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  // select artist from redux store
-//   const artist = useAppSelector((state) => state.artist.user);
+  // select admin from redux store
+  const admin = useAppSelector((state) => state.admin.user);
 
-  //   useEffect(() => {
-  //     // check if artist is logged in
-  //     if (!artist) {
-  //       const _artist = sessionStorage.getItem("hwg-artist");
+    useEffect(() => {
+      // check if artist is logged in
+      if (!admin) {
+        const _admin = sessionStorage.getItem("hwg-admin");
 
-  //       // if artist is logged in get artist data from server
-  //       if (_artist) {
-  //         const currentUser = JSON.parse(_artist);
-  //         getArtist(currentUser.user._id).then((res) => {
-  //           if (res) {
-  //             const newData = { ...currentUser, ...res.user };
-  //             dispatch(logInArtist(newData));
-  //             sessionStorage.setItem("hwg-artist", JSON.stringify(newData));
-  //           }
-  //         });
-  //       }
+        // if artist is logged in get artist data from server
+        if (_admin) {
+          const currentUser = JSON.parse(_admin);
+          getAdmin(currentUser.user._id).then((res) => {
+            if (res) {
+              const newData = { ...currentUser, ...res.user };
+              dispatch(logInAdmin(newData));
+              sessionStorage.setItem("hwg-admin", JSON.stringify(newData));
+            }
+          });
+        }
 
-  //       // if artist is not logged in redirect to artist sign up page
-  //       router.replace("/auth/artistSignUp");
-  //     } else {
-  //       // if artist is logged in check if artist is approved by admins
-  //       // if not redirect to artist sign up page (admin approval page)
-  //       if (!artist.user.isAdminApproved) {
-  //         window.location.replace("/auth/artistSignUp/7");
-  //         return;
-  //       }
-
-  //       // if artist is logged in check if artist has verified mobile number
-  //       // if not redirect to artist sign up page (mobile verification page)
-  //       if (!artist.user.isMobileVerified) {
-  //         window.location.replace("/auth/artistSignUp/8");
-  //         return;
-  //       }
-
-  //       // if artist is logged in redirect to the requested page
-  //       let path = location.pathname.split("/");
-  //       path.shift();
-  //       path.shift();
-  //       router.replace("/artist/" + path.join("/"));
-  //     }
-  //   }, [artist]);
+        // if artist is not logged in redirect to artist sign up page
+        router.replace("/auth/adminSignIn");
+      } else {
+        // if artist is logged in redirect to the requested page
+        let path = location.pathname.split("/");
+        path.shift();
+        path.shift();
+        router.replace("/admin/" + path.join("/"));
+      }
+    }, [admin]);
 
   return (
     <ArtistDashboardLayout>

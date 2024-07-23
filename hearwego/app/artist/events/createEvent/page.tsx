@@ -59,12 +59,14 @@ import Typography from "@mui/material/Typography";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Modal from "@mui/material/Modal";
+import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import {
   Alert,
   CardActionArea,
+  CircularProgress,
   Divider,
   FilledInput,
   IconButton,
@@ -76,6 +78,17 @@ import { Ticket } from "@/app/constants/models";
 import { addTicket } from "@/app/services/EventServices";
 import { Budget } from "@/app/constants/models";
 import { addBudget } from "@/app/services/EventServices";
+import { updateEvent } from "@/app/services/EventServices";
+import { AutoTicket } from "@/app/constants/models";
+import { ManualTicket } from "@/app/constants/models";
+import { TicketType } from "@/app/constants/models";
+import { SoldTickets } from "@/app/constants/models";
+import { RemainingTickets } from "@/app/constants/models";
+import { addAutoTicket } from "@/app/services/EventServices";
+import { addManualTicket } from "@/app/services/EventServices";
+import { addTicketType } from "@/app/services/EventServices";
+import { addSoldTicket } from "@/app/services/EventServices";
+import { addRemainTicket } from "@/app/services/EventServices";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { createFilterOptions } from "@mui/material";
 import { getAllArtists } from "@/app/services/ArtistServices";
@@ -88,6 +101,40 @@ import { IOSSwitch } from "../../../styles/switch.styles";
 
 import DropFile from "../../../components/DropFile";
 import { useAppSelector } from "@/lib/hooks";
+import { GiConsoleController } from "react-icons/gi";
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  "& .MuiDataGrid-columnsContainer": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "& .MuiDataGrid-columnHeader": {
+    backgroundColor: theme.palette.primary.main, // Change to darker shade if needed
+    color: theme.palette.common.white,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.dark,
+    },
+  },
+  "& .MuiDataGrid-cell": {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+  "& .MuiDataGrid-row": {
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+  "& .MuiDataGrid-footerContainer": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "& .MuiCheckbox-root": {
+    color: `${theme.palette.primary.main} !important`,
+  },
+  "& .MuiDataGrid-toolbarContainer": {
+    "& .MuiButton-text": {
+      color: theme.palette.primary.main,
+    },
+  },
+}));
 
 const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
   ({ theme, ownerState }) => ({
@@ -202,9 +249,16 @@ const errorModalStyle = {
 
 function CreateEvent() {
   const artist = useAppSelector((state) => state.artist.user);
+  const router = useRouter();
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openSuccessModal, setOpenSuccessModal] = useState(false);
+  const handleOpenSuccessModal = () => setOpenSuccessModal(true);
+  const handleCloseSuccessModal = () => setOpenSuccessModal(false);
+
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState<{
     [k: number]: boolean;
@@ -220,6 +274,7 @@ function CreateEvent() {
   const [ticketImage, setTicketImage] = useState("");
   const [eventImage, setEventImage] = useState("");
   const [eventData, setEventData] = useState<Event>({
+    event_id: "",
     event_img: "",
     event_name: "",
     event_type: "",
@@ -234,12 +289,10 @@ function CreateEvent() {
     event_created_by: artist ? artist.artist_id : "",
   });
 
-  const [ticketData, setTicketData] = useState<Ticket>({
-    ticket_catagory: "Not-Provided",
-    ticket_img: "",
-    auto_ticket_details: [],
-    manual_ticket_details: [],
+  const [ticketData, setTicketData] = useState<TicketType>({
+    ticket_type: "Not-Provided",
     ticket_description: "",
+    ticket_img: "",
     event_id: "",
   });
 
@@ -247,6 +300,32 @@ function CreateEvent() {
     budget_currency: "LKR",
     budget_details: [],
     event_id: "",
+  });
+
+  const [autoTicketData, setAutoTicketData] = useState<AutoTicket>({
+    ticket_type: "",
+    ticket_price: 0,
+    ticket_count: 0,
+    ticket_session: "",
+    event_id: "",
+  });
+
+  const [manualTicketData, setManualTicketData] = useState<ManualTicket>({
+    ticket_location: "",
+    ticket_session: "",
+    event_id: "",
+  });
+
+  const [ticketTypeData, setTicketTypeData] = useState<TicketType>({
+    ticket_type: "",
+    ticket_description: "",
+    ticket_img: "",
+    event_id: "",
+  });
+
+  const [remainTicketData, setRemainTicketData] = useState<RemainingTickets>({
+    ticket_id: "",
+    remaining_quantity: 0,
   });
 
   const [openErrorModal, setOpenErrorModal] = React.useState(false);
@@ -257,10 +336,10 @@ function CreateEvent() {
 
   useEffect(() => {
     if (isAutoTicket) {
-      setTicketData({ ...ticketData, ticket_catagory: "Auto" });
+      setTicketData({ ...ticketData, ticket_type: "Auto" });
     }
     if (isManualTicket) {
-      setTicketData({ ...ticketData, ticket_catagory: "Manual" });
+      setTicketData({ ...ticketData, ticket_type: "Manual" });
     }
   }, [isAutoTicket, isManualTicket]);
 
@@ -272,6 +351,20 @@ function CreateEvent() {
       }));
     }
   }, [artist]);
+
+  useEffect(() => {
+    setEventData({
+      ...eventData,
+      teams: teamRows.map(
+        ({ id, teamType, teamName, teamContact, teamEmail }) => ({
+          team_type: teamType,
+          team_name: teamName,
+          contact: teamContact,
+          email: teamEmail,
+        })
+      ),
+    });
+  }, [teamRows]);
 
   useEffect(() => {
     setEventData({
@@ -296,6 +389,13 @@ function CreateEvent() {
           session_special_notice: description,
         })
       ),
+    })
+  }
+  , [sessionRows]);
+
+  useEffect(() => {
+    setEventData({
+      ...eventData,
       sponsor: sponsorRows.map(
         ({ id, sponsorType, sponsorName, sponsorContact, sponsorEmail }) => ({
           sponsor_type: sponsorType,
@@ -304,16 +404,9 @@ function CreateEvent() {
           sponsor_email: sponsorEmail,
         })
       ),
-      teams: teamRows.map(
-        ({ id, teamType, teamName, teamContact, teamEmail }) => ({
-          team_type: teamType,
-          team_name: teamName,
-          contact: teamContact,
-          email: teamEmail,
-        })
-      ),
-    });
-  }, [sessionRows, sponsorRows, teamRows]);
+    })
+  }
+  , [sponsorRows]);
 
   useEffect(() => {
     setTicketData({
@@ -374,7 +467,10 @@ function CreateEvent() {
   const handleNext = async (skipValidation = false) => {
     if (!skipValidation) {
       const isValid = await validateCurrentStep();
-      if (!isValid) return;
+      if (!isValid) {
+        console.log("Validation failed for step: ", activeStep);
+        return; // Block navigation if validation fails
+      }
     }
 
     const newActiveStep =
@@ -424,7 +520,7 @@ function CreateEvent() {
       // If the user skips the second step, set ticket_catagory to "Not-Provided"
       setTicketData((prevTicketData) => ({
         ...prevTicketData,
-        ticket_catagory: "Not-Provided",
+        ticket_type: "Not-Provided",
       }));
     }
 
@@ -447,6 +543,10 @@ function CreateEvent() {
       return true;
     }
     return true;
+  };
+
+  const handleViewEvents = () => {
+    router.push("/artist/events");
   };
 
   const validateEventDetails = () => {
@@ -503,16 +603,32 @@ function CreateEvent() {
   const validateBudgetDetails = () => {
     let isValid = true;
 
+    let Errors = [];
+
+    if (budgetRows.length == 0) {
+      isValid = false;
+      Errors.push("There is no budget details provided. You can skip this step and add budget details later.");
+    }
+
+    if (!isValid) {
+      setErrorMessages(Errors);
+      handleOpenErrorModal();
+    }
+
     return isValid;
   };
 
-  const submitData = async () => {
+  const updateEventDetails = async () => {
     setLoading(true);
     try {
-      let updatedEventData = {
-        ...eventData,
-      };
-
+      let updatedEventData = { ...eventData };
+      console.log("Event Data for update function: ", eventData);
+      if (eventData.event_status === "private") {
+        updatedEventData = {
+          ...updatedEventData,
+          event_status: "public",
+        };
+      }
       if (eventData.event_img === "") {
         updatedEventData = {
           ...updatedEventData,
@@ -520,46 +636,131 @@ function CreateEvent() {
             "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
         };
       }
+
+      const updatedEvent = await updateEvent(
+        artist ? artist.token : "",
+        updatedEventData.event_id,
+        updatedEventData
+      );
+      <Alert severity="success">Event Updated Successfully</Alert>;
+
+      router.push("/artist/events");
+      handleOpenSuccessModal();
+    } catch (error) {
+      setErrorMessages(["Failed to update event data. Please try again."]);
+      handleOpenErrorModal();
+      console.error("Error updating event data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitData = async (isPublish: number) => {
+    setLoading(true);
+    try {
+      let updatedEventData = { ...eventData };
+      if (eventData.event_img === "") {
+        updatedEventData = {
+          ...updatedEventData,
+          event_img:
+            "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg",
+        };
+      }
+
       const createdEvent = await addEvent(
         artist ? artist.token : "",
         updatedEventData
       );
+
+      setEventData((prevEventData) => ({
+        ...prevEventData,
+        event_id: createdEvent.event_id,
+      }));
+
       const eventId = createdEvent.event_id;
 
-      let updatedTicketData = {
-        ...ticketData,
-        event_id: eventId,
-      };
+      let updatedTicketData = { ...ticketData, event_id: eventId };
 
-      if (ticketData.ticket_catagory === "Manual") {
-        updatedTicketData = {
-          ...updatedTicketData,
-          auto_ticket_details: [],
-        };
-      } else if (ticketData.ticket_catagory === "Auto") {
-        updatedTicketData = {
-          ...updatedTicketData,
-          manual_ticket_details: [],
-        };
-      } else if (ticketData.ticket_catagory === "Not-Provided") {
-        updatedTicketData = {
-          ...updatedTicketData,
-          auto_ticket_details: [],
-          manual_ticket_details: [],
-        };
-      }
+      await addTicketType(artist ? artist.token : "", updatedTicketData);
 
-      await addTicket(artist ? artist.token : "", updatedTicketData);
-
-      let updatedBudgetData = {
-        ...budgetData,
-        event_id: eventId,
-      };
+      let updatedBudgetData = { ...budgetData, event_id: eventId };
 
       await addBudget(artist ? artist.token : "", updatedBudgetData);
+
+      // Handle AutoTicket and ManualTicket data submissions
+      if (ticketData.ticket_type === "Auto") {
+        await Promise.all(
+          autoTicketRows.map(async (row) => {
+            const { id, ...autoTicketWithoutId } = row;
+            const autoTicket = {
+              ...autoTicketWithoutId,
+              event_id: eventId,
+              ticket_session: row.ticketSession,
+              ticket_type: row.ticketType,
+              ticket_price: row.ticketPrice,
+              ticket_count: row.ticketCount,
+            };
+            const { ticketSession, ...autoTicketWithoutSession } = autoTicket;
+            const { ticketType, ...autoTicketWithoutType } =
+              autoTicketWithoutSession;
+            const { ticketPrice, ...autoTicketWithoutPrice } =
+              autoTicketWithoutType;
+            const { ticketCount, ...autoTicketWithoutCount } =
+              autoTicketWithoutPrice;
+            console.log(
+              "Auto Ticket: ................",
+              autoTicketWithoutCount
+            );
+            // Submit autoTicket to backend function addAutoTicket
+            const createdAutoTicket = await addAutoTicket(
+              artist ? artist.token : "",
+              autoTicketWithoutCount
+            );
+
+            console.log("Created Auto Ticket: ", createdAutoTicket);
+
+            const remainingTicket = {
+              ticket_id: createdAutoTicket._id,
+              remaining_quantity: createdAutoTicket.ticket_count,
+            };
+
+            await addRemainTicket(artist ? artist.token : "", remainingTicket);
+          })
+        );
+      } else if (ticketData.ticket_type === "Manual") {
+        await Promise.all(
+          manualTicketRows.map(async (row) => {
+            const { id, ...manualTicketWithoutId } = row;
+            const manualTicket = {
+              ...manualTicketWithoutId,
+              event_id: eventId,
+              ticket_location: row.ticketLocation,
+              ticket_session: row.ticketSession,
+            };
+
+            const { ticketLocation, ...manualTicketWithoutLocation } =
+              manualTicket;
+            const { ticketSession, ...manualTicketWithoutSession } =
+              manualTicketWithoutLocation;
+            console.log(
+              "Manual Ticket: ................",
+              manualTicketWithoutSession
+            );
+            await addManualTicket(
+              artist ? artist.token : "",
+              manualTicketWithoutSession
+            );
+          })
+        );
+      }
+
+      handleOpenSuccessModal();
     } catch (error) {
+      setErrorMessages(["Failed to submit event data. Please try again."]);
+      handleOpenErrorModal();
       console.error("Error submitting event data:", error);
     } finally {
+      await delay(2000);
       setLoading(false);
     }
   };
@@ -593,127 +794,164 @@ function CreateEvent() {
       </Stack>
       <Box sx={{ padding: "2em", paddingLeft: "7em", paddingRight: "7em" }}>
         {allStepsCompleted() ? (
-          <Box
-            sx={{ width: "100%", display: "flex", justifyContent: "center" }}
-          >
-            <Box
-              sx={{
-                width: "50%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Box sx={{ fontSize: "8em", textAlign: "center" }}>
-                <IoCheckmarkDoneCircle />
-              </Box>
+          <>
+            {loading ? (
               <Box
                 sx={{
-                  fontSize: "2em",
-                  textAlign: "center",
                   display: "flex",
                   justifyContent: "center",
+                  alignItems: "center",
+                  height: "100vh",
                 }}
               >
-                <Stack spacing={1} direction="row" sx={{ marginBottom: "1em" }}>
-                  <Typography
-                    color={"text.secondary"}
-                    component={"div"}
-                    sx={{ fontSize: "1em", fontWeight: 400 }}
-                  >
-                    Event Created
-                  </Typography>
-                  <Typography
-                    color={"primary.main"}
-                    component={"div"}
-                    sx={{ fontSize: "1em", fontWeight: 500 }}
-                  >
-                    Successfully !
-                  </Typography>
-                </Stack>
+                <CircularProgress />
               </Box>
-              <Stack direction="row" spacing={2}>
-                <Button variant="outlined">Not Now</Button>
-                <Button variant="contained" endIcon={<PublishIcon />}>
-                  Publish to Fans
-                </Button>
-              </Stack>
-            </Box>
-          </Box>
+            ) : (
+              <></>
+            )}
+          </>
         ) : (
           <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-              <div>
-                {EventCreateShow(
-                  activeStep,
-                  sessionRows,
-                  setSessionRows,
-                  teamRows,
-                  setTeamRows,
-                  sponsorRows,
-                  setSponsorRows,
-                  autoTicketRows,
-                  setAutoTicketRows,
-                  manualTicketRows,
-                  setManualTicketRows,
-                  eventData,
-                  setEventData,
-                  ticketData,
-                  setTicketData,
-                  isAutoTicket,
-                  setIsAutoTicket,
-                  isManualTicket,
-                  setIsManualTicket,
-                  ticketImage,
-                  setTicketImage,
-                  eventImage,
-                  setEventImage,
-                  budgetRows,
-                  setBudgetRows
-                )}
-              </div>
-            </Typography>
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
+            {loading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100vh",
+                }}
               >
-                Back
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              {activeStep < 3 && (
-                <Button
-                  onClick={handleSkip}
-                  sx={{ mr: 1 }}
-                  disabled={activeStep === 0}
-                >
-                  Skip
-                </Button>
-              )}
-              <Button onClick={handleNext} sx={{ mr: 1 }}>
-                Next
-              </Button>
-              {activeStep !== steps.length &&
-                (completed[activeStep] ? (
-                  <Typography
-                    variant="caption"
-                    sx={{ display: "inline-block" }}
+                <CircularProgress />
+              </Box>
+            ) : (
+              <>
+                <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
+                  <div>
+                    {EventCreateShow(
+                      activeStep,
+                      sessionRows,
+                      setSessionRows,
+                      teamRows,
+                      setTeamRows,
+                      sponsorRows,
+                      setSponsorRows,
+                      autoTicketRows,
+                      setAutoTicketRows,
+                      manualTicketRows,
+                      setManualTicketRows,
+                      eventData,
+                      setEventData,
+                      ticketData,
+                      setTicketData,
+                      isAutoTicket,
+                      setIsAutoTicket,
+                      isManualTicket,
+                      setIsManualTicket,
+                      ticketImage,
+                      setTicketImage,
+                      eventImage,
+                      setEventImage,
+                      budgetRows,
+                      setBudgetRows
+                    )}
+                  </div>
+                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                  <Button
+                    color="inherit"
+                    disabled={true}
+                    onClick={handleBack}
+                    sx={{ mr: 1 }}
                   >
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
-                  <Button onClick={handleComplete}>
-                    {completedSteps() === totalSteps() - 1
-                      ? "Finish"
-                      : "Complete Step"}
+                    Back
                   </Button>
-                ))}
-            </Box>
+                  <Box sx={{ flex: "1 1 auto" }} />
+                  {activeStep < 3 && (
+                    <Button
+                      onClick={handleSkip}
+                      sx={{ mr: 1 }}
+                      disabled={activeStep === 0}
+                    >
+                      Skip
+                    </Button>
+                  )}
+                  {activeStep !== steps.length &&
+                    (completed[activeStep] ? (
+                      <Typography
+                        variant="caption"
+                        sx={{ display: "inline-block" }}
+                      >
+                        Step {activeStep + 1} already completed
+                      </Typography>
+                    ) : (
+                      <Button onClick={handleComplete} disabled={loading}>
+                        {loading ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          "Complete Step"
+                        )}
+                      </Button>
+                    ))}
+                </Box>
+              </>
+            )}
           </React.Fragment>
         )}
       </Box>
+
+      <Modal open={openSuccessModal} onClose={handleCloseSuccessModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 5,
+          }}
+        >
+          <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
+            <IconButton onClick={handleCloseSuccessModal}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <IoCheckmarkDoneCircle
+              style={{ fontSize: "5em", color: "green" }}
+            />
+            <Typography
+              variant="h6"
+              component="h2"
+              color="success.main"
+              sx={{ marginBottom: 2 }}
+            >
+              Event Created Successfully!
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <Button variant="outlined" onClick={handleViewEvents}>
+                Not Now
+              </Button>
+              <Button
+                variant="contained"
+                onClick={updateEventDetails}
+                endIcon={<PublishIcon />}
+              >
+                Publish to Fans
+              </Button>
+            </Stack>
+          </Box>
+        </Box>
+      </Modal>
 
       <Modal open={openErrorModal} onClose={handleCloseErrorModal}>
         <Box
@@ -729,9 +967,9 @@ function CreateEvent() {
             borderRadius: 5,
           }}
         >
-          <Box sx={{ width: "100", display: "flex", justifyContent: "end" }}>
-            <IconButton>
-              <CloseIcon onClick={handleCloseErrorModal} />
+          <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
+            <IconButton onClick={handleCloseErrorModal}>
+              <CloseIcon />
             </IconButton>
           </Box>
           <Box
@@ -753,7 +991,7 @@ function CreateEvent() {
             </Typography>
 
             {errorMessages.map((error, index) => (
-              <Alert severity="error" sx={{ marginBottom: 1 }}>
+              <Alert key={index} severity="error" sx={{ marginBottom: 1 }}>
                 {error}
               </Alert>
             ))}
@@ -920,17 +1158,6 @@ function EventDetails({
                   label="Age Limits"
                 />
               </Stack>
-
-              <TextField
-                id="no_of_sessions"
-                label="No. of Sessions"
-                type="number"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                variant="filled"
-                sx={{ width: "66%" }}
-              />
             </Stack>
           </Box>
         </Box>
@@ -1005,9 +1232,11 @@ function TicketDetails({
     if (isChecked) {
       setIsAutoTicket(true);
       setIsManualTicket(false);
+      setTicketData((prev) => ({ ...prev, ticket_type: "Auto" }));
     } else {
       setIsAutoTicket(false);
       setIsManualTicket(true);
+      setTicketData((prev) => ({ ...prev, ticket_type: "Manual" }));
     }
   }, [isChecked]);
 
@@ -1022,7 +1251,7 @@ function TicketDetails({
           <FormControlLabel
             control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
             label="Generate Tickets Here"
-            onChange={handleSwitchChange}
+            onChange={(e) => setIsChecked(e.target.checked)}
           />
         </FormGroup>
       </InputRow>
@@ -1169,13 +1398,13 @@ type SessionRow = {
 };
 
 const sessionColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "sessionDate", headerName: "Date", width: 100 },
-  { field: "sessionTime", headerName: "Time", width: 100 },
-  { field: "duration", headerName: "Duration", width: 100 },
-  { field: "venue", headerName: "Venue", width: 100 },
-  { field: "artists", headerName: "Artists", width: 200 },
-  { field: "description", headerName: "Description", width: 200 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "sessionDate", headerName: "Date", flex: 1 },
+  { field: "sessionTime", headerName: "Time", flex: 1 },
+  { field: "duration", headerName: "Duration", flex: 1 },
+  { field: "venue", headerName: "Venue", flex: 1 },
+  { field: "artists", headerName: "Artists", flex: 1 },
+  { field: "description", headerName: "Description", flex: 1 },
 ];
 
 function SessionTable({ sessionRows, setSessionRows }) {
@@ -1192,7 +1421,13 @@ function SessionTable({ sessionRows, setSessionRows }) {
   );
   const [open, setOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
+
+  const [dateError, setDateError] = useState("");
+  const [timeError, setTimeError] = useState("");
+  const [durationError, setDurationError] = useState("");
+  const [venueError, setVenueError] = useState("");
+  const [artistsError, setArtistsError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
 
   const getArtists = () => {
     getAllArtists().then((res) => {
@@ -1212,45 +1447,82 @@ function SessionTable({ sessionRows, setSessionRows }) {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSessionDate(event.target.value);
+    setDateError(""); // Clear error on change
   };
 
   const handleSessionTimeChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSessionTime(event.target.value);
+    setTimeError(""); // Clear error on change
   };
 
   const handleDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDuration(event.target.value);
+    setDurationError(""); // Clear error on change
   };
 
   const handleVenueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVenue(event.target.value);
+    setVenueError(""); // Clear error on change
   };
 
   const handleArtistsChange = (event, newValue) => {
     setSelectedArtists(newValue);
+    setArtistsError(""); // Clear error on change
   };
 
   const handleDescriptionChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setDescription(event.target.value);
+    setDescriptionError(""); // Clear error on change
   };
 
   const handleSelectionModelChange = (newSelectionModel) => {
     setSelectedRows(newSelectionModel);
   };
 
+  // Enhanced validation to provide specific error messages and focus on problematic fields
   const validateFields = () => {
-    return (
-      sessionDate &&
-      sessionTime &&
-      duration &&
-      venue &&
-      artists.length > 0 &&
-      description
-    );
+    const today = new Date();
+    const selectedDate = new Date(sessionDate);
+    let isValid = true;
+
+    if (!sessionDate) {
+      setDateError("Session date is required.");
+      isValid = false;
+    } else if (selectedDate <= today) {
+      setDateError("Session date must be greater than today's date.");
+      isValid = false;
+    }
+
+    if (!sessionTime) {
+      setTimeError("Session time is required.");
+      isValid = false;
+    }
+
+    if (!duration) {
+      setDurationError("Duration is required.");
+      isValid = false;
+    }
+
+    if (!venue) {
+      setVenueError("Venue is required.");
+      isValid = false;
+    }
+
+    if (selectedArtists.length === 0) {
+      setArtistsError("At least one artist must be selected.");
+      isValid = false;
+    }
+
+    // if (!description) {
+    //   setDescriptionError("Description is required.");
+    //   isValid = false;
+    // }
+
+    return isValid;
   };
 
   const addNewSession = () => {
@@ -1269,14 +1541,10 @@ function SessionTable({ sessionRows, setSessionRows }) {
       };
 
       setSessionRows([...sessionRows, newSession]);
-      sessionCount += 1;
       console.log(sessionRows);
       refreshTable();
+      sessionCount++;
       handleClose();
-    } else {
-      setErrorMessage(
-        "Please fill in all required fields with correct format."
-      );
     }
   };
 
@@ -1325,14 +1593,18 @@ function SessionTable({ sessionRows, setSessionRows }) {
 
     setSessionRows(reindexedRows);
     setSelectedRows([]);
-
-    sessionCount = reindexedRows.length;
+    sessionCount--;
     refreshTable();
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setErrorMessage("");
+    setDateError("");
+    setTimeError("");
+    setDurationError("");
+    setVenueError("");
+    setArtistsError("");
+    setDescriptionError("");
     setOpen(false);
   };
 
@@ -1376,7 +1648,7 @@ function SessionTable({ sessionRows, setSessionRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={sessionRows}
         columns={sessionColumns}
@@ -1453,11 +1725,15 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   <FormHelperText id="session-date">Date</FormHelperText>
                   <FilledInput
                     id="session_date"
-                    sx={{ width: "100%" }}
+                    sx={{
+                      width: "100%",
+                      ...(dateError && { borderColor: "red" }),
+                    }}
                     type="date"
                     value={sessionDate}
                     onChange={handleSessionDateChange}
-                    defaultValue="2024-10-10"
+                    error={Boolean(dateError)}
+                    helperText={dateError}
                   />
                 </FormControl>
 
@@ -1474,6 +1750,8 @@ function SessionTable({ sessionRows, setSessionRows }) {
                       <InputAdornment position="start">Hours</InputAdornment>
                     ),
                   }}
+                  error={Boolean(durationError)}
+                  helperText={durationError}
                 />
               </Box>
 
@@ -1485,10 +1763,15 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   <FormHelperText id="session-time">Time</FormHelperText>
                   <FilledInput
                     id="session_time"
-                    sx={{ width: "100%" }}
+                    sx={{
+                      width: "100%",
+                      ...(timeError && { borderColor: "red" }),
+                    }}
                     type="time"
                     value={sessionTime}
                     onChange={handleSessionTimeChange}
+                    error={Boolean(timeError)}
+                    helperText={timeError}
                   />
                 </FormControl>
 
@@ -1499,6 +1782,8 @@ function SessionTable({ sessionRows, setSessionRows }) {
                   sx={{ width: "100%", marginBottom: 2 }}
                   value={venue}
                   onChange={handleVenueChange}
+                  error={Boolean(venueError)}
+                  helperText={venueError}
                 />
               </Box>
             </Box>
@@ -1514,7 +1799,13 @@ function SessionTable({ sessionRows, setSessionRows }) {
               value={selectedArtists}
               onChange={handleArtistsChange}
               renderInput={(params) => (
-                <TextField {...params} label="Artists" variant="filled" />
+                <TextField
+                  {...params}
+                  label="Artists"
+                  variant="filled"
+                  error={Boolean(artistsError)}
+                  helperText={artistsError}
+                />
               )}
             />
 
@@ -1527,20 +1818,9 @@ function SessionTable({ sessionRows, setSessionRows }) {
               rows={4}
               value={description}
               onChange={handleDescriptionChange}
+              error={Boolean(descriptionError)}
+              helperText={descriptionError}
             />
-
-            {errorMessage && (
-              <div
-                style={{
-                  color: "red",
-                  marginBottom: "2em",
-                  fontSize: "14px",
-                  textDecoration: "italic",
-                }}
-              >
-                {errorMessage}
-              </div>
-            )}
 
             <Stack direction="row" spacing={2}>
               <Button variant="outlined" onClick={handleClose}>
@@ -1569,11 +1849,11 @@ type TeamRow = {
 };
 
 const teamColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "teamType", headerName: "Team Type", width: 150 },
-  { field: "teamName", headerName: "Team Name", width: 150 },
-  { field: "teamContact", headerName: "Contact", width: 250 },
-  { field: "teamEmail", headerName: "E-mail", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "teamType", headerName: "Team Type", flex: 1 },
+  { field: "teamName", headerName: "Team Name", flex: 1 },
+  { field: "teamContact", headerName: "Contact", flex: 1 },
+  { field: "teamEmail", headerName: "E-mail", flex: 1 },
 ];
 
 function TeamTable({ teamRows, setTeamRows }) {
@@ -1586,6 +1866,11 @@ function TeamTable({ teamRows, setTeamRows }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
+  function validateSriLankanPhoneNumber(phoneNumber) {
+    const sriLankanPhoneNumberPattern = /^0\d{9}$/;
+    return sriLankanPhoneNumberPattern.test(phoneNumber);
+}
 
   const [teamType, setTeamType] = useState("");
   const [teamName, setTeamName] = useState("");
@@ -1627,11 +1912,10 @@ function TeamTable({ teamRows, setTeamRows }) {
 
   const validateFields = () => {
     return (
-      teamType.trim() !== "" &&
-      teamName.trim() !== "" &&
-      teamContact.trim() !== "" &&
-      teamEmail.trim() !== "" &&
-      validateEmail(teamEmail)
+      (teamType.trim() !== "") &&
+      (teamName.trim() !== "") &&
+      (teamContact.trim() !== "" ? validateSriLankanPhoneNumber(teamContact): true) &&
+      (teamEmail.trim() !== "" ? validateEmail(teamEmail): true)
     );
   };
 
@@ -1756,7 +2040,7 @@ function TeamTable({ teamRows, setTeamRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={teamRows}
         columns={teamColumns}
@@ -1907,11 +2191,11 @@ type SponsorRow = {
 };
 
 const sponsorColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "sponsorType", headerName: "Sponsor Type", width: 150 },
-  { field: "sponsorName", headerName: "Sponsor Name", width: 150 },
-  { field: "sponsorContact", headerName: "Contact", width: 250 },
-  { field: "sponsorEmail", headerName: "E-mail", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "sponsorType", headerName: "Sponsor Type", flex: 1 },
+  { field: "sponsorName", headerName: "Sponsor Name", flex: 1 },
+  { field: "sponsorContact", headerName: "Contact", flex: 1 },
+  { field: "sponsorEmail", headerName: "E-mail", flex: 1 },
 ];
 
 function SponsorTable({ sponsorRows, setSponsorRows }) {
@@ -1969,13 +2253,17 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
     setSelectedRows(selectionModel);
   };
 
+  function validateSriLankanPhoneNumber(phoneNumber) {
+    const sriLankanPhoneNumberPattern = /^0\d{9}$/;
+    return sriLankanPhoneNumberPattern.test(phoneNumber);
+}
+
   const validateFields = () => {
     return (
-      sponsorType.trim() !== "" &&
-      sponsorName.trim() !== "" &&
-      sponsorContact.trim() !== "" &&
-      sponsorEmail.trim() !== "" &&
-      validateEmail(sponsorEmail)
+      (sponsorType.trim() !== "") &&
+      (sponsorName.trim() !== "") &&
+      (sponsorEmail.trim() !== "" ? (validateEmail(sponsorEmail)) : true) &&
+      (sponsorContact.trim() !== "" ? (validateSriLankanPhoneNumber(sponsorContact)) : true)
     );
   };
 
@@ -2101,7 +2389,7 @@ function SponsorTable({ sponsorRows, setSponsorRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={sponsorRows}
         columns={sponsorColumns}
@@ -2292,11 +2580,11 @@ function BudgetDetails({ budgetRows, setBudgetRows }) {
 }
 
 const budgetColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "budgetTitle", headerName: "Title", width: 150 },
-  { field: "budgetSession", headerName: "Session", width: 150 },
-  { field: "budgetType", headerName: "Type", width: 250 },
-  { field: "budgetAmount", headerName: "Amount", width: 250 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "budgetTitle", headerName: "Title", flex: 1 },
+  { field: "budgetSession", headerName: "Session", flex: 1 },
+  { field: "budgetType", headerName: "Type", flex: 1 },
+  { field: "budgetAmount", headerName: "Amount", flex: 1 },
 ];
 
 let budgetRows = [];
@@ -2501,7 +2789,7 @@ function BudgetTable({ budgetRows, setBudgetRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={budgetRows}
         columns={budgetColumns}
@@ -2650,9 +2938,9 @@ function BudgetTable({ budgetRows, setBudgetRows }) {
 }
 
 const manulTicketColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "ticketSession", headerName: "Session", width: 150 },
-  { field: "ticketLocation", headerName: "Where to Buy Tickets", width: 150 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "ticketSession", headerName: "Session", flex: 1 },
+  { field: "ticketLocation", headerName: "Where to Buy Tickets", flex: 1 },
 ];
 
 type ManualTicketRow = {
@@ -2814,7 +3102,7 @@ function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={manualTicketRows}
         columns={manulTicketColumns}
@@ -2933,43 +3221,7 @@ function ManualTicketTable({ manualTicketRows, setManualTicketRows }) {
   );
 }
 
-function ManualTicketForm() {
-  return (
-    <Paper
-      sx={{ width: "100%", padding: "2em", marginBottom: "1em" }}
-      elevation={3}
-    >
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "3em",
-        }}
-      >
-        {/* <ManualTicketTable /> */}
-      </Box>
 
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "1em",
-        }}
-      >
-        <TextField
-          id="ticket-des"
-          label="Description"
-          multiline
-          rows={4}
-          variant="filled"
-          sx={{ width: "100%" }}
-        />
-      </Box>
-    </Paper>
-  );
-}
 
 const autoTicketModalStyle = {
   position: "absolute" as "absolute",
@@ -2984,11 +3236,11 @@ const autoTicketModalStyle = {
 };
 
 const autoTicketColumns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 50 },
-  { field: "ticketType", headerName: "Ticket Type", width: 150 },
-  { field: "ticketPrice", headerName: "Price", width: 80 },
-  { field: "ticketCount", headerName: "Count", width: 70 },
-  { field: "ticketSession", headerName: "Session", width: 150 },
+  { field: "id", headerName: "ID", flex: 0.5 },
+  { field: "ticketType", headerName: "Ticket Type", flex: 1 },
+  { field: "ticketPrice", headerName: "Price", flex: 1 },
+  { field: "ticketCount", headerName: "Count", flex: 1 },
+  { field: "ticketSession", headerName: "Session", flex: 1 },
 ];
 
 let autoTicketRows = [];
@@ -3191,7 +3443,7 @@ function AutoTicketTable({ autoTicketRows, setAutoTicketRows }) {
 
   return (
     <div style={{ width: "100%" }}>
-      <DataGrid
+      <StyledDataGrid
         key={refreshKey}
         rows={autoTicketRows}
         columns={autoTicketColumns}
@@ -3417,6 +3669,7 @@ function EventCreateShow(
         setTicketData={setTicketData}
         autoTicketRows={autoTicketRows}
         manualTicketRows={manualTicketRows}
+        budgetRows={budgetRows}
       />
     );
   }
@@ -3435,6 +3688,7 @@ function EventFormFinish({
   setTicketData,
   autoTicketRows,
   manualTicketRows,
+  budgetRows,
 }) {
   function createSessionData(
     sessionDate: string,
@@ -3450,7 +3704,7 @@ function EventFormFinish({
     sponsorType: string,
     sponsorName: string,
     sponsorContact: string,
-    sponsorEmail: string,
+    sponsorEmail: string
   ) {
     return { sponsorType, sponsorName, sponsorContact, sponsorEmail };
   }
@@ -3459,7 +3713,7 @@ function EventFormFinish({
     teamType: string,
     teamName: string,
     teamContact: string,
-    teamEmail: string,
+    teamEmail: string
   ) {
     return { teamType, teamName, teamContact, teamEmail };
   }
@@ -3468,7 +3722,7 @@ function EventFormFinish({
     ticketType: string,
     ticketPrice: string,
     ticketCount: string,
-    ticketSession: string,
+    ticketSession: string
   ) {
     return { ticketType, ticketPrice, ticketCount, ticketSession };
   }
@@ -3479,6 +3733,35 @@ function EventFormFinish({
       ticket.ticketPrice,
       ticket.ticketCount,
       ticket.ticketSession
+    )
+  );
+
+  function createManualTicketData(
+    ticketSession: string,
+    ticketLocation: string
+  ) {
+    return { ticketSession, ticketLocation };
+  }
+
+  const mtRows = manualTicketRows.map((ticket) =>
+    createManualTicketData(ticket.ticketSession, ticket.ticketLocation)
+  );
+
+  function createBudgetData(
+    budgetTitle: string,
+    budgetSession: string,
+    budgetType: string,
+    budgetAmount: string
+  ) {
+    return { budgetTitle, budgetSession, budgetType, budgetAmount };
+  }
+
+  const budRows = budgetRows.map((budget) =>
+    createBudgetData(
+      budget.budgetTitle,
+      budget.budgetSession,
+      budget.budgetType,
+      budget.budgetAmount
     )
   );
 
@@ -3528,7 +3811,11 @@ function EventFormFinish({
             }}
           >
             <CardMedia
-              image={(eventData.event_img=="")? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg":eventData.event_img}
+              image={
+                eventData.event_img == ""
+                  ? "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/defaultEvent.jpeg"
+                  : eventData.event_img
+              }
               sx={{ width: 250, height: 250, borderRadius: 2 }}
             />
           </Box>
@@ -3622,8 +3909,6 @@ function EventFormFinish({
               </TableBody>
             </Table>
           </TableContainer>
-
-          
         </Box>
 
         <CardContent>
@@ -3707,8 +3992,8 @@ function EventFormFinish({
         </Box>
       </Card>
 
-      <Card sx={{ width: "100%", padding: 2 }}>
-      <CardContent>
+      <Card sx={{ width: "100%", padding: 2, marginBottom: 2 }}>
+        <CardContent>
           <Typography variant="h5" component="div">
             Ticket Details
           </Typography>
@@ -3716,11 +4001,12 @@ function EventFormFinish({
         <Divider />
 
         <Box sx={{ width: "100%", padding: 2 }}>
-          {(ticketData.ticket_catagory == "Not Provided") ? (
-            <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
-          ) : (
-            (ticketData.ticket_catagory == "Auto") ? (
-              <TableContainer component={Paper}>
+          {ticketData.ticket_type == "Not Provided" ? (
+            <Typography variant="h6">
+              Ticket Catagory: {ticketData.ticket_type}
+            </Typography>
+          ) : ticketData.ticket_type == "Auto" ? (
+            <TableContainer component={Paper}>
               <Table
                 sx={{ minWidth: 650 }}
                 size="small"
@@ -3751,14 +4037,78 @@ function EventFormFinish({
                 </TableBody>
               </Table>
             </TableContainer>
-            ) : (
-              <Box>
-                <Typography variant="h6">Ticket Catagory: {ticketData.ticket_catagory}</Typography>
-                <Typography variant="h6">Ticket Description: {ticketData.ticket_description}</Typography>
-              </Box>
-            )
+          ) : (
+            <TableContainer component={Paper}>
+              <Table
+                sx={{ minWidth: 650 }}
+                size="small"
+                aria-label="a dense table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Session</TableCell>
+                    <TableCell align="right">Location</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {mtRows.map((row) => (
+                    <TableRow
+                      key={row.ticketType}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.ticketSession}
+                      </TableCell>
+                      <TableCell align="right">{row.ticketLocation}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
-          
+        </Box>
+      </Card>
+
+      <Card sx={{ width: "100%", padding: 2 }}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Budget Details
+          </Typography>
+        </CardContent>
+        <Divider />
+
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell align="right">Session</TableCell>
+                  <TableCell align="right">Type</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {budRows.map((row) => (
+                  <TableRow
+                    key={row.budgetTitle}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.budgetTitle}
+                    </TableCell>
+                    <TableCell align="right">{row.budgetSession}</TableCell>
+                    <TableCell align="right">{row.budgetType}</TableCell>
+                    <TableCell align="right">{row.budgetAmount}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Card>
     </Box>

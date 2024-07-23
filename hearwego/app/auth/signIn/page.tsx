@@ -7,8 +7,10 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Snackbar,
+  Alert
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,6 +37,22 @@ const SignIn = () => {
   const [emailError, setEmailError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   // Function to handle sign in
   const handleSignIn = () => {
     const errors = [false, false];
@@ -51,10 +69,18 @@ const SignIn = () => {
     if (errors.includes(true)) return;
 
     handleLogin(userDetails).then((res) => {
-      if (res) {
-        dispatch(logInUser(res?.user));
-        sessionStorage.setItem("hwg-user", JSON.stringify(res));
+      if (res?.user) {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Logged in successfully");
+
+        dispatch(logInUser({...res?.user, token: res?.token}));
+        sessionStorage.setItem("hwg-user", JSON.stringify({...res?.user, token: res?.token}));
         router.replace("/");
+      } else {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(res || "An error occurred");
       }
     });
   };
@@ -169,6 +195,11 @@ const SignIn = () => {
 
           {/* Sign up link */}
           <Typography variant="body1" sx={{ marginTop: "40px" }}>
+            <Link href="/auth/forgot" style={{ color: "#C084FC" }}>
+              Forgot Password?
+            </Link>
+          </Typography>
+          <Typography variant="body1" sx={{ marginTop: "20px" }}>
             Don't have an account?{" "}
             <Link href="/auth/signUp" style={{ color: "#C084FC" }}>
               Sign Up
@@ -176,6 +207,15 @@ const SignIn = () => {
           </Typography>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </AuthContainer>
   );
 };

@@ -7,8 +7,10 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import Link from "next/link";
@@ -36,6 +38,22 @@ const ArtistSignIn = () => {
   const [emailError, setEmailError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   // Function to handle sign in
   const handleSignIn = () => {
     const errors = [false, false];
@@ -52,10 +70,21 @@ const ArtistSignIn = () => {
     if (errors.includes(true)) return;
 
     handleArtistLogin(artistDetails).then((res) => {
-      if (res) {
-        dispatch(logInArtist(res));
-        sessionStorage.setItem("hwg-artist", JSON.stringify(res));
+      if (res?.user) {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Login successful");
+
+        dispatch(logInArtist({ ...res, ...res?.user }));
+        sessionStorage.setItem(
+          "hwg-artist",
+          JSON.stringify({ ...res, ...res?.user })
+        );
         router.replace("/artist");
+      } else {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(res || "An error occurred");
       }
     });
   };
@@ -170,6 +199,11 @@ const ArtistSignIn = () => {
 
           {/* Sign up link */}
           <Typography variant="body1" sx={{ marginTop: "40px" }}>
+            <Link href="/auth/forgotArtist" style={{ color: "#C084FC" }}>
+              Forgot Password?
+            </Link>
+          </Typography>
+          <Typography variant="body1" sx={{ marginTop: "20px" }}>
             Don't have an account?{" "}
             <Link href="/auth/artistSignUp" style={{ color: "#C084FC" }}>
               Sign Up
@@ -177,6 +211,15 @@ const ArtistSignIn = () => {
           </Typography>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </AuthContainer>
   );
 };

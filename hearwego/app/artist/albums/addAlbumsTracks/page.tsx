@@ -97,7 +97,15 @@ export default function AddAlbumTracks() {
               Add New Album
             </Typography>
 
-            <Box sx={{ width: "100%", display: "flex", flexWrap: "wrap", flexDirection: matches?"column":"row", alignItems:matches?"center":"flex-start" }}>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexWrap: "wrap",
+                flexDirection: matches ? "column" : "row",
+                alignItems: matches ? "center" : "flex-start",
+              }}
+            >
               {/* Box for uploading album cover image */}
               <Box sx={{ width: "30%" }}>
                 <DropFile
@@ -122,7 +130,7 @@ export default function AddAlbumTracks() {
               </Box>
 
               {/* Box for adding songs to the album */}
-              <Box sx={{ width:matches?"90%": "70%" }}>
+              <Box sx={{ width: matches ? "90%" : "70%" }}>
                 <Typography
                   component="div"
                   sx={{ marginBottom: "1em", fontSize: 14 }}
@@ -132,8 +140,7 @@ export default function AddAlbumTracks() {
 
                 <Box sx={{ width: "100%", display: "flex" }}>
                   <Box sx={{ width: "95%" }}>
-
-                     {/* Component for selecting songs */}
+                    {/* Component for selecting songs */}
                     <SongSelectBox setAlbumSongs={setAlbumSongs} />
                   </Box>
                   <Box
@@ -153,8 +160,7 @@ export default function AddAlbumTracks() {
                 </Box>
 
                 <Box sx={{ width: "100%", marginTop: "1em" }}>
-                  
-                   {/* Display selected album songs */}
+                  {/* Display selected album songs */}
                   {albumSongs.map((song, index) => (
                     <SongCard
                       key={index}
@@ -173,7 +179,13 @@ export default function AddAlbumTracks() {
                 </Box>
 
                 <Box sx={{ width: "100%", marginTop: "1em" }}>
-                  <Button  variant="contained" startIcon={<AddCircleIcon />}>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddCircleIcon />}
+                    onClick={() => {
+                      router.push("/artist/songs/add");
+                    }}
+                  >
                     Add New Song
                   </Button>
                 </Box>
@@ -187,9 +199,16 @@ export default function AddAlbumTracks() {
                   }}
                 >
                   <Stack direction="row" spacing={2}>
-                    <Button variant="outlined">Reset</Button>
-                   
-                    {/* Button to save album tracks */}
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        window.location.reload();
+                      }}
+                    >
+                      Reset
+                    </Button>
+                    {/* Button to save album tracks  */}
+
                     <LoadingButton
                       loading={uploading}
                       startIcon={<SaveIcon />}
@@ -305,7 +324,12 @@ function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
           sx={{ display: "flex", alignItems: "center" }}
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ClickPlay song_track={song ? song.song_track : ""} />
+            <ClickPlay
+              url={song?.song_track as string}
+              songName={song?.song_title as string}
+              artist={song?.artist?.map((a: any) => a.artist_name).join("," ) as string}
+              coverArt={song?.song_img as string}
+            />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -320,10 +344,19 @@ function SongCard({ songData, setAlbumSongs, setSongTracks }: SongCardProps) {
 }
 
 // Component for handling play/pause button
-function ClickPlay({ song_track }: { song_track: string }) {
-
+function ClickPlay({
+  url,
+  songName,
+  artist,
+  coverArt,
+}: {
+  url: string;
+  songName: string;
+  artist: string;
+  coverArt: string;
+}) {
   // Custom hook to manage audio playback
-  const { playing, toggle } = useAudio({ url: song_track });
+  const { playing, toggle } = useAudio({ url, songName, artist, coverArt });
 
   return (
     <>
@@ -331,7 +364,6 @@ function ClickPlay({ song_track }: { song_track: string }) {
         <IconButton sx={{ color: "primary.main" }}>
           <PlayCircleIcon
             sx={{ color: "primary.main", fontSize: 36 }}
-           
             onClick={toggle}
           />
         </IconButton>
@@ -339,11 +371,9 @@ function ClickPlay({ song_track }: { song_track: string }) {
         <IconButton sx={{ color: "primary.main" }}>
           <PauseCircleIcon
             sx={{ color: "primary.main", fontSize: 36 }}
-            
             onClick={toggle}
           />
         </IconButton>
-       
       )}
     </>
   );
@@ -351,7 +381,6 @@ function ClickPlay({ song_track }: { song_track: string }) {
 
 // Component for selecting songs
 function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
-
   // Initialize state variables
   const [songs, setSongs] = useState<Song[]>([]);
   const artist = useAppSelector((state) => state.artist.user);
@@ -360,7 +389,6 @@ function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
   useEffect(() => {
     if (artist?.user.artist_id && artist.token) {
       getSongsForArtist(artist.token, artist.user.artist_id).then((songs) => {
-       
         // Map fetched songs to required format
         const data = songs.data.map((song: any) => ({
           label: song.song_title,
@@ -378,7 +406,6 @@ function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
       options={songs}
       sx={{ width: "90%" }}
       onChange={(event, newValue) => {
-
         // Update selected songs
         setAlbumSongs((prev: any) => [...prev, newValue]);
       }}
@@ -393,5 +420,3 @@ function SongSelectBox({ setAlbumSongs }: { setAlbumSongs: any }) {
     />
   );
 }
-
-

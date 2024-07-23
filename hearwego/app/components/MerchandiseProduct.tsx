@@ -11,6 +11,7 @@ import {
 import { styled } from "@mui/system";
 import Link from "next/link";
 import Box from "@mui/material/Box";
+import { MerchProduct } from "../constants/models";
 
 interface Comment {
   id: number;
@@ -19,22 +20,8 @@ interface Comment {
   rating: number;
 }
 
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image1: string;
-  image2: string;
-  rating: number;
-  ratingCount: number;
-  category: string;
-  subcategory: string;
-  comments: Comment[];
-}
-
 interface ProductCardProps {
-  product: Product;
+  product: MerchProduct;
 }
 
 // Styled Card component with hover effect
@@ -46,20 +33,20 @@ const StyledCard = styled(Card)({
     transform: "scale(1.05)",
   },
 });
-
+ 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
-    <Link href="/main/artists/store/1/product/1">
+    <Link href={"/main/artists/store/1/product/" + product?.product_id}>
       <StyledCard>
-        <CardMedia
+        <CardMedia 
           component="img"
           height="140"
-          image={product.image1}
-          alt={product.name}
+          image={product.product_Main_image}
+          alt={product.product_name}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {product.name}
+            {product.product_name}
           </Typography>
           <Box sx={{
             display: 'flex',
@@ -72,17 +59,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           }}>
           <Rating
             name="read-only-rating"
-            value={product.rating}
+            value={Number(product.product_rating)}
             readOnly
             precision={0.5}
            
-          /> <Typography variant="body2" color="text.secondary" sx={{ marginLeft:"20px",marginTop:"2px"}}>{product.ratingCount}</Typography>
+          /> <Typography variant="body2" color="text.secondary" sx={{ marginLeft:"20px",marginTop:"2px"}}>{product?.rating_count}</Typography>
           </Box>
           <Typography variant="body2" color="text.secondary">
-            {product.description}
+            {product.product_description}
           </Typography>
           <Typography variant="h6" color="text.primary" sx={{ marginTop: 2 }}>
-            Rs {product.price}
+            Rs {product.product_price}
           </Typography>
         </CardContent>
       </StyledCard>

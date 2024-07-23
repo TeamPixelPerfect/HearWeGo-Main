@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -6,121 +7,158 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Grid from "@mui/material/Grid";
 import SingleEvent from "@/app/components/SingleEvent";
+import { Event } from "@/app/constants/models";
+import { Artist } from "@/app/constants/models";
+import { getAllArtists } from "@/app/services/ArtistServices";
+import { getUpcomingEventsByInterest } from "@/app/services/EventServices";
 
 import { Maindiv, SearchPaper } from "../../../styles/eventsMW.styles";
+import { Pagination, Typography } from "@mui/material";
 
 const trendingEvents = [
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-      name: "Beats",
-      img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-      date: "Jan 12",
-      day: "Wed",
-      time: "8:00 PM",
-      artist: "Kaizer Kaize",
-    },
-    {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-      {
-        name: "Beats",
-        img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
-        date: "Jan 12",
-        day: "Wed",
-        time: "8:00 PM",
-        artist: "Kaizer Kaize",
-      },
-  ];
-
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+  {
+    name: "Beats",
+    img: "https://hwgbucket.s3.ap-south-1.amazonaws.com/images/Pink+And+Blue+Club+DJ+Party+Night+Flyer.png ",
+    date: "Jan 12",
+    day: "Wed",
+    time: "8:00 PM",
+    artist: "Kaizer Kaize",
+  },
+];
 
 export default function MoreAlbums() {
+  const [trendingEvents, setTrendingEvents] = React.useState<Event[]>([]);
+  const [artists, setArtists] = React.useState<Artist[]>([]);
+  const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(12);
+  const [pageCount, setPageCount] = React.useState(0);
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  React.useEffect(() => {
+    getUpcomingEventsByInterest().then((events) => {
+      console.log("Events Trending......", events);
+      setTrendingEvents(events);
+      // setPageCount(Math.ceil(events.total / limit));
+    });
+  }, [page, trendingEvents.length]);
+
+  React.useEffect(() => {
+    getAllArtists().then((artists) => {
+      console.log("Artists......", artists);
+      setArtists(artists.data);
+    });
+  }, []);
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find((artist) => artist.artist_id === artistId);
+    return artist ? artist.artistName : "Unknown";
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const filteredEvents = trendingEvents.filter((event) => {
+    const artistName = getArtistName(event.event_created_by).toLowerCase();
+    const eventName = event.event_name.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return eventName.includes(query) || artistName.includes(query);
+  });
+
   return (
     <Maindiv>
-      <Box
-        style={{
-          display: "flex",
-          padding: "15px",
-        }}
-      >
-        <SearchPaper>
-          <InputBase
-            sx={{ ml: 5, flex: 1 }}
-            placeholder="Search events"
-            inputProps={{ "aria-label": "search" }}
-          />
-          <IconButton type="button" sx={{ p: "10px" }} aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-            
-        </SearchPaper>
+      <Box sx={{ width: "100%", p: 5 }}>
+        <InputBase
+          placeholder="Search Events"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            width: "80%",
+            padding: "5px 10px",
+            borderRadius: "4px",
+          }}
+          startAdornment={<SearchIcon sx={{ marginRight: "8px" }} />}
+        />
       </Box>
       <Box
         style={{
@@ -133,21 +171,64 @@ export default function MoreAlbums() {
       >
         Trending Events
       </Box>
-      <Grid container spacing={1} sx={{ margin: "1em auto", width: "95%" }}>
-        {trendingEvents.map(({ name, img, date, day, time, artist }) => (
-          <Grid item xs={4} md={2} style={{ paddingLeft: 30 }}>
-            <SingleEvent
-              eventName={name}
-              eventImg={img}
-              eventDate={date}
-              eventDay={day}
-              eventTime={time}
-              artistName={artist}
-            ></SingleEvent>
-          </Grid>
-        ))}
+      <Grid container spacing={2} sx={{ margin: "1em auto", width: "95%" }}>
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map(
+            ({
+              event_id,
+              event_name,
+              event_img,
+              sessions,
+              event_created_by,
+            }) => (
+              <Grid item xs={6} md={3}>
+                <SingleEvent
+                  eventID={event_id}
+                  eventName={event_name}
+                  eventImg={event_img}
+                  artistName={getArtistName(event_created_by)}
+                  noOfSessions={sessions?.length}
+                ></SingleEvent>
+              </Grid>
+            )
+          )
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "75vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              color="secondary"
+              variant="subtitle1"
+              sx={{ fontStyle: "italic" }}
+            >
+              No Events Found
+            </Typography>
+          </Box>
+        )}
       </Grid>
-   
+
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "1em",
+          marginBottom: "1em",
+        }}
+      >
+        <Pagination
+          count={pageCount}
+          color="primary"
+          page={page}
+          onChange={handlePageChange}
+        />
+      </Box>
     </Maindiv>
   );
 }

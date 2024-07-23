@@ -23,6 +23,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -70,6 +72,22 @@ const ArtistSignUp = () => {
 
   const matches = useMediaQuery("(max-width:960px)");
   const artist = useAppSelector((state) => state.artist.user);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   // Sign up stage
   const [step, setStep] = useState<number>(0);
@@ -168,6 +186,9 @@ const ArtistSignUp = () => {
   const [professionError, setProfessionError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorText, setPasswordErrorText] = useState(
+    "Password is required"
+  );
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
   const [mobileNumberError, setMobileNumberError] = useState(false);
@@ -291,6 +312,27 @@ const ArtistSignUp = () => {
     incrementStep(1);
   };
 
+  const validatePassword = (password: string) => {
+    const minLength = /.{8,}/;
+    const uppercase = /[A-Z]/;
+    const lowercase = /[a-z]/;
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!minLength.test(password)) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!uppercase.test(password)) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!lowercase.test(password)) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    if (!specialChar.test(password)) {
+      return "Password must contain at least one special character.";
+    }
+    return null;
+  };
+
   const handleStageSix = () => {
     const errors = [false, false, false, false, false, false];
 
@@ -302,6 +344,15 @@ const ArtistSignUp = () => {
       setPasswordError(true);
       errors[1] = true;
     }
+
+    if (validatePassword(artistDetails.password)) {
+      setPasswordError(true);
+      setPasswordErrorText(validatePassword(artistDetails.password) as string);
+      errors[1] = true;
+    } else {
+      setPasswordErrorText("");
+    }
+
     if (artistDetails.confirmPassword === "") {
       setConfirmPasswordError(true);
       errors[2] = true;
@@ -367,10 +418,19 @@ const ArtistSignUp = () => {
 
     console.log("Artist Details:::", artistDetails);
 
-    handleArtistRegister(artistDetails).then((res) => {
-      if (res) {
-        console.log("Artist Registered Successfully! " + res);
+    handleArtistRegister({
+      ...artistDetails,
+      verificationDocuments: verDoc,
+    }).then((res) => {
+      if (res?.user) {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Documents submitted successfully!");
         incrementStep(1);
+      } else {
+        setSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(res || "Error submitting documents!");
       }
     });
   };
@@ -543,9 +603,9 @@ const ArtistSignUp = () => {
           </Typography>
           <Typography
             variant="h5"
-            sx={{ color: "#A5B4FC", textAlign: "center" }}
+            sx={{ color: "#A5B4FC", textAlign: "center", fontSize: "24px" }}
           >
-            You’re going to join HearWeGo as an Artist!
+            You’re going to join <b>HearWeGo</b> as an Artist!
           </Typography>
           <Button
             size="large"
@@ -959,7 +1019,7 @@ const ArtistSignUp = () => {
               id="performer"
               style={
                 checkProfession("performer") && {
-                  background:"#a5b4fc",
+                  background: "#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("performer")}
@@ -988,7 +1048,7 @@ const ArtistSignUp = () => {
               id="producer"
               style={
                 checkProfession("producer") && {
-                  background:"#a5b4fc",
+                  background: "#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("producer")}
@@ -1017,7 +1077,7 @@ const ArtistSignUp = () => {
               id="songwriter"
               style={
                 checkProfession("songwriter") && {
-                  background:"#a5b4fc",
+                  background: "#a5b4fc",
                 }
               }
               onClick={() => handleProfessionSelect("songwriter")}
@@ -1162,7 +1222,7 @@ const ArtistSignUp = () => {
             onChange={(e) => {
               setArtistDetails({ ...artistDetails, password: e.target.value });
             }}
-            helperText={passwordError ? "Password is required" : ""}
+            helperText={passwordError ? passwordErrorText : ""}
             FormHelperTextProps={{ style: { color: "red" } }}
           />
           <AuthTextField
@@ -1284,22 +1344,12 @@ const ArtistSignUp = () => {
             sx={{ m: 1, minWidth: 80, marginBottom: "30px", width: "40%" }}
           >
             <InputLabel id="demo-simple-select-autowidth-label">
-              <ReactCountryFlag
-                countryCode={selectedCountry}
-                svg
-                style={{
-                  width: "1.5em",
-                  height: "1.5em",
-                  marginRight: "8px",
-                }}
-                title={selectedCountry}
-              />
-              {selectedCountry}
+              Country
             </InputLabel>
             <Select
               labelId="country-label"
               id="country"
-              value={artistDetails.country}
+              defaultValue={artistDetails.country}
               onChange={handleCountryChange}
               // autoWidth
               label="Country"
@@ -2314,6 +2364,15 @@ const ArtistSignUp = () => {
           </Box>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </AuthContainer>
   );
 };
