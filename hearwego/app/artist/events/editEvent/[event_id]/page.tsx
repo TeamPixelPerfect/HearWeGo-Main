@@ -23,6 +23,7 @@ import {
   Switch,
   SwitchProps,
   FilledInput,
+  FormHelperText,
 } from "@mui/material";
 import { GridColDef, GridRowSelectionModel, DataGrid } from "@mui/x-data-grid";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -290,7 +291,8 @@ export default function EventDetails() {
           <Box sx={{ width: "50%" }}>
             <Stack spacing={2}>
               <FormControl variant="filled">
-                <InputLabel htmlFor="component-filled">Event Name</InputLabel>
+                <FormHelperText>Event Name</FormHelperText>
+                {/* <InputLabel htmlFor="component-filled">Event Name</InputLabel> */}
                 <FilledInput
                   id="event_name"
                   value={eventData.event_name}
@@ -305,7 +307,8 @@ export default function EventDetails() {
               </FormControl>
 
               <FormControl variant="filled">
-                <InputLabel htmlFor="component-filled">Event Name</InputLabel>
+              <FormHelperText>Event Type</FormHelperText>
+                {/* <InputLabel htmlFor="component-filled">Event Name</InputLabel> */}
                 <FilledInput
                   id="event_type"
                   value={eventData.event_type}
