@@ -130,7 +130,7 @@ export const SearchPaper = styled(Paper)(({ theme }) => ({
 //created the artist card component where the details of the artist are displayed
 export const ArtistCard: React.FC<ArtistCardProps> = ({
   name,
-  Genre,
+  Genre, 
   img_url,
   id,
 }) => {
